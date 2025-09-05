@@ -66,5 +66,12 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'subdomain.admin' => \App\Http\Middleware\AdminSubdomainMiddleware::class,
+        'subdomain.public' => \App\Http\Middleware\PublicSubdomainMiddleware::class,
+        'api.validate' => \App\Http\Middleware\ApiValidationMiddleware::class,
+        'tenant.mongo' => \App\Http\Middleware\ResolveTenantMongo::class,
+        'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
+        'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+        'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
     ];
 }

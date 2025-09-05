@@ -38,7 +38,6 @@ export default function Login({ status, canResetPassword }: any) {
                                             <img src={logoLight} alt="" height="20" />
                                         </Link>
                                     </div>
-                                    <p className="mt-3 fs-15 fw-medium">Premium Admin & Dashboard Template</p>
                                 </div>
                             </Col>
                         </Row>
@@ -48,8 +47,8 @@ export default function Login({ status, canResetPassword }: any) {
                                 <Card className="mt-4">
                                     <Card.Body className='p-4'>
                                         <div className="text-center mt-2">
-                                            <h5 className="text-primary">Welcome Back !</h5>
-                                            <p className="text-muted">Sign in to continue to Velzon.</p>
+                                            <h5 className="text-primary">Welcome MMO Store !</h5>
+                                            <p className="text-muted">Sign in to continue to MMO Store.</p>
                                         </div>
                                         {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
                                         <div className='p-2 mt-4'>
@@ -123,33 +122,33 @@ export default function Login({ status, canResetPassword }: any) {
                                                     </Button>
                                                 </div>
 
-                                                <div className="mt-4 text-center">
-                                                    <div className="signin-other-title">
-                                                        <h5 className="fs-13 mb-4 title">Sign In with</h5>
-                                                    </div>
-                                                    <div>
-                                                        <Link
-                                                            href="#"
-                                                            className="btn btn-primary btn-icon me-1"
+                                                {/*<div className="mt-4 text-center">*/}
+                                                {/*    <div className="signin-other-title">*/}
+                                                {/*        <h5 className="fs-13 mb-4 title">Sign In with</h5>*/}
+                                                {/*    </div>*/}
+                                                {/*    <div>*/}
+                                                {/*        <Link*/}
+                                                {/*            href="#"*/}
+                                                {/*            className="btn btn-primary btn-icon me-1"*/}
 
-                                                        >
-                                                            <i className="ri-facebook-fill fs-16" />
-                                                        </Link>
-                                                        <Link
-                                                            href="#"
-                                                            className="btn btn-danger btn-icon me-1"
+                                                {/*        >*/}
+                                                {/*            <i className="ri-facebook-fill fs-16" />*/}
+                                                {/*        </Link>*/}
+                                                {/*        <Link*/}
+                                                {/*            href="#"*/}
+                                                {/*            className="btn btn-danger btn-icon me-1"*/}
 
-                                                        >
-                                                            <i className="ri-google-fill fs-16" />
-                                                        </Link>
-                                                        <Button variant="dark" className="btn-icon btn-dark">
-                                                            <i className="ri-github-fill fs-16"></i>
-                                                        </Button>{" "}
-                                                        <Button variant="info" className="btn-icon btn-info">
-                                                            <i className="ri-twitter-fill fs-16"></i>
-                                                        </Button>
-                                                    </div>
-                                                </div>
+                                                {/*        >*/}
+                                                {/*            <i className="ri-google-fill fs-16" />*/}
+                                                {/*        </Link>*/}
+                                                {/*        <Button variant="dark" className="btn-icon btn-dark">*/}
+                                                {/*            <i className="ri-github-fill fs-16"></i>*/}
+                                                {/*        </Button>{" "}*/}
+                                                {/*        <Button variant="info" className="btn-icon btn-info">*/}
+                                                {/*            <i className="ri-twitter-fill fs-16"></i>*/}
+                                                {/*        </Button>*/}
+                                                {/*    </div>*/}
+                                                {/*</div>*/}
                                             </Form>
                                         </div>
                                     </Card.Body>
