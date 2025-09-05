@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Store extends Model
 {
+    protected $connection = 'mysql';
     protected $table = 'stores';
 
     protected $fillable = [
