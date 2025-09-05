@@ -8,7 +8,7 @@
         "php": "^8.2",
         "getsolaris/laravel-make-service": "^1.1",
         "guzzlehttp/guzzle": "^7.2",
-        "inertiajs/inertia-laravel": "^1.0",
+        "inertiajs/inertia-laravel": "2.0.6",
         "kalnoy/nestedset": "^6.0",
         "laravel/breeze": "^2.0",
         "laravel/framework": "^12.0",
@@ -16,7 +16,7 @@
         "laravel/tinker": "^2.8",
         "mongodb/laravel-mongodb": "^5.5",
         "spatie/laravel-permission": "^6.21",
-        "tightenco/ziggy": "^1.0"
+        "tightenco/ziggy": "2.5.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
