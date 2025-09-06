@@ -16,7 +16,6 @@ return new class extends Migration
             $table->bigInteger('user_id');
             $table->tinyInteger('type');
             $table->string('name');
-            $table->smallInteger('shop_number');
             $table->smallInteger('interval');
             $table->smallInteger('interval_type');
             $table->text('feature')->nullable();

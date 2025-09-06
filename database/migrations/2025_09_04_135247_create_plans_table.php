@@ -24,6 +24,7 @@ return new class extends Migration
             $table->tinyInteger('best_choice')->default(0);
             $table->tinyInteger('show_public')->default(1);
             $table->text('sub_description')->nullable();
+            $table->text('feature')->nullable();
             $table->integer('status');
             $table->integer('creator_id');
             $table->softDeletes();

@@ -21,7 +21,6 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->smallInteger('interval');
             $table->smallInteger('interval_type');
-            $table->integer('shop_number');
             $table->text('feature');
             $table->tinyInteger('status');
             $table->bigInteger('creator_id');

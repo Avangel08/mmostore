@@ -15,7 +15,14 @@ class User extends Authenticatable
     use Notifiable;
     use HasRoles;
 
+    const STATUS = [
+        'INACTIVE' => 0,
+        'ACTIVE' => 1,
+        'BLOCK' => 2,
+    ];
+
     protected $connection = 'mysql';
+    protected $table = 'users';
     /**
      * The attributes that are mass assignable.
      *
@@ -25,6 +32,20 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'parent_id',
+        'type',
+        'email_verified_at',
+        'status',
+        'image',
+        'first_name',
+        'last_name',
+        'phone_number',
+        'organization',
+        'address',
+        'state',
+        'country',
+        'language',
+        'currency',
     ];
 
     /**

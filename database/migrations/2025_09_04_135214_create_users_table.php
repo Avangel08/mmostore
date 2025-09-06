@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->decimal('balance', 15, 2)->default(0);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
@@ -30,7 +29,6 @@ return new class extends Migration
             $table->string('country')->nullable();
             $table->string('language')->nullable();
             $table->string('currency')->nullable();
-            $table->dateTime('time_notification_auto_renew_plan')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
