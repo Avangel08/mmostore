@@ -33,4 +33,4 @@ yarn-error.log
 /storage/logs
 yarn.lock
 
-
+/composer.lock

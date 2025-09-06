@@ -29,11 +29,11 @@ use Inertia\Inertia;
 // Route::get("/apps-ecommerce-orders", [ProfileController::class, 'index'])->name('order-list');
 Route::redirect('/', '/dashboard');
 Route::middleware('auth')->group(function () {
-    // Route::get('/profile-edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    // Route::patch('/profile-update', [ProfileController::class, 'update'])->name('profile.update');
-    // Route::delete('/profile-destroy', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile-edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile-update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile-destroy', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // // orders crud
+    // orders crud
     // Route::get("/apps-ecommerce-orders", [OrderController::class, 'index'])->name('order-list');
     // Route::post("order-create", [OrderController::class, 'store'])->name('order-create');
     // Route::post("order-update", [OrderController::class, 'update'])->name('order-update');
