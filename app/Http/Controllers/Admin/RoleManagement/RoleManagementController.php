@@ -3,13 +3,28 @@
 namespace App\Http\Controllers\Admin\RoleManagement;
 
 use App\Http\Controllers\Controller;
+use App\Service\RoleManagement\RoleManagementService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class RoleManagementController extends Controller
 {
+    protected $roleService;
+
+    public function __construct(RoleManagementService $roleService) {
+        $this->roleService = $roleService;
+    }
+
     public function index()
     {
-        return Inertia::render('Admin/RoleManagement/index');
+        $roles = function() {
+            return $this->roleService->getAllRoles(isPaginate: true);
+        };
+
+        return Inertia::render('Admin/RoleManagement/index', [
+            'roles' => [
+                
+            ],
+        ]);
     }
 }

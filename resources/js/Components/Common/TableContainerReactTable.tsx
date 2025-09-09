@@ -119,7 +119,7 @@ const TableContainer = ({
 
   const table = useReactTable({
     columns,
-    data,
+    data: data.data,
     filterFns: {
       fuzzy: fuzzyFilter,
     },
@@ -133,7 +133,9 @@ const TableContainer = ({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel()
+    getSortedRowModel: getSortedRowModel(),
+    manualPagination: true,
+    rowCount: data?.data?.rowCount ?? 0
   });
 
   const {
