@@ -10,10 +10,13 @@ import translationENG from "../locales/en.json";
 import translationCN from "../locales/ch.json";
 import translationFR from "../locales/fr.json";
 import translationAR from "../locales/ar.json";
-
+import translateVi from "../locales/vi.json";
 
 // the translations
 const resources = {
+  vi: {
+    translation: translateVi,
+  },
   gr: {
     translation: translationGr,
   },
