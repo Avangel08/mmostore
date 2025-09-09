@@ -15,6 +15,7 @@ import {
 } from '@tanstack/react-table';
 
 import { rankItem } from '@tanstack/match-sorter-utils';
+import { useTranslation } from "react-i18next";
 
 // Column Filter
 const Filter = ({
@@ -87,6 +88,7 @@ interface TableContainerProps {
   handleCompanyClick?: any;
   handleContactClick?: any;
   handleTicketClick?: any;
+  onSubmit?: any;
 }
 
 const TableContainer = ({
@@ -101,8 +103,9 @@ const TableContainer = ({
   thClass,
   divClass,
   SearchPlaceholder,
-
+  onSubmit = (e: React.FormEvent<HTMLFormElement>) => { e.preventDefault(); }
 }: TableContainerProps) => {
+  const {t} = useTranslation();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
 
@@ -154,7 +157,7 @@ const TableContainer = ({
     <Fragment>
       {isGlobalFilter && <Row className="mb-3">
         <Card.Body className="border border-dashed border-end-0 border-start-0">
-          <form>
+          <form onSubmit={onSubmit}>
             <Row>
               <Col sm={5}>
                 <div className="search-box me-2 mb-2 d-inline-block col-12">
@@ -226,15 +229,15 @@ const TableContainer = ({
         </Table>
       </div>
 
-      <Row className="align-items-center mt-2 g-3 text-center text-sm-start">
+      <Row className="align-items-center mt-2 g-3 text-center text-sm-start"> 
         <div className="col-sm">
-          <div className="text-muted">Showing<span className="fw-semibold ms-1">{getState().pagination.pageSize}</span> of <span className="fw-semibold">{data.length}</span> Results
+          <div className="text-muted">{t("Showing")}<span className="fw-semibold ms-1">{getRowModel().rows.length}</span> {t("on")} <span className="fw-semibold">{data.length}</span> {t("results")}
           </div>
         </div>
         <div className="col-sm-auto">
           <ul className="pagination pagination-separated pagination-md justify-content-center justify-content-sm-start mb-0">
             <li className={!getCanPreviousPage() ? "page-item disabled" : "page-item"}>
-              <Button className="page-link" onClick={previousPage} variant="link">Previous</Button>
+              <Button className="page-link" onClick={previousPage} variant="link">&lt;</Button>
             </li>
             {getPageOptions().map((item: any, key: number) => (
               <React.Fragment key={key}>
@@ -244,7 +247,7 @@ const TableContainer = ({
               </React.Fragment>
             ))}
             <li className={!getCanNextPage() ? "page-item disabled" : "page-item"}>
-              <Button variant="link" className="page-link" onClick={nextPage}>Next</Button>
+              <Button variant="link" className="page-link" onClick={nextPage}>&gt;</Button>
             </li>
           </ul>
         </div>

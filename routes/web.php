@@ -27,8 +27,8 @@ use Inertia\Inertia;
 // });
 
 // Route::get("/apps-ecommerce-orders", [ProfileController::class, 'index'])->name('order-list');
-Route::redirect('/', '/dashboard');
-Route::middleware('auth')->group(function () {
+// Route::redirect('/', '/dashboard');
+Route::middleware('auth:web,admin,store_owner,customer')->group(function () {
     Route::get('/profile-edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile-update', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile-destroy', [ProfileController::class, 'destroy'])->name('profile.destroy');
