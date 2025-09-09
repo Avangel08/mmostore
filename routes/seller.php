@@ -10,6 +10,7 @@ Route::domain('{sub}.mmostore.local')
         Route::prefix('admin')->group(function () {
             Route::get('/', [SellerController::class, 'home'])->name('seller.home');
             Route::get('/login', [SellerController::class, 'login'])->name('seller.login');
+            Route::post('/login', [SellerController::class, 'authenticate'])->name('seller.login.post');
             Route::get('/dashboard', [SellerController::class, 'dashboard'])->name('seller.dashboard');
         });
     });

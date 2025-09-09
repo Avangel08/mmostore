@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\MySQL\Store;
+use App\Models\MySQL\Stores;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -18,7 +18,7 @@ class ResolveTenantMongo
         $subdomain = count($parts) > 2 ? $parts[0] : null;
 
         if ($subdomain) {
-            $store = Store::query()->where('subdomain', $subdomain)->first();
+            $store = Stores::query()->where('domain', $subdomain)->first();
             if ($store && is_array($store->database_config)) {
                 $cfg = $store->database_config;
 
@@ -53,7 +53,6 @@ class ResolveTenantMongo
                 }
 
                 Config::set('database.connections.tenant_mongo', $connection);
-                Config::set('database.default', 'tenant_mongo');
             }
         }
 
