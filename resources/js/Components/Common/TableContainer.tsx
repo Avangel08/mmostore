@@ -29,6 +29,7 @@ import {
   NFTRankingGlobalFilter,
   TaskListGlobalFilter,
 } from "../../Components/Common/GlobalSearchFilter";
+import { useTranslation } from "react-i18next";
 
 // Column Filter
 const Filter = ({
@@ -111,6 +112,7 @@ interface TableContainerProps {
   handleCompanyClick?: any;
   handleContactClick?: any;
   handleTicketClick?: any;
+  onSubmit?: any;
 }
 
 const TableContainer = ({
@@ -135,8 +137,9 @@ const TableContainer = ({
   thClass,
   divClass,
   SearchPlaceholder,
-
+  onSubmit = (e: React.FormEvent<HTMLFormElement>) => { e.preventDefault(); }
 }: TableContainerProps) => {
+  const {t} = useTranslation();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
 
@@ -188,7 +191,7 @@ const TableContainer = ({
     <Fragment>
       {isGlobalFilter && <Row className="mb-3">
         <Card.Body className="border border-dashed border-end-0 border-start-0">
-          <form>
+          <form onSubmit={onSubmit}>
             <Row>
               <Col sm={5}>
                 <div className={(isProductsFilter || isContactsFilter || isCompaniesFilter || isNFTRankingFilter) ? "search-box me-2 mb-2 d-inline-block" : "search-box me-2 mb-2 d-inline-block col-12"}>
@@ -295,13 +298,13 @@ const TableContainer = ({
 
       <Row className="align-items-center mt-2 g-3 text-center text-sm-start">
         <div className="col-sm">
-          <div className="text-muted">Showing<span className="fw-semibold ms-1">{getState().pagination.pageSize}</span> of <span className="fw-semibold">{data.length}</span> Results
+          <div className="text-muted">{t("Showing")}<span className="fw-semibold ms-1">{getRowModel().rows.length}</span> {t("on")} <span className="fw-semibold">{data.length}</span> {t("results")}
           </div>
         </div>
         <div className="col-sm-auto">
           <ul className="pagination pagination-separated pagination-md justify-content-center justify-content-sm-start mb-0">
             <li className={!getCanPreviousPage() ? "page-item disabled" : "page-item"}>
-              <Button variant="link" className="page-link" onClick={previousPage}>Previous</Button>
+              <Button variant="link" className="page-link" onClick={previousPage}>&lt;</Button>
             </li>
             {getPageOptions().map((item: any, key: number) => (
               <React.Fragment key={key}>
@@ -311,7 +314,7 @@ const TableContainer = ({
               </React.Fragment>
             ))}
             <li className={!getCanNextPage() ? "page-item disabled" : "page-item"}>
-              <Button className="page-link" onClick={nextPage} variant="link">Next</Button>
+              <Button className="page-link" onClick={nextPage} variant="link">&gt;</Button>
             </li>
           </ul>
         </div>
