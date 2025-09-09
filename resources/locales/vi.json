@@ -208,5 +208,8 @@
     "Privacy Policy": "Chính sách bảo mật",
     "Terms Condition": "Điều kiện điều kiện",
     "pages": "trang",
-    "React Datatables": "React DataTables"
+    "React Datatables": "React DataTables",
+    "Role Management": "Quản lý Role",
+    "Permission Management": "Quản lý phân quyền",
+    "Homepage": "Trang chủ"
 }
