@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\RoleManagement;
 
 use App\Http\Controllers\Controller;
-use App\Service\RoleManagement\RoleManagementService;
+use App\Services\RoleManagement\RoleManagementService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
