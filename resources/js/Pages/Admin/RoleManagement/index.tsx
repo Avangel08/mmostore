@@ -1,5 +1,5 @@
 import { Head, router, usePage } from "@inertiajs/react";
-import React from "react";
+import React, { useEffect } from "react";
 import Layout from "../../../CustomAdminLayouts";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
@@ -9,7 +9,13 @@ import TableRole from "./TableRole";
 const RoleManagement = () => {
   const { t } = useTranslation();
   const { roles } = usePage().props;
-  console.log(roles);
+
+  const onReloadTable = (currentPage: number = 0, perPage: number = 10) => {
+    router.reload({
+      only: ["roles"],
+      data: { page: currentPage + 1, perPage },
+    });
+  };
 
   return (
     <React.Fragment>
@@ -24,7 +30,7 @@ const RoleManagement = () => {
                   <h5 className="card-title mb-0">{t("Role Management")}</h5>
                 </Card.Header>
                 <Card.Body>
-                  <TableRole data={roles} />
+                  <TableRole data={roles} onReloadTable={onReloadTable} />
                 </Card.Body>
               </Card>
             </Col>
