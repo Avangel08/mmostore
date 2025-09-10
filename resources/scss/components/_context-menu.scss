@@ -11,6 +11,61 @@
   font-family: inherit;
   font-size: 14px;
   user-select: none;
+  // Thin, minimal scrollbar
+  scrollbar-width: thin; // Firefox
+  scrollbar-color: rgba(0, 0, 0, 0.35) transparent; // Firefox: thumb, track
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none; // hide arrow buttons
+    width: 0;
+    height: 0;
+  }
+
+  // Ensure ALL possible WebKit scrollbar button variants are hidden
+  &::-webkit-scrollbar-button:single-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  &::-webkit-scrollbar-button:horizontal:decrement,
+  &::-webkit-scrollbar-button:horizontal:increment,
+  &::-webkit-scrollbar-button:vertical:decrement,
+  &::-webkit-scrollbar-button:vertical:increment,
+  &::-webkit-scrollbar-button:start:decrement,
+  &::-webkit-scrollbar-button:end:increment,
+  &::-webkit-scrollbar-button:double-button:horizontal:decrement,
+  &::-webkit-scrollbar-button:double-button:horizontal:increment,
+  &::-webkit-scrollbar-button:double-button:vertical:decrement,
+  &::-webkit-scrollbar-button:double-button:vertical:increment {
+    display: none;
+    width: 0;
+    height: 0;
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    border: 2px solid transparent; // create thin thumb
+    background-clip: content-box;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
 
   .context-menu-item {
     padding: 8px 16px;
@@ -56,6 +111,17 @@
     background-color: #2d3748;
     border-color: #4a5568;
     color: #e2e8f0;
+
+    // Dark theme scrollbar
+    scrollbar-color: rgba(226, 232, 240, 0.35) transparent; // Firefox
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(226, 232, 240, 0.35);
+    }
+
+    &:hover::-webkit-scrollbar-thumb {
+      background-color: rgba(226, 232, 240, 0.55);
+    }
 
     .context-menu-item {
       color: #e2e8f0;

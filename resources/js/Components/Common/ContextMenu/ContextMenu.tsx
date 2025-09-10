@@ -123,7 +123,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         zIndex: config?.zIndex || 9999,
         minWidth: config?.minWidth || 180,
         maxWidth: config?.maxWidth || 250,
-        maxHeight: config?.maxHeight || 300,
+        maxHeight:
+          Math.max(100, (window.innerHeight - adjustedPosition.y - 10)) ||
+          config?.maxHeight ||
+          300,
         backgroundColor: 'white',
         border: '1px solid #e0e0e0',
         borderRadius: '6px',
@@ -150,7 +153,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 
         return (
           <div
-            key={option.id}
+            key={`${option.id}-${index}`}
             className={`context-menu-item ${option.className || ''} ${
               option.disabled ? 'disabled' : ''
             }`}
