@@ -3,13 +3,12 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import authLoginIllustration from "../../../../images/seller/auth-login-illustration-light.png";
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 
-export default function Login({ status, canResetPassword }: any) {
-
+export default function Login({}: any) {
+    const t = (window as any).t as (key: string, params?: Record<string, any>) => string;
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: 'admin@themesbrand.com',
-        password: '12345678',
-        remember: false,
+    const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm({
+        email: '',
+        password: ''
     });
 
     const getSubdomain = () => {
@@ -30,6 +29,31 @@ export default function Login({ status, canResetPassword }: any) {
 
     const submit = (e: any) => {
         e.preventDefault();
+
+        clearErrors();
+
+        let hasError = false;
+
+        if (!data.email) {
+            setError('email', 'Email is required');
+            hasError = true;
+        } else {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(data.email)) {
+                setError('email', 'Invalid email address');
+                hasError = true;
+            }
+        }
+
+        if (!data.password) {
+            setError('password', 'Password is required');
+            hasError = true;
+        }
+
+        if (hasError) {
+            return;
+        }
+
         post(route('seller.login.post'));
     };
 
@@ -43,27 +67,24 @@ export default function Login({ status, canResetPassword }: any) {
                                 <Card className="border-0 shadow-lg">
                                     <Card.Body className="p-5">
                                         <div className="text-center mb-4">
-                                            <h2 className="fw-bold text-dark mb-2" style={{ fontSize: '25px' }}>Welcome to {getSubdomain()} 👋</h2>
-                                            <div>Please sign-in to your account and start the adventure</div>
+                                            <h2 className="fw-bold text-dark mb-2" style={{ fontSize: '25px' }}>{ t('Welcome to :name 👋', { name: getSubdomain() }) }</h2>
+                                            <div>{ t('Please sign-in to your account and start the adventure') }</div>
                                         </div>
                                         
-                                        {status && <div className="mb-4 font-medium text-sm text-success">{status}</div>}
-                                        
-                                        <Form onSubmit={submit}>
+                                        <Form onSubmit={submit} noValidate>
                                             <div className="mb-4">
-                                                <Form.Label className="form-label fw-semibold text-dark">Email</Form.Label>
+                                                <Form.Label className="form-label fw-semibold text-dark">{ t('Email') }</Form.Label>
                                                 <div className="position-relative">
                                                     <i className="ri-mail-line position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
                                                     <Form.Control
                                                         id="email"
                                                         type="email"
                                                         name="email"
-                                                        placeholder="Enter your email"
-                                                        value={data.email}
+                                                        placeholder={ t('Enter your email') }
                                                         className={'ps-5 ' + (errors.email ? 'is-invalid' : '')}
                                                         autoComplete="username"
                                                         autoFocus
-                                                        required
+                                                        value={data.email}
                                                         onChange={(e: any) => setData('email', e.target.value)}
                                                         style={{ 
                                                             border: '1px solid #e9ecef',
@@ -77,18 +98,17 @@ export default function Login({ status, canResetPassword }: any) {
                                             </div>
 
                                             <div className="mb-4">
-                                                <Form.Label className="form-label fw-semibold text-dark">Password</Form.Label>
+                                                <Form.Label className="form-label fw-semibold text-dark">{ t('Password') }</Form.Label>
                                                 <div className="position-relative">
                                                     <i className="ri-lock-line position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
                                                     <Form.Control
                                                         id="password"
                                                         type={passwordShow ? "text" : "password"}
                                                         name="password"
-                                                        value={data.password}
-                                                        placeholder="Enter your password"
-                                                        required
+                                                        placeholder={ t('Enter your password') }
                                                         className={'ps-5 pe-5 ' + (errors.password ? 'is-invalid' : '')}
                                                         autoComplete="current-password"
+                                                        value={data.password}
                                                         onChange={(e: any) => setData('password', e.target.value)}
                                                         style={{ 
                                                             border: '1px solid #e9ecef',
@@ -97,39 +117,29 @@ export default function Login({ status, canResetPassword }: any) {
                                                             fontSize: '14px'
                                                         }}
                                                     />
-                                                    <button  className="btn btn-link position-absolute end-0 top-50 translate-middle-y text-decoration-none text-muted p-0 me-3" type="button"  onClick={() => setPasswordShow(!passwordShow)} style={{ border: 'none', background: 'none' }}>
+                                                    <button className="btn btn-link position-absolute end-0 top-50 translate-middle-y text-decoration-none text-muted p-0 me-3" type="button"  onClick={() => setPasswordShow(!passwordShow)} style={{ border: 'none', background: 'none' }}>
                                                         <i className={passwordShow ? "ri-eye-off-line" : "ri-eye-line"}></i>
                                                     </button>
                                                 </div>
                                                 <Form.Control.Feedback type="invalid" className="d-block mt-2">{errors.password}</Form.Control.Feedback>
                                                 
                                                 <div className="d-flex justify-content-end mt-2">
-                                                    <Link href="#" className="text-decoration-none fw-semibold" style={{ transition: 'color 0.3s ease', cursor: 'pointer' }} onMouseEnter={(e) => { e.target.style.color = 'blue'; }} onMouseLeave={(e) => { e.target.style.color = '#808283'; }}>
-                                                        Forgot password
+                                                    <Link href="#" className="text-decoration-none fw-semibold" style={{ transition: 'color 0.3s ease', cursor: 'pointer' }} onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = 'blue'; }} onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = '#808283'; }}>
+                                                        { t('Forgot password') }
                                                     </Link>
                                                 </div>
                                             </div>
 
-                                            <Button
-                                                type="submit" 
-                                                className="w-100 py-3 fw-semibold" 
-                                                disabled={processing}
-                                                style={{ 
-                                                    background: '#4f46e5',
-                                                    border: 'none',
-                                                    borderRadius: '8px',
-                                                    fontSize: '16px'
-                                                }}
-                                            >
-                                                Sign In
+                                            <Button type="submit" className="w-100 py-3 fw-semibold" disabled={processing} style={{ background: '#4f46e5', border: 'none', borderRadius: '8px', fontSize: '16px' }}>
+                                                { t('Sign In') }
                                             </Button>
                                         </Form>
 
                                         <div className="text-center mt-4">
                                             <p className="text-muted mb-0">
-                                                Don't have an account? 
+                                                { t("Don't have an account?") } 
                                                 <Link href="#" className="text-primary text-decoration-none fw-semibold ms-1">
-                                                    Sign up
+                                                    { t('Sign Up') }
                                                 </Link>
                                             </p>
                                         </div>
@@ -137,17 +147,13 @@ export default function Login({ status, canResetPassword }: any) {
                                         <div className="text-center my-4">
                                             <div className="d-flex align-items-center">
                                                 <hr className="flex-grow-1" />
-                                                <span className="px-3 text-muted">OR</span>
+                                                <span className="px-3 text-muted">{ t('OR') }</span>
                                                 <hr className="flex-grow-1" />
                                             </div>
                                         </div>
 
                                         <div className="d-flex justify-content-center gap-3">
-                                            <Button 
-                                                variant="outline-danger" 
-                                                className="rounded-circle p-3"
-                                                style={{ width: '60px', height: '60px' }}
-                                            >
+                                            <Button  variant="outline-danger"  className="rounded-circle p-3" style={{ width: '60px', height: '60px' }}>
                                                 <i className="ri-google-fill fs-3"></i>
                                             </Button>
                                         </div>
@@ -158,12 +164,7 @@ export default function Login({ status, canResetPassword }: any) {
 
                         <Col lg={6} className="d-flex align-items-center justify-content-center p-0 position-relative">
                             <div className="position-relative w-100 h-100 d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
-                                <img
-                                    src={authLoginIllustration}
-                                    alt="Login Illustration"
-                                    className="img-fluid"
-                                    style={{ maxHeight: '80%', maxWidth: '90%' }}
-                                />
+                                <img src={authLoginIllustration} alt="Login Illustration" className="img-fluid" style={{ maxHeight: '80%', maxWidth: '90%' }}/>
                             </div>
                         </Col>
                     </Row>

@@ -16,6 +16,19 @@ createInertiaApp({
     resolve: (name) => resolvePageComponent(`./Pages/Buyer/${name}.tsx`, import.meta.glob('./Pages/Buyer/**/*.tsx')),
     setup({ el, App, props }) {
         const root = createRoot(el);
+
+        (window as any).t = (key: string, params?: Record<string, any>) => {
+            const translations = (props as any)?.initialPage?.props?.translations || (props as any)?.props?.translations || {};
+            let str = translations[key] || key;
+            if (params) {
+                Object.keys(params).forEach((k) => {
+                    const re = new RegExp(':' + k, 'g');
+                    str = str.replace(re, params[k]);
+                });
+            }
+            return str;
+        };
+
         root.render(
             <Provider store={store}>
                 <App {...props} />
