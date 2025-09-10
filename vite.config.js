@@ -20,5 +20,10 @@ export default defineConfig({
             "@assets": "resources/",
             "@": "resources/js/",
         }
+    },
+    server: {
+        cors: {
+            origin: '*',
+        }
     }
 });

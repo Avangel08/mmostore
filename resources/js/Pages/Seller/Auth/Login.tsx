@@ -1,17 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import GuestLayout from '../../../Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import logoLight from "../../../../images/logo-light.png";
+import authLoginIllustration from "../../../../images/seller/auth-login-illustration-light.png";
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 
 export default function Login({ status, canResetPassword }: any) {
 
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
     const { data, setData, post, processing, errors, reset } = useForm({
-        email: 'admin@themesbrand.com' || '',
-        password: '12345678' || '',
+        email: 'admin@themesbrand.com',
+        password: '12345678',
         remember: false,
     });
+
+    const getSubdomain = () => {
+        const hostname = window.location.hostname;
+        const parts = hostname.split('.');
+        if (parts.length >= 3) {
+            const subdomain = parts[0];
+            return subdomain.charAt(0).toUpperCase() + subdomain.slice(1);
+        }
+        return 'Merdify';
+    };
 
     useEffect(() => {
         return () => {
@@ -26,114 +35,140 @@ export default function Login({ status, canResetPassword }: any) {
 
     return (
         <React.Fragment>
-            <GuestLayout>
-                <div className="auth-page-content mt-lg-5">
-                    <Container>
-                        <Row>
-                            <Col lg={12}>
-                                <div className="text-center mt-sm-5 mb-4 text-white-50">
-                                    <div>
-                                        <Link href='/' className="d-inline-block auth-logo">
-                                            <img src={logoLight} alt="" height="20" />
-                                        </Link>
-                                    </div>
-                                </div>
-                            </Col>
-                        </Row>
-
-                        <Row className="justify-content-center">
-                            <Col md={8} lg={6} xl={5}>
-                                <Card className="mt-4">
-                                    <Card.Body className='p-4'>
-                                        <div className="text-center mt-2">
-                                            <h5 className="text-primary">Welcome MMO Store !</h5>
-                                            <p className="text-muted">Sign in to continue to MMO Store.</p>
+            <div className="min-vh-100 d-flex align-items-center" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                <Container fluid>
+                    <Row className="h-100">
+                        <Col lg={6} className="d-flex align-items-center justify-content-center">
+                            <div className="w-100" style={{ maxWidth: '600px' }}>
+                                <Card className="border-0 shadow-lg">
+                                    <Card.Body className="p-5">
+                                        <div className="text-center mb-4">
+                                            <h2 className="fw-bold text-dark mb-2" style={{ fontSize: '25px' }}>Welcome to {getSubdomain()} 👋</h2>
+                                            <div>Please sign-in to your account and start the adventure</div>
                                         </div>
-                                        {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
-                                        <div className='p-2 mt-4'>
-                                            <Form onSubmit={submit}>
-                                                <div className='mb-3'>
-                                                    <Form.Label className='form-label' htmlFor="email" value="Email" > Email </Form.Label>
-                                                    <span className="text-danger ms-1">*</span>
+                                        
+                                        {status && <div className="mb-4 font-medium text-sm text-success">{status}</div>}
+                                        
+                                        <Form onSubmit={submit}>
+                                            <div className="mb-4">
+                                                <Form.Label className="form-label fw-semibold text-dark">Email</Form.Label>
+                                                <div className="position-relative">
+                                                    <i className="ri-mail-line position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
                                                     <Form.Control
                                                         id="email"
                                                         type="email"
                                                         name="email"
-                                                        placeholder="Enter email"
+                                                        placeholder="Enter your email"
                                                         value={data.email}
-                                                        className={'mb-1 ' + (errors.email ? 'is-invalid' : ' ')}
+                                                        className={'ps-5 ' + (errors.email ? 'is-invalid' : '')}
                                                         autoComplete="username"
                                                         autoFocus
                                                         required
                                                         onChange={(e: any) => setData('email', e.target.value)}
+                                                        style={{ 
+                                                            border: '1px solid #e9ecef',
+                                                            borderRadius: '8px',
+                                                            padding: '12px 16px 12px 40px',
+                                                            fontSize: '14px'
+                                                        }}
                                                     />
-
-                                                    <Form.Control.Feedback type="invalid" className='d-block mt-2'> {errors.email} </Form.Control.Feedback>
                                                 </div>
+                                                <Form.Control.Feedback type="invalid" className="d-block mt-2">{errors.email}</Form.Control.Feedback>
+                                            </div>
 
-                                                <div className="mb-3">
-                                                    <div className="float-end">
-
-                                                        {canResetPassword && (
-                                                            <Link href="#" className="text-muted">Forgot password?</Link>
-                                                        )}
-                                                    </div>
-
-                                                    <Form.Label className='form-label' htmlFor="password" value="Password" > Password </Form.Label>
-                                                    <span className="text-danger ms-1">*</span>
-                                                    <div className="position-relative auth-pass-inputgroup mb-3">
-
-                                                        <Form.Control
-                                                            id="password"
-                                                            type={passwordShow ? "text" : "password"}
-                                                            name="password"
-                                                            value={data.password}
-                                                            placeholder="Enter Password"
-                                                            required
-                                                            className={'mt-1 ' + (errors.password ? 'is-invalid' : ' ')}
-                                                            autoComplete="current-password"
-                                                            onChange={(e: any) => setData('password', e.target.value)}
-                                                        />
-                                                       
-                                                        <Form.Control.Feedback type="invalid" className='d-block mt-2'> {errors.password} </Form.Control.Feedback>
-                                                        <button className="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted material-shadow-none" type="button" id="password-addon" onClick={() => setPasswordShow(!passwordShow)}><i className="ri-eye-fill align-middle"></i></button>
-                                                    </div>
+                                            <div className="mb-4">
+                                                <Form.Label className="form-label fw-semibold text-dark">Password</Form.Label>
+                                                <div className="position-relative">
+                                                    <i className="ri-lock-line position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+                                                    <Form.Control
+                                                        id="password"
+                                                        type={passwordShow ? "text" : "password"}
+                                                        name="password"
+                                                        value={data.password}
+                                                        placeholder="Enter your password"
+                                                        required
+                                                        className={'ps-5 pe-5 ' + (errors.password ? 'is-invalid' : '')}
+                                                        autoComplete="current-password"
+                                                        onChange={(e: any) => setData('password', e.target.value)}
+                                                        style={{ 
+                                                            border: '1px solid #e9ecef',
+                                                            borderRadius: '8px',
+                                                            padding: '12px 16px 12px 40px',
+                                                            fontSize: '14px'
+                                                        }}
+                                                    />
+                                                    <button  className="btn btn-link position-absolute end-0 top-50 translate-middle-y text-decoration-none text-muted p-0 me-3" type="button"  onClick={() => setPasswordShow(!passwordShow)} style={{ border: 'none', background: 'none' }}>
+                                                        <i className={passwordShow ? "ri-eye-off-line" : "ri-eye-line"}></i>
+                                                    </button>
                                                 </div>
-
-                                                <div className="block mt-4">
-                                                    <label className="flex items-center">
-                                                        <Form.Check.Input
-                                                            className='form-check-input'
-                                                            name="remember"
-                                                            checked={data.remember}
-                                                            onChange={(e: any) => setData('remember', e.target.checked)}
-                                                        />
-                                                        <Form.Check.Label className="form-check-label" htmlFor="auth-remember-check">
-                                                            <span className='ms-2'>Remember me</span>
-                                                        </Form.Check.Label>
-                                                    </label>
+                                                <Form.Control.Feedback type="invalid" className="d-block mt-2">{errors.password}</Form.Control.Feedback>
+                                                
+                                                <div className="d-flex justify-content-end mt-2">
+                                                    <Link href="#" className="text-decoration-none fw-semibold" style={{ transition: 'color 0.3s ease', cursor: 'pointer' }} onMouseEnter={(e) => { e.target.style.color = 'blue'; }} onMouseLeave={(e) => { e.target.style.color = '#808283'; }}>
+                                                        Forgot password
+                                                    </Link>
                                                 </div>
+                                            </div>
 
-                                                <div className="mt-4">
+                                            <Button
+                                                type="submit" 
+                                                className="w-100 py-3 fw-semibold" 
+                                                disabled={processing}
+                                                style={{ 
+                                                    background: '#4f46e5',
+                                                    border: 'none',
+                                                    borderRadius: '8px',
+                                                    fontSize: '16px'
+                                                }}
+                                            >
+                                                Sign In
+                                            </Button>
+                                        </Form>
 
-                                                    <Button type="submit" className="btn btn-success w-100" disabled={processing}>
-                                                        Sign In
-                                                    </Button>
-                                                </div>
+                                        <div className="text-center mt-4">
+                                            <p className="text-muted mb-0">
+                                                Don't have an account? 
+                                                <Link href="#" className="text-primary text-decoration-none fw-semibold ms-1">
+                                                    Sign up
+                                                </Link>
+                                            </p>
+                                        </div>
 
-                                            </Form>
+                                        <div className="text-center my-4">
+                                            <div className="d-flex align-items-center">
+                                                <hr className="flex-grow-1" />
+                                                <span className="px-3 text-muted">OR</span>
+                                                <hr className="flex-grow-1" />
+                                            </div>
+                                        </div>
+
+                                        <div className="d-flex justify-content-center gap-3">
+                                            <Button 
+                                                variant="outline-danger" 
+                                                className="rounded-circle p-3"
+                                                style={{ width: '60px', height: '60px' }}
+                                            >
+                                                <i className="ri-google-fill fs-3"></i>
+                                            </Button>
                                         </div>
                                     </Card.Body>
                                 </Card>
-                                <div className="mt-4 text-center">
-                                    <p className="mb-0">Don't have an account ? <Link href="#" className="fw-semibold text-primary text-decoration-underline"> Contact Admin </Link> </p>
-                                </div>
-                            </Col>
-                        </Row>
-                    </Container>
-                </div>
+                            </div>
+                        </Col>
 
-            </GuestLayout>
+                        <Col lg={6} className="d-flex align-items-center justify-content-center p-0 position-relative">
+                            <div className="position-relative w-100 h-100 d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
+                                <img
+                                    src={authLoginIllustration}
+                                    alt="Login Illustration"
+                                    className="img-fluid"
+                                    style={{ maxHeight: '80%', maxWidth: '90%' }}
+                                />
+                            </div>
+                        </Col>
+                    </Row>
+                </Container>
+            </div>
         </React.Fragment>
     );
 }
