@@ -11,18 +11,17 @@ class RoleManagementController extends Controller
 {
     protected $roleService;
 
-    public function __construct(RoleManagementService $roleService) {
+    public function __construct(RoleManagementService $roleService)
+    {
         $this->roleService = $roleService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $roles = function() {
-            return $this->roleService->getAllRoles(isPaginate: false);
-        };
-
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
         return Inertia::render('RoleManagement/index', [
-            'roles' => $roles,
+            'roles' => fn() => $this->roleService->getAllRoles(isPaginate: true, page: $page, perPage: $perPage),
         ]);
     }
 }

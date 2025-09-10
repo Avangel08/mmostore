@@ -1,7 +1,8 @@
-import React from 'react';
-import { useContextMenu, ContextMenuOption } from './ContextMenu';
-import { ContextMenuConfig } from './ContextMenu/types';
-import TableContainer from './TableContainerReactTable';
+import React from "react";
+import { useContextMenu, ContextMenuOption } from "./ContextMenu";
+import { ContextMenuConfig } from "./ContextMenu/types";
+import TableContainer from "./TableContainerReactTable";
+import PaginateTableContainer from "./PaginateTableContainerReactTable";
 
 interface TableWithContextMenuProps {
   columns?: any;
@@ -21,38 +22,50 @@ interface TableWithContextMenuProps {
   handleContactClick?: any;
   handleTicketClick?: any;
   onSubmit?: any;
-  contextMenuOptions?: ContextMenuOption[] | ((rowData: any) => ContextMenuOption[]);
+  contextMenuOptions?:
+    | ContextMenuOption[]
+    | ((rowData: any) => ContextMenuOption[]);
   enableContextMenu?: boolean;
   contextMenuConfig?: ContextMenuConfig;
+  isPaginateTable?: boolean;
+  onReloadTable?: (page: number, perPage: number) => void;
+  defaultCurrentPage?: number;
+  defaultPageSize?: number;
+  divStyle?: React.CSSProperties;
 }
 
 const TableWithContextMenu: React.FC<TableWithContextMenuProps> = (props) => {
   const contextMenu = useContextMenu();
-  
+
   const handleRowContextMenu = (event: React.MouseEvent, rowData: any) => {
     if (props.enableContextMenu && props.contextMenuOptions && contextMenu) {
       event.preventDefault();
       event.stopPropagation();
-      
+
       // Get context menu options - either array or function
-      const options = typeof props.contextMenuOptions === 'function' 
-        ? props.contextMenuOptions(rowData)
-        : props.contextMenuOptions;
-      
+      const options =
+        typeof props.contextMenuOptions === "function"
+          ? props.contextMenuOptions(rowData)
+          : props.contextMenuOptions;
+
       if (options && options.length > 0) {
-        contextMenu.showContextMenu(options, rowData, {
-          x: event.clientX,
-          y: event.clientY,
-        }, props.contextMenuConfig);
+        contextMenu.showContextMenu(
+          options,
+          rowData,
+          {
+            x: event.clientX,
+            y: event.clientY,
+          },
+          props.contextMenuConfig
+        );
       }
     }
   };
 
-  return (
-    <TableContainer
-      {...props}
-      onRowContextMenu={handleRowContextMenu}
-    />
+  return props?.isPaginateTable ? (
+    <PaginateTableContainer {...props} onRowContextMenu={handleRowContextMenu} />
+  ) : (
+    <TableContainer {...props} onRowContextMenu={handleRowContextMenu} />
   );
 };
 
