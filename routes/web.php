@@ -231,4 +231,4 @@ Route::middleware('auth:web,admin,store_owner,customer')->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
+//require __DIR__.'/auth.php';

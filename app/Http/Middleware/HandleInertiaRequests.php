@@ -19,21 +19,24 @@ class HandleInertiaRequests extends Middleware
         $host = $request->getHost();
         $path = '/'.ltrim($request->path(), '/');
 
-        // Home root domain always uses home app (even if path contains /admin)
+        if ($host === 'mmostore.local' && str_starts_with($path, '/admin')) {
+            return 'app_admin';
+        }
+
         if ($host === 'mmostore.local') {
             return 'app_home';
         }
 
-        // Determine if this is a subdomain like {sub}.mmostore.local
         $isSubdomain = count(explode('.', $host)) > 2;
-
-        // Admin area (seller): only for subdomains with /admin prefix
         if ($isSubdomain && str_starts_with($path, '/admin')) {
             return 'app_seller';
         }
 
-        // Buyer: public subdomains by default
-        return 'app_buyer';
+        if ($isSubdomain) {
+            return 'app_buyer';
+        }
+
+        return 'app_home';
     }
 
     /**

@@ -10,3 +10,4 @@ Route::middleware(['auth:'.config('guard.admin')])
         Route::get('/roles', [RoleManagementController::class, 'index'])->name('admin.roles');
         Route::get('/permissions', [RoleManagementController::class, 'index'])->name('admin.permissions');
     });
+require __DIR__.'/auth.php';
