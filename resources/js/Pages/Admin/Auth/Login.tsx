@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import GuestLayout from '../../../Layouts/GuestLayout';
+import GuestLayout from '../../../CustomAdminLayouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import logoLight from "../../../../images/logo-light.png";
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
@@ -21,7 +21,7 @@ export default function Login({ status, canResetPassword }: any) {
 
     const submit = (e: any) => {
         e.preventDefault();
-        post(route('seller.login.post'));
+        post(route('admin.login'));
     };
 
     return (
@@ -76,7 +76,7 @@ export default function Login({ status, canResetPassword }: any) {
                                                     <div className="float-end">
 
                                                         {canResetPassword && (
-                                                            <Link href="#" className="text-muted">Forgot password?</Link>
+                                                            <Link href={route('admin.password.request')} className="text-muted">Forgot password?</Link>
                                                         )}
                                                     </div>
 
@@ -122,12 +122,39 @@ export default function Login({ status, canResetPassword }: any) {
                                                     </Button>
                                                 </div>
 
+                                                {/*<div className="mt-4 text-center">*/}
+                                                {/*    <div className="signin-other-title">*/}
+                                                {/*        <h5 className="fs-13 mb-4 title">Sign In with</h5>*/}
+                                                {/*    </div>*/}
+                                                {/*    <div>*/}
+                                                {/*        <Link*/}
+                                                {/*            href="#"*/}
+                                                {/*            className="btn btn-primary btn-icon me-1"*/}
+
+                                                {/*        >*/}
+                                                {/*            <i className="ri-facebook-fill fs-16" />*/}
+                                                {/*        </Link>*/}
+                                                {/*        <Link*/}
+                                                {/*            href="#"*/}
+                                                {/*            className="btn btn-danger btn-icon me-1"*/}
+
+                                                {/*        >*/}
+                                                {/*            <i className="ri-google-fill fs-16" />*/}
+                                                {/*        </Link>*/}
+                                                {/*        <Button variant="dark" className="btn-icon btn-dark">*/}
+                                                {/*            <i className="ri-github-fill fs-16"></i>*/}
+                                                {/*        </Button>{" "}*/}
+                                                {/*        <Button variant="info" className="btn-icon btn-info">*/}
+                                                {/*            <i className="ri-twitter-fill fs-16"></i>*/}
+                                                {/*        </Button>*/}
+                                                {/*    </div>*/}
+                                                {/*</div>*/}
                                             </Form>
                                         </div>
                                     </Card.Body>
                                 </Card>
                                 <div className="mt-4 text-center">
-                                    <p className="mb-0">Don't have an account ? <Link href="#" className="fw-semibold text-primary text-decoration-underline"> Contact Admin </Link> </p>
+                                    {/* <p className="mb-0">Don't have an account ? <Link href={route('admin.register')} className="fw-semibold text-primary text-decoration-underline"> Signup </Link> </p> */}
                                 </div>
                             </Col>
                         </Row>
@@ -138,5 +165,4 @@ export default function Login({ status, canResetPassword }: any) {
         </React.Fragment>
     );
 }
-
 

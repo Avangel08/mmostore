@@ -18,13 +18,11 @@ class RoleManagementController extends Controller
     public function index()
     {
         $roles = function() {
-            return $this->roleService->getAllRoles(isPaginate: true);
+            return $this->roleService->getAllRoles(isPaginate: false);
         };
 
         return Inertia::render('Admin/RoleManagement/index', [
-            'roles' => [
-                
-            ],
+            'roles' => $roles,
         ]);
     }
 }

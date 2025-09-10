@@ -32,7 +32,7 @@ const ProfileDropdown = () => {
                 <Dropdown.Menu className="dropdown-menu-end">
                     <h6 className="dropdown-header">Welcome {user.name}!</h6>
 
-                    <Dropdown.Item href={route('profile.edit')} className="dropdown-item">
+                    <Dropdown.Item href={""} className="dropdown-item">
                         <i className="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i>
                         <span className="align-middle">Edit Profile</span>
                     </Dropdown.Item>
@@ -70,7 +70,7 @@ const ProfileDropdown = () => {
                     <Dropdown.Item href="/auth-lockscreen-basic" className="dropdown-item">
                         <i className="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span className="align-middle">Lock screen</span>
                     </Dropdown.Item>
-                    <Link className="dropdown-item" as="button" method="post" href={route('logout')}><i
+                    <Link className="dropdown-item" as="button" method="post" href={""}><i
                             className="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
                                 className="align-middle" data-key="t-logout">Logout</span></Link>
                 </Dropdown.Menu>

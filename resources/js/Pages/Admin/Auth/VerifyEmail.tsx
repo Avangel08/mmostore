@@ -1,7 +1,7 @@
-import GuestLayout from '../../../Layouts/GuestLayout';
+import GuestLayout from '../../../CustomAdminLayouts/GuestLayout';
 import { Head, Link} from '@inertiajs/react';
 import { Card, Col, Container, Row, Button } from 'react-bootstrap';
-import logoLight from '../../../../images/logo-light.png'
+import logoLight from '../../../images/logo-light.png'
 
 export default function VerifyEmail() {
     const getInputElement = (index: number): HTMLInputElement => {

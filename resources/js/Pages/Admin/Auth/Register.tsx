@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import GuestLayout from '../../../Layouts/GuestLayout';
+import GuestLayout from '../../../CustomAdminLayouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import logoLight from '../../../../images/logo-light.png';
+import logoLight from '../../../images/logo-light.png';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
