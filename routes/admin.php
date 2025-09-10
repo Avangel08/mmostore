@@ -66,6 +66,5 @@ Route::middleware('auth.admin')->group(function () {
         ->name('admin.logout');
 
     Route::get('/', [RoleManagementController::class, 'index'])->name('admin.index');
-    Route::get('/roles', [RoleManagementController::class, 'index'])->name('admin.roles');
     Route::get('/permissions', [RoleManagementController::class, 'index'])->name('admin.permissions');
 });
