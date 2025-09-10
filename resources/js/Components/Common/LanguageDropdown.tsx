@@ -3,6 +3,8 @@ import { Dropdown } from 'react-bootstrap';
 import { get } from "lodash";
 
 //i18n
+// Prefer backend-driven locale via middleware + JSON translations.
+// Keep i18n instance as optional for components that still call changeLanguage.
 import i18n from "../../i18n";
 import languages from "../../common/languages";
 
@@ -17,10 +19,13 @@ const LanguageDropdown = () => {
     }, []);
 
     const changeLanguageAction = (lang : any) => {
-        //set language as i18n
-        i18n.changeLanguage(lang);
+        try { i18n.changeLanguage && i18n.changeLanguage(lang); } catch (e) {}
         localStorage.setItem("I18N_LANGUAGE", lang);
         setSelectedLang(lang);
+        // Also notify backend via query param to set cookie and App::setLocale
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', lang);
+        window.location.href = url.toString();
     };
 
 

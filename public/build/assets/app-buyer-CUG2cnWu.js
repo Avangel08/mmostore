@@ -1,1 +1,0 @@
-import{c as t,r as a,W as c,a as n,b as l,j as r,P as u}from"./index-BFOjcQ0e.js";const i="Laravel",p=t({reducer:a,devTools:!0});c({title:e=>`${e} - Buyer - ${i}`,resolve:e=>n(`./Pages/Buyer/${e}.tsx`,Object.assign({})),setup({el:e,App:o,props:s}){l.createRoot(e).render(r.jsx(u,{store:p,children:r.jsx(o,{...s})}))},progress:{color:"#4B5563"}});
