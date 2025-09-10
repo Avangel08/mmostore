@@ -22,6 +22,8 @@ export default function Login({}: any) {
         return 'Merdify';
     };
 
+    const titleWeb = t("Sign In") + " - " +  getSubdomain();
+
     useEffect(() => {
         return () => {
             reset('password');
@@ -60,12 +62,14 @@ export default function Login({}: any) {
 
     return (
         <React.Fragment>
+            <Head title={ titleWeb } />
+
             <div className="min-vh-100 d-flex align-items-center" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
                 <Container fluid>
                     <Row className="h-100">
                         <Col lg={6} className="d-flex align-items-center justify-content-center">
                             <div className="w-100" style={{ maxWidth: '600px' }}>
-                                <Card className="border-0 shadow-lg">
+                                <Card className="border-0 shadow-lg" style={{ borderRadius: "25px" }}>
                                     <Card.Body className="p-5">
                                         <div className="text-center mb-4">
                                             <h2 className="fw-bold text-dark mb-2" style={{ fontSize: '25px' }}>{ t('Welcome to {{name}} 👋', { name: getSubdomain() }) }</h2>
@@ -112,13 +116,7 @@ export default function Login({}: any) {
                                                         autoComplete="current-password"
                                                         value={data.password}
                                                         onChange={(e: any) => setData('password', e.target.value)}
-                                                        style={{ 
-                                                            border: '1px solid #e9ecef',
-                                                            borderRadius: '8px',
-                                                            padding: '12px 16px 12px 40px',
-                                                            fontSize: '14px',
-                                                            backgroundImage: 'none'
-                                                        }}
+                                                        style={{ border: '1px solid #e9ecef', borderRadius: '8px', padding: '12px 16px 12px 40px', fontSize: '14px', backgroundImage: 'none' }}
                                                     />
                                                     <button className="btn btn-link position-absolute end-0 top-50 translate-middle-y text-decoration-none text-muted p-0 me-3" type="button"  onClick={() => setPasswordShow(!passwordShow)} style={{ border: 'none', background: 'none' }}>
                                                         <i className={passwordShow ? "ri-eye-off-line" : "ri-eye-line"}></i>
