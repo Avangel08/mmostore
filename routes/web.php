@@ -33,13 +33,12 @@ Route::middleware('auth:web,admin,store_owner,customer')->group(function () {
     Route::patch('/profile-update', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile-destroy', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // orders crud
-    // Route::get("/apps-ecommerce-orders", [OrderController::class, 'index'])->name('order-list');
-    // Route::post("order-create", [OrderController::class, 'store'])->name('order-create');
-    // Route::post("order-update", [OrderController::class, 'update'])->name('order-update');
-    // Route::post("order-delete", [OrderController::class, 'destroy'])->name('order-delete');
-
+    
     Route::controller(VelzonRoutesController::class)->group(function () {
+        Route::get("/apps-ecommerce-orders", 'order_index')->name('order-list');
+        Route::post("order-create", 'order_store')->name('order-create');
+        Route::post("order-update", 'order_update')->name('order-update');
+        Route::post("order-delete", 'order_destroy')->name('order-delete');
 
         // dashboard routes
         // Route::inertia('/', 'Dashboard')->name('index');
