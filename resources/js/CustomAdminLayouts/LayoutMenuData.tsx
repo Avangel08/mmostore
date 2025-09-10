@@ -46,7 +46,7 @@ const Navdata = () => {
             id: "rolemanagement",
             label: "Role Management",
             icon: "ri-user-star-fill",
-            link: route("admin.roles"),
+            link: route("admin.index"),
             stateVariables: isRoleManagement,
             click: function (e : any) {
                 e.preventDefault();

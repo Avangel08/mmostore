@@ -1,5 +1,5 @@
 <?php
-namespace App\Service\RoleManagement;
+namespace App\Services\RoleManagement;
 
 use Spatie\Permission\Models\Role;
 
