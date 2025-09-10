@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import GuestLayout from '../../../CustomAdminLayouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import logoLight from '../../../images/logo-light.png';
-import avatar1 from '../../../images/users/avatar-1.jpg'
+import logoLight from '../../../../images/logo-light.png';
+import avatar1 from '../../../../images/users/avatar-1.jpg'
 export default function ConfirmPassword() {
     const { data, setData, post, processing, errors, reset } = useForm({
         password: '',

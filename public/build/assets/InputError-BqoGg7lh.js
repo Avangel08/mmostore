@@ -1,0 +1,1 @@
+import{j as n,R as e}from"./app-fd4t7no8.js";function s({message:r,className:t="",...a}){return r?n.jsx(e.Fragment,{children:n.jsx("p",{...a,className:"invalid-feedback "+t,children:r})}):null}export{s as I};
