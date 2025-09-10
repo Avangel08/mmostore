@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import authLoginIllustration from "../../../../images/seller/auth-login-illustration-light.png";
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
+import { useTranslation } from "react-i18next";
 
 export default function Login({}: any) {
+    const { t } = useTranslation();
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
     const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm({
         email: '',
@@ -34,7 +36,7 @@ export default function Login({}: any) {
         let hasError = false;
 
         if (!data.email) {
-            setError('email', 'Email is required');
+            setError('email', t("Email is required"));
             hasError = true;
         } else {
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

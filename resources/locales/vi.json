@@ -219,5 +219,16 @@
     "Role name": "Tên vai trò",
     "Permissions": "Quyền",
     "Actions": "Hành động",
-    "Edit": "Chỉnh sửa"
+    "Edit": "Chỉnh sửa",
+    "Welcome to :name 👋": "Chào mừng đến với :name 👋",
+    "Please sign-in to your account and start the adventure": "Vui lòng đăng nhập vào tài khoản của bạn để bắt đầu hành trình",
+    "Enter your email": "Nhập email của bạn",
+    "Password": "Mật khẩu",
+    "Enter your password": "Nhập mật khẩu của bạn",
+    "Forgot password": "Quên mật khẩu",
+    "Don't have an account?": "Chưa có tài khoản?",
+    "OR": "HOẶC",
+    "Password is required": "Mật khẩu là bắt buộc",
+    "Email is required": "Email là bắt buộc",
+    "Invalid email": "Email không đúng định dạng"
 }
