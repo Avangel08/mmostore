@@ -9,5 +9,8 @@
     "Sign In": "Sign In",
     "Sign Up": "Sign Up",
     "Don't have an account?": "Don't have an account?",
-    "OR": "OR"
+    "OR": "OR",
+    "Password is required": "Password is required",
+    "Email is required": "Email is required",
+    "Invalid email": "Invalid email"
 }

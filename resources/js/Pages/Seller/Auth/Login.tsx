@@ -35,18 +35,18 @@ export default function Login({}: any) {
         let hasError = false;
 
         if (!data.email) {
-            setError('email', 'Email is required');
+            setError('email', t('Email is required'));
             hasError = true;
         } else {
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailPattern.test(data.email)) {
-                setError('email', 'Invalid email address');
+                setError('email', t('Invalid email'));
                 hasError = true;
             }
         }
 
         if (!data.password) {
-            setError('password', 'Password is required');
+            setError('password', t('Password is required'));
             hasError = true;
         }
 
@@ -90,7 +90,8 @@ export default function Login({}: any) {
                                                             border: '1px solid #e9ecef',
                                                             borderRadius: '8px',
                                                             padding: '12px 16px 12px 40px',
-                                                            fontSize: '14px'
+                                                            fontSize: '14px',
+                                                            backgroundImage: 'none'
                                                         }}
                                                     />
                                                 </div>
@@ -114,7 +115,8 @@ export default function Login({}: any) {
                                                             border: '1px solid #e9ecef',
                                                             borderRadius: '8px',
                                                             padding: '12px 16px 12px 40px',
-                                                            fontSize: '14px'
+                                                            fontSize: '14px',
+                                                            backgroundImage: 'none'
                                                         }}
                                                     />
                                                     <button className="btn btn-link position-absolute end-0 top-50 translate-middle-y text-decoration-none text-muted p-0 me-3" type="button"  onClick={() => setPasswordShow(!passwordShow)} style={{ border: 'none', background: 'none' }}>

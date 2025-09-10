@@ -9,5 +9,8 @@
     "Sign In": "Đăng nhập",
     "Sign Up": "Đăng ký",
     "Don't have an account?": "Chưa có tài khoản?",
-    "OR": "HOẶC"
+    "OR": "HOẶC",
+    "Password is required": "Mật khẩu là bắt buộc",
+    "Email is required": "Email là bắt buộc",
+    "Invalid email": "Email không đúng định dạng"
 }
