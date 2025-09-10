@@ -41,13 +41,13 @@ export default function Login({}: any) {
         } else {
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailPattern.test(data.email)) {
-                setError('email', 'Invalid email');
+                setError('email', t('Invalid email'));
                 hasError = true;
             }
         }
 
         if (!data.password) {
-            setError('password', 'Password is required');
+            setError('password', t('Password is required'));
             hasError = true;
         }
 
@@ -68,20 +68,20 @@ export default function Login({}: any) {
                                 <Card className="border-0 shadow-lg">
                                     <Card.Body className="p-5">
                                         <div className="text-center mb-4">
-                                            <h2 className="fw-bold text-dark mb-2" style={{ fontSize: '25px' }}>Welcome to :name 👋</h2>
-                                            <div>Please sign-in to your account and start the adventure</div>
+                                            <h2 className="fw-bold text-dark mb-2" style={{ fontSize: '25px' }}>{ t('Welcome to {{name}} 👋', { name: getSubdomain() }) }</h2>
+                                            <div>{ t("Please sign-in to your account and start the adventure") }</div>
                                         </div>
                                         
                                         <Form onSubmit={submit} noValidate>
                                             <div className="mb-4">
-                                                <Form.Label className="form-label fw-semibold text-dark">Email</Form.Label>
+                                                <Form.Label className="form-label fw-semibold text-dark">{ t("Email") }</Form.Label>
                                                 <div className="position-relative">
                                                     <i className="ri-mail-line position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
                                                     <Form.Control
                                                         id="email"
                                                         type="email"
                                                         name="email"
-                                                        placeholder="Enter your email"
+                                                        placeholder={ t("Enter your email") }
                                                         className={'ps-5 ' + (errors.email ? 'is-invalid' : '')}
                                                         autoComplete="username"
                                                         autoFocus
@@ -100,14 +100,14 @@ export default function Login({}: any) {
                                             </div>
 
                                             <div className="mb-4">
-                                                <Form.Label className="form-label fw-semibold text-dark">Password</Form.Label>
+                                                <Form.Label className="form-label fw-semibold text-dark">{ t("Password") }</Form.Label>
                                                 <div className="position-relative">
                                                     <i className="ri-lock-line position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
                                                     <Form.Control
                                                         id="password"
                                                         type={passwordShow ? "text" : "password"}
                                                         name="password"
-                                                        placeholder="Enter your password"
+                                                        placeholder={ t("Enter your password") }
                                                         className={'ps-5 pe-5 ' + (errors.password ? 'is-invalid' : '')}
                                                         autoComplete="current-password"
                                                         value={data.password}
@@ -128,21 +128,21 @@ export default function Login({}: any) {
                                                 
                                                 <div className="d-flex justify-content-end mt-2">
                                                     <Link href="#" className="text-decoration-none fw-semibold" style={{ transition: 'color 0.3s ease', cursor: 'pointer' }} onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = 'blue'; }} onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = '#808283'; }}>
-                                                        Forgot password
+                                                        { t("Forgot password") }
                                                     </Link>
                                                 </div>
                                             </div>
 
                                             <Button type="submit" className="w-100 py-3 fw-semibold" disabled={processing} style={{ background: '#4f46e5', border: 'none', borderRadius: '8px', fontSize: '16px' }}>
-                                                Sign In
+                                                { t("Sign In") }
                                             </Button>
                                         </Form>
 
                                         <div className="text-center mt-4">
                                             <p className="text-muted mb-0">
-                                                Don't have an account?
+                                                { t("Don't have an account?") }
                                                 <Link href="#" className="text-primary text-decoration-none fw-semibold ms-1">
-                                                    Sign Up
+                                                    { t("Sign Up") }
                                                 </Link>
                                             </p>
                                         </div>
@@ -150,7 +150,7 @@ export default function Login({}: any) {
                                         <div className="text-center my-4">
                                             <div className="d-flex align-items-center">
                                                 <hr className="flex-grow-1" />
-                                                <span className="px-3 text-muted">OR</span>
+                                                <span className="px-3 text-muted">{ t("OR") }</span>
                                                 <hr className="flex-grow-1" />
                                             </div>
                                         </div>

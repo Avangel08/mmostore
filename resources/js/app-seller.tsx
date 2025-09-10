@@ -1,4 +1,3 @@
-//import Scss
 import '../scss/themes.scss'
 
 import { createRoot } from 'react-dom/client';

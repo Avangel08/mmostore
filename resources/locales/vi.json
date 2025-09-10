@@ -220,7 +220,7 @@
     "Permissions": "Quyền",
     "Actions": "Hành động",
     "Edit": "Chỉnh sửa",
-    "Welcome to :name 👋": "Chào mừng đến với :name 👋",
+    "Welcome to {{name}} 👋": "Chào mừng đến với {{name}} 👋",
     "Please sign-in to your account and start the adventure": "Vui lòng đăng nhập vào tài khoản của bạn để bắt đầu hành trình",
     "Enter your email": "Nhập email của bạn",
     "Password": "Mật khẩu",

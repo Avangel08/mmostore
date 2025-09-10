@@ -209,7 +209,7 @@
     "Terms Condition": "Terms Condition",
     "pages": "pages",
     "React Datatables": "React Datatables",
-    "Welcome to :name 👋": "Welcome to :name 👋",
+    "Welcome to {{name}} 👋": "Welcome to {{name}} 👋",
     "Please sign-in to your account and start the adventure": "Please sign-in to your account and start the adventure",
     "Enter your email": "Enter your email",
     "Password": "Password",
