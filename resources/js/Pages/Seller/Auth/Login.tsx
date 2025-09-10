@@ -27,7 +27,6 @@ export default function Login({ status, canResetPassword }: any) {
     return (
         <React.Fragment>
             <GuestLayout>
-                <Head title="Basic SignIn | Velzon - React Admin & Dashboard Template" />
                 <div className="auth-page-content mt-lg-5">
                     <Container>
                         <Row>

@@ -22,7 +22,7 @@ class SellerController extends Controller
 
     public function login(): Response
     {
-        return Inertia::render('Seller/Auth/Login', [
+        return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
         ]);
