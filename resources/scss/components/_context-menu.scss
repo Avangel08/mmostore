@@ -1,0 +1,171 @@
+// Context Menu Styles
+.context-menu {
+  position: fixed;
+  z-index: 9999;
+  min-width: 180px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 4px 0;
+  font-family: inherit;
+  font-size: 14px;
+  user-select: none;
+
+  .context-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+      color: #999;
+      opacity: 0.6;
+
+      &:hover {
+        background-color: transparent;
+      }
+    }
+
+    &.text-danger {
+      color: #dc3545 !important;
+
+      &:hover {
+        background-color: #f8d7da;
+      }
+    }
+
+    i {
+      font-size: 16px;
+      width: 16px;
+      text-align: center;
+    }
+  }
+
+  // Dark theme support
+  .dark & {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+
+    .context-menu-item {
+      color: #e2e8f0;
+
+      &:hover {
+        background-color: #4a5568;
+      }
+
+      &.disabled {
+        color: #718096;
+      }
+
+      &.text-danger {
+        color: #fc8181 !important;
+
+        &:hover {
+          background-color: #742a2a;
+        }
+      }
+    }
+  }
+}
+
+// Theme variants
+.context-menu {
+  &-light {
+    background-color: white;
+    border-color: #e0e0e0;
+    color: #333;
+
+    .context-menu-item {
+      color: #333;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+  }
+
+  &-dark {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+
+    .context-menu-item {
+      color: #e2e8f0;
+
+      &:hover {
+        background-color: #4a5568;
+      }
+
+      &.disabled {
+        color: #718096;
+      }
+    }
+  }
+
+  &-auto {
+    // Auto theme - will be handled by CSS variables or parent theme
+  }
+
+  // Animation variants
+  &-fade {
+    animation: contextMenuFadeIn 0.2s ease-out;
+  }
+
+  &-slide {
+    animation: contextMenuSlideIn 0.2s ease-out;
+  }
+
+  &-scale {
+    animation: contextMenuScaleIn 0.2s ease-out;
+  }
+}
+
+// Animations
+@keyframes contextMenuFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes contextMenuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes contextMenuScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Table row context menu cursor
+.table tbody tr {
+  &[style*="context-menu"] {
+    cursor: context-menu !important;
+  }
+}

@@ -21,7 +21,7 @@ class RoleManagementController extends Controller
             return $this->roleService->getAllRoles(isPaginate: false);
         };
 
-        return Inertia::render('Admin/RoleManagement/index', [
+        return Inertia::render('RoleManagement/index', [
             'roles' => $roles,
         ]);
     }

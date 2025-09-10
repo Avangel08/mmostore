@@ -10,7 +10,7 @@ class PermissionManagementController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/PermissionManagement/index');
+        return Inertia::render('PermissionManagement/index');
     }
 
 }

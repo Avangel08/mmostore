@@ -1,0 +1,1 @@
+import{c as t,W as a,r as c,a as n,b as l,j as o,P as i}from"./index-BFOjcQ0e.js";const p="Laravel",d=t({reducer:c,devTools:!0});a({title:e=>`${e} - ${p}`,resolve:e=>n(`./Pages/Home/${e}.tsx`,Object.assign({})),setup({el:e,App:r,props:s}){l.createRoot(e).render(o.jsx(i,{store:d,children:o.jsx(r,{...s})}))},progress:{color:"#4B5563"}});

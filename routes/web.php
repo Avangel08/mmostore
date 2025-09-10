@@ -228,6 +228,7 @@ Route::middleware('auth:web,admin,store_owner,customer')->group(function () {
         Route::get("/auth-offline", "auth_offline");      
         Route::get("/pages-maintenance", "pages_maintenance");
         Route::get("/pages-coming-soon", "pages_coming_soon");
+        
     });
 });
 

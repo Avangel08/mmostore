@@ -16,6 +16,7 @@ import {
 
 import { rankItem } from '@tanstack/match-sorter-utils';
 import { useTranslation } from "react-i18next";
+import { ContextMenuOption } from './ContextMenu';
 
 // Column Filter
 const Filter = ({
@@ -89,6 +90,7 @@ interface TableContainerProps {
   handleContactClick?: any;
   handleTicketClick?: any;
   onSubmit?: any;
+  onRowContextMenu?: (event: React.MouseEvent, rowData: any) => void;
 }
 
 const TableContainer = ({
@@ -103,7 +105,8 @@ const TableContainer = ({
   thClass,
   divClass,
   SearchPlaceholder,
-  onSubmit = (e: React.FormEvent<HTMLFormElement>) => { e.preventDefault(); }
+  onSubmit = (e: React.FormEvent<HTMLFormElement>) => { e.preventDefault(); },
+  onRowContextMenu
 }: TableContainerProps) => {
   const {t} = useTranslation();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -152,6 +155,12 @@ const TableContainer = ({
   useEffect(() => {
     Number(customPageSize) && setPageSize(Number(customPageSize));
   }, [customPageSize, setPageSize]);
+
+  const handleRowContextMenu = (event: React.MouseEvent, rowData: any) => {
+    if (onRowContextMenu) {
+      onRowContextMenu(event, rowData);
+    }
+  };
 
   return (
     <Fragment>
@@ -211,7 +220,11 @@ const TableContainer = ({
           <tbody>
             {getRowModel().rows.map((row: any) => {
               return (
-                <tr key={row.id}>
+                <tr 
+                  key={row.id}
+                  onContextMenu={(e) => handleRowContextMenu(e, row.original)}
+                  style={{ cursor: onRowContextMenu ? 'context-menu' : 'default' }}
+                >
                   {row.getVisibleCells().map((cell: any) => {
                     return (
                       <td key={cell.id}>
