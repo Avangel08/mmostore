@@ -5,3 +5,68 @@ Website: https://themesbrand.com/
 Contact: support@themesbrand.com
 File: Custom Css File
 */
+
+.page-home-title-xl {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.page-home-title-lg {
+    font-size: 2.25rem;
+    font-weight: 700;
+}
+
+.page-home-title-md {
+    font-size: 1.625rem;
+    font-weight: $font-weight-semibold;
+}
+
+.page-home-title-sm {
+    font-size: 1.625rem;
+    font-weight: 700;
+}
+
+.text-gray-title {
+    color: #3A4D5B;
+}
+
+.btn-bg-primary {
+    background-color: #417AFF;
+}
+
+.theme-bg-primary {
+    border: 1px solid #4A88E1;
+    background-color: #DBE6F7;
+}
+
+.theme-bg-secondary {
+    border: 1px solid #019597;
+    background-color: #01959726;
+}
+
+.theme-bg-success {
+    border: 1px solid #1F7101;
+    background-color: #44FF0026;
+}
+
+.showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    .card {
+        box-shadow: 0 1px 2px rgba(56, 65, 74, .15);
+    }
+
+    .showcase-box {
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        overflow: hidden;
+    }
+
+    .card-animate:hover {
+        -webkit-transform: translateY(calc(-1.5rem / 5));
+        transform: translateY(calc(-1.5rem / 5));
+        -webkit-box-shadow: 0 5px 10px rgba(30, 32, 37, .12);
+        box-shadow: 0 5px 10px rgba(30, 32, 37, .12);
+    }
+}
