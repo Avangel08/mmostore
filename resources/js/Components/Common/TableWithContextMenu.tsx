@@ -32,6 +32,7 @@ interface TableWithContextMenuProps {
   defaultCurrentPage?: number;
   defaultPageSize?: number;
   divStyle?: React.CSSProperties;
+  tableStyle?: React.CSSProperties;
 }
 
 const TableWithContextMenu: React.FC<TableWithContextMenuProps> = (props) => {

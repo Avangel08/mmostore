@@ -140,7 +140,7 @@ const Navdata = () => {
             id: "dashboard",
             label: "Dashboards",
             icon: "ri-dashboard-2-line",
-            link: "/#",
+            link: "/demo/#",
             stateVariables: isDashboard,
             click: function (e : any) {
                 e.preventDefault();
@@ -152,49 +152,49 @@ const Navdata = () => {
                 {
                     id: "analytics",
                     label: "Analytics",
-                    link: "/dashboard-analytics",
+                    link: "/demo/dashboard-analytics",
                     parentId: "dashboard",
                 },
                 {
                     id: "crm",
                     label: "CRM",
-                    link: "/dashboard-crm",
+                    link: "/demo/dashboard-crm",
                     parentId: "dashboard",
                 },
                 {
                     id: "ecommerce",
                     label: "Ecommerce",
-                    link: "/dashboard",
+                    link: "/demo/dashboard",
                     parentId: "dashboard",
                 },
                 {
                     id: "crypto",
                     label: "Crypto",
-                    link: "/dashboard-crypto",
+                    link: "/demo/dashboard-crypto",
                     parentId: "dashboard",
                 },
                 {
                     id: "projects",
                     label: "Projects",
-                    link: "/dashboard-projects",
+                    link: "/demo/dashboard-projects",
                     parentId: "dashboard",
                 },
                 {
                     id: "nft",
                     label: "NFT",
-                    link: "/dashboard-nft",
+                    link: "/demo/dashboard-nft",
                     parentId: "dashboard",
                 },
                 {
                     id: "job",
                     label: "Job",
-                    link: "/dashboard-job",
+                    link: "/demo/dashboard-job",
                     parentId: "dashboard",
                 },
                 {
                     id: "blog",
                     label: "Blog",
-                    link: "/dashboard-blog",
+                    link: "/demo/dashboard-blog",
                     parentId: "dashboard",
                     badgeColor: "success",
                     badgeName: "New",
@@ -205,7 +205,7 @@ const Navdata = () => {
             id: "apps",
             label: "Apps",
             icon: "ri-apps-2-line",
-            link: "/#",
+            link: "/demo/#",
             click: function (e : any) {
                 e.preventDefault();
                 setIsApps(!isApps);
@@ -217,7 +217,7 @@ const Navdata = () => {
                 {
                     id: "calendar",
                     label: "Calendar",
-                    link: "/#",
+                    link: "/demo/#",
                     parentId: "apps",
                     isChildItem: true,
                     click: function (e : any) {
@@ -229,13 +229,13 @@ const Navdata = () => {
                         {
                             id: 1,
                             label: "Main Calendar",
-                            link: "/apps-calendar",
+                            link: "/demo/apps-calendar",
                             parentId: "apps"
                         },
                         {
                             id: 2,
                             label: "Month Grid",
-                            link: "/apps-calendar-month-grid",
+                            link: "/demo/apps-calendar-month-grid",
                             parentId: "apps",
                         },
                     ]
@@ -243,13 +243,13 @@ const Navdata = () => {
                 {
                     id: "chat",
                     label: "Chat",
-                    link: "/apps-chat",
+                    link: "/demo/apps-chat",
                     parentId: "apps",
                 },
                 {
                     id: "mailbox",
                     label: "Email",
-                    link: "/#",
+                    link: "/demo/#",
                     parentId: "apps",
                     isChildItem: true,
                     click: function (e : any) {
@@ -261,13 +261,13 @@ const Navdata = () => {
                         {
                             id: 1,
                             label: "Mailbox",
-                            link: "/apps-mailbox",
+                            link: "/demo/apps-mailbox",
                             parentId: "apps"
                         },
                         {
                             id: 2,
                             label: "Email Templates",
-                            link: "/#",
+                            link: "/demo/#",
                             parentId: "apps",
                             isChildItem: true,
                             stateVariables: isSubEmail,
@@ -276,8 +276,8 @@ const Navdata = () => {
                                 setSubEmail(!isSubEmail);
                             },
                             childItems: [
-                                { id: 2, label: "Basic Action", link: "/apps-email-basic", parentId: "apps" },
-                                { id: 3, label: "Ecommerce Action", link: "/apps-email-ecommerce", parentId: "apps" },
+                                { id: 2, label: "Basic Action", link: "/demo/apps-email-basic", parentId: "apps" },
+                                { id: 3, label: "Ecommerce Action", link: "/demo/apps-email-ecommerce", parentId: "apps" },
                             ],
                         },
                     ]
@@ -285,7 +285,7 @@ const Navdata = () => {
                 {
                     id: "appsecommerce",
                     label: "Ecommerce",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -294,22 +294,22 @@ const Navdata = () => {
                     parentId: "apps",
                     stateVariables: isEcommerce,
                     childItems: [
-                        { id: 1, label: "Products", link: "/apps-ecommerce-products", parentId: "apps" },
-                        { id: 2, label: "Product Details", link: "/apps-ecommerce-product-details", parentId: "apps" },
-                        { id: 3, label: "Create Product", link: "/apps-ecommerce-add-product", parentId: "apps" },
-                        { id: 4, label: "Orders", link: "/apps-ecommerce-orders", parentId: "apps" },
-                        { id: 5, label: "Order Details", link: "/apps-ecommerce-order-details", parentId: "apps" },
-                        { id: 6, label: "Customers", link: "/apps-ecommerce-customers", parentId: "apps" },
-                        { id: 7, label: "Shopping Cart", link: "/apps-ecommerce-cart", parentId: "apps" },
-                        { id: 8, label: "Checkout", link: "/apps-ecommerce-checkout", parentId: "apps" },
-                        { id: 9, label: "Sellers", link: "/apps-ecommerce-sellers", parentId: "apps" },
-                        { id: 10, label: "Seller Details", link: "/apps-ecommerce-seller-details", parentId: "apps" },
+                        { id: 1, label: "Products", link: "/demo/apps-ecommerce-products", parentId: "apps" },
+                        { id: 2, label: "Product Details", link: "/demo/apps-ecommerce-product-details", parentId: "apps" },
+                        { id: 3, label: "Create Product", link: "/demo/apps-ecommerce-add-product", parentId: "apps" },
+                        { id: 4, label: "Orders", link: "/demo/apps-ecommerce-orders", parentId: "apps" },
+                        { id: 5, label: "Order Details", link: "/demo/apps-ecommerce-order-details", parentId: "apps" },
+                        { id: 6, label: "Customers", link: "/demo/apps-ecommerce-customers", parentId: "apps" },
+                        { id: 7, label: "Shopping Cart", link: "/demo/apps-ecommerce-cart", parentId: "apps" },
+                        { id: 8, label: "Checkout", link: "/demo/apps-ecommerce-checkout", parentId: "apps" },
+                        { id: 9, label: "Sellers", link: "/demo/apps-ecommerce-sellers", parentId: "apps" },
+                        { id: 10, label: "Seller Details", link: "/demo/apps-ecommerce-seller-details", parentId: "apps" },
                     ]
                 },
                 {
                     id: "appsprojects",
                     label: "Projects",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -318,15 +318,15 @@ const Navdata = () => {
                     parentId: "apps",
                     stateVariables: isProjects,
                     childItems: [
-                        { id: 1, label: "List", link: "/apps-projects-list", parentId: "apps", },
-                        { id: 2, label: "Overview", link: "/apps-projects-overview", parentId: "apps", },
-                        { id: 3, label: "Create Project", link: "/apps-projects-create", parentId: "apps", },
+                        { id: 1, label: "List", link: "/demo/apps-projects-list", parentId: "apps", },
+                        { id: 2, label: "Overview", link: "/demo/apps-projects-overview", parentId: "apps", },
+                        { id: 3, label: "Create Project", link: "/demo/apps-projects-create", parentId: "apps", },
                     ]
                 },
                 {
                     id: "tasks",
                     label: "Tasks",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -335,15 +335,15 @@ const Navdata = () => {
                     parentId: "apps",
                     stateVariables: isTasks,
                     childItems: [
-                        { id: 1, label: "List View", link: "/apps-tasks-list-view", parentId: "apps", },
-                        { id: 2, label: "Task Details", link: "/apps-tasks-details", parentId: "apps", },
-                        { id: 3, label: "Kanban Board", link: "/apps-tasks-kanban", parentId: "apps", },
+                        { id: 1, label: "List View", link: "/demo/apps-tasks-list-view", parentId: "apps", },
+                        { id: 2, label: "Task Details", link: "/demo/apps-tasks-details", parentId: "apps", },
+                        { id: 3, label: "Kanban Board", link: "/demo/apps-tasks-kanban", parentId: "apps", },
                     ]
                 },
                 {
                     id: "appscrm",
                     label: "CRM",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -352,16 +352,16 @@ const Navdata = () => {
                     parentId: "apps",
                     stateVariables: isCRM,
                     childItems: [
-                        { id: 1, label: "Contacts", link: "/apps-crm-contacts" },
-                        { id: 2, label: "Companies", link: "/apps-crm-companies" },
-                        { id: 3, label: "Deals", link: "/apps-crm-deals" },
-                        { id: 4, label: "Leads", link: "/apps-crm-leads" },
+                        { id: 1, label: "Contacts", link: "/demo/apps-crm-contacts" },
+                        { id: 2, label: "Companies", link: "/demo/apps-crm-companies" },
+                        { id: 3, label: "Deals", link: "/demo/apps-crm-deals" },
+                        { id: 4, label: "Leads", link: "/demo/apps-crm-leads" },
                     ]
                 },
                 {
                     id: "appscrypto",
                     label: "Crypto",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -370,18 +370,18 @@ const Navdata = () => {
                     parentId: "apps",
                     stateVariables: isCrypto,
                     childItems: [
-                        { id: 1, label: "Transactions", link: "/apps-crypto-transactions" },
-                        { id: 2, label: "Buy & Sell", link: "/apps-crypto-buy-sell" },
-                        { id: 3, label: "Orders", link: "/apps-crypto-orders" },
-                        { id: 4, label: "My Wallet", link: "/apps-crypto-wallet" },
-                        { id: 5, label: "ICO List", link: "/apps-crypto-ico" },
-                        { id: 6, label: "KYC Application", link: "/apps-crypto-kyc" },
+                        { id: 1, label: "Transactions", link: "/demo/apps-crypto-transactions" },
+                        { id: 2, label: "Buy & Sell", link: "/demo/apps-crypto-buy-sell" },
+                        { id: 3, label: "Orders", link: "/demo/apps-crypto-orders" },
+                        { id: 4, label: "My Wallet", link: "/demo/apps-crypto-wallet" },
+                        { id: 5, label: "ICO List", link: "/demo/apps-crypto-ico" },
+                        { id: 6, label: "KYC Application", link: "/demo/apps-crypto-kyc" },
                     ]
                 },
                 {
                     id: "invoices",
                     label: "Invoices",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -390,15 +390,15 @@ const Navdata = () => {
                     parentId: "apps",
                     stateVariables: isInvoices,
                     childItems: [
-                        { id: 1, label: "List View", link: "/apps-invoices-list" },
-                        { id: 2, label: "Details", link: "/apps-invoices-details" },
-                        { id: 3, label: "Create Invoice", link: "/apps-invoices-create" },
+                        { id: 1, label: "List View", link: "/demo/apps-invoices-list" },
+                        { id: 2, label: "Details", link: "/demo/apps-invoices-details" },
+                        { id: 3, label: "Create Invoice", link: "/demo/apps-invoices-create" },
                     ]
                 },
                 {
                     id: "supportTickets",
                     label: "Support Tickets",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -407,14 +407,14 @@ const Navdata = () => {
                     parentId: "apps",
                     stateVariables: isSupportTickets,
                     childItems: [
-                        { id: 1, label: "List View", link: "/apps-tickets-list" },
-                        { id: 2, label: "Ticket Details", link: "/apps-tickets-details" },
+                        { id: 1, label: "List View", link: "/demo/apps-tickets-list" },
+                        { id: 2, label: "Ticket Details", link: "/demo/apps-tickets-details" },
                     ]
                 },
                 {
                     id: "NFTMarketplace",
                     label: "NFT Marketplace",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -423,33 +423,33 @@ const Navdata = () => {
                     parentId: "apps",
                     stateVariables: isNFTMarketplace,
                     childItems: [
-                        { id: 1, label: "Marketplace", link: "/apps-nft-marketplace" },
-                        { id: 2, label: "Explore Now", link: "/apps-nft-explore" },
-                        { id: 3, label: "Live Auction", link: "/apps-nft-auction" },
-                        { id: 4, label: "Item Details", link: "/apps-nft-item-details" },
-                        { id: 5, label: "Collections", link: "/apps-nft-collections" },
-                        { id: 6, label: "Creators", link: "/apps-nft-creators" },
-                        { id: 7, label: "Ranking", link: "/apps-nft-ranking" },
-                        { id: 8, label: "Wallet Connect", link: "/apps-nft-wallet" },
-                        { id: 9, label: "Create NFT", link: "/apps-nft-create" },
+                        { id: 1, label: "Marketplace", link: "/demo/apps-nft-marketplace" },
+                        { id: 2, label: "Explore Now", link: "/demo/apps-nft-explore" },
+                        { id: 3, label: "Live Auction", link: "/demo/apps-nft-auction" },
+                        { id: 4, label: "Item Details", link: "/demo/apps-nft-item-details" },
+                        { id: 5, label: "Collections", link: "/demo/apps-nft-collections" },
+                        { id: 6, label: "Creators", link: "/demo/apps-nft-creators" },
+                        { id: 7, label: "Ranking", link: "/demo/apps-nft-ranking" },
+                        { id: 8, label: "Wallet Connect", link: "/demo/apps-nft-wallet" },
+                        { id: 9, label: "Create NFT", link: "/demo/apps-nft-create" },
                     ]
                 },
                 {
                     id: "filemanager",
                     label: "File Manager",
-                    link: "/apps-file-manager",
+                    link: "/demo/apps-file-manager",
                     parentId: "apps",
                 },
                 {
                     id: "todo",
                     label: "To Do",
-                    link: "/apps-todo",
+                    link: "/demo/apps-todo",
                     parentId: "apps",
                 },
                 {
                     id: "job",
                     label: "Jobs",
-                    link: "/#",
+                    link: "/demo/#",
                     parentId: "apps",
                     // badgeName: "New",
                     // badgeColor: "success",
@@ -463,13 +463,13 @@ const Navdata = () => {
                         {
                             id: 1,
                             label: "Statistics",
-                            link: "/apps-job-statistics",
+                            link: "/demo/apps-job-statistics",
                             parentId: "apps",
                         },
                         {
                             id: 2,
                             label: "Job Lists",
-                            link: "/#",
+                            link: "/demo/#",
                             parentId: "apps",
                             isChildItem: true,
                             stateVariables: isJobList,
@@ -481,19 +481,19 @@ const Navdata = () => {
                                 {
                                     id: 1,
                                     label: "List",
-                                    link: "/apps-job-lists",
+                                    link: "/demo/apps-job-lists",
                                     parentId: "apps",
                                 },
                                 {
                                     id: 2,
                                     label: "Grid",
-                                    link: "/apps-job-grid-lists",
+                                    link: "/demo/apps-job-grid-lists",
                                     parentId: "apps",
                                 },
                                 {
                                     id: 3,
                                     label: "Overview",
-                                    link: "/apps-job-details",
+                                    link: "/demo/apps-job-details",
                                     parentId: "apps",
                                 },
                             ],
@@ -501,7 +501,7 @@ const Navdata = () => {
                         {
                             id: 3,
                             label: "Candidate Lists",
-                            link: "/#",
+                            link: "/demo/#",
                             parentId: "apps",
                             isChildItem: true,
                             stateVariables: isCandidateList,
@@ -513,13 +513,13 @@ const Navdata = () => {
                                 {
                                     id: 1,
                                     label: "List View",
-                                    link: "/apps-job-candidate-lists",
+                                    link: "/demo/apps-job-candidate-lists",
                                     parentId: "apps",
                                 },
                                 {
                                     id: 2,
                                     label: "Grid View",
-                                    link: "/apps-job-candidate-grid",
+                                    link: "/demo/apps-job-candidate-grid",
                                     parentId: "apps",
                                 },
                             ],
@@ -527,25 +527,25 @@ const Navdata = () => {
                         {
                             id: 4,
                             label: "Application",
-                            link: "/apps-job-application",
+                            link: "/demo/apps-job-application",
                             parentId: "apps",
                         },
                         {
                             id: 5,
                             label: "New Job",
-                            link: "/apps-job-new",
+                            link: "/demo/apps-job-new",
                             parentId: "apps",
                         },
                         {
                             id: 6,
                             label: "Companies List",
-                            link: "/apps-job-companies-lists",
+                            link: "/demo/apps-job-companies-lists",
                             parentId: "apps",
                         },
                         {
                             id: 7,
                             label: "Job Categories",
-                            link: "/apps-job-categories",
+                            link: "/demo/apps-job-categories",
                             parentId: "apps",
                         },
                     ],
@@ -553,7 +553,7 @@ const Navdata = () => {
                 {
                     id: "apikey",
                     label: "API Key",
-                    link: "/apps-api-key",
+                    link: "/demo/apps-api-key",
                     parentId: "apps",
                     // badgeName: "New",
                     // badgeColor: "success"
@@ -568,7 +568,7 @@ const Navdata = () => {
             id: "authentication",
             label: "Authentication",
             icon: "ri-account-circle-line",
-            link: "/#",
+            link: "/demo/#",
             click: function (e : any) {
                 e.preventDefault();
                 setIsAuth(!isAuth);
@@ -580,7 +580,7 @@ const Navdata = () => {
                 {
                     id: "signIn",
                     label: "Sign In",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -589,14 +589,14 @@ const Navdata = () => {
                     parentId: "authentication",
                     stateVariables: isSignIn,
                     childItems: [
-                        { id: 1, label: "Basic", link: "/auth-signin-basic" },
-                        { id: 2, label: "Cover", link: "/auth-signin-cover" },
+                        { id: 1, label: "Basic", link: "/demo/auth-signin-basic" },
+                        { id: 2, label: "Cover", link: "/demo/auth-signin-cover" },
                     ]
                 },
                 {
                     id: "signUp",
                     label: "Sign Up",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -605,14 +605,14 @@ const Navdata = () => {
                     parentId: "authentication",
                     stateVariables: isSignUp,
                     childItems: [
-                        { id: 1, label: "Basic", link: "/auth-signup-basic" },
-                        { id: 2, label: "Cover", link: "/auth-signup-cover" },
+                        { id: 1, label: "Basic", link: "/demo/auth-signup-basic" },
+                        { id: 2, label: "Cover", link: "/demo/auth-signup-cover" },
                     ]
                 },
                 {
                     id: "passwordReset",
                     label: "Password Reset",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -621,14 +621,14 @@ const Navdata = () => {
                     parentId: "authentication",
                     stateVariables: isPasswordReset,
                     childItems: [
-                        { id: 1, label: "Basic", link: "/auth-pass-reset-basic" },
-                        { id: 2, label: "Cover", link: "/auth-pass-reset-cover" },
+                        { id: 1, label: "Basic", link: "/demo/auth-pass-reset-basic" },
+                        { id: 2, label: "Cover", link: "/demo/auth-pass-reset-cover" },
                     ]
                 },
                 {
                     id: "passwordCreate",
                     label: "Password Create",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -637,14 +637,14 @@ const Navdata = () => {
                     parentId: "authentication",
                     stateVariables: isPasswordCreate,
                     childItems: [
-                        { id: 1, label: "Basic", link: "/auth-pass-change-basic" },
-                        { id: 2, label: "Cover", link: "/auth-pass-change-cover" },
+                        { id: 1, label: "Basic", link: "/demo/auth-pass-change-basic" },
+                        { id: 2, label: "Cover", link: "/demo/auth-pass-change-cover" },
                     ]
                 },
                 {
                     id: "lockScreen",
                     label: "Lock Screen",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -653,14 +653,14 @@ const Navdata = () => {
                     parentId: "authentication",
                     stateVariables: isLockScreen,
                     childItems: [
-                        { id: 1, label: "Basic", link: "/auth-lockscreen-basic" },
-                        { id: 2, label: "Cover", link: "/auth-lockscreen-cover" },
+                        { id: 1, label: "Basic", link: "/demo/auth-lockscreen-basic" },
+                        { id: 2, label: "Cover", link: "/demo/auth-lockscreen-cover" },
                     ]
                 },
                 {
                     id: "logout",
                     label: "Logout",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -669,14 +669,14 @@ const Navdata = () => {
                     parentId: "authentication",
                     stateVariables: isLogout,
                     childItems: [
-                        { id: 1, label: "Basic", link: "/auth-logout-basic" },
-                        { id: 2, label: "Cover", link: "/auth-logout-cover" },
+                        { id: 1, label: "Basic", link: "/demo/auth-logout-basic" },
+                        { id: 2, label: "Cover", link: "/demo/auth-logout-cover" },
                     ]
                 },
                 {
                     id: "successMessage",
                     label: "Success Message",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -685,14 +685,14 @@ const Navdata = () => {
                     parentId: "authentication",
                     stateVariables: isSuccessMessage,
                     childItems: [
-                        { id: 1, label: "Basic", link: "/auth-success-msg-basic" },
-                        { id: 2, label: "Cover", link: "/auth-success-msg-cover" },
+                        { id: 1, label: "Basic", link: "/demo/auth-success-msg-basic" },
+                        { id: 2, label: "Cover", link: "/demo/auth-success-msg-cover" },
                     ]
                 },
                 {
                     id: "twoStepVerification",
                     label: "Two Step Verification",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -701,14 +701,14 @@ const Navdata = () => {
                     parentId: "authentication",
                     stateVariables: isVerification,
                     childItems: [
-                        { id: 1, label: "Basic", link: "/auth-twostep-basic" },
-                        { id: 2, label: "Cover", link: "/auth-twostep-cover" },
+                        { id: 1, label: "Basic", link: "/demo/auth-twostep-basic" },
+                        { id: 2, label: "Cover", link: "/demo/auth-twostep-cover" },
                     ]
                 },
                 {
                     id: "errors",
                     label: "Errors",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -717,11 +717,11 @@ const Navdata = () => {
                     parentId: "authentication",
                     stateVariables: isError,
                     childItems: [
-                        { id: 1, label: "404 Basic", link: "/auth-404-basic" },
-                        { id: 2, label: "404 Cover", link: "/auth-404-cover" },
-                        { id: 3, label: "404 Alt", link: "/auth-404-alt" },
-                        { id: 4, label: "500", link: "/auth-500" },
-                        { id: 5, label: "Offline Page", link: "/auth-offline" },
+                        { id: 1, label: "404 Basic", link: "/demo/auth-404-basic" },
+                        { id: 2, label: "404 Cover", link: "/demo/auth-404-cover" },
+                        { id: 3, label: "404 Alt", link: "/demo/auth-404-alt" },
+                        { id: 4, label: "500", link: "/demo/auth-500" },
+                        { id: 5, label: "Offline Page", link: "/demo/auth-offline" },
                     ]
                 },
             ],
@@ -730,7 +730,7 @@ const Navdata = () => {
             id: "pages",
             label: "Pages",
             icon: "ri-pages-line",
-            link: "/#",
+            link: "/demo/#",
             click: function (e : any) {
                 e.preventDefault();
                 setIsPages(!isPages);
@@ -742,13 +742,13 @@ const Navdata = () => {
                 {
                     id: "starter",
                     label: "Starter",
-                    link: "/pages-starter",
+                    link: "/demo/pages-starter",
                     parentId: "pages",
                 },
                 {
                     id: "profile",
                     label: "Profile",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -757,25 +757,25 @@ const Navdata = () => {
                     parentId: "pages",
                     stateVariables: isProfile,
                     childItems: [
-                        { id: 1, label: "Simple Page", link: "/pages-profile", parentId: "pages" },
-                        { id: 2, label: "Settings", link: "/pages-profile-settings", parentId: "pages" },
+                        { id: 1, label: "Simple Page", link: "/demo/pages-profile", parentId: "pages" },
+                        { id: 2, label: "Settings", link: "/demo/pages-profile-settings", parentId: "pages" },
                     ]
                 },
-                { id: "team", label: "Team", link: "/pages-team", parentId: "pages" },
-                { id: "timeline", label: "Timeline", link: "/pages-timeline", parentId: "pages" },
-                { id: "faqs", label: "FAQs", link: "/pages-faqs", parentId: "pages" },
-                { id: "pricing", label: "Pricing", link: "/pages-pricing", parentId: "pages" },
-                { id: "gallery", label: "Gallery", link: "/pages-gallery", parentId: "pages" },
-                { id: "maintenance", label: "Maintenance", link: "/pages-maintenance", parentId: "pages" },
-                { id: "comingSoon", label: "Coming Soon", link: "/pages-coming-soon", parentId: "pages" },
-                { id: "sitemap", label: "Sitemap", link: "/pages-sitemap", parentId: "pages" },
-                { id: "searchResults", label: "Search Results", link: "/pages-search-results", parentId: "pages" },
-                { id: "PrivecyPolicy", label: "Privacy Policy", link: "/pages-privacy-policy", parentId: "pages" },
-                { id: "TermsCondition", label: "Terms Condition", link: "/pages-terms-condition", parentId: "pages" },
+                { id: "team", label: "Team", link: "/demo/pages-team", parentId: "pages" },
+                { id: "timeline", label: "Timeline", link: "/demo/pages-timeline", parentId: "pages" },
+                { id: "faqs", label: "FAQs", link: "/demo/pages-faqs", parentId: "pages" },
+                { id: "pricing", label: "Pricing", link: "/demo/pages-pricing", parentId: "pages" },
+                { id: "gallery", label: "Gallery", link: "/demo/pages-gallery", parentId: "pages" },
+                { id: "maintenance", label: "Maintenance", link: "/demo/pages-maintenance", parentId: "pages" },
+                { id: "comingSoon", label: "Coming Soon", link: "/demo/pages-coming-soon", parentId: "pages" },
+                { id: "sitemap", label: "Sitemap", link: "/demo/pages-sitemap", parentId: "pages" },
+                { id: "searchResults", label: "Search Results", link: "/demo/pages-search-results", parentId: "pages" },
+                { id: "PrivecyPolicy", label: "Privacy Policy", link: "/demo/pages-privacy-policy", parentId: "pages" },
+                { id: "TermsCondition", label: "Terms Condition", link: "/demo/pages-terms-condition", parentId: "pages" },
                 {
                     id: "blogs",
                     label: "Blogs",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     badgeColor: "success", badgeName: "New",
                     click: function (e: any) {
@@ -785,9 +785,9 @@ const Navdata = () => {
                     parentId: "pages",
                     stateVariables: isBlog,
                     childItems: [
-                        { id: 1, label: "List View", link: "/pages-blog-list", parentId: "pages" },
-                        { id: 2, label: "Grid View", link: "/pages-blog-grid", parentId: "pages" },
-                        { id: 3, label: "Overview", link: "/pages-blog-overview", parentId: "pages" },
+                        { id: 1, label: "List View", link: "/demo/pages-blog-list", parentId: "pages" },
+                        { id: 2, label: "Grid View", link: "/demo/pages-blog-grid", parentId: "pages" },
+                        { id: 3, label: "Overview", link: "/demo/pages-blog-overview", parentId: "pages" },
                     ]
                 }
             ],
@@ -796,7 +796,7 @@ const Navdata = () => {
             id: "landing",
             label: "Landing",
             icon: "ri-rocket-line",
-            link: "/#",
+            link: "/demo/#",
             stateVariables: isLanding,
             click: function (e : any) {
                 e.preventDefault();
@@ -805,9 +805,9 @@ const Navdata = () => {
                 updateIconSidebar(e);
             },
             subItems: [
-                { id: "onePage", label: "One Page", link: "/landing", parentId: "landing" },
-                { id: "nftLanding", label: "NFT Landing", link: "/nft-landing", parentId: "landing" },
-                { id: "jobLanding", label: "Job", link: "/job-landing", parentId: "landing", 
+                { id: "onePage", label: "One Page", link: "/demo/landing", parentId: "landing" },
+                { id: "nftLanding", label: "NFT Landing", link: "/demo/nft-landing", parentId: "landing" },
+                { id: "jobLanding", label: "Job", link: "/demo/job-landing", parentId: "landing", 
                 // badgeColor: "success", badgeName: "New"
              },
             ],
@@ -820,7 +820,7 @@ const Navdata = () => {
             id: "baseUi",
             label: "Base UI",
             icon: "ri-pencil-ruler-2-line",
-            link: "/#",
+            link: "/demo/#",
             click: function (e : any) {
                 e.preventDefault();
                 setIsBaseUi(!isBaseUi);
@@ -829,37 +829,37 @@ const Navdata = () => {
             },
             stateVariables: isBaseUi,
             subItems: [
-                { id: "alerts", label: "Alerts", link: "/ui-alerts", parentId: "baseUi" },
-                { id: "badges", label: "Badges", link: "/ui-badges", parentId: "baseUi" },
-                { id: "buttons", label: "Buttons", link: "/ui-buttons", parentId: "baseUi" },
-                { id: "colors", label: "Colors", link: "/ui-colors", parentId: "baseUi" },
-                { id: "cards", label: "Cards", link: "/ui-cards", parentId: "baseUi" },
-                { id: "carousel", label: "Carousel", link: "/ui-carousel", parentId: "baseUi" },
-                { id: "dropdowns", label: "Dropdowns", link: "/ui-dropdowns", parentId: "baseUi" },
-                { id: "grid", label: "Grid", link: "/ui-grid", parentId: "baseUi" },
-                { id: "images", label: "Images", link: "/ui-images", parentId: "baseUi" },
-                { id: "tabs", label: "Tabs", link: "/ui-tabs", parentId: "baseUi" },
-                { id: "accordions", label: "Accordion & Collapse", link: "/ui-accordions", parentId: "baseUi" },
-                { id: "modals", label: "Modals", link: "/ui-modals", parentId: "baseUi" },
-                { id: "offcanvas", label: "Offcanvas", link: "/ui-offcanvas", parentId: "baseUi" },
-                { id: "placeholders", label: "Placeholders", link: "/ui-placeholders", parentId: "baseUi" },
-                { id: "progress", label: "Progress", link: "/ui-progress", parentId: "baseUi" },
-                { id: "notifications", label: "Notifications", link: "/ui-notifications", parentId: "baseUi" },
-                { id: "media", label: "Media object", link: "/ui-media", parentId: "baseUi" },
-                { id: "embedvideo", label: "Embed Video", link: "/ui-embed-video", parentId: "baseUi" },
-                { id: "typography", label: "Typography", link: "/ui-typography", parentId: "baseUi" },
-                { id: "lists", label: "Lists", link: "/ui-lists", parentId: "baseUi" },
-                { id: "links", label: "Links", link: "/ui-links", parentId: "baseUi", badgeColor: "success", badgeName: "New" },
-                { id: "general", label: "General", link: "/ui-general", parentId: "baseUi" },
-                { id: "ribbons", label: "Ribbons", link: "/ui-ribbons", parentId: "baseUi" },
-                { id: "utilities", label: "Utilities", link: "/ui-utilities", parentId: "baseUi" },
+                { id: "alerts", label: "Alerts", link: "/demo/ui-alerts", parentId: "baseUi" },
+                { id: "badges", label: "Badges", link: "/demo/ui-badges", parentId: "baseUi" },
+                { id: "buttons", label: "Buttons", link: "/demo/ui-buttons", parentId: "baseUi" },
+                { id: "colors", label: "Colors", link: "/demo/ui-colors", parentId: "baseUi" },
+                { id: "cards", label: "Cards", link: "/demo/ui-cards", parentId: "baseUi" },
+                { id: "carousel", label: "Carousel", link: "/demo/ui-carousel", parentId: "baseUi" },
+                { id: "dropdowns", label: "Dropdowns", link: "/demo/ui-dropdowns", parentId: "baseUi" },
+                { id: "grid", label: "Grid", link: "/demo/ui-grid", parentId: "baseUi" },
+                { id: "images", label: "Images", link: "/demo/ui-images", parentId: "baseUi" },
+                { id: "tabs", label: "Tabs", link: "/demo/ui-tabs", parentId: "baseUi" },
+                { id: "accordions", label: "Accordion & Collapse", link: "/demo/ui-accordions", parentId: "baseUi" },
+                { id: "modals", label: "Modals", link: "/demo/ui-modals", parentId: "baseUi" },
+                { id: "offcanvas", label: "Offcanvas", link: "/demo/ui-offcanvas", parentId: "baseUi" },
+                { id: "placeholders", label: "Placeholders", link: "/demo/ui-placeholders", parentId: "baseUi" },
+                { id: "progress", label: "Progress", link: "/demo/ui-progress", parentId: "baseUi" },
+                { id: "notifications", label: "Notifications", link: "/demo/ui-notifications", parentId: "baseUi" },
+                { id: "media", label: "Media object", link: "/demo/ui-media", parentId: "baseUi" },
+                { id: "embedvideo", label: "Embed Video", link: "/demo/ui-embed-video", parentId: "baseUi" },
+                { id: "typography", label: "Typography", link: "/demo/ui-typography", parentId: "baseUi" },
+                { id: "lists", label: "Lists", link: "/demo/ui-lists", parentId: "baseUi" },
+                { id: "links", label: "Links", link: "/demo/ui-links", parentId: "baseUi", badgeColor: "success", badgeName: "New" },
+                { id: "general", label: "General", link: "/demo/ui-general", parentId: "baseUi" },
+                { id: "ribbons", label: "Ribbons", link: "/demo/ui-ribbons", parentId: "baseUi" },
+                { id: "utilities", label: "Utilities", link: "/demo/ui-utilities", parentId: "baseUi" },
             ],
         },
         {
             id: "advanceUi",
             label: "Advance UI",
             icon: "ri-stack-line",
-            link: "/#",
+            link: "/demo/#",
             click: function (e : any) {
                 e.preventDefault();
                 setIsAdvanceUi(!isAdvanceUi);
@@ -868,23 +868,23 @@ const Navdata = () => {
             },
             stateVariables: isAdvanceUi,
             subItems: [
-                { id: "scrollbar", label: "Scrollbar", link: "/advance-ui-scrollbar", parentId: "advanceUi" },
-                { id: "swiperslider", label: "Swiper Slider", link: "/advance-ui-swiper", parentId: "advanceUi" },
-                { id: "ratings", label: "Ratings", link: "/advance-ui-ratings", parentId: "advanceUi" },
-                { id: "highlight", label: "Highlight", link: "/advance-ui-highlight", parentId: "advanceUi" },
+                { id: "scrollbar", label: "Scrollbar", link: "/demo/advance-ui-scrollbar", parentId: "advanceUi" },
+                { id: "swiperslider", label: "Swiper Slider", link: "/demo/advance-ui-swiper", parentId: "advanceUi" },
+                { id: "ratings", label: "Ratings", link: "/demo/advance-ui-ratings", parentId: "advanceUi" },
+                { id: "highlight", label: "Highlight", link: "/demo/advance-ui-highlight", parentId: "advanceUi" },
             ],
         },
         {
             id: "widgets",
             label: "Widgets",
             icon: "ri-honour-line",
-            link: "/widgets",
+            link: "/demo/widgets",
         },
         {
             id: "forms",
             label: "Forms",
             icon: "ri-file-list-3-line",
-            link: "/#",
+            link: "/demo/#",
             click: function (e : any) {
                 e.preventDefault();
                 setIsForms(!isForms);
@@ -893,26 +893,26 @@ const Navdata = () => {
             },
             stateVariables: isForms,
             subItems: [
-                { id: "basicelements", label: "Basic Elements", link: "/forms-elements", parentId: "forms" },
-                { id: "formselect", label: "Form Select", link: "/forms-select", parentId: "forms" },
-                { id: "checkboxsradios", label: "Checkboxs & Radios", link: "/forms-checkboxes-radios", parentId: "forms" },
-                { id: "pickers", label: "Pickers", link: "/forms-pickers", parentId: "forms" },
-                { id: "inputmasks", label: "Input Masks", link: "/forms-masks", parentId: "forms" },
-                { id: "advanced", label: "Advanced", link: "/forms-advanced", parentId: "forms" },
-                { id: "rangeslider", label: "Range Slider", link: "/forms-range-sliders", parentId: "forms" },
-                { id: "validation", label: "Validation", link: "/forms-validation", parentId: "forms" },
-                { id: "wizard", label: "Wizard", link: "/forms-wizard", parentId: "forms" },
-                { id: "editors", label: "Editors", link: "/forms-editors", parentId: "forms" },
-                { id: "fileuploads", label: "File Uploads", link: "/forms-file-uploads", parentId: "forms" },
-                { id: "formlayouts", label: "Form Layouts", link: "/forms-layouts", parentId: "forms" },
-                { id: "select2", label: "Select2", link: "/forms-select2", parentId: "forms" },
+                { id: "basicelements", label: "Basic Elements", link: "/demo/forms-elements", parentId: "forms" },
+                { id: "formselect", label: "Form Select", link: "/demo/forms-select", parentId: "forms" },
+                { id: "checkboxsradios", label: "Checkboxs & Radios", link: "/demo/forms-checkboxes-radios", parentId: "forms" },
+                { id: "pickers", label: "Pickers", link: "/demo/forms-pickers", parentId: "forms" },
+                { id: "inputmasks", label: "Input Masks", link: "/demo/forms-masks", parentId: "forms" },
+                { id: "advanced", label: "Advanced", link: "/demo/forms-advanced", parentId: "forms" },
+                { id: "rangeslider", label: "Range Slider", link: "/demo/forms-range-sliders", parentId: "forms" },
+                { id: "validation", label: "Validation", link: "/demo/forms-validation", parentId: "forms" },
+                { id: "wizard", label: "Wizard", link: "/demo/forms-wizard", parentId: "forms" },
+                { id: "editors", label: "Editors", link: "/demo/forms-editors", parentId: "forms" },
+                { id: "fileuploads", label: "File Uploads", link: "/demo/forms-file-uploads", parentId: "forms" },
+                { id: "formlayouts", label: "Form Layouts", link: "/demo/forms-layouts", parentId: "forms" },
+                { id: "select2", label: "Select2", link: "/demo/forms-select2", parentId: "forms" },
             ],
         },
         {
             id: "tables",
             label: "Tables",
             icon: "ri-layout-grid-line",
-            link: "/#",
+            link: "/demo/#",
             click: function (e : any) {
                 e.preventDefault();
                 setIsTables(!isTables);
@@ -921,15 +921,15 @@ const Navdata = () => {
             },
             stateVariables: isTables,
             subItems: [
-                { id: "basictables", label: "Basic Tables", link: "/tables-basic", parentId: "tables" },
-                { id: "reactdatatables", label: "React Datatables", link: "/tables-react", parentId: "tables" },
+                { id: "basictables", label: "Basic Tables", link: "/demo/tables-basic", parentId: "tables" },
+                { id: "reactdatatables", label: "React Datatables", link: "/demo/tables-react", parentId: "tables" },
             ],
         },
         {
             id: "charts",
             label: "Charts",
             icon: "ri-pie-chart-line",
-            link: "/#",
+            link: "/demo/#",
             click: function (e : any) {
                 e.preventDefault();
                 setIsCharts(!isCharts);
@@ -941,7 +941,7 @@ const Navdata = () => {
                 {
                     id: "apexcharts",
                     label: "Apexcharts",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -949,29 +949,29 @@ const Navdata = () => {
                     },
                     stateVariables: isApex,
                     childItems: [
-                        { id: 1, label: "Line", link: "/charts-apex-line" },
-                        { id: 2, label: "Area", link: "/charts-apex-area" },
-                        { id: 3, label: "Column", link: "/charts-apex-column" },
-                        { id: 4, label: "Bar", link: "/charts-apex-bar" },
-                        { id: 5, label: "Mixed", link: "/charts-apex-mixed" },
-                        { id: 6, label: "Timeline", link: "/charts-apex-timeline" },
-                        { id: 7, label: "Range Area", link: "/charts-apex-range-area" },
-                        { id: 8, label: "Funnel", link: "/charts-apex-funnel" },
-                        { id: 9, label: "Candlstick", link: "/charts-apex-candlestick" },
-                        { id: 10, label: "Boxplot", link: "/charts-apex-boxplot" },
-                        { id: 11, label: "Bubble", link: "/charts-apex-bubble" },
-                        { id: 12, label: "Scatter", link: "/charts-apex-scatter" },
-                        { id: 13, label: "Heatmap", link: "/charts-apex-heatmap" },
-                        { id: 14, label: "Treemap", link: "/charts-apex-treemap" },
-                        { id: 15, label: "Pie", link: "/charts-apex-pie" },
-                        { id: 16, label: "Radialbar", link: "/charts-apex-radialbar" },
-                        { id: 17, label: "Radar", link: "/charts-apex-radar" },
-                        { id: 18, label: "Polar Area", link: "/charts-apex-polar" },
-                        { id: 19, label: "Slope", link: "/charts-apex-slope", parentId: "charts", badgeColor: "success", badgeName: "New" },
+                        { id: 1, label: "Line", link: "/demo/charts-apex-line" },
+                        { id: 2, label: "Area", link: "/demo/charts-apex-area" },
+                        { id: 3, label: "Column", link: "/demo/charts-apex-column" },
+                        { id: 4, label: "Bar", link: "/demo/charts-apex-bar" },
+                        { id: 5, label: "Mixed", link: "/demo/charts-apex-mixed" },
+                        { id: 6, label: "Timeline", link: "/demo/charts-apex-timeline" },
+                        { id: 7, label: "Range Area", link: "/demo/charts-apex-range-area" },
+                        { id: 8, label: "Funnel", link: "/demo/charts-apex-funnel" },
+                        { id: 9, label: "Candlstick", link: "/demo/charts-apex-candlestick" },
+                        { id: 10, label: "Boxplot", link: "/demo/charts-apex-boxplot" },
+                        { id: 11, label: "Bubble", link: "/demo/charts-apex-bubble" },
+                        { id: 12, label: "Scatter", link: "/demo/charts-apex-scatter" },
+                        { id: 13, label: "Heatmap", link: "/demo/charts-apex-heatmap" },
+                        { id: 14, label: "Treemap", link: "/demo/charts-apex-treemap" },
+                        { id: 15, label: "Pie", link: "/demo/charts-apex-pie" },
+                        { id: 16, label: "Radialbar", link: "/demo/charts-apex-radialbar" },
+                        { id: 17, label: "Radar", link: "/demo/charts-apex-radar" },
+                        { id: 18, label: "Polar Area", link: "/demo/charts-apex-polar" },
+                        { id: 19, label: "Slope", link: "/demo/charts-apex-slope", parentId: "charts", badgeColor: "success", badgeName: "New" },
                     ]
                 },
-                { id: "chartjs", label: "Chartjs", link: "/charts-chartjs", parentId: "charts" },
-                { id: "echarts", label: "Echarts", link: "/charts-echarts", parentId: "charts" },
+                { id: "chartjs", label: "Chartjs", link: "/demo/charts-chartjs", parentId: "charts" },
+                { id: "echarts", label: "Echarts", link: "/demo/charts-echarts", parentId: "charts" },
 
             ],
         },
@@ -979,7 +979,7 @@ const Navdata = () => {
             id: "icons",
             label: "Icons",
             icon: "ri-compasses-2-line",
-            link: "/#",
+            link: "/demo/#",
             click: function (e : any) {
                 e.preventDefault();
                 setIsIcons(!isIcons);
@@ -988,19 +988,19 @@ const Navdata = () => {
             },
             stateVariables: isIcons,
             subItems: [
-                { id: "remix", label: "Remix", link: "/icons-remix", parentId: "icons" },
-                { id: "boxicons", label: "Boxicons", link: "/icons-boxicons", parentId: "icons" },
-                { id: "materialdesign", label: "Material Design", link: "/icons-materialdesign", parentId: "icons" },
-                { id: "lineawesome", label: "Line Awesome", link: "/icons-lineawesome", parentId: "icons" },
-                { id: "feather", label: "Feather", link: "/icons-feather", parentId: "icons" },
-                { id: "crypto", label: "Crypto SVG", link: "/icons-crypto", parentId: "icons" },
+                { id: "remix", label: "Remix", link: "/demo/icons-remix", parentId: "icons" },
+                { id: "boxicons", label: "Boxicons", link: "/demo/icons-boxicons", parentId: "icons" },
+                { id: "materialdesign", label: "Material Design", link: "/demo/icons-materialdesign", parentId: "icons" },
+                { id: "lineawesome", label: "Line Awesome", link: "/demo/icons-lineawesome", parentId: "icons" },
+                { id: "feather", label: "Feather", link: "/demo/icons-feather", parentId: "icons" },
+                { id: "crypto", label: "Crypto SVG", link: "/demo/icons-crypto", parentId: "icons" },
             ],
         },
         {
             id: "maps",
             label: "Maps",
             icon: "ri-map-pin-line",
-            link: "/#",
+            link: "/demo/#",
             click: function (e : any) {
                 e.preventDefault();
                 setIsMaps(!isMaps);
@@ -1009,14 +1009,14 @@ const Navdata = () => {
             },
             stateVariables: isMaps,
             subItems: [
-                { id: "google", label: "Google", link: "/maps-google", parentId: "maps" },
+                { id: "google", label: "Google", link: "/demo/maps-google", parentId: "maps" },
             ],
         },
         {
             id: "multilevel",
             label: "Multi Level",
             icon: "ri-share-line",
-            link: "/#",
+            link: "/demo/#",
             click: function (e : any) {
                 e.preventDefault();
                 setIsMultiLevel(!isMultiLevel);
@@ -1025,11 +1025,11 @@ const Navdata = () => {
             },
             stateVariables: isMultiLevel,
             subItems: [
-                { id: "level1.1", label: "Level 1.1", link: "/#", parentId: "multilevel" },
+                { id: "level1.1", label: "Level 1.1", link: "/demo/#", parentId: "multilevel" },
                 {
                     id: "level1.2",
                     label: "Level 1.2",
-                    link: "/#",
+                    link: "/demo/#",
                     isChildItem: true,
                     click: function (e : any) {
                         e.preventDefault();
@@ -1037,11 +1037,11 @@ const Navdata = () => {
                     },
                     stateVariables: isLevel1,
                     childItems: [
-                        { id: 1, label: "Level 2.1", link: "/#" },
+                        { id: 1, label: "Level 2.1", link: "/demo/#" },
                         {
                             id: "level2.2",
                             label: "Level 2.2",
-                            link: "/#",
+                            link: "/demo/#",
                             isChildItem: true,
                             click: function (e : any) {
                                 e.preventDefault();
@@ -1049,8 +1049,8 @@ const Navdata = () => {
                             },
                             stateVariables: isLevel2,
                             childItems: [
-                                { id: 1, label: "Level 3.1", link: "/#" },
-                                { id: 2, label: "Level 3.2", link: "/#" },
+                                { id: 1, label: "Level 3.1", link: "/demo/#" },
+                                { id: 2, label: "Level 3.2", link: "/demo/#" },
                             ]
                         },
                     ]
