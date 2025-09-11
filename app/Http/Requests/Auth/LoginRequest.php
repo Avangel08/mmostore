@@ -43,22 +43,22 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $user = User::where('email', $this->input('email'))->first();
-
-        if (!$user || !Hash::check($this->input('password'), $user?->password)) {
+        if (! Auth::attempt($this->only('email', 'password'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => 'auth.invalid_credentials',
             ]);
         }
 
-        $userRoles = $user?->roles;
-        foreach ($userRoles as $role) {
-            $guard = $role?->guard_name;
-            if ($guard) {
-                Auth::guard($guard)->attempt($this->only('email', 'password'), $this->boolean('remember'));
-            }
+        $user = Auth::user();
+        if ($user && $user->status != User::STATUS['ACTIVE']) {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'auth.account_inactive',
+            ]);
         }
 
         RateLimiter::clear($this->throttleKey());

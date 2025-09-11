@@ -22,7 +22,7 @@ class StoreOwnerUser extends Seeder
             ]
         );
 
-        $storeOwnerRole = Role::findOrCreate(config('role.store_owner'), config('guard.store_owner'));
+        $storeOwnerRole = Role::findOrCreate(config('role.seller'), config('guard.seller'));
         $storeOwner->assignRole($storeOwnerRole);
     }
 }

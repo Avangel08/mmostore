@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -15,28 +17,15 @@ class LoginController extends Controller
 
     public function login(): Response
     {
-        return Inertia::render('Auth/Login', [
-            'canResetPassword' => Route::has('password.request'),
-            'status' => session('status'),
-        ]);
+        return Inertia::render('Auth/Login');
     }
 
-    public function authenticate(Request $request)
+    public function authenticate(LoginRequest $request): RedirectResponse
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        $request->authenticate();
+        $request->session()->regenerate();
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-
-            return redirect()->intended(route('seller.dashboard'));
-        }
-
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+        return redirect()->route('seller.dashboard');
     }
 }
 

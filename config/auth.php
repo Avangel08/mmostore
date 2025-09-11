@@ -44,11 +44,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'store_owner' => [
+        'seller' => [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'customer' => [
+        'buyer' => [
             'driver' => 'session',
             'provider' => 'customers',
         ],
@@ -80,11 +80,6 @@ return [
             'driver' => 'eloquent',
             'model' => \App\Models\Mongo\Customers::class,
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
     ],
 
     /*

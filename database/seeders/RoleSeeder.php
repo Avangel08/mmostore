@@ -17,6 +17,6 @@ class RoleSeeder extends Seeder
         Role::findOrCreate(config('role.admin'), config('guard.admin'));
 
         // Store Owner
-        Role::findOrCreate(config('role.store_owner'), config('guard.store_owner'));
+        Role::findOrCreate(config('role.seller'), config('guard.seller'));
     }
 }

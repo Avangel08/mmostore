@@ -59,11 +59,18 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $this->rootView = $this->detectRootView($request);
+        
+        // Extract subdomain from hostname
+        $host = $request->getHost();
+        $parts = explode('.', $host);
+        $subdomain = count($parts) > 2 ? $parts[0] : null;
+        
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
             ],
+            'subdomain' => $subdomain,
         ];
     }
 }

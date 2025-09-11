@@ -6,12 +6,17 @@ use Illuminate\Support\Facades\Route;
 
 // Dynamic admin subdomain routes: {sub}.mmostore.local/admin
 Route::domain('{sub}.mmostore.local')
-    ->middleware(['web', 'tenant.mongo', 'subdomain.admin'])
+    ->middleware(['route.subdomain', 'tenant.mongo', 'seller'])
     ->group(function () {
         Route::prefix('admin')->group(function () {
-            Route::get('/', [DashBoardController::class, 'home'])->name('seller.home');
-            Route::get('/login', [LoginController::class, 'login'])->name('seller.login');
-            Route::post('/login', [LoginController::class, 'authenticate'])->name('seller.login.post');
+            Route::group(['prefix' => 'login'], function () {
+                Route::get('/', [LoginController::class, 'login'])->name('seller.login');
+                Route::post('/', [LoginController::class, 'authenticate'])->name('seller.login.post');
+            });
+
+            Route::group(['prefix' => '/dashboard'], function () {
+                Route::get('/', [DashBoardController::class, 'index'])->name('seller.dashboard');
+            });
         });
     });
 

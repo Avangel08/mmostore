@@ -219,5 +219,7 @@
     "OR": "OR",
     "Password is required": "Password is required",
     "Email is required": "Email is required",
-    "Invalid email": "Invalid email"
+    "Invalid email": "Invalid email",
+    "auth.invalid_credentials": "Invalid email or password",
+    "auth.account_inactive": "Your account is locked or not activated"
 }

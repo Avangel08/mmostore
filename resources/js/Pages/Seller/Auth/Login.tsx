@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import authLoginIllustration from "../../../../images/seller/auth-login-illustration-light.png";
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import { useTranslation } from "react-i18next";
 
 export default function Login({}: any) {
     const { t } = useTranslation();
+    const { props } = usePage();
+    const subdomain = (props as any).subdomain;
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
     const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm({
         email: '',
@@ -57,7 +59,7 @@ export default function Login({}: any) {
             return;
         }
 
-        post(route('seller.login.post'));
+        post(route('seller.login.post', { sub: subdomain }));
     };
 
     return (
@@ -100,7 +102,7 @@ export default function Login({}: any) {
                                                         }}
                                                     />
                                                 </div>
-                                                <Form.Control.Feedback type="invalid" className="d-block mt-2">{errors.email}</Form.Control.Feedback>
+                                                <Form.Control.Feedback type="invalid" className="d-block mt-2">{errors.email ? t(String(errors.email)) : null}</Form.Control.Feedback>
                                             </div>
 
                                             <div className="mb-4">
@@ -109,7 +111,7 @@ export default function Login({}: any) {
                                                     <i className="ri-lock-line position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
                                                     <Form.Control
                                                         id="password"
-                                                        type={passwordShow ? "text" : "password"}
+                                                        type={ passwordShow ? "text" : "password" }
                                                         name="password"
                                                         placeholder={ t("Enter your password") }
                                                         className={'ps-5 pe-5 ' + (errors.password ? 'is-invalid' : '')}
@@ -122,7 +124,7 @@ export default function Login({}: any) {
                                                         <i className={passwordShow ? "ri-eye-off-line" : "ri-eye-line"}></i>
                                                     </button>
                                                 </div>
-                                                <Form.Control.Feedback type="invalid" className="d-block mt-2">{errors.password}</Form.Control.Feedback>
+                                                <Form.Control.Feedback type="invalid" className="d-block mt-2">{errors.password ? t(String(errors.password)) : null}</Form.Control.Feedback>
                                                 
                                                 <div className="d-flex justify-content-end mt-2">
                                                     <Link href="#" className="text-decoration-none fw-semibold" style={{ transition: 'color 0.3s ease', cursor: 'pointer' }} onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = 'blue'; }} onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = '#808283'; }}>

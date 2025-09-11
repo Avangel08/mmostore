@@ -21,5 +21,7 @@
     "OR": "HOẶC",
     "Password is required": "Mật khẩu là bắt buộc",
     "Email is required": "Email là bắt buộc",
-    "Invalid email": "Email không đúng định dạng"
+    "Invalid email": "Email không đúng định dạng",
+    "auth.invalid_credentials": "Email hoặc mật khẩu không đúng",
+    "auth.account_inactive": "Tài khoản của bạn đã bị khóa hoặc chưa được kích hoạt"
 }

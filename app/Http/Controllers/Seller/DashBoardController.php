@@ -12,12 +12,9 @@ use Inertia\Response;
 
 class DashBoardController extends Controller
 {
-    public function home(string $sub)
+    public function index(string $sub)
     {
-        if (View::exists('welcome')) {
-            return view('welcome', ['subdomain' => $sub, 'section' => 'admin']);
-        }
-        return 'MMO Store - Admin for subdomain: ' . $sub;
+        return Inertia::render('Dashboard/index');
     }
 }
 
