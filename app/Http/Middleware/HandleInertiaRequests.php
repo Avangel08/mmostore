@@ -17,7 +17,7 @@ class HandleInertiaRequests extends Middleware
     private function detectRootView(Request $request): string
     {
         $host = $request->getHost();
-        $path = '/'.ltrim($request->path(), '/');
+        $path = '/' . ltrim($request->path(), '/');
 
         if ($host === 'mmostore.local' && str_starts_with($path, '/admin')) {
             return 'app_admin';
@@ -70,7 +70,11 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'subdomain' => $subdomain,
+            'message' => [
+                'success' => fn() => $request->session()->get('success'),
+                'error' => fn() => $request->session()->get('error'),
+                'info' => fn() => $request->session()->get('info'),
+            ],
         ];
     }
 }

@@ -59,7 +59,7 @@ const Navdata = () => {
             id: "permissionmanagement",
             label: "Permission Management",
             icon: "ri-lock-2-fill",
-            link: route("admin.permissions"),
+            link: route("admin.permissions.index"),
             stateVariables: isPermissionManagement,
             click: function (e : any) {
                 e.preventDefault();
