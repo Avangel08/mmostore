@@ -25,29 +25,12 @@ const TableRole = ({
     return new ContextMenuBuilder()
       .addCustomOption(
         "permissions",
-        t("Manage Permissions"),
-        "ri-shield-user-fill",
+        t("Edit"),
+        "ri-edit-2-fill",
         "",
-        () => {}
-      )
-      .addDivider()
-      .addDeleteOption(
-        t("Delete Role"),
-        "ri-delete-bin-fill",
         () => {
-          if (canDelete) {
-            if (
-              window.confirm(
-                t(
-                  "Are you sure you want to delete this role? This action cannot be undone."
-                )
-              )
-            ) {
-              router.delete(`/admin/roles/${rowData.id}`);
-            }
-          }
-        },
-        !canDelete
+          
+        }
       )
       .build();
   };

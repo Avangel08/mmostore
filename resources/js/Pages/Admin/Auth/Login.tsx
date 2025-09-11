@@ -8,8 +8,8 @@ export default function Login({ status, canResetPassword }: any) {
 
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
     const { data, setData, post, processing, errors, reset } = useForm({
-        email: 'admin@themesbrand.com' || '',
-        password: '12345678' || '',
+        email: '',
+        password: '',
         remember: false,
     });
 
@@ -73,12 +73,12 @@ export default function Login({ status, canResetPassword }: any) {
                                                 </div>
 
                                                 <div className="mb-3">
-                                                    <div className="float-end">
+                                                    {/* <div className="float-end">
 
                                                         {canResetPassword && (
                                                             <Link href={route('admin.password.request')} className="text-muted">Forgot password?</Link>
                                                         )}
-                                                    </div>
+                                                    </div> */}
 
                                                     <Form.Label className='form-label' htmlFor="password" value="Password" > Password </Form.Label>
                                                     <span className="text-danger ms-1">*</span>

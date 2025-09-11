@@ -12,7 +12,7 @@ export default function ForgotPassword({ status }: any) {
     const submit = (e: any) => {
         e.preventDefault();
 
-        post(route('password.email'));
+        post(route('admin.password.email'));
     };
 
     return (
@@ -80,7 +80,7 @@ export default function ForgotPassword({ status }: any) {
                                     </Card.Body>
                                 </Card>
                                 <div className="mt-4 text-center">
-                                    <p className="mb-0">Wait, I remember my password... <Link href={route('login')} className="fw-semibold text-primary text-decoration-underline"> Click here </Link> </p>
+                                    <p className="mb-0">Wait, I remember my password... <Link href={route('admin.login')} className="fw-semibold text-primary text-decoration-underline"> Click here </Link> </p>
                                 </div>
                             </Col>
                         </Row>

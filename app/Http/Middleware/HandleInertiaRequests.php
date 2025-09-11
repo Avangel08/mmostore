@@ -23,6 +23,10 @@ class HandleInertiaRequests extends Middleware
             return 'app_admin';
         }
 
+        if ($host === 'mmostore.local' && str_starts_with($path, '/demo')) {
+            return 'app';
+        }
+
         if ($host === 'mmostore.local') {
             return 'app_home';
         }
