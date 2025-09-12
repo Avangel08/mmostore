@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\MySQL;
 
+use App\Models\MySQL\GroupPermission;
 use Spatie\Permission\Models\Role;
 
 class RoleCustom extends Role

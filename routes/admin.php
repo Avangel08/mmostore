@@ -20,6 +20,8 @@ Route::middleware(['unified.auth', 'unified.session'])->group(function () {
 
     Route::group(['prefix' => '/roles'], function () {
         Route::get('/', [RoleManagementController::class, 'index'])->name('admin.roles.index');
+        Route::post('/add-roles', [RoleManagementController::class, 'addNewRole'])->name('admin.roles.add');
+        Route::put('/update-role/{id}', [RoleManagementController::class, 'updateRole'])->name('admin.roles.update');
     });
 
     Route::group(['prefix' => '/permissions'], function () {
