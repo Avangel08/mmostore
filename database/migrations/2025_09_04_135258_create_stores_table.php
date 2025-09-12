@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 255);
             $table->bigInteger('user_id');
-            $table->longText('domain');
+            $table->json('domain');
             $table->longText('database_config');
             $table->longText('settings');
             $table->bigInteger('server_id');
