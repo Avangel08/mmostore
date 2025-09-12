@@ -13,6 +13,8 @@ class AuthHelper
     public static function getGuardType(Request $request): string
     {
         $host = $request->getHost();
+        // Bỏ qua phần port (vd: :8000) nếu có trong host
+        $host = preg_replace('/:\\d+$/', '', $host);
         $path = ltrim($request->path(), '/');
 
         $parts = explode('.', $host);
