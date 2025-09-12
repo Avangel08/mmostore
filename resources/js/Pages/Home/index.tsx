@@ -4,7 +4,9 @@ import Home from "./home";
 import Navbar from "./navbar";
 import Footer from "./footer";
 import Showcase from "./Showcase";
-import Services from "./services";
+import Services from "./Services";
+import Features from "./Features";
+import Faqs from "./Faqs";
 
 export default function Index() {
     const toTop = () => {
@@ -19,6 +21,8 @@ export default function Index() {
                 <Home />
                 <Showcase />
                 <Services />
+                <Features />
+                <Faqs />
                 <Footer />
                 <button
                     onClick={() => toTop()}

@@ -1,4 +1,4 @@
-import '../scss/themes.scss'
+import '../scss/theme-landing-page.scss'
 import './i18n'
 
 import { createRoot } from 'react-dom/client';
