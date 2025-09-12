@@ -17,7 +17,6 @@ return new class extends Migration
             $table->bigInteger('user_id');
             $table->json('domain');
             $table->longText('database_config');
-            $table->longText('settings');
             $table->bigInteger('server_id');
             $table->tinyInteger('status');
             $table->softDeletes();

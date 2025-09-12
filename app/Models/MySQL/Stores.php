@@ -19,7 +19,6 @@ class Stores extends Model
         'user_id',
         'domain',
         'database_config',
-        'settings',
         'server_id',
         'status',
     ];
