@@ -22,7 +22,7 @@ const TablePermission = ({
   const contextMenuOptions = (rowData: any) => {
     return new ContextMenuBuilder()
       .addCustomOption("permissions", t("Edit"), "ri-edit-2-fill", "", () => {
-        onEdit(rowData?.id);
+        onEdit && onEdit(rowData?.id);
       })
       .build();
   };
