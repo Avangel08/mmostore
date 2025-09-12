@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\Auth\PasswordController;
 use App\Http\Controllers\Admin\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Admin\Auth\RegisteredUserController;
 use App\Http\Controllers\Admin\Auth\VerifyEmailController;
+use App\Http\Controllers\Admin\PermissionManagement\PermissionManagementController;
 use App\Http\Controllers\Admin\Profile\ProfileController;
 use App\Http\Controllers\Admin\RoleManagement\RoleManagementController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
@@ -66,5 +67,12 @@ Route::middleware(['unified.auth', 'unified.session'])->group(function () {
         ->name('admin.logout');
 
     Route::get('/', [RoleManagementController::class, 'index'])->name('admin.index');
-    Route::get('/permissions', [RoleManagementController::class, 'index'])->name('admin.permissions');
+    Route::group(['prefix' => '/roles'], function () {
+        Route::get('/', [RoleManagementController::class, 'index'])->name('admin.roles.index');
+    });
+    Route::group(['prefix' => '/permissions'], function () {
+        Route::get('/', [PermissionManagementController::class, 'index'])->name('admin.permissions.index');
+        Route::post('/add-new-group-permission', [PermissionManagementController::class, 'addNewGroupPermission'])->name('admin.permissions.add');
+        Route::put('/update-group-permission/{id}', [PermissionManagementController::class, 'updateGroupPermission'])->name('admin.permissions.update');
+    });
 });
