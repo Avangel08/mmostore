@@ -1,5 +1,4 @@
 :root {
-
     // card
     --#{$prefix}card-logo-dark:                                     block;
     --#{$prefix}card-logo-light:                                    none;
@@ -29,6 +28,14 @@
     //form
     --#{$prefix}input-bg-custom:                                #{$input-bg-custom};
     --#{$prefix}input-border-custom:                            #{$input-border-custom};
+
+    // Typography
+    --#{$prefix}font-weight-semibold: 700;
+    --#{$prefix}font-18: 18px;
+    --#{$prefix}font-20: 20px;
+    --#{$prefix}font-base: 0.8125rem; //13px
+    --#{$prefix}headings-font-weight: 500;
+
 }
 
 //sidebar gradient light theme
@@ -244,3 +251,4 @@
         }
     }
 }
+
