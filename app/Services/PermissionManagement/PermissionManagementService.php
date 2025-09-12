@@ -19,6 +19,11 @@ class PermissionManagementService
         return $query->orderBy(...$orderBy)->get();
     }
 
+    public function getAllGroupWithPermissions($select = '*')
+    {
+        return GroupPermission::query()->with('permissions')->select($select)->get();
+    }
+
     public function findByListKey(array $listKey, $select = ["*"], $relation = [], $id = null)
     {
         $query = GroupPermission::whereIn('key', $listKey);

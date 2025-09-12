@@ -1,14 +1,19 @@
 import { Head, router, usePage } from "@inertiajs/react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../../CustomAdminLayouts";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
 import TableRole from "./TableRole";
+import { ToastContainer } from "react-toastify";
+import { ModalDetailRole } from "./ModalDetailRole";
 
 const RoleManagement = () => {
   const { t } = useTranslation();
   const { roles } = usePage().props;
+  const [isOpenAddModal, setIsOpenAddModal] = useState(false);
+  const [isOpenEditModal, setIsOpenEditModal] = useState(false);
+  const [dataEdit, setDataEdit] = useState<any>(null);
 
   const onReloadTable = (currentPage: number = 0, perPage: number = 10) => {
     router.reload({
@@ -17,10 +22,36 @@ const RoleManagement = () => {
     });
   };
 
+  const openModalEdit = (id: number | string) => {
+    router.reload({
+      only: ["detailRole"],
+      data: { id },
+      onSuccess: (page) => {
+        setDataEdit(page.props.detailRole);
+        setIsOpenEditModal(true);
+      },
+    });
+  };
+
+  const toggleOpenAddModal = () => {
+    setIsOpenAddModal((prevState) => !prevState);
+  };
+
+  const toggleOpenEditModal = () => {
+    setIsOpenEditModal((prevState) => !prevState);
+  };
+
   return (
     <React.Fragment>
       <Head title={t("Role Management")} />
       <div className="page-content">
+        <ToastContainer />
+        <ModalDetailRole show={isOpenAddModal} onHide={toggleOpenAddModal} />
+        <ModalDetailRole 
+          show={isOpenEditModal} 
+          onHide={toggleOpenEditModal} 
+          dataEdit={dataEdit}
+        />
         <Container fluid>
           <BreadCrumb title={t("Role Management")} pageTitle={t("Homepage")} />
           <Row>
@@ -30,7 +61,19 @@ const RoleManagement = () => {
                   <h5 className="card-title mb-0">{t("Role Management")}</h5>
                 </Card.Header>
                 <Card.Body>
-                  <TableRole data={roles} onReloadTable={onReloadTable} />
+                  <Row style={{ marginBottom: "32px" }}>
+                    <Col>
+                      <Button variant="success" onClick={toggleOpenAddModal}>
+                        <i className="ri-add-line align-bottom me-1"></i>{" "}
+                        {t("Add role")}
+                      </Button>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <TableRole data={roles} onReloadTable={onReloadTable} onEdit={openModalEdit} />
+                    </Col>
+                  </Row>
                 </Card.Body>
               </Card>
             </Col>

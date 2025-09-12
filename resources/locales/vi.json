@@ -43,5 +43,10 @@
     "Input permission name": "Nhập tên quyền",
     "Add": "Thêm",
     "Group permission added successfully": "Thêm nhóm quyền thành công",
-    "Update": "Cập nhật"
+    "Update": "Cập nhật",
+    "Add role": "Thêm vai trò",
+    "Group permission": "Nhóm quyền",
+    "Enter role name": "Nhập tên vai trò",
+    "Select guard": "Chọn guard",
+    "Please select guard": "Vui lòng chọn guard"
 }

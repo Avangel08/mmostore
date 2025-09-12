@@ -4,13 +4,16 @@ import { router, usePage } from "@inertiajs/react";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
 import { Button, OverlayTrigger, Tooltip, Form } from "react-bootstrap";
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
+import moment from "moment";
 
 const TableRole = ({
   data,
   onReloadTable,
+  onEdit,
 }: {
   data: any;
   onReloadTable?: (page: number, perPage: number) => void;
+  onEdit?: (id: number | string) => void;
 }) => {
   const { t } = useTranslation();
   const params = new URLSearchParams(window.location.search);
@@ -18,20 +21,10 @@ const TableRole = ({
   const perPage = params.get("perPage") ?? "10";
 
   const contextMenuOptions = (rowData: any) => {
-    const isSystemRole =
-      rowData.name === "admin" || rowData.name === "super-admin";
-    const canDelete = !isSystemRole; // Don't allow deletion of system roles
-
     return new ContextMenuBuilder()
-      .addCustomOption(
-        "permissions",
-        t("Edit"),
-        "ri-edit-2-fill",
-        "",
-        () => {
-          
-        }
-      )
+      .addCustomOption("permissions", t("Edit"), "ri-edit-2-fill", "", () => {
+        onEdit && onEdit(rowData?.id);
+      })
       .build();
   };
 
@@ -87,9 +80,32 @@ const TableRole = ({
         enableColumnFilter: false,
       },
       {
-        header: t("Permissions"),
-        accessorKey: "",
+        header: t("Group permission"),
+        accessorKey: "group_permissions",
         enableColumnFilter: false,
+        cell: (cell: any) => {
+          return cell.getValue().map((group: any, index: number) => {
+            const groupName: string = group?.name;
+            return (
+              <span
+                key={group?.id ?? index}
+                className={`badge border border-dark text-body fs-6 me-2`}
+              >
+                {groupName}
+              </span>
+            );
+          });
+        },
+      },
+      {
+        header: t("Created date"),
+        accessorKey: "created_at",
+        enableColumnFilter: false,
+        cell: (cell: any) => {
+          return (
+            <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
+          );
+        },
       },
     ],
     [t]
@@ -103,7 +119,6 @@ const TableRole = ({
         divClass="table-responsive table-card mb-3"
         tableClass="table align-middle table-nowrap mb-0"
         theadClass="table-light"
-        isGlobalFilter={true}
         SearchPlaceholder={t("Search...")}
         enableContextMenu={true}
         contextMenuOptions={contextMenuOptions}
@@ -112,9 +127,6 @@ const TableRole = ({
         defaultCurrentPage={Number(page)}
         defaultPageSize={Number(perPage)}
         divStyle={{ height: "50vh" }}
-        tableStyle={{
-          tableLayout: "fixed",
-        }}
       />
     </div>
   );
