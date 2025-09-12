@@ -49,7 +49,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => 'auth.invalid_credentials',
+                'email' => 'Incorrect email or password',
             ]);
         }
 
@@ -59,7 +59,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => 'auth.account_inactive',
+                'email' => 'Your account has been locked or not yet activated',
             ]);
         }
 
