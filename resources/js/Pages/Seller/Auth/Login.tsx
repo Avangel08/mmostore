@@ -24,7 +24,7 @@ export default function Login({}: any) {
         return 'Merdify';
     };
 
-    const titleWeb = t("Sign In") + " - " +  getSubdomain();
+    const titleWeb = t("Sign in") + " - " +  getSubdomain();
 
     useEffect(() => {
         return () => {
@@ -59,7 +59,16 @@ export default function Login({}: any) {
             return;
         }
 
-        post(route('seller.login.post', { sub: subdomain }));
+        // Add loading state and error handling
+        post(route('seller.login.post', { sub: subdomain }), {
+            onSuccess: () => {
+                // Session should be maintained after successful login
+                console.log('Login successful, session maintained');
+            },
+            onError: (errors: any) => {
+                console.error('Login failed:', errors);
+            }
+        });
     };
 
     return (
@@ -81,6 +90,7 @@ export default function Login({}: any) {
                                         <Form onSubmit={submit} noValidate>
                                             <div className="mb-4">
                                                 <Form.Label className="form-label fw-semibold text-dark">{ t("Email") }</Form.Label>
+                                                <span className="text-danger ms-1">*</span>
                                                 <div className="position-relative">
                                                     <i className="ri-mail-line position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
                                                     <Form.Control
@@ -107,6 +117,7 @@ export default function Login({}: any) {
 
                                             <div className="mb-4">
                                                 <Form.Label className="form-label fw-semibold text-dark">{ t("Password") }</Form.Label>
+                                                <span className="text-danger ms-1">*</span>
                                                 <div className="position-relative">
                                                     <i className="ri-lock-line position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
                                                     <Form.Control
@@ -134,7 +145,7 @@ export default function Login({}: any) {
                                             </div>
 
                                             <Button type="submit" className="w-100 py-3 fw-semibold" disabled={processing} style={{ background: '#4f46e5', border: 'none', borderRadius: '8px', fontSize: '16px' }}>
-                                                { t("Sign In") }
+                                                { t("Sign in") }
                                             </Button>
                                         </Form>
 

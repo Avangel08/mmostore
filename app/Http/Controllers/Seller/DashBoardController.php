@@ -14,7 +14,13 @@ class DashBoardController extends Controller
 {
     public function index(string $sub)
     {
-        return Inertia::render('Dashboard/index');
+        $guard = config('guard.seller');
+        $user = Auth::guard($guard)->user();
+        
+        return Inertia::render('Dashboard/index', [
+            'user' => $user,
+            'subdomain' => $sub
+        ]);
     }
 }
 

@@ -10,7 +10,7 @@ class AdminSubdomainMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $isAuthenticated = auth()->check();
+        $isAuthenticated = auth('admin')->check();
         $path = ltrim($request->path(), '/');
 
         if (!$isAuthenticated && (str_starts_with($path, 'admin/login') || $path === 'admin/login')) {

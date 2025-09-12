@@ -39,11 +39,13 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function authenticate(): void
+    public function authenticate($guard = null): void
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'))) {
+        $guard = $guard ?: config('auth.defaults.guard');
+        
+        if (! Auth::guard($guard)->attempt($this->only('email', 'password'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -51,9 +53,9 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        $user = Auth::user();
+        $user = Auth::guard($guard)->user();
         if ($user && $user->status != User::STATUS['ACTIVE']) {
-            Auth::logout();
+            Auth::guard($guard)->logout();
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

@@ -13,12 +13,9 @@ class ResolveTenantMongo
     public function handle(Request $request, Closure $next): Response
     {
         $host = $request->getHost();
-        // Expect sub.domain.tld, take first label as subdomain
-        $parts = explode('.', $host);
-        $subdomain = count($parts) > 2 ? $parts[0] : null;
 
-        if ($subdomain) {
-            $store = Stores::query()->where('domain', $subdomain)->first();
+        if ($host) {
+            $store = Stores::query()->whereJsonContains('domain', $host)->first();
             if ($store && is_array($store->database_config)) {
                 $cfg = $store->database_config;
 
@@ -27,12 +24,11 @@ class ResolveTenantMongo
                 $username = $cfg['user'] ?? null;
                 $password = $cfg['password'] ?? null;
                 $prefix = $cfg['prefix'] ?? '';
-                $authDatabase = $cfg['authentication'] ?? null; // auth database name
+                $authDatabase = $cfg['authentication'] ?? null;
                 $authMechanism = $cfg['authentication_mechanism'] ?? 'SCRAM-SHA-256';
                 $dsn = $cfg['dsn'] ?? null;
 
-                // Derive database name from prefix and subdomain if provided
-                $database = $prefix !== '' ? ($prefix.'_'.$subdomain) : $subdomain;
+                $database = $prefix !== '' ? ($prefix) : '';
 
                 $connection = [
                     'driver' => 'mongodb',
@@ -42,7 +38,6 @@ class ResolveTenantMongo
                     'username' => $username,
                     'password' => $password,
                     'options' => array_filter([
-                        // Match typical Laravel Mongo config keys
                         'database' => $authDatabase,
                         'authMechanism' => $authMechanism,
                     ], fn($v) => !is_null($v) && $v !== ''),

@@ -57,7 +57,6 @@ class Kernel extends HttpKernel
      */
     protected $middlewareAliases = [
         'auth' => \App\Http\Middleware\Authenticate::class,
-        'auth.admin' => \App\Http\Middleware\AuthAdmin::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
@@ -68,13 +67,18 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'setlocale' => \App\Http\Middleware\SetLocale::class,
-        'seller' => \App\Http\Middleware\AdminSubdomainMiddleware::class,
         'api.validate' => \App\Http\Middleware\ApiValidationMiddleware::class,
-        'tenant.mongo' => \App\Http\Middleware\ResolveTenantMongo::class,
+
+        'unified.session' => \App\Http\Middleware\UnifiedSessionMiddleware::class,
+        'unified.auth' => \App\Http\Middleware\UnifiedAuthMiddleware::class,
+        'unified.subdomain' => \App\Http\Middleware\UnifiedSubdomainMiddleware::class,
+
+        'validate.subdomain' => \App\Http\Middleware\ValidateSubdomain::class,
         'route.subdomain' => \App\Http\Middleware\SetRouteSubdomain::class,
+
         'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+        'tenant.mongo' => \App\Http\Middleware\ResolveTenantMongo::class,
     ];
 }

@@ -23,12 +23,14 @@ class RouteServiceProvider extends ServiceProvider
     {
         foreach(config('auth.guards') as $guardName => $guardConfig) {
             if (auth()->guard($guardName)->check()) {
-                $user = auth()->guard($guardName)->user();  
+                $user = auth()->guard($guardName)->user();
+
                 if ($user?->hasRole(config('role.admin'))) {
                     return '/admin';
                 }
             }
         }
+
         return '/';
     }
 
@@ -46,7 +48,7 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')->prefix('demo')->group(base_path('routes/web.php'));
             Route::middleware('web')->group(base_path('routes/home.php'));
             Route::middleware('web')->group(base_path('routes/buyer.php'));
-            Route::middleware('web')->group(base_path('routes/seller.php'));
+            Route::middleware('web')->prefix('admin')->group(base_path('routes/seller.php'));
             Route::middleware('web')->prefix('admin')->group(base_path('routes/admin.php'));
         });
     }

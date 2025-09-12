@@ -1,39 +1,34 @@
 <?php
 
-namespace App\Http\Controllers\Seller;
+namespace App\Http\Controllers\Buyer;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class LoginController extends Controller
 {
-
-    public function login(): Response
+    /**
+     * Display the login view.
+     */
+    public function show(): Response
     {
         return Inertia::render('Auth/Login');
     }
 
+    /**
+     * Handle an incoming authentication request.
+     */
     public function authenticate(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate(config('guard.seller'));
+        $request->authenticate(config('guard.buyer'));
         $request->session()->regenerate();
-
-        $host = $request->getHost();
-        $parts = explode('.', $host);
-        $subdomain = count($parts) > 2 ? $parts[0] : null;
-
-        if ($subdomain) {
-            return redirect()->route('seller.dashboard', ['sub' => $subdomain]);
-        }
-
-        return redirect()->route('seller.dashboard');
+        
+        return redirect()->route('buyer.home');
     }
 
     /**
@@ -41,14 +36,12 @@ class LoginController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard(config('guard.seller'))->logout();
+        Auth::guard(config('guard.buyer'))->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
-        return redirect()->route('seller.login');
+        return redirect()->route('buyer.home');
     }
 }
-
-

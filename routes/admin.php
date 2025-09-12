@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\RoleManagement\RoleManagementController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('guest:' . config('guard.admin'))->group(function () {
+Route::middleware(['guest:' . config('guard.admin'), 'unified.session'])->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('admin.register');
 
@@ -38,7 +38,7 @@ Route::middleware('guest:' . config('guard.admin'))->group(function () {
 });
 
 
-Route::middleware('auth.admin')->group(function () {
+Route::middleware(['unified.auth', 'unified.session'])->group(function () {
 
     Route::get('/profile-edit', [ProfileController::class, 'edit'])->name('admin.profile.edit');
     Route::patch('/profile-update', [ProfileController::class, 'update'])->name('admin.profile.update');

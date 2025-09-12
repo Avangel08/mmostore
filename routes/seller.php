@@ -4,17 +4,20 @@ use App\Http\Controllers\Seller\DashBoardController;
 use App\Http\Controllers\Seller\LoginController;
 use Illuminate\Support\Facades\Route;
 
-// Dynamic admin subdomain routes: {sub}.mmostore.local/admin
 Route::domain('{sub}.mmostore.local')
-    ->middleware(['route.subdomain', 'tenant.mongo', 'seller'])
+    ->middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo', 'unified.session', 'unified.subdomain'])
     ->group(function () {
-        Route::prefix('admin')->group(function () {
-            Route::group(['prefix' => 'login'], function () {
-                Route::get('/', [LoginController::class, 'login'])->name('seller.login');
-                Route::post('/', [LoginController::class, 'authenticate'])->name('seller.login.post');
-            });
+        // Public routes (no auth middleware needed)
+        Route::group(['prefix' => 'login'], function () {
+            Route::get('/', [LoginController::class, 'login'])->name('seller.login');
+            Route::post('/', [LoginController::class, 'authenticate'])->name('seller.login.post');
+        });
 
-            Route::group(['prefix' => '/dashboard'], function () {
+        // Protected routes (need auth middleware)
+        Route::middleware('unified.auth')->group(function () {
+            Route::post('logout', [LoginController::class, 'destroy'])->name('seller.logout');
+
+            Route::group(['prefix' => 'dashboard'], function () {
                 Route::get('/', [DashBoardController::class, 'index'])->name('seller.dashboard');
             });
         });
