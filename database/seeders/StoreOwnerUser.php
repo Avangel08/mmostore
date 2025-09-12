@@ -19,6 +19,7 @@ class StoreOwnerUser extends Seeder
             [
                 'name' => 'Store Owner',
                 'password' => Hash::make('123123'),
+                'type' => 'SELLER',
             ]
         );
 
