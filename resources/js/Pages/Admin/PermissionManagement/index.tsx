@@ -19,7 +19,7 @@ import { ModalEditGroupPermission } from "./ModalEditGroupPermission";
 
 const PermissionManagement = () => {
   const { t } = useTranslation();
-  const { groupPermissions } = usePage().props;
+  const { groupPermissions, guards } = usePage().props;
   const [isOpenAddModal, setIsOpenAddModal] = React.useState(false);
   const [isOpenEditModal, setIsOpenEditModal] = React.useState(false);
   const [dataEdit, setDataEdit] = React.useState<any>(null);

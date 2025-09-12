@@ -63,6 +63,7 @@ class PermissionManagementService
                 Permission::create([
                     'name' => $permissionKey,
                     'group_permission_id' => $newGroup->id,
+                    'guard_name' => $data['groupPermissionGuard'],
                 ]);
             }
         });
@@ -100,6 +101,7 @@ class PermissionManagementService
                 Permission::firstOrCreate([
                     'name' => $permissionKey,
                     'group_permission_id' => $groupPermission->id,
+                    'guard_name' => $data['groupPermissionGuard'],
                 ]);
             }
         });

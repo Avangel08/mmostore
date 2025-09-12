@@ -22,6 +22,11 @@ class PermissionManagementController extends Controller
         return Inertia::render('PermissionManagement/index', [
             'groupPermissions' => fn() => $this->permissionService->getAllGroupPermissions(isPaginate: true, page: $page, perPage: $perPage, relation: ['roles', 'permissions']),
             'detailPermission' => Inertia::optional(fn() => $this->permissionService->getGroupPermissionById($request->input('id'), relation: ['permissions'])),
+            'guards' => array_map(
+                fn($key, $item) => ['value' => $item, 'label' => $key],
+                array_keys(config('guard', [])),
+                config('guard', [])
+            ),
         ]);
     }
 

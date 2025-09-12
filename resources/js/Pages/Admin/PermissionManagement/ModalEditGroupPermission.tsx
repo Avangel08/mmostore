@@ -19,8 +19,8 @@ export const ModalEditGroupPermission = ({
   const maxLengthDescription = 1000;
   const { t } = useTranslation();
   const groupPermissionValueRef = React.useRef<HTMLDivElement>(null);
+  const {guards} = usePage().props;
   
-  // Extract permission names without the key prefix for the checkbox list
   const getPermissionNameFromFull = (fullName: string, key: string) => {
     return fullName.replace(`${key}_`, '');
   };
@@ -30,7 +30,6 @@ export const ModalEditGroupPermission = ({
   >([]);
   const valueInputPermissionRef = React.useRef<HTMLInputElement>(null);
 
-  // Update permission list when data changes
   React.useEffect(() => {
     if (data?.permissions && data?.key) {
       const permissionNames = data.permissions.map((item: any) => 
@@ -59,6 +58,7 @@ export const ModalEditGroupPermission = ({
       groupPermissionName: data?.name || "",
       groupPermissionDescription: data?.description || "",
       groupPermissionKey: data?.key || "",
+      groupPermissionGuard: data?.permissions?.[0]?.guard_name || "",
       groupPermissionValue: data?.permissions && data?.key ? 
         data.permissions.map((item: any) => getPermissionNameFromFull(item?.name, data?.key)) : [],
     },
@@ -71,6 +71,8 @@ export const ModalEditGroupPermission = ({
         maxLengthDescription,
         `Must be ${maxLengthDescription} characters or less`
       ),
+      groupPermissionGuard: Yup.string()
+        .required(t("Please select guard")),
       groupPermissionValue: Yup.array()
         .min(1, "Please select at least one permission")
         .of(
@@ -86,6 +88,7 @@ export const ModalEditGroupPermission = ({
         groupPermissionName: values.groupPermissionName,
         groupPermissionDescription: values.groupPermissionDescription,
         groupPermissionKey: data?.key,
+        groupPermissionGuard: values.groupPermissionGuard,
         groupPermissionValue: values.groupPermissionValue,
       };
       
@@ -210,6 +213,34 @@ export const ModalEditGroupPermission = ({
             />
             <Form.Control.Feedback type="invalid">
               {formik.errors.groupPermissionName}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          {/* guard */}
+          <Form.Group className="mb-3" controlId="groupPermissionGuard">
+            <Form.Label>
+              {t("Guard")} <span className="text-danger">*</span>
+            </Form.Label>
+            <Form.Select
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.groupPermissionGuard}
+              isInvalid={
+                !!(
+                  formik.touched.groupPermissionGuard &&
+                  formik.errors.groupPermissionGuard
+                )
+              }
+            >
+              <option value="">{t("Select guard")}</option>
+              {guards?.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {formik.errors.groupPermissionGuard}
             </Form.Control.Feedback>
           </Form.Group>
 

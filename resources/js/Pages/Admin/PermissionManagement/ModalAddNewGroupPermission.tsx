@@ -17,6 +17,7 @@ export const ModalAddNewGroupPermission = ({
   const maxLengthDescription = 1000;
   const { t } = useTranslation();
   const groupPermissionValueRef = React.useRef<HTMLDivElement>(null);
+  const {guards} = usePage().props;
   const [currentPermissionList, setCurrentPermissionList] = React.useState<
     string[]
   >(["view", "create", "edit", "delete"]);
@@ -41,6 +42,7 @@ export const ModalAddNewGroupPermission = ({
       groupPermissionName: "",
       groupPermissionDescription: "",
       groupPermissionKey: "",
+      groupPermissionGuard: "",
       groupPermissionValue: [],
     },
     validationSchema: Yup.object({
@@ -54,6 +56,8 @@ export const ModalAddNewGroupPermission = ({
       groupPermissionKey: Yup.string()
         .max(maxLengthName, `Must be ${maxLengthName} characters or less`)
         .required(t("Please enter this field")),
+      groupPermissionGuard: Yup.string()
+        .required(t("Please select guard")),
       groupPermissionValue: Yup.array()
         .min(1, "Please select at least one permission")
         .of(
@@ -171,6 +175,34 @@ export const ModalAddNewGroupPermission = ({
             />
             <Form.Control.Feedback type="invalid">
               {formik.errors.groupPermissionName}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          {/* guard */}
+          <Form.Group className="mb-3" controlId="groupPermissionGuard">
+            <Form.Label>
+              {t("Guard")} <span className="text-danger">*</span>
+            </Form.Label>
+            <Form.Select
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.groupPermissionGuard}
+              isInvalid={
+                !!(
+                  formik.touched.groupPermissionGuard &&
+                  formik.errors.groupPermissionGuard
+                )
+              }
+            >
+              <option value="">{t("Select guard")}</option>
+              {guards?.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {formik.errors.groupPermissionGuard}
             </Form.Control.Feedback>
           </Form.Group>
 
