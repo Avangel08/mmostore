@@ -43,10 +43,20 @@ const Navdata = () => {
             isHeader: true,
         },
         {
+            id: "dashboard",
+            label: "Dashboard",
+            icon: "ri-user-star-fill",
+            link: route("admin.dashboard"),
+            click: function (e : any) {
+                e.preventDefault();
+                updateIconSidebar(e);
+            },
+        },
+        {
             id: "rolemanagement",
             label: "Role Management",
             icon: "ri-user-star-fill",
-            link: route("admin.index"),
+            link: route("admin.roles.index"),
             stateVariables: isRoleManagement,
             click: function (e : any) {
                 e.preventDefault();
