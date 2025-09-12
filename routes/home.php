@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Home\Auth\RegisteredUserController;
 use App\Http\Controllers\Home\HomeController;
+use App\Http\Controllers\Home\Register\RegisteredUserController;
 use Illuminate\Support\Facades\Route;
 
 // Routes for primary domain mmostore.local (no middleware)

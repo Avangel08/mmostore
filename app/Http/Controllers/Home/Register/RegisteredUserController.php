@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Home\Auth;
+namespace App\Http\Controllers\Home\Register;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -14,6 +14,6 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Auth/Register');
+        return Inertia::render('Register/index');
     }
 }
