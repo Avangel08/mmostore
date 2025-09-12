@@ -6,29 +6,10 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Symfony\Component\HttpFoundation\Response;
+use App\Helpers\AuthHelper;
 
 class UnifiedAuthMiddleware extends Middleware
 {
-    /**
-     * Determine the guard type from the request.
-     */
-    protected function getGuardType(Request $request): string
-    {
-        $host = $request->getHost();
-        $path = ltrim($request->path(), '/');
-
-        $parts = explode('.', $host);
-        $hasSubdomain = count($parts) > 2;
-
-        $firstSegment = $path === '' ? '' : explode('/', $path)[0];
-
-        if ($firstSegment === 'admin') {
-            return $hasSubdomain ? 'seller' : 'admin';
-        }
-
-        return 'buyer';
-    }
-
     /**
      * Get the path the user should be redirected to when they are not authenticated.
      */
@@ -38,7 +19,7 @@ class UnifiedAuthMiddleware extends Middleware
             return null;
         }
 
-        $guardType = $this->getGuardType($request);
+        $guardType = AuthHelper::getGuardType($request);
         
         return match($guardType) {
             'admin' => route('admin.login'),
@@ -85,7 +66,7 @@ class UnifiedAuthMiddleware extends Middleware
      */
     public function handle($request, Closure $next, ...$guards): Response
     {
-        $guardType = $this->getGuardType($request);
+        $guardType = AuthHelper::getGuardType($request);
         $guard = config("guard.{$guardType}");
         $this->authenticate($request, [$guard, ...$guards]);
 

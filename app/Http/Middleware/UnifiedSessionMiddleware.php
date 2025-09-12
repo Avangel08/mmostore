@@ -3,9 +3,9 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
 use Illuminate\Session\Middleware\StartSession;
 use Symfony\Component\HttpFoundation\Response;
+use App\Helpers\AuthHelper;
 
 class UnifiedSessionMiddleware extends StartSession
 {
@@ -29,32 +29,11 @@ class UnifiedSessionMiddleware extends StartSession
     }
 
     /**
-     * Determine the guard type from the request.
-     */
-    protected function getGuardType(Request $request): string
-    {
-        $host = $request->getHost();
-        $path = ltrim($request->path(), '/');
-
-        $parts = explode('.', $host);
-        $hasSubdomain = count($parts) > 2;
-        $subdomain = $hasSubdomain ? $parts[0] : null;
-
-        $firstSegment = $path === '' ? '' : explode('/', $path)[0];
-
-        if ($firstSegment === 'admin') {
-            return $hasSubdomain ? 'seller' : 'admin';
-        }
-
-        return 'buyer';
-    }
-
-    /**
      * Handle an incoming request.
      */
     public function handle($request, Closure $next): Response
     {
-        $guardType = $this->getGuardType($request);
+        $guardType = AuthHelper::getGuardType($request);
         
         $originalConfig = config('session');
         $guardConfig = $this->getSessionConfig($guardType);

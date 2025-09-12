@@ -3,9 +3,30 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class AuthHelper
 {
+    /**
+     * Determine guard type (admin / seller / buyer) from the current request.
+     */
+    public static function getGuardType(Request $request): string
+    {
+        $host = $request->getHost();
+        $path = ltrim($request->path(), '/');
+
+        $parts = explode('.', $host);
+        $hasSubdomain = count($parts) > 2;
+
+        $firstSegment = $path === '' ? '' : explode('/', $path)[0];
+
+        if ($firstSegment === 'admin') {
+            return $hasSubdomain ? 'seller' : 'admin';
+        }
+
+        return 'buyer';
+    }
+
     /**
      * Lấy user hiện tại theo context
      */

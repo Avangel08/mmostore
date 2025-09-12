@@ -5,29 +5,10 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Helpers\AuthHelper;
 
 class UnifiedSubdomainMiddleware
 {
-    /**
-     * Determine the guard type from the request.
-     */
-    protected function getGuardType(Request $request): string
-    {
-        $host = $request->getHost();
-        $path = ltrim($request->path(), '/');
-
-        $parts = explode('.', $host);
-        $hasSubdomain = count($parts) > 2;
-
-        $firstSegment = $path === '' ? '' : explode('/', $path)[0];
-
-        if ($firstSegment === 'admin') {
-            return $hasSubdomain ? 'seller' : 'admin';
-        }
-
-        return 'buyer';
-    }
-
     /**
      * Get public routes for each guard type.
      */
@@ -115,7 +96,7 @@ class UnifiedSubdomainMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $guardType = $this->getGuardType($request);
+        $guardType = AuthHelper::getGuardType($request);
         $isAuthenticated = auth(config("guard.{$guardType}"))->check();
         $isPublicRoute = $this->isPublicRoute($request, $guardType);
 
