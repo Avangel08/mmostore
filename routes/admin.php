@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Dashboard\DashboardController;
 use App\Http\Controllers\Admin\PermissionManagement\PermissionManagementController;
 use App\Http\Controllers\Admin\RoleManagement\RoleManagementController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\UserManager\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['guest:' . config('guard.admin'), 'unified.session'])->group(function () {
@@ -25,5 +26,9 @@ Route::middleware(['unified.auth', 'unified.session'])->group(function () {
         Route::get('/', [PermissionManagementController::class, 'index'])->name('admin.permissions.index');
         Route::post('/add-new-group-permission', [PermissionManagementController::class, 'addNewGroupPermission'])->name('admin.permissions.add');
         Route::put('/update-group-permission/{id}', [PermissionManagementController::class, 'updateGroupPermission'])->name('admin.permissions.update');
+    });
+
+    Route::group(['prefix' => '/user'], function () {
+        Route::get('/', [UserController::class, 'index'])->name('admin.user.index');
     });
 });

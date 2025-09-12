@@ -53,6 +53,17 @@ const Navdata = () => {
             },
         },
         {
+            id: "usermanagement",
+            label: "User Management",
+            icon: "ri-user-star-fill",
+            link: route("admin.user.index"),
+            click: function (e : any) {
+                e.preventDefault();
+                setIscurrentState('User Management');
+                updateIconSidebar(e);
+            },
+        },
+        {
             id: "rolemanagement",
             label: "Role Management",
             icon: "ri-user-star-fill",
