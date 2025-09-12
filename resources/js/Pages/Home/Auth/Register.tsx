@@ -1,27 +1,50 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import GuestLayout from "../../../Layouts/GuestLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import logoLight from "../../../../images/logo-light.png";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: "",
-        email: "",
-        password: "",
-        password_confirmation: "",
+    const [passwordShow, setPasswordShow] = useState<boolean>(false);
+    const [confirmPasswordShow, setConfirmPasswordShow] = useState<boolean>(false);
+
+    const validation = useFormik({
+        enableReinitialize: true,
+
+        initialValues: {
+            email: "",
+            storename: "",
+            password: "",
+            confirmPassword: "",
+        },
+        validationSchema: Yup.object({
+            email: Yup.string()
+                .email("Invalid email address")
+                .required("This field is required"),
+            storename: Yup.string()
+                .min(2, "Username must be at least 2 characters")
+                .max(100, "Username must be at most 100 characters")
+                .required("This field is required"),
+            password: Yup.string()
+                .min(8, "Password must be at least 8 characters")
+                .matches(RegExp("(.*[a-z].*)"), "At least lowercase letter")
+                .matches(RegExp("(.*[A-Z].*)"), "At least uppercase letter")
+                .matches(RegExp("(.*[0-9].*)"), "At least one number")
+                .required("This field is required"),
+            confirmPassword: Yup.string()
+                .min(8, "Confirm password must be at least 8 characters")
+                .matches(RegExp("(.*[a-z].*)"), "At least lowercase letter")
+                .matches(RegExp("(.*[A-Z].*)"), "At least uppercase letter")
+                .matches(RegExp("(.*[0-9].*)"), "At least one number")
+                .required("This field is required"),
+        }),
+        onSubmit: (values) => {
+            console.log(values);
+        },
     });
 
-    useEffect(() => {
-        return () => {
-            reset("password", "password_confirmation");
-        };
-    }, []);
-
-    const submit = (e: any) => {
-        e.preventDefault();
-        post(route("register"));
-    };
 
     return (
         <React.Fragment>
@@ -60,241 +83,126 @@ export default function Register() {
                                                 Create New Account
                                             </h5>
                                             <p className="text-muted">
-                                                Get your free velzon account now
+                                                Get your free mmoshop account now
                                             </p>
                                         </div>
                                         <div className="p-2 mt-4">
-                                            <form onSubmit={submit}>
-                                                <div>
-                                                    <Form.Label
-                                                        htmlFor="email"
-                                                        value="Email"
-                                                        className="form-label"
-                                                    >
-                                                        {" "}
-                                                        Email{" "}
-                                                    </Form.Label>
-                                                    <span className="text-danger ms-1">
-                                                        *
-                                                    </span>
-                                                    <Form.Control
-                                                        id="email"
-                                                        type="email"
-                                                        name="email"
-                                                        placeholder="Enter Email address"
-                                                        value={data.email}
-                                                        className={
-                                                            "mt-1 form-control" +
-                                                            (errors.email
-                                                                ? "is-invalid"
-                                                                : "")
-                                                        }
-                                                        autoComplete="username"
-                                                        onChange={(e: any) =>
-                                                            setData(
-                                                                "email",
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        required
-                                                    />
+                                            <Form onSubmit={validation.handleSubmit}>
+                                                {/* Email */}
+                                                <div className="mb-3">
+                                                    <Form.Label className="form-label" htmlFor="user-email">Email <span className="text-danger">*</span></Form.Label>
+                                                    <div className="position-relative auth-email-inputgroup">
+                                                        <Form.Control
+                                                            type='email'
+                                                            className="form-control pe-5 user-email-input"
+                                                            placeholder="Enter email"
+                                                            id="user-email"
+                                                            name="email"
+                                                            value={validation.values.email}
+                                                            onBlur={validation.handleBlur}
+                                                            onChange={validation.handleChange}
+                                                            isInvalid={validation.errors.email && validation.touched.email ? true : false}
+                                                        />
+                                                        {validation.errors.email && validation.touched.email ? (
+                                                            <Form.Control.Feedback type="invalid">{validation.errors.email}</Form.Control.Feedback>
+                                                        ) : null}
+                                                    </div>
+                                                </div>
+                                                {/* Store Name */}
+                                                <div className="mb-3">
+                                                    <Form.Label className="form-label" htmlFor="store-name">Store Name <span className="text-danger">*</span></Form.Label>
+                                                    <div className="position-relative auth-store-name-inputgroup">
+                                                        <Form.Control
+                                                            type='text'
+                                                            className="form-control pe-5 store-name-input"
+                                                            placeholder="Enter store name"
+                                                            id="store-name"
+                                                            name="storename"
+                                                            value={validation.values.storename}
+                                                            onBlur={validation.handleBlur}
+                                                            onChange={validation.handleChange}
+                                                            isInvalid={validation.errors.storename && validation.touched.storename ? true : false}
+                                                        />
+                                                        {validation.errors.storename && validation.touched.storename ? (
+                                                            <Form.Control.Feedback type="invalid">{validation.errors.storename}</Form.Control.Feedback>
+                                                        ) : null}
+                                                    </div>
+                                                </div>
+                                                {/* Password */}
+                                                <div className="mb-3">
+                                                    <Form.Label className="form-label" htmlFor="password-input">Password</Form.Label>
+                                                    <div className="position-relative auth-pass-inputgroup">
+                                                        <Form.Control
+                                                            type={passwordShow ? "text" : "password"}
+                                                            className="form-control pe-5 password-input"
+                                                            placeholder="Enter password"
+                                                            id="password-input"
+                                                            name="password"
+                                                            value={validation.values.password}
+                                                            onBlur={validation.handleBlur}
+                                                            onChange={validation.handleChange}
+                                                            isInvalid={validation.errors.password && validation.touched.password ? true : false}
+                                                        />
+                                                        {validation.errors.password && validation.touched.password ? (
+                                                            <Form.Control.Feedback type="invalid">{validation.errors.password}</Form.Control.Feedback>
+                                                        ) : null}
+                                                        <Button variant="link" onClick={() => setPasswordShow(!passwordShow)} className="position-absolute end-0 top-0 text-decoration-none text-muted password-addon material-shadow-none" type="button"
+                                                            id="password-addon"><i className="ri-eye-fill align-middle"></i></Button>
+                                                    </div>
+                                                </div>
+                                                {/*  Confirm Password */}
+                                                <div className="mb-3">
+                                                    <Form.Label className="form-label" htmlFor="confirm-password-input">Confirm Password</Form.Label>
+                                                    <div className="position-relative auth-pass-inputgroup">
+                                                        <Form.Control
+                                                            type={confirmPasswordShow ? "text" : "password"}
+                                                            className="form-control pe-5 password-input"
+                                                            placeholder="Enter confirm password"
+                                                            id="confirm-password-input"
+                                                            name="confirmPassword"
+                                                            value={validation.values.confirmPassword}
+                                                            onBlur={validation.handleBlur}
+                                                            onChange={validation.handleChange}
+                                                            isInvalid={validation.errors.confirmPassword && validation.touched.confirmPassword ? true : false}
+                                                        />
+                                                        {validation.errors.confirmPassword && validation.touched.confirmPassword ? (
+                                                            <Form.Control.Feedback type="invalid">{validation.errors.confirmPassword}</Form.Control.Feedback>
+                                                        ) : null}
+                                                        <Button variant="link" onClick={() => setConfirmPasswordShow(!confirmPasswordShow)} className="position-absolute end-0 top-0 text-decoration-none text-muted confirm-password-addon material-shadow-none" type="button"
+                                                            id="confirm-password-addon"><i className="ri-eye-fill align-middle"></i></Button>
+                                                    </div>
+                                                </div>
 
-                                                    <Form.Control.Feedback
-                                                        type="invalid"
-                                                        className="mt-2 d-block"
-                                                    >
-                                                        {errors.email}
-                                                    </Form.Control.Feedback>
+                                                <div className="mb-4">
+                                                    <p className="mb-0 fs-12 text-muted fst-italic">By registering you agree to the Velzon
+                                                        <Link href="#" className="text-primary text-decoration-underline fst-normal fw-medium ms-2">Terms of Use</Link></p>
+                                                </div>
+
+                                                <div id="password-contain" className="p-3 bg-light mb-2 rounded">
+                                                    <h5 className="fs-13">Password must contain:</h5>
+                                                    <p id="pass-length" className="invalid fs-12 mb-2">Minimum <b>8 characters</b></p>
+                                                    <p id="pass-lower" className="invalid fs-12 mb-2">At <b>lowercase</b> letter (a-z)</p>
+                                                    <p id="pass-upper" className="invalid fs-12 mb-2">At least <b>uppercase</b> letter (A-Z)</p>
+                                                    <p id="pass-number" className="invalid fs-12 mb-0">A least <b>number</b> (0-9)</p>
                                                 </div>
 
                                                 <div className="mt-4">
-                                                    <Form.Label
-                                                        htmlFor="name"
-                                                        value="Username"
-                                                    >
-                                                        {" "}
-                                                        Username{" "}
-                                                    </Form.Label>
-                                                    <span className="text-danger ms-1">
-                                                        *
-                                                    </span>
-
-                                                    <Form.Control
-                                                        id="name"
-                                                        name="name"
-                                                        placeholder="Enter username"
-                                                        value={data.name}
-                                                        className={
-                                                            "mt-1 form-control" +
-                                                            (errors.name
-                                                                ? "is-invalid"
-                                                                : "")
-                                                        }
-                                                        autoComplete="name"
-                                                        autoFocus
-                                                        onChange={(e: any) =>
-                                                            setData(
-                                                                "name",
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        required
-                                                    />
-
-                                                    <Form.Control.Feedback
-                                                        type="invalid"
-                                                        className="mt-2 d-block"
-                                                    >
-                                                        {errors.name}
-                                                    </Form.Control.Feedback>
+                                                    <button className="btn btn-success w-100" type="submit">Sign Up</button>
                                                 </div>
-
-                                                <div className="mt-4">
-                                                    <Form.Label
-                                                        htmlFor="password"
-                                                        value="Password"
-                                                        className="form-label"
-                                                    >
-                                                        {" "}
-                                                        Password{" "}
-                                                    </Form.Label>
-                                                    <span className="text-danger ms-1">
-                                                        *
-                                                    </span>
-                                                    <Form.Control
-                                                        id="password"
-                                                        type="password"
-                                                        name="password"
-                                                        placeholder="Enter Password"
-                                                        value={data.password}
-                                                        className={
-                                                            "mt-1 form-control" +
-                                                            (errors.password
-                                                                ? "is-invalid"
-                                                                : "")
-                                                        }
-                                                        autoComplete="new-password"
-                                                        onChange={(e: any) =>
-                                                            setData(
-                                                                "password",
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        required
-                                                    />
-
-                                                    <Form.Control.Feedback
-                                                        type="invalid"
-                                                        className="mt-2 d-block"
-                                                    >
-                                                        {errors.password}
-                                                    </Form.Control.Feedback>
-                                                </div>
-
-                                                <div className="mt-4">
-                                                    <Form.Label
-                                                        htmlFor="password_confirmation"
-                                                        value="Confirm Password"
-                                                        className="form-label"
-                                                    >
-                                                        {" "}
-                                                        Confirm Password{" "}
-                                                    </Form.Label>
-                                                    <span className="text-danger ms-1">
-                                                        *
-                                                    </span>
-
-                                                    <Form.Control
-                                                        id="password_confirmation"
-                                                        type="password"
-                                                        placeholder="Confirm password"
-                                                        name="password_confirmation"
-                                                        value={
-                                                            data.password_confirmation
-                                                        }
-                                                        className={
-                                                            "mt-1 form-control" +
-                                                            (errors.password_confirmation
-                                                                ? "is-invalid"
-                                                                : "")
-                                                        }
-                                                        autoComplete="new-password"
-                                                        onChange={(e: any) =>
-                                                            setData(
-                                                                "password_confirmation",
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        required
-                                                    />
-
-                                                    <Form.Control.Feedback
-                                                        type="invalid"
-                                                        className="mt-2 d-block"
-                                                    >
-                                                        {
-                                                            errors.password_confirmation
-                                                        }
-                                                    </Form.Control.Feedback>
-                                                </div>
-
-                                                <div className="mb-4 mt-4">
-                                                    <p className="mb-0 fs-12 text-muted fst-italic">
-                                                        By registering you agree
-                                                        to the Velzon
-                                                        <Link
-                                                            href="#"
-                                                            className="text-primary text-decoration-underline fst-normal fw-medium ms-2"
-                                                        >
-                                                            {" "}
-                                                            Terms of Use
-                                                        </Link>
-                                                    </p>
-                                                </div>
-
-                                                <Button
-                                                    type="submit"
-                                                    className="btn btn-success w-100"
-                                                    disabled={processing}
-                                                >
-                                                    Sign Up
-                                                </Button>
 
                                                 <div className="mt-4 text-center">
                                                     <div className="signin-other-title">
-                                                        <h5 className="fs-13 mb-4 title text-muted">
-                                                            Create account with
-                                                        </h5>
+                                                        <h5 className="fs-13 mb-4 title text-muted">Create account with</h5>
                                                     </div>
 
                                                     <div>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-primary btn-icon waves-effect waves-light"
-                                                        >
-                                                            <i className="ri-facebook-fill fs-16"></i>
-                                                        </button>{" "}
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-danger btn-icon waves-effect waves-light"
-                                                        >
-                                                            <i className="ri-google-fill fs-16"></i>
-                                                        </button>{" "}
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-dark btn-icon waves-effect waves-light"
-                                                        >
-                                                            <i className="ri-github-fill fs-16"></i>
-                                                        </button>{" "}
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-info btn-icon waves-effect waves-light"
-                                                        >
-                                                            <i className="ri-twitter-fill fs-16"></i>
-                                                        </button>
+                                                        <button type="button" className="btn btn-primary btn-icon waves-effect waves-light"><i className="ri-facebook-fill fs-16"></i></button>{" "}
+                                                        <button type="button" className="btn btn-danger btn-icon waves-effect waves-light"><i className="ri-google-fill fs-16"></i></button>{" "}
+                                                        <button type="button" className="btn btn-dark btn-icon waves-effect waves-light"><i className="ri-github-fill fs-16"></i></button>{" "}
+                                                        <button type="button" className="btn btn-info btn-icon waves-effect waves-light"><i className="ri-twitter-fill fs-16"></i></button>
                                                     </div>
                                                 </div>
-                                            </form>
+                                            </Form>
                                         </div>
                                     </Card.Body>
                                 </Card>
