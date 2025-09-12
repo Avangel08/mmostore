@@ -8,10 +8,11 @@ import RoleManagement from "../RoleManagement";
 
 const Dashboard = () => {
     const { t } = useTranslation();
+    const titleWeb = t("Dashboard") + " - Admin";
 
     return (
         <React.Fragment>
-            <Head title={t("Dashboard")} />
+            <Head title={ titleWeb }/>
 
         </React.Fragment>
     );
