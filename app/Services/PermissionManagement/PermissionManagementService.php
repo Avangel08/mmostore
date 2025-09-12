@@ -19,9 +19,18 @@ class PermissionManagementService
         return $query->orderBy(...$orderBy)->get();
     }
 
-    public function findByListKey(array $listKey, $select = ["*"], $relation = [])
+    public function findByListKey(array $listKey, $select = ["*"], $relation = [], $id = null)
     {
-        return GroupPermission::whereIn('key', $listKey)->select($select)->with($relation)->get();
+        $query = GroupPermission::whereIn('key', $listKey);
+        if ($id) {
+            $query->where('id', '!=', $id);
+        }
+        return $query->select($select)->with($relation)->get();
+    }
+
+    public function getGroupPermissionById($id, $select = ["*"], $relation = [])
+    {
+        return GroupPermission::where('id', $id)->select($select)->with($relation)->first();
     }
 
     public function createGroupPermission($data)
@@ -35,9 +44,12 @@ class PermissionManagementService
                 'description' => $description,
                 'key' => $key,
             ]);
-            
+
             $listKey = [];
             foreach ($data['groupPermissionValue'] as $permissionName) {
+                if ($permissionName == 'all') {
+                    continue;
+                }
                 $listKey[] = $key . '_' . $permissionName;
             }
 
@@ -51,6 +63,43 @@ class PermissionManagementService
                 Permission::create([
                     'name' => $permissionKey,
                     'group_permission_id' => $newGroup->id,
+                ]);
+            }
+        });
+    }
+
+    public function updateGroupPermission(GroupPermission $groupPermission, $data)
+    {
+        DB::transaction(function () use ($groupPermission, $data) {
+            $name = $data['groupPermissionName'];
+            $description = $data['groupPermissionDescription'] ?? null;
+            $key = $data['groupPermissionKey'];
+            $groupPermission->update([
+                'name' => $name,
+                'description' => $description,
+                'key' => $key,
+            ]);
+
+            $groupPermission->permissions()->forceDelete();
+
+            $listKey = [];
+            foreach ($data['groupPermissionValue'] as $permissionName) {
+                if ($permissionName == 'all') {
+                    continue;
+                }
+                $listKey[] = $key . '_' . $permissionName;
+            }
+
+            $currentListKey = $this->findByListKey($listKey, ['key'], id: $groupPermission->id)->toArray();
+
+            if (count($currentListKey) > 0) {
+                throw new \Exception("Some permission keys already exist: " . implode(", ", array_column($currentListKey, 'key')));
+            }
+
+            foreach ($listKey as $permissionKey) {
+                Permission::firstOrCreate([
+                    'name' => $permissionKey,
+                    'group_permission_id' => $groupPermission->id,
                 ]);
             }
         });

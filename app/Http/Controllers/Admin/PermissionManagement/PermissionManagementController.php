@@ -21,6 +21,7 @@ class PermissionManagementController extends Controller
         $perPage = $request->input('perPage', 10);
         return Inertia::render('PermissionManagement/index', [
             'groupPermissions' => fn() => $this->permissionService->getAllGroupPermissions(isPaginate: true, page: $page, perPage: $perPage, relation: ['roles', 'permissions']),
+            'detailPermission' => Inertia::optional(fn() => $this->permissionService->getGroupPermissionById($request->input('id'), relation: ['permissions'])),
         ]);
     }
 
@@ -33,6 +34,25 @@ class PermissionManagementController extends Controller
             $data = $permissionRequest->validated();
             $this->permissionService->createGroupPermission($data);
             return back()->with('success', "Group permission added successfully");
+        } catch (\Exception $e) {
+            \Log::error($e, ['ip' => $permissionRequest->ip(), 'user_id' => auth(config('guard.admin'))->id() ?? null]);
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function updateGroupPermission($id, PermissionManagementRequest $permissionRequest)
+    {
+        // if (auth(config('guard.admin'))->user()->cannot('permission_update')) {
+        //     return abort(403);
+        // }
+        try {
+            $data = $permissionRequest->validated();
+            $groupPermission = $this->permissionService->getGroupPermissionById($id, relation: ['permissions']);
+            if (!$groupPermission) {
+                return back()->with('error', "Group permission not found");
+            }
+            $this->permissionService->updateGroupPermission($groupPermission, $data);
+            return back()->with('success', "Group permission updated successfully");
         } catch (\Exception $e) {
             \Log::error($e, ['ip' => $permissionRequest->ip(), 'user_id' => auth(config('guard.admin'))->id() ?? null]);
             return back()->with('error', $e->getMessage());

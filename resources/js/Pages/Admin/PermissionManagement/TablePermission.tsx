@@ -8,9 +8,11 @@ import moment from "moment";
 const TablePermission = ({
   data,
   onReloadTable,
+  onEdit
 }: {
   data: any;
   onReloadTable?: (page: number, perPage: number) => void;
+  onEdit: (id: number) => void;
 }) => {
   const { t } = useTranslation();
   const params = new URLSearchParams(window.location.search);
@@ -19,7 +21,9 @@ const TablePermission = ({
 
   const contextMenuOptions = (rowData: any) => {
     return new ContextMenuBuilder()
-      .addCustomOption("permissions", t("Edit"), "ri-edit-2-fill", "", () => {})
+      .addCustomOption("permissions", t("Edit"), "ri-edit-2-fill", "", () => {
+        onEdit(rowData?.id);
+      })
       .build();
   };
 
@@ -98,7 +102,7 @@ const TablePermission = ({
             delete: "border-danger text-danger",
           };
           return cell.getValue().map((permission: any, index: number) => {
-            const permissionName: string = permission?.name?.split("_")[1] ?? "";
+            const permissionName: string = permission?.name?.split("_").slice(1).join("_") ?? "";
             return (
               <span key={permission?.id ?? index} className={`badge border ${classColor[permissionName] || "border-dark text-body"} fs-6 me-2`}>
                 {permissionName}

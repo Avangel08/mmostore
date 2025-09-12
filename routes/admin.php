@@ -73,5 +73,6 @@ Route::middleware('auth.admin')->group(function () {
     Route::group(['prefix' => '/permissions'], function () {
         Route::get('/', [PermissionManagementController::class, 'index'])->name('admin.permissions.index');
         Route::post('/add-new-group-permission', [PermissionManagementController::class, 'addNewGroupPermission'])->name('admin.permissions.add');
+        Route::put('/update-group-permission/{id}', [PermissionManagementController::class, 'updateGroupPermission'])->name('admin.permissions.update');
     });
 });

@@ -26,7 +26,14 @@ class PermissionManagementRequest extends FormRequest
             'addNewGroupPermission' => [
                 'groupPermissionName' => ['required', 'string', 'max:50'],
                 'groupPermissionDescription' => ['nullable', 'string', 'max:1000'],
-                'groupPermissionKey' => ['required', 'string', 'max:50', 'unique:group_permissions,key'],
+                'groupPermissionKey' => ['required', 'string', 'max:50'],
+                'groupPermissionValue' => ['required', 'array', 'min:1'],
+                'groupPermissionValue.*' => ['required', 'string', 'max:50'],
+            ],
+            'updateGroupPermission' => [
+                'groupPermissionName' => ['required', 'string', 'max:50'],
+                'groupPermissionDescription' => ['nullable', 'string', 'max:1000'],
+                'groupPermissionKey' => ['required', 'string', 'max:50'],
                 'groupPermissionValue' => ['required', 'array', 'min:1'],
                 'groupPermissionValue.*' => ['required', 'string', 'max:50'],
             ],

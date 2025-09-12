@@ -13,14 +13,16 @@ import {
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
 import TablePermission from "./TablePermission";
-import { useFormik } from "formik";
-import { ModalAddNewGroupPermission } from "./ModalAddNewGroupPermission";
 import { ToastContainer } from "react-toastify";
+import { ModalAddNewGroupPermission } from "./ModalAddNewGroupPermission";
+import { ModalEditGroupPermission } from "./ModalEditGroupPermission";
 
 const PermissionManagement = () => {
   const { t } = useTranslation();
   const { groupPermissions } = usePage().props;
   const [isOpenAddModal, setIsOpenAddModal] = React.useState(false);
+  const [isOpenEditModal, setIsOpenEditModal] = React.useState(false);
+  const [dataEdit, setDataEdit] = React.useState<any>(null);
 
   const onReloadTable = (currentPage: number = 0, perPage: number = 10) => {
     router.reload({
@@ -29,15 +31,30 @@ const PermissionManagement = () => {
     });
   };
 
-  const toggleAddModal = () => {
+  const openModalEdit = (id: number|string) => {
+    router.reload({
+      only: ["detailPermission"],
+      data: { id },
+      onSuccess: (page) => {
+        setDataEdit(page.props.detailPermission);
+        setIsOpenEditModal(true);
+      },
+    });
+  };
+
+  const toggleOpenAddModal = () => {
     setIsOpenAddModal((prevState) => !prevState);
+  };
+  const toggleOpenEditModal = () => {
+    setIsOpenEditModal((prevState) => !prevState);
   };
   return (
     <React.Fragment>
       <Head title={t("Permission Management")} />
       <div className="page-content">
         <ToastContainer />
-        <ModalAddNewGroupPermission show={isOpenAddModal} onHide={toggleAddModal} />
+        <ModalAddNewGroupPermission show={isOpenAddModal} onHide={toggleOpenAddModal} />
+        <ModalEditGroupPermission show={isOpenEditModal} onHide={toggleOpenEditModal} data={dataEdit} />
         <Container fluid>
           <BreadCrumb
             title={t("Permission Management")}
@@ -54,7 +71,7 @@ const PermissionManagement = () => {
                 <Card.Body>
                   <Row style={{ marginBottom: "32px" }}>
                     <Col>
-                      <Button variant="success" onClick={toggleAddModal}>
+                      <Button variant="success" onClick={toggleOpenAddModal}>
                         <i className="ri-add-line align-bottom me-1"></i>{" "}
                         {t("Add group permission")}
                       </Button>
@@ -65,6 +82,7 @@ const PermissionManagement = () => {
                       <TablePermission
                         data={groupPermissions}
                         onReloadTable={onReloadTable}
+                        onEdit={openModalEdit}
                       />
                     </Col>
                   </Row>
