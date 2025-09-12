@@ -4,6 +4,7 @@
 @import "../scss/custom.scss";
 @import"./shepherd.css";
 @import "./mermaid.min.css";
+@import "../scss/fonts/fonts.scss";
 
 //RTL 
 // @import "../scss/rtl/components-rtl";
@@ -22,6 +23,7 @@
 body {
   * {
     outline: none;
+    font-family: 'Poppins', sans-serif !important;
   }
 }
 
