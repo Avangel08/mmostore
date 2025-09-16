@@ -55,10 +55,10 @@ class UnifiedAuthMiddleware extends Middleware
         $subdomain = count($parts) > 2 ? $parts[0] : null;
 
         if ($subdomain) {
-            return route('buyer.login', ['sub' => $subdomain]);
+            return route('buyer.home', ['sub' => $subdomain]);
         }
 
-        return route('buyer.login');
+        return route('buyer.home');
     }
 
     /**
