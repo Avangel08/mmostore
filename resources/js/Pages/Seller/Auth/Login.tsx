@@ -59,7 +59,6 @@ export default function Login({}: any) {
             return;
         }
 
-        // Add loading state and error handling
         post(route('seller.login.post', { sub: subdomain }), {
             onSuccess: () => {
                 // Session should be maintained after successful login

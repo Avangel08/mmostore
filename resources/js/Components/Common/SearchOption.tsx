@@ -34,14 +34,14 @@ const SearchOption = () => {
         }
       };
     
-      searchInput.addEventListener("focus", handleSearchInput);
-      searchInput.addEventListener("keyup", handleSearchInput);
+      // searchInput.addEventListener("focus", handleSearchInput);
+      // searchInput.addEventListener("keyup", handleSearchInput);
     
-      searchOptions.addEventListener("click", () => {
-        searchInput.value = "";
-        dropdown.classList.remove("show");
-        searchOptions.classList.add("d-none");
-      });
+      // searchOptions.addEventListener("click", () => {
+      //   searchInput.value = "";
+      //   dropdown.classList.remove("show");
+      //   searchOptions.classList.add("d-none");
+      // });
     
       document.body.addEventListener("click", (e: any) => {
         if (e.target.getAttribute('id') !== "search-options") {
@@ -51,17 +51,17 @@ const SearchOption = () => {
       });
     }, [searchTerm]);
     
-    const onKeyDownPress = (e : any) => {
-        const  { key} = e;
-        if(key === "Enter"){
-			e.preventDefault();
-            setSearchTerm(e.target.value);
-		}
-    }
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        event.preventDefault();
-        setSearchTerm(event.target.value);
-    };
+    // const onKeyDownPress = (e : any) => {
+    //     const  { key} = e;
+    //     if(key === "Enter"){
+	// 		e.preventDefault();
+    //         setSearchTerm(e.target.value);
+	// 	}
+    // }
+    // const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     event.preventDefault();
+    //     setSearchTerm(event.target.value);
+    // };
     
     // Filter routes based on search term
     useEffect(() => {
@@ -101,17 +101,17 @@ const SearchOption = () => {
     return (
         <React.Fragment>
             <form className="app-search d-none d-md-block">
-                <div className="position-relative">
-                    <Form.Control type="text" className="form-control" placeholder="Search..."
-                        id="search-options"
-                        value={searchTerm}
-                        onKeyDown={onKeyDownPress}
-                        onChange={handleChange}
-                    />
-                    <span className="mdi mdi-magnify search-widget-icon"></span>
-                    <span className="mdi mdi-close-circle search-widget-icon search-widget-icon-close d-none"
-                        id="search-close-options"></span>
-                </div>
+                {/*<div className="position-relative">*/}
+                {/*    <Form.Control type="text" className="form-control" placeholder="Search..."*/}
+                {/*        id="search-options"*/}
+                {/*        value={searchTerm}*/}
+                {/*        onKeyDown={onKeyDownPress}*/}
+                {/*        onChange={handleChange}*/}
+                {/*    />*/}
+                {/*    <span className="mdi mdi-magnify search-widget-icon"></span>*/}
+                {/*    <span className="mdi mdi-close-circle search-widget-icon search-widget-icon-close d-none"*/}
+                {/*        id="search-close-options"></span>*/}
+                {/*</div>*/}
                 <div className="dropdown-menu dropdown-menu-lg" id="search-dropdown">
                     <SimpleBar style={{ height: "320px" }}>
 

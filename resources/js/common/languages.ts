@@ -11,7 +11,7 @@ import flagVN from "../../images/flags/vn.svg";
 
 const languages = {
   vi: {
-    label: "Tiếng Việt",
+    label: "Vietnamese",
     flag: flagVN,
   },
   en: {

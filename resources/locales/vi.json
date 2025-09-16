@@ -49,5 +49,14 @@
     "Group permission": "Nhóm quyền",
     "Enter role name": "Nhập tên vai trò",
     "Select guard": "Chọn guard",
-    "Please select guard": "Vui lòng chọn guard"
+    "Please select guard": "Vui lòng chọn guard",
+    "Password must be at least 8 characters": "Mật khẩu phải có ít nhất 8 ký tự",
+    "Passwords must match": "Mật khẩu phải trùng khớp",
+    "Store name is required": "Tên cửa hàng là bắt buộc",
+    "Store name must be at least 3 characters": "Tên cửa hàng phải có ít nhất 3 ký tự",
+    "Store name must be at most 20 characters": "Tên cửa hàng phải có tối đa 20 ký tự",
+    "Store name": "Tên cửa hàng",
+    "Confirm password": "Xác nhận mật khẩu",
+    "Enter your store name": "Nhập tên cửa hàng của bạn",
+    "Sign up store": "Đăng ký cửa hàng"
 }
