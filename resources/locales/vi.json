@@ -58,5 +58,9 @@
     "Store name": "Tên cửa hàng",
     "Confirm password": "Xác nhận mật khẩu",
     "Enter your store name": "Nhập tên cửa hàng của bạn",
-    "Sign up store": "Đăng ký cửa hàng"
+    "Sign up store": "Đăng ký cửa hàng",
+    "Domain store is required": "Tên miền cửa hàng là bắt buộc",
+    "Domain store must be at least 3 characters": "Tên miền cửa hàng phải có ít nhất 3 ký tự",
+    "Domain store must be at most 10 characters": "Tên miền cửa hàng phải có tối đa 10 ký tự",
+    "Domain store": "Tên miền cửa hàng"
 }

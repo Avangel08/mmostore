@@ -12,6 +12,8 @@ use App\Services\Home\UserService;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class RegisteredStoreController extends Controller
 {
@@ -35,9 +37,8 @@ class RegisteredStoreController extends Controller
         return Inertia::render('Register/index');
     }
 
-    public function createStore(RegisterStoreRequest $registerStoreRequest): Response
+    public function createStore(RegisterStoreRequest $registerStoreRequest)
     {
-
         try {
             $data = $registerStoreRequest->validated();
             $dataUser = [
@@ -53,17 +54,45 @@ class RegisteredStoreController extends Controller
             $server = $server->random();
 
             $dataStore = [
-                'name' => $data['name'],
+                'name' => $data['store_name'],
                 'user_id' => $user['id'],
                 'server_id' => $server['id'],
                 'status' => Stores::STATUS['ACTIVE'],
+                'domain' => [
+                    $data['domain_store'] . env('DOMAIN_STORE'),
+                ],
+                'database_config' => [
+                    "host" => $server['host'],
+                    "port" => $server['port'],
+                    "user" => $server['user'],
+                    "password" => $server['password'],
+                ],
             ];
 
-            $this->storeService->create($dataStore);
-        } catch (\Exception $exception) {
-            dd($exception->getMessage());
-        }
+            $store = $this->storeService->create($dataStore);
 
-        return true;
+            $this->storeService->update($store, [
+                'database_config' => [
+                    "host" => $server['host'],
+                    "port" => $server['port'],
+                    "user" => $server['user'],
+                    "password" => $server['password'],
+                    "database_name" => date('Y_m_d') . '_' . $store['id'],
+                    "prefix" => $store['id'],
+                ]
+            ]);
+
+            $scheme = request()->isSecure() ? 'https://' : 'http://';
+            $redirectUrl = $scheme . $data['domain_store'] . env('DOMAIN_STORE') . '/admin';
+
+            return Inertia::render('Register/Redirect', [
+                'redirectUrl' => $redirectUrl,
+                'seconds' => 5,
+            ]);
+        } catch (\Exception $exception) {
+            throw ValidationException::withMessages([
+                'register' => $exception->getMessage(),
+            ]);
+        }
     }
 }

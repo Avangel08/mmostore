@@ -25,6 +25,7 @@ class Stores extends Model
 
     protected $casts = [
         'database_config' => 'array',
+        'domain' => 'array',
     ];
 }
 

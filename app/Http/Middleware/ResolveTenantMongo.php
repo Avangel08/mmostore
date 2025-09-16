@@ -29,12 +29,13 @@ class ResolveTenantMongo
                 $dsn = $cfg['dsn'] ?? null;
 
                 $database = $prefix !== '' ? ($prefix) : '';
+                $databaseName = $cfg['database_name'];
 
                 $connection = [
                     'driver' => 'mongodb',
                     'host' => $host,
                     'port' => $port,
-                    'database' => $database,
+                    'database' => $databaseName,
                     'username' => $username,
                     'password' => $password,
                     'options' => array_filter([

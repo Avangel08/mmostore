@@ -71,6 +71,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'subdomain' => $subdomain,
+            'domainSuffix' => env('DOMAIN_STORE', '.mmostore.local'),
             'message' => [
                 'success' => fn() => $request->session()->get('success'),
                 'error' => fn() => $request->session()->get('error'),
