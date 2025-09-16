@@ -21,6 +21,11 @@ class User extends Authenticatable
         'BLOCK' => 2,
     ];
 
+    const TYPE = [
+        'ADMIN' => 'ADMIN',
+        'SELLER' => 'SELLER'
+    ];
+
     protected $connection = 'mysql';
     protected $table = 'users';
     /**

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\PermissionManagement;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\PermissionManagement\PermissionManagementRequest;
-use App\Services\PermissionManagement\PermissionManagementService;
+use App\Services\Admin\PermissionManagement\PermissionManagementService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

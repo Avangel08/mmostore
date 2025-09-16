@@ -34,16 +34,16 @@ class UnifiedSessionMiddleware extends StartSession
     public function handle($request, Closure $next): Response
     {
         $guardType = AuthHelper::getGuardType($request);
-        
+
         $originalConfig = config('session');
         $guardConfig = $this->getSessionConfig($guardType);
-        
+
         config(['session' => array_merge($originalConfig, $guardConfig)]);
         
         $response = parent::handle($request, $next);
-        
+
         config(['session' => $originalConfig]);
-        
+
         return $response;
     }
 }

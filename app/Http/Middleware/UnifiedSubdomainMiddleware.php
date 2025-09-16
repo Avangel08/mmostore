@@ -15,8 +15,8 @@ class UnifiedSubdomainMiddleware
     protected function getPublicRoutes(string $guardType): array
     {
         return match($guardType) {
-            'admin' => ['admin/login', 'admin/register', 'admin/forgot-password', 'admin/reset-password'],
-            'seller' => ['login', 'login/'],
+            'admin' => ['admin/login'],
+            'seller' => ['admin/login'],
             'buyer' => ['', '/', 'products', 'product', 'about', 'contact', 'login', 'register'],
             default => []
         };

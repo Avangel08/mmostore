@@ -61,7 +61,7 @@ export default function Login({}: any) {
 
         post(route('seller.login.post', { sub: subdomain }), {
             onSuccess: () => {
-                // Session should be maintained after successful login
+                console.log(123);
                 console.log('Login successful, session maintained');
             },
             onError: (errors: any) => {

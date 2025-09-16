@@ -9,7 +9,6 @@ class Servers extends Model
     const STATUS = [
         'INACTIVE' => 0,
         'ACTIVE' => 1,
-        'USED' => 2,
     ];
 
     protected $connection = 'mysql';

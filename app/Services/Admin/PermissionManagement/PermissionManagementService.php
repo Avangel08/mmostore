@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\PermissionManagement;
+namespace App\Services\Admin\PermissionManagement;
 
 use App\Models\MySQL\GroupPermission;
 use DB;
