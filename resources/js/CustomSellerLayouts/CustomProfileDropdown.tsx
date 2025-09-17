@@ -25,12 +25,12 @@ const CustomProfileDropdown = () => {
                         <img className="rounded-circle header-profile-user" src={avatar1}
                             alt="Header Avatar" />
                         <span className="text-start ms-xl-2">
-                            <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{user.name}</span>
+                            <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{user?.name}</span>
                         </span>
                     </span>
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="dropdown-menu-end">
-                    <h6 className="dropdown-header">{t("Hello")}, {user.name}</h6>
+                    <h6 className="dropdown-header">{t("Hello")}, {user?.name}</h6>
                     <Dropdown.Item href={route("seller.profile", {sub: subdomain})} className="dropdown-item">
                        <i className="mdi mdi-account-circle text-muted fs-16 align-middle me-2"></i>
                        <span className="align-middle">{t("Edit information")}</span>

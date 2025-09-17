@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Seller\Category\CategoryController;
 use App\Http\Controllers\Seller\DashBoardController;
 use App\Http\Controllers\Seller\LoginController;
 use App\Http\Controllers\Seller\Profile\ProfileController;
@@ -32,6 +33,13 @@ Route::domain('{sub}.'. env('APP_BASE_DOMAIN', 'mmostore.local'))
                     Route::put('/update-info', [ProfileController::class, 'updateInfo'])->name('seller.profile.update-info');
                     Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('seller.profile.change-password');
                 });
+                
+                Route::group(['prefix' => 'category'], function () {
+                    Route::get('/', [CategoryController::class, 'index'])->name('seller.category');
+                    Route::post('/create', [CategoryController::class, 'createCategory'])->name('seller.category.create');
+                    Route::put('/update/{id}', [CategoryController::class, 'updateCategory'])->name('seller.category.update');
+                });
             });
+
         });
     });

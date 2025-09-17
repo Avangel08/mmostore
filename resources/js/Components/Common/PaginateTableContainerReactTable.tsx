@@ -147,7 +147,7 @@ const PaginateTableContainer = ({
 
   const table = useReactTable({
     columns,
-    data: data?.data,
+    data: data?.data ?? [],
     filterFns: {
       fuzzy: fuzzyFilter,
     },
@@ -164,7 +164,7 @@ const PaginateTableContainer = ({
     // getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true,
     getSortedRowModel: getSortedRowModel(),
-    rowCount: data?.total,
+    rowCount: data?.total ?? 0,
     onPaginationChange: (updater) => {
       if (onReloadTable) {
         const newState = updater(table.getState().pagination);

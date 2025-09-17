@@ -1,0 +1,131 @@
+import { useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
+import { Form } from "react-bootstrap";
+import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
+import moment from "moment";
+import { usePage } from "@inertiajs/react";
+
+const TableCategory = ({
+  data,
+  onReloadTable,
+  onEdit,
+}: {
+  data: any;
+  onReloadTable?: (page: number, perPage: number) => void;
+  onEdit?: (id: number | string) => void;
+}) => {
+  const { t } = useTranslation();
+  const { statusConst } = usePage().props as any;
+  const params = new URLSearchParams(window.location.search);
+  const page = params.get("page") ?? "1";
+  const perPage = params.get("perPage") ?? "10";
+
+  const contextMenuOptions = (rowData: any) => {
+    return new ContextMenuBuilder()
+      .addCustomOption("permissions", t("Edit"), "ri-edit-2-fill", "", () => {
+        onEdit && onEdit(rowData?.id);
+      })
+      .build();
+  };
+
+  const checkedAll = useCallback(() => {
+    const checkall: any = document.getElementById("checkBoxAll");
+    const ele = document.querySelectorAll(".categoryCheckbox");
+
+    if (checkall.checked) {
+      ele.forEach((ele: any) => {
+        ele.checked = true;
+      });
+    } else {
+      ele.forEach((ele: any) => {
+        ele.checked = false;
+      });
+    }
+  }, []);
+
+  const columns = useMemo(
+    () => [
+      {
+        header: (
+          <Form.Check.Input
+            type="checkbox"
+            id="checkBoxAll"
+            className="form-check-input"
+            onClick={() => checkedAll()}
+          />
+        ),
+        cell: (cellProps: any) => {
+          return (
+            <Form.Check.Input
+              type="checkbox"
+              className="categoryCheckbox form-check-input"
+              value={cellProps.getValue()}
+              onChange={() => {}}
+            />
+          );
+        },
+        id: "#",
+      },
+      {
+        header: t("Category name"),
+        cell: (cell: any) => {
+          return <span className="fw-semibold">{cell.getValue()}</span>;
+        },
+        accessorKey: "name",
+        enableColumnFilter: false,
+      },
+      {
+        header: t("Created date"),
+        accessorKey: "created_at",
+        enableColumnFilter: false,
+        cell: (cell: any) => {
+          return (
+            <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
+          );
+        },
+      },
+      {
+        header: t("Status"),
+        accessorKey: "status",
+        enableColumnFilter: false,
+        cell: (cell: any) => {
+          const statusLabel = statusConst[cell.getValue()] || "Unknown";
+          const className = {
+            Active: "bg-success",
+            Inactive: "bg-danger",
+            Unknown: "bg-dark",
+          } as any;
+
+          return (
+            <span className={`badge ${className[statusLabel]} fs-6 fw-medium`}>
+              {t(statusLabel)}
+            </span>
+          );
+        },
+      },
+    ],
+    [t]
+  );
+
+  return (
+    <div>
+      <TableWithContextMenu
+        columns={columns}
+        data={data || []}
+        divClass="table-responsive table-card mb-3"
+        tableClass="table align-middle table-nowrap mb-0"
+        theadClass="table-light"
+        SearchPlaceholder={t("Search...")}
+        enableContextMenu={true}
+        contextMenuOptions={contextMenuOptions}
+        isPaginateTable={true}
+        onReloadTable={onReloadTable}
+        defaultCurrentPage={Number(page)}
+        defaultPageSize={Number(perPage)}
+        divStyle={{ height: "50vh" }}
+      />
+    </div>
+  );
+};
+export default TableCategory;

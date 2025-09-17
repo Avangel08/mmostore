@@ -8,6 +8,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { Provider } from 'react-redux';
 import { configureStore } from "@reduxjs/toolkit";
 import rootReducer from "./slices";
+import { ContextMenuProvider } from './Components/Common/ContextMenu';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const store = configureStore({ reducer: rootReducer, devTools: true });
@@ -19,7 +20,9 @@ createInertiaApp({
 
         root.render(
             <Provider store={store}>
-                <App {...props} />
+                <ContextMenuProvider>
+                    <App {...props} />
+                </ContextMenuProvider>
             </Provider>
         );
     },
