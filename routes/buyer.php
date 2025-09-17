@@ -5,7 +5,7 @@ use App\Http\Controllers\Buyer\Auth\RegisteredUserController;
 use App\Http\Controllers\Buyer\BuyerController;
 use Illuminate\Support\Facades\Route;
 
-Route::domain('{sub}.' . config('domains.base'))
+Route::domain('{sub}.' . env('APP_BASE_DOMAIN', 'mmostore.local'))
     ->middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo', 'unified.session', 'unified.subdomain'])
     ->group(function () {
         // Public routes (no authentication required)
