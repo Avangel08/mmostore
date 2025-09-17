@@ -6,6 +6,8 @@
 
         <title inertia>Buyer | {{ config('app.name', 'Laravel') }}</title>
 
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
         @routes
         @viteReactRefresh
         @vite(['resources/js/app-buyer.tsx'])
