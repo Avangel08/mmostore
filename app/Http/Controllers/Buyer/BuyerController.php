@@ -12,8 +12,7 @@ class BuyerController extends Controller
     public function home(string $sub): Response
     {
         $user = auth('buyer')->user();
-        
-        return Inertia::render('Home/Index', [
+        return Inertia::render('Home/index', [
             'subdomain' => $sub,
             'user' => $user,
             'isAuthenticated' => $user !== null
