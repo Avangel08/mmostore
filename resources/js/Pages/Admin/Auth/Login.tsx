@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import { useTranslation } from "react-i18next";
-import authLoginIllustration from "../../../../images/Seller/auth-login-illustration-light.png";
+import authLoginIllustration from "../../../../images/seller/auth-login-illustration-light.png";
 
 export default function Login({ status, canResetPassword }: any) {
     const { t } = useTranslation();
