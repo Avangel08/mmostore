@@ -16,8 +16,7 @@ Route::domain('{sub}.mmostore.local')
         // Route::get('/contact', [BuyerController::class, 'contact'])->name('buyer.contact');
         
         // Login/Register routes (public but with session)
-        Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('buyer.login');
-        Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+        Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('buyer.login');
         
         Route::get('/register', [RegisteredUserController::class, 'create'])->name('buyer.register');
         Route::post('/register', [RegisteredUserController::class, 'store']);
@@ -25,7 +24,7 @@ Route::domain('{sub}.mmostore.local')
 
         // Protected routes (authentication required)
         Route::middleware('unified.auth')->group(function () {
-        // Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('buyer.logout');
+            // Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('buyer.logout');
             // Route::get('/profile', [BuyerProfileController::class, 'index'])->name('buyer.profile');
             // Route::get('/orders', [BuyerOrderController::class, 'index'])->name('buyer.orders');
             // Route::get('/cart', [BuyerCartController::class, 'index'])->name('buyer.cart');

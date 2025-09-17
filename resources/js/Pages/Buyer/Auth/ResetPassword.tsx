@@ -87,7 +87,7 @@ export default function ResetPassword({ token, email }: any) {
                                     </Card.Body>
                                 </Card>
                                 <div className="mt-4 text-center">
-                                    <p className="mb-0">Wait, I remember my password... <Link href={route('buyer.login')} className="fw-bold text-primary text-decoration-underline"> Click here </Link> </p>
+                                    <p className="mb-0">Wait, I remember my password... <Link href={route('buyer.home')} className="fw-bold text-primary text-decoration-underline"> Click here </Link> </p>
                                 </div>
                             </Col>
                         </Row>

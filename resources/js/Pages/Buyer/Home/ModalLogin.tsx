@@ -68,9 +68,7 @@ export default function ModalLogin({
       rememberMe: Yup.boolean(),
     }),
     onSubmit: (values) => {
-      console.log("Submit:", values);
       router.post(route("buyer.login"), values);
-      // Inertia.post(route("buyer.login"), values);
     },
   });
 

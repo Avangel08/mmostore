@@ -55,7 +55,7 @@ class UnifiedSubdomainMiddleware
             'admin' => route('admin.login'),
             'seller' => $this->getSellerLoginRoute($request),
             'buyer' => $this->getBuyerLoginRoute($request),
-            default => route('buyer.login')
+            default => route('buyer.home')
         };
     }
 
@@ -85,10 +85,10 @@ class UnifiedSubdomainMiddleware
         $subdomain = count($parts) > 2 ? $parts[0] : null;
 
         if ($subdomain) {
-            return route('buyer.login', ['sub' => $subdomain]);
+            return route('buyer.home', ['sub' => $subdomain]);
         }
 
-        return route('buyer.login');
+        return route('buyer.home');
     }
 
     /**
