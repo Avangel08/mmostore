@@ -18,7 +18,6 @@ class HandleInertiaRequests extends Middleware
     {
         $domain = [
             'mmostore.local',
-            'mmostores.shop',
         ];
 
         $host = $request->getHost();
@@ -65,7 +64,6 @@ class HandleInertiaRequests extends Middleware
     {
         $this->rootView = $this->detectRootView($request);
         
-        // Extract subdomain from hostname
         $host = $request->getHost();
         $parts = explode('.', $host);
         $subdomain = count($parts) > 2 ? $parts[0] : null;

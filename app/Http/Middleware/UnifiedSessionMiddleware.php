@@ -39,7 +39,7 @@ class UnifiedSessionMiddleware extends StartSession
         $guardConfig = $this->getSessionConfig($guardType);
 
         config(['session' => array_merge($originalConfig, $guardConfig)]);
-        
+
         $response = parent::handle($request, $next);
 
         config(['session' => $originalConfig]);

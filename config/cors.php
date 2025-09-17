@@ -15,12 +15,10 @@ return [
     |
     */
 
-    // Apply CORS to all routes so non-api endpoints like /register are covered
-    'paths' => ['api/*', 'sanctum/csrf-cookie', '*'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
-    // Explicit origins are required if you plan to use credentials (cookies)
     'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
@@ -31,7 +29,6 @@ return [
 
     'max_age' => 0,
 
-    // Enable credentials if you rely on session cookies across origins
-    'supports_credentials' => true,
+    'supports_credentials' => false,
 
 ];

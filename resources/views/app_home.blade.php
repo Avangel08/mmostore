@@ -6,15 +6,9 @@
 
         <title inertia>Home | {{ config('app.name', 'Laravel') }}</title>
 
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
         @routes
-		<script>
-			if (typeof Ziggy !== 'undefined') {
-				Ziggy.absolute = false;
-				try {
-					Ziggy.url = window.location.origin;
-				} catch (e) {}
-			}
-		</script>
         @viteReactRefresh
         @vite(['resources/js/app-home.tsx'])
         @inertiaHead

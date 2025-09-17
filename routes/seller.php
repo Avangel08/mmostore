@@ -5,7 +5,7 @@ use App\Http\Controllers\Seller\LoginController;
 use App\Http\Controllers\Seller\Profile\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-$domains = ['mmostore.local', 'mmostores.shop'];
+$domains = ['mmostore.local'];
 
 foreach ($domains as $domain) {
     Route::domain('{sub}.'.$domain)
