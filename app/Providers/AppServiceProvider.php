@@ -25,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
     {
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
+            // Ensure absolute URLs (including assets) use HTTPS and the current host
+            $host = request()->getHost();
+            if (!empty($host)) {
+                URL::forceRootUrl('https://' . $host);
+            }
         }
         Inertia::share('translations', function () {
             $locale = App::getLocale();
