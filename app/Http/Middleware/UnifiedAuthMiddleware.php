@@ -25,7 +25,7 @@ class UnifiedAuthMiddleware extends Middleware
             'admin' => route('admin.login'),
             'seller' => $this->getSellerLoginRoute($request),
             'buyer' => $this->getBuyerLoginRoute($request),
-            default => route('buyer.login')
+            default => route('buyer.home')
         };
     }
 
