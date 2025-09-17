@@ -16,15 +16,12 @@ return [
     */
 
     // Apply CORS to all routes so non-api endpoints like /register are covered
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', '*'],
 
     'allowed_methods' => ['*'],
 
     // Explicit origins are required if you plan to use credentials (cookies)
-    'allowed_origins' => [
-        'https://mmostores.shop',
-        'http://mmostore.local',
-    ],
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 
