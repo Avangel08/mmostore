@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
         Inertia::share('translations', function () {
             $locale = App::getLocale();
             $path = resource_path("lang/{$locale}.json");

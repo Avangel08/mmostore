@@ -16,18 +16,23 @@ class HandleInertiaRequests extends Middleware
 
     private function detectRootView(Request $request): string
     {
+        $domain = [
+            'mmostore.local',
+            'mmostores.shop',
+        ];
+
         $host = $request->getHost();
         $path = '/' . ltrim($request->path(), '/');
 
-        if ($host === 'mmostore.local' && str_starts_with($path, '/admin')) {
+        if (in_array($host, $domain) && str_starts_with($path, '/admin')) {
             return 'app_admin';
         }
 
-        if ($host === 'mmostore.local' && str_starts_with($path, '/demo')) {
+        if (in_array($host, $domain) && str_starts_with($path, '/demo')) {
             return 'app';
         }
 
-        if ($host === 'mmostore.local') {
+        if (in_array($host, $domain)) {
             return 'app_home';
         }
 
