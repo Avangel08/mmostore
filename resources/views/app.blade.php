@@ -12,6 +12,11 @@
 
         <!-- Scripts -->
         @routes
+        <script>
+            if (typeof Ziggy !== 'undefined') {
+                Ziggy.absolute = false;
+            }
+        </script>
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/Pages/{$page['component']}.tsx"])
         @inertiaHead

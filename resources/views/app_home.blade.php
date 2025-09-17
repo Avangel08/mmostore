@@ -7,6 +7,11 @@
         <title inertia>Home | {{ config('app.name', 'Laravel') }}</title>
 
         @routes
+		<script>
+			if (typeof Ziggy !== 'undefined') {
+				Ziggy.absolute = false;
+			}
+		</script>
         @viteReactRefresh
         @vite(['resources/js/app-home.tsx'])
         @inertiaHead
