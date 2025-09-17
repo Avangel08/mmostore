@@ -4,7 +4,7 @@ use App\Http\Controllers\Home\HomeController;
 use App\Http\Controllers\Home\Register\RegisteredStoreController;
 use Illuminate\Support\Facades\Route;
 
-$domains = ['mmostore.local'];
+$domains = config('domains.hosts');
 
 foreach ($domains as $domain) {
     Route::domain($domain)

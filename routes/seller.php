@@ -5,7 +5,7 @@ use App\Http\Controllers\Seller\LoginController;
 use App\Http\Controllers\Seller\Profile\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-$domains = ['mmostore.local'];
+$domains = config('domains.hosts');
 
 foreach ($domains as $domain) {
     Route::domain('{sub}.'.$domain)
