@@ -49,8 +49,7 @@
 </head>
 <body>
     <div class="error-container">
-        <img src="" alt="404 Error" class="error-image">
-{{--        <img src="{{ Vite::asset('resources/images/error400-cover.png') }}" alt="404 Error" class="error-image">--}}
+        <img src="{{ asset('images/error400-cover.png') }}" alt="404 Error" class="error-image">
 
         <p class="error-message">
             Oops! The page you're looking for doesn't exist or the store is not found.
