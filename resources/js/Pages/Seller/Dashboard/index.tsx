@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
+import Layout from "../../../CustomSellerLayouts";
 
 const Dashboard = () => {
     const { t } = useTranslation();
@@ -24,10 +25,10 @@ const Dashboard = () => {
         <React.Fragment>
             <Head title={ titleWeb } />
             <div className="page-content">
-
+                
             </div>
         </React.Fragment>
     );
 };
-
+Dashboard.layout = (page: any) => <Layout children={page} />;
 export default Dashboard;

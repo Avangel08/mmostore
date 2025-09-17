@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Seller\DashBoardController;
 use App\Http\Controllers\Seller\LoginController;
+use App\Http\Controllers\Seller\Profile\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::domain('{sub}.mmostore.local')
@@ -17,11 +18,18 @@ Route::domain('{sub}.mmostore.local')
         Route::middleware('unified.auth')->group(function () {
             Route::post('logout', [LoginController::class, 'destroy'])->name('seller.logout');
 
+            Route::get('/', function () {
+                return redirect()->route('seller.dashboard');
+            })->name('seller.home');
+            
             Route::group(['prefix' => 'dashboard'], function () {
                 Route::get('/', [DashBoardController::class, 'index'])->name('seller.dashboard');
             });
+
+            Route::group(['prefix' => 'profile'], function () {
+                Route::get('/', [ProfileController::class, 'index'])->name('seller.profile');
+                Route::put('/update-info', [ProfileController::class, 'updateInfo'])->name('seller.profile.update-info');
+                Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('seller.profile.change-password');
+            });
         });
     });
-
-
-
