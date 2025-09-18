@@ -4,7 +4,7 @@ import { router, usePage } from "@inertiajs/react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Slide, toast } from "react-toastify";
-
+import { showToast } from "../../../utils/showToast";
 // minh hoạ, có thể thay thế bằng hình ảnh hoặc component khác
 const GoogleIcon = (props) => (
   <svg
@@ -97,20 +97,6 @@ const Illustration = () => (
 );
 function SignUpPage() {
   const { errors } = usePage().props;
-  
-  const showToast = (message: string, type: "success" | "error") => {
-    toast[type](message, {
-      position: "top-center",
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Slide,
-    });
-  };
 
   const formik = useFormik({
     initialValues: {

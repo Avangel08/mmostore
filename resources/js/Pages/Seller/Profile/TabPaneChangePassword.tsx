@@ -3,11 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { router, usePage } from "@inertiajs/react";
-export default function TabPaneChangePassword({
-  showToast,
-}: {
-  showToast: (message: string, type: "success" | "error") => void;
-}) {
+import { showToast } from "../../../utils/showToast";
+export default function TabPaneChangePassword() {
   const { t } = useTranslation();
   const errors = usePage().props.errors;
 
@@ -30,7 +27,7 @@ export default function TabPaneChangePassword({
     }),
     onSubmit: (values) => {
       router.put(route("seller.profile.change-password"), values, {
-        onSuccess: (success) => {
+        onSuccess: (success: any) => {
           if (success.props?.message?.error) {
             showToast(t(success.props.message.error), "error");
             return;

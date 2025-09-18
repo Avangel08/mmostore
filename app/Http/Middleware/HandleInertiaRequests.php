@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\AuthHelper;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use App\Helpers\AuthHelper;

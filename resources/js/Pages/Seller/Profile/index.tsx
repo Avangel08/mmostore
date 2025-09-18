@@ -20,24 +20,11 @@ import { useTranslation } from "react-i18next";
 import { Slide, toast, ToastContainer } from "react-toastify";
 import TabPaneChangeInformation from "./TabPaneChangeInformation";
 import TabPaneChangePassword from "./TabPaneChangePassword";
+import { showToast } from "../../../utils/showToast";
 
 const EditProfile = () => {
   const { t } = useTranslation();
   const user = usePage().props.auth.user;
-
-  const showToast = (message: string, type: "success" | "error") => {
-    toast[type](message, {
-      position: "top-center",
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Slide,
-    });
-  };
 
   return (
     <React.Fragment>
@@ -97,8 +84,8 @@ const EditProfile = () => {
                   </Card.Header>
                   <Card.Body className="p-4">
                     <Tab.Content>
-                      <TabPaneChangeInformation showToast={showToast} />
-                      <TabPaneChangePassword showToast={showToast} />
+                      <TabPaneChangeInformation />
+                      <TabPaneChangePassword />
                     </Tab.Content>
                   </Card.Body>
                 </Tab.Container>
