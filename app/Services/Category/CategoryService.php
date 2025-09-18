@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Seller\Category;
+namespace App\Services\Category;
 
 use App\Models\Mongo\Categories;
 

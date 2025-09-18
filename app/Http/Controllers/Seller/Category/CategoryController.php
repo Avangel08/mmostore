@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Seller\Category;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\Category\CategoryRequest;
 use App\Models\Mongo\Categories;
-use App\Services\Seller\Category\CategoryService;
+use App\Services\Category\CategoryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
