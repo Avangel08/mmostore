@@ -185,4 +185,5 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    'main_domain' => env('APP_MAIN_DOMAIN', 'mmostore.local'),
 ];

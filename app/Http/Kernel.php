@@ -80,5 +80,7 @@ class Kernel extends HttpKernel
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         'tenant.mongo' => \App\Http\Middleware\ResolveTenantMongo::class,
+
+        'checkauth' => \App\Http\Middleware\CheckAuth::class,
     ];
 }
