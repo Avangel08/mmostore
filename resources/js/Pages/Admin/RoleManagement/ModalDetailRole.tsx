@@ -5,7 +5,7 @@ import { Modal, Form, Button, Row, Col, Container } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { Slide, toast } from "react-toastify";
 import * as Yup from "yup" ;
-
+import { showToast } from "../../../utils/showToast";
 export const ModalDetailRole = ({
   show,
   onHide,
@@ -19,20 +19,6 @@ export const ModalDetailRole = ({
   const { t } = useTranslation();
   const {guards, allGroupPermissions} = usePage().props;
   const isEditMode = !!dataEdit;
-
-  const showToast = (message: string, type: "success" | "error") => {
-    toast[type](message, {
-      position: "top-center",
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Slide,
-    });
-  };
 
   const formik = useFormik({
     initialValues: {

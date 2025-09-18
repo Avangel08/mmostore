@@ -9,12 +9,15 @@ import TableCategory from "./TableCategory";
 import { ModalDetailCategory } from "./ModalDetailCategory";
 import CategoryFilter from "./CategoryFilter";
 import { useQueryParams } from "../../../hooks/useQueryParam";
+import { confirmDelete, confirmDialog } from "../../../utils/sweetAlert";
+import { showToast } from "../../../utils/showToast";
 
 const Category = () => {
   const { t } = useTranslation();
   const { categories } = usePage().props;
   const [showModal, setShowModal] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   const params = useQueryParams();
   const refetchData = () => {
     router.reload({
@@ -60,6 +63,65 @@ const Category = () => {
     });
   };
 
+  const onDelete = async (id: number | string) => {
+    const confirmed = await confirmDelete({
+      title: t("Delete this item?"),
+      text: t("Once deleted, you will not be able to recover it."),
+      confirmButtonText: t("Delete now"),
+      cancelButtonText: t("Cancel"),
+    });
+
+    if (confirmed) {
+      router.delete(route("seller.category.delete", { id }), {
+        onSuccess: (page: any) => {
+          if (page.props?.message?.error) {
+            showToast(t(page.props.message.error), "error");
+            return;
+          }
+          if (page.props?.message?.success) {
+            showToast(t(page.props.message.success), "success");
+          }
+          refetchData();
+        },
+      });
+    }
+  };
+
+  const onDeleteMultiple = async () => {
+    if (selectedIds.length === 0) return;
+
+    const confirmed = await confirmDelete({
+      title: t("Delete selected items?"),
+      text: t(
+        `You are about to delete {{count}} categories. Once deleted, you will not be able to recover them.`, { count: selectedIds.length }
+      ),
+      confirmButtonText: t("Delete now"),
+      cancelButtonText: t("Cancel"),
+    });
+
+    if (confirmed) {
+      router.delete(route("seller.category.delete-multiple"), {
+        data: { ids: selectedIds },
+        onSuccess: (page: any) => {
+          if (page.props?.message?.error) {
+            showToast(t(page.props.message.error), "error");
+            return;
+          }
+
+          if (page.props?.message?.success) {
+            showToast(t(page.props.message.success), "success");
+          }
+          setSelectedIds([]);
+          refetchData();
+        },
+      });
+    }
+  };
+
+  const handleSelectionChange = (selectedItems: (string | number)[]) => {
+    setSelectedIds(selectedItems);
+  };
+
   return (
     <React.Fragment>
       <Head title={t("Category Management")} />
@@ -89,16 +151,24 @@ const Category = () => {
                   <CategoryFilter onFilter={handleFilter} />
                   <Row style={{ marginBottom: "32px" }}>
                     <Col>
-                      <Button
-                        variant="success"
-                        onClick={() => {
-                          setDataEdit(null);
-                          setShowModal(true);
-                        }}
-                      >
-                        <i className="ri-add-line align-bottom me-1"></i>{" "}
-                        {t("Add category")}
-                      </Button>
+                      <div className="d-flex gap-2">
+                        <Button
+                          variant="success"
+                          onClick={() => {
+                            setDataEdit(null);
+                            setShowModal(true);
+                          }}
+                        >
+                          <i className="ri-add-line align-bottom me-1"></i>{" "}
+                          {t("Add category")}
+                        </Button>
+                        {selectedIds.length > 0 && (
+                          <Button variant="danger" onClick={onDeleteMultiple}>
+                            <i className="ri-delete-bin-line align-bottom me-1"></i>{" "}
+                            {t("Delete selected")} ({selectedIds.length})
+                          </Button>
+                        )}
+                      </div>
                     </Col>
                   </Row>
                   <Row>
@@ -107,6 +177,8 @@ const Category = () => {
                         data={categories || []}
                         onReloadTable={fetchData}
                         onEdit={openModalEdit}
+                        onDelete={onDelete}
+                        onSelectionChange={handleSelectionChange}
                       />
                     </Col>
                   </Row>

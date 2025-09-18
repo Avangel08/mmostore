@@ -4,8 +4,8 @@ import { max } from "moment";
 import React, { ChangeEvent } from "react";
 import { Modal, Form, Button, Row, Col, Container } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { Slide, toast, ToastContainer } from "react-toastify";
 import * as Yup from "yup";
+import { showToast } from "../../../utils/showToast";
 export const ModalAddNewGroupPermission = ({
   show,
   onHide,
@@ -22,20 +22,6 @@ export const ModalAddNewGroupPermission = ({
     string[]
   >(["view", "create", "edit", "delete"]);
   const valueInputPermissionRef = React.useRef<HTMLInputElement>(null);
-
-  const showToast = (message: string, type: "success" | "error") => {
-    toast[type](message, {
-      position: "top-center",
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Slide,
-    });
-  };
 
   const formik = useFormik({
     initialValues: {
@@ -69,7 +55,7 @@ export const ModalAddNewGroupPermission = ({
     }),
     onSubmit: (values) => {
       router.post(route("admin.permissions.add"), values, {
-        onSuccess: (success) => {
+        onSuccess: (success: any) => {
           if (success.props?.message?.error) {
             showToast(t(success.props.message.error), "error");
             return;

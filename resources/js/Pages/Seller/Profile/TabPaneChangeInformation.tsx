@@ -4,14 +4,11 @@ import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { router, usePage } from "@inertiajs/react";
+import { showToast } from "../../../utils/showToast";
 
-export default function TabPaneChangeInformation({
-  showToast,
-}: {
-  showToast: (message: string, type: "success" | "error") => void;
-}) {
+export default function TabPaneChangeInformation() {
   const { t } = useTranslation();
-  const user = usePage().props.auth.user;
+  const user = usePage().props.auth.user as any;
   const errors = usePage().props.errors;
 
   const personalInfoFormik = useFormik({
@@ -35,7 +32,7 @@ export default function TabPaneChangeInformation({
     }),
     onSubmit: (values) => {
       router.put(route("seller.profile.update-info"), values, {
-        onSuccess: (success) => {
+        onSuccess: (success: any) => {
           if (success.props?.message?.error) {
             showToast(t(success.props.message.error), "error");
             return;

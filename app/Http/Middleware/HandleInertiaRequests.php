@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\AuthHelper;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -71,7 +72,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user(AuthHelper::getGuardType($request)),
             ],
             'subdomain' => $subdomain,
             'domainSuffix' => env('DOMAIN_STORE', '.mmostore.local'),

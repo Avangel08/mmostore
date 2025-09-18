@@ -1,10 +1,11 @@
 import { router, usePage } from "@inertiajs/react";
 import { useFormik } from "formik";
 import React, { useEffect } from "react";
-import { Modal, Form, Button, Row, Col, Container, Stack } from "react-bootstrap";
+import { Modal, Form, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { Slide, toast } from "react-toastify";
+
 import * as Yup from "yup" ;
+import { showToast } from "../../../utils/showToast";
 
 export const ModalDetailCategory = ({
   show,
@@ -21,20 +22,6 @@ export const ModalDetailCategory = ({
   const { t } = useTranslation();
   const isEditMode = !!dataEdit;
   const errors = usePage().props.errors as any;
-
-  const showToast = (message: string, type: "success" | "error") => {
-    toast[type](message, {
-      position: "top-center",
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Slide,
-    });
-  };
 
   const formik = useFormik({
     initialValues: {

@@ -12,8 +12,8 @@ class User extends Authenticatable
 {
     use HasApiTokens;
     use HasFactory;
-    use Notifiable;
     use HasRoles;
+    use Notifiable;
 
     const STATUS = [
         'INACTIVE' => 0,
@@ -23,11 +23,13 @@ class User extends Authenticatable
 
     const TYPE = [
         'ADMIN' => 'ADMIN',
-        'SELLER' => 'SELLER'
+        'SELLER' => 'SELLER',
     ];
 
     protected $connection = 'mysql';
+
     protected $table = 'users';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -35,22 +37,12 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
-        'password',
-        'parent_id',
-        'type',
-        'email_verified_at',
-        'status',
-        'image',
         'first_name',
         'last_name',
-        'phone_number',
-        'organization',
-        'address',
-        'state',
-        'country',
-        'language',
-        'currency',
+        'email',
+        'status',
+        'password',
+        'email_verified_at',
     ];
 
     /**
@@ -73,5 +65,3 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 }
-
-
