@@ -92,7 +92,19 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
-
+        'mongodb' => [
+            'driver' => 'mongodb',
+            'host' => env('DB_HOST_MONGO', 'localhost'),
+            'port' => env('DB_PORT_MONGO', 27017),
+            'database' => env('DB_DATABASE_MONGO', 'mmo_store'),
+            'username' => env('DB_USERNAME_MONGO', ''),
+            'password' => env('DB_PASSWORD_MONGO', ''),
+            'options' => [
+                'database' => env('DB_AUTHENTICATION_DATABASE', 'mmo_store'), // Nếu cần authentication
+                'authMechanism' => env('DB_AUTHENTICATION_DATABASE_MECHAN', 'SCRAM-SHA-256'),
+            ],
+            'dsn' => env('DB_DNS_MONGO', ''),
+        ],
     ],
 
     /*
