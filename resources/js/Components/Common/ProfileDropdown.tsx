@@ -5,7 +5,6 @@ import { Link, usePage } from '@inertiajs/react';
 import avatar1 from "../../../images/users/user-dummy-img.jpg";
 
 const ProfileDropdown = () => {
-
     const user = usePage().props.auth.user;
 
     //Dropdown Toggle
@@ -24,7 +23,7 @@ const ProfileDropdown = () => {
                         <img className="rounded-circle header-profile-user" src={avatar1}
                             alt="Header Avatar" />
                         <span className="text-start ms-xl-2">
-                            <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{user.name}</span>
+                            <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{user?.name}</span>
                         </span>
                     </span>
                 </Dropdown.Toggle>

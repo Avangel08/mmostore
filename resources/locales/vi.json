@@ -109,5 +109,14 @@
     "Hide Filters": "Ẩn bộ lọc",
     "All": "Tất cả",
     "Category created successfully": "Tạo danh mục thành công",
-    "Edit category": "Chỉnh sửa danh mục"
+    "Edit category": "Chỉnh sửa danh mục",
+    "Delete": "Xóa",
+    "Delete this item?": "Xóa mục này?",
+    "Once deleted, you will not be able to recover it.": "Khi đã xóa, bạn sẽ không thể khôi phục lại.",
+    "Delete now": "Xoá ngay",
+    "Delete selected items?": "Xóa các mục đã chọn?",
+    "You are about to delete {{count}} categories. Once deleted, you will not be able to recover them.": "Bạn sắp xóa {{count}} danh mục. Khi đã xóa, bạn sẽ không thể khôi phục lại.",
+    "Delete selected": "Xóa mục đã chọn",
+    "Category deleted successfully": "Xóa danh mục thành công",
+    "Categories deleted successfully": "Xóa các danh mục thành công"
 }

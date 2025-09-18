@@ -38,4 +38,19 @@ class CategoryService
             'status' => $data['categoryStatus'],
         ]);
     }
+
+    public function findByIds(array $ids, $select = ['*'], $relation = [])
+    {
+        return Categories::select($select)->with($relation)->whereIn('_id', $ids)->get();
+    }
+
+    public function delete(Categories $category)
+    {
+        return $category->delete();
+    }
+
+    public function deleteMultiple(array $ids)
+    {
+        return Categories::whereIn('_id', $ids)->delete();
+    }
 }

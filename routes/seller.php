@@ -35,8 +35,11 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                 
                 Route::group(['prefix' => 'category'], function () {
                     Route::get('/', [CategoryController::class, 'index'])->name('seller.category');
+                    Route::get('/detail/{id}', [CategoryController::class, 'getDetailCategory'])->name('seller.category.detail');
                     Route::post('/create', [CategoryController::class, 'createCategory'])->name('seller.category.create');
                     Route::put('/update/{id}', [CategoryController::class, 'updateCategory'])->name('seller.category.update');
+                    Route::delete('/delete/{id}', [CategoryController::class, 'deleteCategory'])->name('seller.category.delete');
+                    Route::delete('/delete-multiple', [CategoryController::class, 'deleteMultipleCategories'])->name('seller.category.delete-multiple');
                 });
             });
 
