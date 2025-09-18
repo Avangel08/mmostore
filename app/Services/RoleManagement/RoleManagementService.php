@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\Admin\RoleManagement;
+namespace App\Services\RoleManagement;
 
 use App\Models\MySQL\RoleCustom;
 use DB;

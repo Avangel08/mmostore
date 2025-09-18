@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Admin\RoleManagement;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RoleManagement\RoleManagementRequest;
-use App\Services\Admin\PermissionManagement\PermissionManagementService;
-use App\Services\Admin\RoleManagement\RoleManagementService;
-use Artisan;
+use App\Services\PermissionManagement\PermissionManagementService;
+use App\Services\RoleManagement\RoleManagementService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
