@@ -69,9 +69,11 @@ const ProfileDropdown = () => {
                     {/*<Dropdown.Item href="/auth-lockscreen-basic" className="dropdown-item">*/}
                     {/*    <i className="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span className="align-middle">Lock screen</span>*/}
                     {/*</Dropdown.Item>*/}
-                    <Link className="dropdown-item" as="button" method="post" href={route('admin.logout')}><i
-                            className="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
-                                className="align-middle" data-key="t-logout">Logout</span></Link>
+                    {user && (
+                        <Link className="dropdown-item" as="button" method="post" href={route('admin.logout')}><i
+                                className="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
+                                    className="align-middle" data-key="t-logout">Logout</span></Link>
+                    )}
                 </Dropdown.Menu>
             </Dropdown>
         </React.Fragment>

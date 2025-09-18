@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Helpers\AuthHelper;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -18,6 +19,7 @@ class HandleInertiaRequests extends Middleware
     {
         $domain = [
             'mmostore.local',
+            'mmostores.shop',
         ];
 
         $host = $request->getHost();
@@ -71,7 +73,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => AuthHelper::getCurrentUser(),
             ],
             'subdomain' => $subdomain,
             'domainSuffix' => env('DOMAIN_STORE', '.mmostore.local'),
