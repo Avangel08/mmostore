@@ -1,20 +1,24 @@
-import React, { useMemo, useCallback } from "react";
+import { useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
 import { Form } from "react-bootstrap";
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import moment from "moment";
+import { usePage } from "@inertiajs/react";
+import { useQueryParams } from "../../../hooks/useQueryParam";
 
-const TablePermission = ({
+const TableCategory = ({
   data,
   onReloadTable,
-  onEdit
+  onEdit,
 }: {
   data: any;
-  onReloadTable?: (page: number, perPage: number) => void;
-  onEdit: (id: number) => void;
+  onReloadTable?: (page: number, perPage: number, filters?: any) => void;
+  onEdit?: (id: number | string) => void;
 }) => {
   const { t } = useTranslation();
+  const { statusConst } = usePage().props as any;
+  const params = useQueryParams();
 
   const contextMenuOptions = (rowData: any) => {
     return new ContextMenuBuilder()
@@ -26,7 +30,7 @@ const TablePermission = ({
 
   const checkedAll = useCallback(() => {
     const checkall: any = document.getElementById("checkBoxAll");
-    const ele = document.querySelectorAll(".roleCheckbox");
+    const ele = document.querySelectorAll(".categoryCheckbox");
 
     if (checkall.checked) {
       ele.forEach((ele: any) => {
@@ -54,7 +58,7 @@ const TablePermission = ({
           return (
             <Form.Check.Input
               type="checkbox"
-              className="roleCheckbox form-check-input"
+              className="categoryCheckbox form-check-input"
               value={cellProps.getValue()}
               onChange={() => {}}
             />
@@ -63,58 +67,42 @@ const TablePermission = ({
         id: "#",
       },
       {
-        header: t("Group permission name"),
+        header: t("Category name"),
         cell: (cell: any) => {
           return <span className="fw-semibold">{cell.getValue()}</span>;
         },
         accessorKey: "name",
         enableColumnFilter: false,
-      },
-      {
-        header: t("Role"),
-        accessorKey: "roles",
-        enableColumnFilter: false,
-        cell: (cell: any) => {
-          return cell.getValue().map((role: any, index: number) => (
-            <span key={role?.id ?? index} className="badge bg-dark-subtle text-body fs-6 me-2">
-              {role?.name ?? ""}
-            </span>
-          ));
-        },
-      },
-      {
-        header: "Key",
-        accessorKey: "key",
-        enableColumnFilter: false,
-      },
-      {
-        header: t("List permission"),
-        accessorKey: "permissions",
-        enableColumnFilter: false,
-        cell: (cell: any) => {
-          const classColor: Record<string, string> = {
-            view: "border-info text-info",
-            create: "border-success text-success",
-            update: "border-warning text-warning",
-            delete: "border-danger text-danger",
-          };
-          return cell.getValue().map((permission: any, index: number) => {
-            const permissionName: string = permission?.name?.split("_").slice(1).join("_") ?? "";
-            return (
-              <span key={permission?.id ?? index} className={`badge border ${classColor[permissionName] || "border-dark text-body"} fs-6 me-2`}>
-                {permissionName}
-              </span>
-            );
-          });
-        },
+        enableSorting: true,
       },
       {
         header: t("Created date"),
         accessorKey: "created_at",
         enableColumnFilter: false,
+        enableSorting: true,
         cell: (cell: any) => {
           return (
             <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
+          );
+        },
+      },
+      {
+        header: t("Status"),
+        accessorKey: "status",
+        enableColumnFilter: false,
+        enableSorting: true,
+        cell: (cell: any) => {
+          const statusLabel = statusConst[cell.getValue()] || "Unknown";
+          const className = {
+            Active: "bg-success",
+            Inactive: "bg-danger",
+            Unknown: "bg-dark",
+          } as any;
+
+          return (
+            <span className={`badge ${className[statusLabel]} fs-6 fw-medium`}>
+              {t(statusLabel)}
+            </span>
           );
         },
       },
@@ -130,6 +118,7 @@ const TablePermission = ({
         divClass="table-responsive table-card mb-3"
         tableClass="table align-middle table-nowrap mb-0"
         theadClass="table-light"
+        SearchPlaceholder={t("Search...")}
         enableContextMenu={true}
         contextMenuOptions={contextMenuOptions}
         isPaginateTable={true}
@@ -138,4 +127,4 @@ const TablePermission = ({
     </div>
   );
 };
-export default TablePermission;
+export default TableCategory;

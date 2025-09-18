@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Http\Requests\Seller\Category;
+
+use App\Models\Mongo\Categories;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class CategoryRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        $action = $this->route()->getActionMethod();
+        return match ($action) {
+            'createCategory' => [
+                'categoryName' => ['required', 'string', 'max:150', Rule::unique('tenant_mongo.categories', 'name')],
+                'categoryStatus' => ['required', Rule::in(array_values(Categories::STATUS))],
+            ],
+            'updateCategory' => [
+                'categoryName' => ['required', 'string', 'max:150', Rule::unique('tenant_mongo.categories', 'name')->ignore($this->route('id'))],
+                'categoryStatus' => ['required', Rule::in(array_values(Categories::STATUS))],
+            ],
+            default => [],
+        };
+    }
+}

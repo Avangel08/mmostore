@@ -24,17 +24,18 @@ const PermissionManagement = () => {
   const [isOpenEditModal, setIsOpenEditModal] = React.useState(false);
   const [dataEdit, setDataEdit] = React.useState<any>(null);
 
-  const onReloadTable = (currentPage: number = 0, perPage: number = 10) => {
+  const onReloadTable = (currentPage: number = 1, perPage: number = 10) => {
     router.reload({
       only: ["groupPermissions"],
-      data: { page: currentPage + 1, perPage },
+      data: { page: currentPage, perPage },
     });
   };
 
-  const openModalEdit = (id: number|string) => {
+  const openModalEdit = (id: number | string) => {
     router.reload({
       only: ["detailPermission"],
       data: { id },
+      replace: true,
       onSuccess: (page) => {
         setDataEdit(page.props.detailPermission);
         setIsOpenEditModal(true);
@@ -53,8 +54,15 @@ const PermissionManagement = () => {
       <Head title={t("Permission Management")} />
       <div className="page-content">
         <ToastContainer />
-        <ModalAddNewGroupPermission show={isOpenAddModal} onHide={toggleOpenAddModal} />
-        <ModalEditGroupPermission show={isOpenEditModal} onHide={toggleOpenEditModal} data={dataEdit} />
+        <ModalAddNewGroupPermission
+          show={isOpenAddModal}
+          onHide={toggleOpenAddModal}
+        />
+        <ModalEditGroupPermission
+          show={isOpenEditModal}
+          onHide={toggleOpenEditModal}
+          data={dataEdit}
+        />
         <Container fluid>
           <BreadCrumb
             title={t("Permission Management")}

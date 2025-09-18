@@ -5,6 +5,7 @@ import TableWithContextMenu from "../../../Components/Common/TableWithContextMen
 import { Button, OverlayTrigger, Tooltip, Form } from "react-bootstrap";
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import moment from "moment";
+import { useQueryParams } from "../../../hooks/useQueryParam";
 
 const TableRole = ({
   data,
@@ -16,9 +17,6 @@ const TableRole = ({
   onEdit?: (id: number | string) => void;
 }) => {
   const { t } = useTranslation();
-  const params = new URLSearchParams(window.location.search);
-  const page = params.get("page") ?? "1";
-  const perPage = params.get("perPage") ?? "10";
 
   const contextMenuOptions = (rowData: any) => {
     return new ContextMenuBuilder()
@@ -124,9 +122,6 @@ const TableRole = ({
         contextMenuOptions={contextMenuOptions}
         isPaginateTable={true}
         onReloadTable={onReloadTable}
-        defaultCurrentPage={Number(page)}
-        defaultPageSize={Number(perPage)}
-        divStyle={{ height: "50vh" }}
       />
     </div>
   );

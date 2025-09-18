@@ -48,7 +48,7 @@ const Navdata = () => {
             id: "dashboard",
             label: "Dashboards",
             icon: "ri-dashboard-2-line",
-            link: route("seller.dashboard", subdomain),
+            link: route("seller.dashboard"),
             stateVariables: isDashboard,
             click: function (e : any) {
                 e.preventDefault();
@@ -61,7 +61,7 @@ const Navdata = () => {
             id: "category",
             label: "Category Management",
             icon: "ri-file-list-fill",
-            link: "/#",
+            link: route('seller.category'),
             stateVariables: isCategory,
             click: function (e : any) {
                 e.preventDefault();
