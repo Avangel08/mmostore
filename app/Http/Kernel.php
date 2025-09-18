@@ -32,9 +32,10 @@ class Kernel extends HttpKernel
         'web' => [
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \App\Http\Middleware\UnifiedSessionMiddleware::class,
+            \Illuminate\Session\Middleware\StartSession::class,
             \App\Http\Middleware\SetLocale::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
@@ -68,10 +69,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'api.validate' => \App\Http\Middleware\ApiValidationMiddleware::class,
-
-        'unified.session' => \App\Http\Middleware\UnifiedSessionMiddleware::class,
-        'unified.auth' => \App\Http\Middleware\UnifiedAuthMiddleware::class,
-        'unified.subdomain' => \App\Http\Middleware\UnifiedSubdomainMiddleware::class,
 
         'validate.subdomain' => \App\Http\Middleware\ValidateSubdomain::class,
         'route.subdomain' => \App\Http\Middleware\SetRouteSubdomain::class,

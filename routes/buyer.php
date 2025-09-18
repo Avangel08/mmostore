@@ -5,7 +5,7 @@ use App\Http\Controllers\Buyer\Auth\RegisteredUserController;
 use App\Http\Controllers\Buyer\BuyerController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo', 'unified.session', 'unified.subdomain'])
+Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
     ->group(function () {
         // Public routes (no authentication required)
         Route::get('/', [BuyerController::class, 'home'])->name('buyer.home');
