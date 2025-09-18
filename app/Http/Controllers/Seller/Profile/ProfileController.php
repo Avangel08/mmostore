@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Seller\Profile;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Seller\Profile\ProfileRequest;
+use App\Http\Requests\Seller\SellerProfile\SellerProfileRequest;
 use App\Services\SellerProfile\SellerProfileService;
 use Auth;
 use Inertia\Inertia;
@@ -23,7 +23,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function updateInfo(ProfileRequest $request)
+    public function updateInfo(SellerProfileRequest $request)
     {
         try {
             $user = Auth::guard(config('guard.seller'))->user();
@@ -41,7 +41,7 @@ class ProfileController extends Controller
         }
     }
 
-    public function changePassword(ProfileRequest $request)
+    public function changePassword(SellerProfileRequest $request)
     {
         try {
             $user = Auth::guard(config('guard.seller'))->user();

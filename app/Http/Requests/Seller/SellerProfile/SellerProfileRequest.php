@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Seller\Profile;
+namespace App\Http\Requests\Seller\SellerProfile;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProfileRequest extends FormRequest
+class SellerProfileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,7 +28,7 @@ class ProfileRequest extends FormRequest
                 'last_name' => ['required', 'string', 'min:2', 'max:50'],
             ],
             'changePassword' => [
-                'current_password' => ['required', 'current_password'], 
+                'current_password' => ['required', 'current_password:'.config('guard.seller')],
                 'password' => ['required', 'string', 'min:8', 'confirmed'], 
             ],
             default => [],
