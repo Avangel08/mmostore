@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Seller\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\Profile\ProfileRequest;
-use App\Services\Seller\Profile\ProfileService;
+use App\Services\SellerProfile\SellerProfileService;
 use Auth;
 use Inertia\Inertia;
 
@@ -12,7 +12,7 @@ class ProfileController extends Controller
 {
     protected $profileService;
 
-    public function __construct(ProfileService $profileService)
+    public function __construct(SellerProfileService $profileService)
     {
         $this->profileService = $profileService;
     }

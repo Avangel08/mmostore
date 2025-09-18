@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Seller\Profile;
+namespace App\Services\SellerProfile;
 
 use App\Models\MySQL\User;
 use Hash;
@@ -8,7 +8,7 @@ use Hash;
 /**
  * Class ProfileService
  */
-class ProfileService
+class SellerProfileService
 {
     public function updateInfo(User $user, array $data)
     {
