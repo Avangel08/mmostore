@@ -42,6 +42,7 @@ class RegisteredUserController extends Controller
         $user = Customers::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
+            'name' => $request->first_name . ($request?->last_name ?? ''),
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'status' => Customers::STATUS['ACTIVE'],
