@@ -5,6 +5,7 @@ import { Form } from "react-bootstrap";
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import moment from "moment";
 import { usePage } from "@inertiajs/react";
+import { useQueryParams } from "../../../hooks/useQueryParam";
 
 const TableCategory = ({
   data,
@@ -12,14 +13,12 @@ const TableCategory = ({
   onEdit,
 }: {
   data: any;
-  onReloadTable?: (page: number, perPage: number) => void;
+  onReloadTable?: (page: number, perPage: number, filters?: any) => void;
   onEdit?: (id: number | string) => void;
 }) => {
   const { t } = useTranslation();
   const { statusConst } = usePage().props as any;
-  const params = new URLSearchParams(window.location.search);
-  const page = params.get("page") ?? "1";
-  const perPage = params.get("perPage") ?? "10";
+  const params = useQueryParams();
 
   const contextMenuOptions = (rowData: any) => {
     return new ContextMenuBuilder()
@@ -74,11 +73,13 @@ const TableCategory = ({
         },
         accessorKey: "name",
         enableColumnFilter: false,
+        enableSorting: true,
       },
       {
         header: t("Created date"),
         accessorKey: "created_at",
         enableColumnFilter: false,
+        enableSorting: true,
         cell: (cell: any) => {
           return (
             <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
@@ -89,6 +90,7 @@ const TableCategory = ({
         header: t("Status"),
         accessorKey: "status",
         enableColumnFilter: false,
+        enableSorting: true,
         cell: (cell: any) => {
           const statusLabel = statusConst[cell.getValue()] || "Unknown";
           const className = {
@@ -121,9 +123,6 @@ const TableCategory = ({
         contextMenuOptions={contextMenuOptions}
         isPaginateTable={true}
         onReloadTable={onReloadTable}
-        defaultCurrentPage={Number(page)}
-        defaultPageSize={Number(perPage)}
-        divStyle={{ height: "50vh" }}
       />
     </div>
   );

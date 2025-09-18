@@ -15,10 +15,10 @@ const RoleManagement = () => {
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
 
-  const onReloadTable = (currentPage: number = 0, perPage: number = 10) => {
+  const onReloadTable = (currentPage: number = 1, perPage: number = 10) => {
     router.reload({
       only: ["roles"],
-      data: { page: currentPage + 1, perPage },
+      data: { page: currentPage, perPage },
     });
   };
 
@@ -26,6 +26,7 @@ const RoleManagement = () => {
     router.reload({
       only: ["detailRole"],
       data: { id },
+      replace: true,
       onSuccess: (page) => {
         setDataEdit(page.props.detailRole);
         setIsOpenEditModal(true);

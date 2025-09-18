@@ -29,8 +29,6 @@ interface TableWithContextMenuProps {
   contextMenuConfig?: ContextMenuConfig;
   isPaginateTable?: boolean;
   onReloadTable?: (page: number, perPage: number) => void;
-  defaultCurrentPage?: number;
-  defaultPageSize?: number;
   divStyle?: React.CSSProperties;
   tableStyle?: React.CSSProperties;
 }

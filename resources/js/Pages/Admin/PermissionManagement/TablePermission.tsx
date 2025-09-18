@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
-import { Button, OverlayTrigger, Tooltip, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import moment from "moment";
 
@@ -15,9 +15,6 @@ const TablePermission = ({
   onEdit: (id: number) => void;
 }) => {
   const { t } = useTranslation();
-  const params = new URLSearchParams(window.location.search);
-  const page = params.get("page") ?? "1";
-  const perPage = params.get("perPage") ?? "10";
 
   const contextMenuOptions = (rowData: any) => {
     return new ContextMenuBuilder()
@@ -137,9 +134,6 @@ const TablePermission = ({
         contextMenuOptions={contextMenuOptions}
         isPaginateTable={true}
         onReloadTable={onReloadTable}
-        defaultCurrentPage={Number(page)}
-        defaultPageSize={Number(perPage)}
-        divStyle={{ height: "50vh" }}
       />
     </div>
   );

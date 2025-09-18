@@ -10,10 +10,12 @@ export const ModalDetailCategory = ({
   show,
   onHide,
   dataEdit,
+  refetchData
 }: {
   show: boolean;
   onHide: () => void;
   dataEdit?: any;
+  refetchData: () => void;
 }) => {
   const maxLengthName = 150;
   const { t } = useTranslation();
@@ -65,6 +67,7 @@ export const ModalDetailCategory = ({
           if (success.props?.message?.success) {
             showToast(t(success.props.message.success), "success");
           }
+          refetchData();
         },
       });
     },
@@ -149,7 +152,7 @@ export const ModalDetailCategory = ({
             {t("Close")}
           </Button>
           <Button variant="primary" type="submit">
-            {isEditMode ? t("Update category") : t("Save changes")}
+            {isEditMode ? t("Update") : t("Save changes")}
           </Button>
         </Modal.Footer>
       </Form>

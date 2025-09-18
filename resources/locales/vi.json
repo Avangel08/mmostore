@@ -98,5 +98,16 @@
     "Select status": "Chọn trạng thái",
     "Enter category name": "Nhập tên danh mục",
     "Please select status": "Vui lòng chọn trạng thái",
-    "The category name has already been taken.": "Tên danh mục đã được sử dụng."
+    "The category name has already been taken.": "Tên danh mục đã được sử dụng.",
+    "Category updated successfully": "Cập nhật danh mục thành công",
+    "Name": "Tên",
+    "Created Date Range": "Khoảng ngày tạo",
+    "Select date range": "Chọn khoảng ngày",
+    "Reset": "Đặt lại",
+    "Filter": "Lọc",
+    "Show Filters": "Hiện bộ lọc",
+    "Hide Filters": "Ẩn bộ lọc",
+    "All": "Tất cả",
+    "Category created successfully": "Tạo danh mục thành công",
+    "Edit category": "Chỉnh sửa danh mục"
 }

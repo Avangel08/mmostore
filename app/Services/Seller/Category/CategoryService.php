@@ -6,15 +6,16 @@ use App\Models\Mongo\Categories;
 
 class CategoryService
 {
-    public function getAllCategory($select = ['*'], $relation = [], $isPaginate = false, $perPage = 10, $page = 1, $orderBy = ['id', 'DESC'])
+    public function getForTable($request)
     {
-        $query = Categories::select($select)->with($relation);
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
 
-        if ($isPaginate) {
-            return $query->orderBy(...$orderBy)->paginate($perPage, ['*'], 'page', $page);
-        }
-
-        return $query->orderBy(...$orderBy)->get();
+        return Categories::filterName($request)
+            ->filterStatus($request)
+            ->filterCreatedDate($request)
+            ->orderBy('_id', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function getById($id, $select = ['*'], $relation = [])

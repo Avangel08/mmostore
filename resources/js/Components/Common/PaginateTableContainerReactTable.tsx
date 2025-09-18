@@ -17,7 +17,7 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils';
 import { useTranslation } from "react-i18next";
 import Select from "react-select";
-import { usePage } from "@inertiajs/react";
+import { useQueryParams } from "../../hooks/useQueryParam";
 
 // Column Filter
 const Filter = ({
@@ -93,11 +93,10 @@ interface TableContainerProps {
   onSubmit?: any;
   onReloadTable?: (page: number, perPage: number) => void;
   perPageEntries?: number[];
-  defaultCurrentPage?: number;
-  defaultPageSize?: number;
   onRowContextMenu?: (event: React.MouseEvent, rowData: any) => void;
   divStyle?: React.CSSProperties;
   tableStyle?: React.CSSProperties;
+  maxHeight?: string | number;
 }
 
 const PaginateTableContainer = ({
@@ -114,21 +113,25 @@ const PaginateTableContainer = ({
   SearchPlaceholder,
   onSubmit = (e: React.FormEvent<HTMLFormElement>) => { e.preventDefault(); },
   onReloadTable,
-  defaultCurrentPage = 1,
-  defaultPageSize = 10,
   perPageEntries = [10, 50, 100, 200],
   onRowContextMenu,
   divStyle,
   tableStyle,
+  maxHeight = '500px',
 }: TableContainerProps) => {
   const {t} = useTranslation();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
-  const [selectedEntries, setSelectedEntries] = useState({ value: defaultPageSize, label: defaultPageSize });
+  
+  const param = useQueryParams();
+  const page = param?.page ?? "1";
+  const perPage = param?.perPage ?? "10";
+
+  const [selectedEntries, setSelectedEntries] = useState({ value: perPage, label: perPage });
 
   const [pagination, setPagination] = React.useState<PaginationState>({
-    pageIndex: defaultCurrentPage - 1,
-    pageSize: defaultPageSize,
+    pageIndex: Number(page) - 1,
+    pageSize: Number(perPage),
   });
 
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -167,8 +170,9 @@ const PaginateTableContainer = ({
     rowCount: data?.total ?? 0,
     onPaginationChange: (updater) => {
       if (onReloadTable) {
-        const newState = updater(table.getState().pagination);
-        onReloadTable(newState.pageIndex, newState.pageSize);
+        const currentState = table.getState().pagination;
+        const newState = typeof updater === 'function' ? updater(currentState) : updater;
+        onReloadTable(newState.pageIndex + 1, newState.pageSize);
       }
       setPagination(updater);
     },
@@ -190,6 +194,50 @@ const PaginateTableContainer = ({
   useEffect(() => {
     Number(customPageSize) && setPageSize(Number(customPageSize));
   }, [customPageSize, setPageSize]);
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      setPagination(prev => {
+        const newPageIndex = Number(page) - 1;
+        const newPageSize = Number(perPage);
+
+        if (prev.pageIndex !== newPageIndex || prev.pageSize !== newPageSize) {
+          return {
+            pageIndex: newPageIndex,
+            pageSize: newPageSize,
+          };
+        }
+        return prev;
+      });
+      
+      setSelectedEntries({ value: perPage, label: perPage });
+    };
+
+    window.addEventListener('popstate', handleUrlChange);
+    handleUrlChange();
+
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+    };
+  }, []);
+
+  // Effect to sync with data changes (for Inertia.js page updates)
+  useEffect(() => {
+    setPagination(prev => {
+      const newPageIndex = Number(page) - 1;
+      const newPageSize = Number(perPage);
+
+      if (prev.pageIndex !== newPageIndex || prev.pageSize !== newPageSize) {
+        return {
+          pageIndex: newPageIndex,
+          pageSize: newPageSize,
+        };
+      }
+      return prev;
+    });
+    
+    setSelectedEntries({ value: perPage, label: perPage });
+  }, [data]);
 
   return (
     <Fragment>
@@ -213,26 +261,47 @@ const PaginateTableContainer = ({
       </Row>}
 
 
-      <div className={divClass} style={divStyle}>
+      <div className={divClass} style={{ ...divStyle, position: 'relative', maxHeight: maxHeight, overflowY: 'auto' }}>
         <Table hover className={tableClass} bordered={borderClass} style={tableStyle}>
-          <thead className={theadClass}>
+          <thead className={`${theadClass} sticky-top`} style={{ zIndex: 10 }}>
             {getHeaderGroups().map((headerGroup: any) => (
               <tr className={trClass} key={headerGroup.id}>
                 {headerGroup.headers.map((header: any) => (
-                  <th key={header.id} className={thClass}  {...{
-                    onClick: header.column.getToggleSortingHandler(),
-                  }}>
+                  <th 
+                    key={header.id} 
+                    className={`${thClass} ${header.column.getCanSort() ? 'sortable-header' : ''}`}
+                    style={{ 
+                      position: 'sticky', 
+                      top: 0, 
+                      zIndex: 10,
+                      cursor: header.column.getCanSort() ? 'pointer' : 'default',
+                      userSelect: 'none'
+                    }}
+                    {...{
+                      onClick: header.column.getToggleSortingHandler(),
+                    }}
+                  >
                     {header.isPlaceholder ? null : (
                       <React.Fragment>
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        {{
-                          asc: ' ',
-                          desc: ' ',
-                        }
-                        [header.column.getIsSorted() as string] ?? null}
+                        <div className="d-flex align-items-center">
+                          <div>
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                          </div>
+                          {header.column.getCanSort() && (
+                            <div className="ms-1">
+                              {header.column.getIsSorted() === 'asc' ? (
+                                <i className="ri-arrow-up-s-line"></i>
+                              ) : header.column.getIsSorted() === 'desc' ? (
+                                <i className="ri-arrow-down-s-line"></i>
+                              ) : (
+                                <i className="ri-expand-up-down-line text-muted"></i>
+                              )}
+                            </div>
+                          )}
+                        </div>
                         {header.column.getCanFilter() ? (
                           <div>
                             <Filter column={header.column} table={table} />
@@ -297,7 +366,7 @@ const PaginateTableContainer = ({
           <Select
               value={selectedEntries}
               onChange={(selected: any) => {
-                onReloadTable && onReloadTable(pagination.pageIndex, selected.value);
+                onReloadTable && onReloadTable(1, selected.value);
                 setPagination((old) => ({
                   ...old,
                   pageSize: selected.value,

@@ -23,15 +23,13 @@ class CategoryController extends Controller
         // if (auth(config('guard.seller'))->user()->cannot('category_view')) {
         //     return abort(403);
         // }
-        $page = $request->input('page', 1);
-        $perPage = $request->input('perPage', 10);
 
         return Inertia::render('Category/index', [
             'statusConst' => fn () => [
                 Categories::STATUS['ACTIVE'] => 'Active',
                 Categories::STATUS['INACTIVE'] => 'Inactive',
             ],
-            'categories' => fn () => $this->categoryService->getAllCategory(isPaginate: true, page: $page, perPage: $perPage),
+            'categories' => fn () => $this->categoryService->getForTable($request),
             'detailCategory' => fn () => $this->categoryService->getById(id: $request->input('id')),
         ]);
     }
@@ -45,7 +43,7 @@ class CategoryController extends Controller
             $data = $request->validated();
             $this->categoryService->createCategory($data);
 
-            return redirect()->route('seller.category')->with('success', 'Category created successfully.');
+            return redirect()->route('seller.category')->with('success', 'Category created successfully');
         } catch (\Exception $e) {
             \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.admin'))->id() ?? null]);
 
@@ -68,7 +66,7 @@ class CategoryController extends Controller
             $data = $request->validated();
             $this->categoryService->updateCategory($category, $data);
 
-            return redirect()->route('seller.category')->with('success', 'Category updated successfully.');
+            return redirect()->route('seller.category')->with('success', 'Category updated successfully');
         } catch (\Exception $e) {
             \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.admin'))->id() ?? null]);
 
