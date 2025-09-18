@@ -35,10 +35,13 @@ class Customers extends Authenticatable
         'country',
         'language',
         'currency',
+        'balance',
+        'identifier',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
+    
 }

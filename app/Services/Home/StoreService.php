@@ -31,4 +31,9 @@ class StoreService
     {
         return Stores::select($select)->with($relation)->whereIn('id', $ids)->get();
     }
+
+    public function findByUserId($userId, $select = ["*"], $relation = [])
+    {
+        return Stores::select($select)->with($relation)->where('user_id', $userId)->first();
+    }
 }
