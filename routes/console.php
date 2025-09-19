@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\Systems\CheckBank;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
@@ -17,3 +18,10 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+
+Schedule::command(CheckBank::class)
+  ->everyMinute()
+  ->withoutOverlapping(10)
+  ->runInBackground()
+  ->appendOutputTo($pathLogs . '/check_bank.txt');

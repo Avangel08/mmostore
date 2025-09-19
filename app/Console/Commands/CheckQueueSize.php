@@ -29,6 +29,9 @@ class CheckQueueSize extends Command
     {
         $listQueue = [
             'default',
+            'check-bank-admin',
+            'check-bank-user',
+            'deposit-customer',
         ];
         foreach ($listQueue as $queue) {
             echo $queue . ' : ' . Queue::size($queue) . PHP_EOL;
