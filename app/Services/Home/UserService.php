@@ -31,4 +31,15 @@ class UserService
     {
         return User::select($select)->with($relation)->whereIn('id', $ids)->get();
     }
+
+    public function getAll($select = ["*"], $relation = [], $isPaginate = false, $perPage = 10, $page = 1, $orderBy = ['id', 'DESC'])
+    {
+        $query = User::select($select)->with($relation);
+
+        if ($isPaginate) {
+            return $query->orderBy(...$orderBy)->paginate($perPage, ['*'], 'page', $page);
+        }
+
+        return $query->orderBy(...$orderBy)->get();
+    }
 }

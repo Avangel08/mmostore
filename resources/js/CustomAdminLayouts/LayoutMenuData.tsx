@@ -54,18 +54,18 @@ const Navdata = () => {
         },
         {
             id: "usermanagement",
-            label: "User Management",
+            label: "User",
             icon: "ri-user-star-fill",
             link: route("admin.user.index"),
             click: function (e : any) {
                 e.preventDefault();
-                setIscurrentState('User Management');
+                setIscurrentState('User');
                 updateIconSidebar(e);
             },
         },
         {
             id: "rolemanagement",
-            label: "Role Management",
+            label: "Role",
             icon: "ri-user-star-fill",
             link: route("admin.roles.index"),
             stateVariables: isRoleManagement,
@@ -78,7 +78,7 @@ const Navdata = () => {
         },
         {
             id: "permissionmanagement",
-            label: "Permission Management",
+            label: "Permission",
             icon: "ri-lock-2-fill",
             link: route("admin.permissions.index"),
             stateVariables: isPermissionManagement,

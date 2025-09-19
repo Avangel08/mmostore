@@ -118,5 +118,10 @@
     "You are about to delete {{count}} categories. Once deleted, you will not be able to recover them.": "Bạn sắp xóa {{count}} danh mục. Khi đã xóa, bạn sẽ không thể khôi phục lại.",
     "Delete selected": "Xóa mục đã chọn",
     "Category deleted successfully": "Xóa danh mục thành công",
-    "Categories deleted successfully": "Xóa các danh mục thành công"
+    "Categories deleted successfully": "Xóa các danh mục thành công",
+    "Type": "Loại",
+    "Enter name": "Nhập tên",
+    "Enter email": "Nhập email",
+    "Block": "Khoá",
+    "Select type": "Chọn loại"
 }

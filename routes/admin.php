@@ -30,5 +30,7 @@ Route::middleware(['checkauth:admin'])->group(function () {
 
     Route::group(['prefix' => '/user'], function () {
         Route::get('/', [UserController::class, 'index'])->name('admin.user.index');
+        Route::post('/add', [UserController::class, 'add'])->name('admin.user.add');
+        Route::put('/update/{id}', [UserController::class, 'update'])->name('admin.user.update');
     });
 });

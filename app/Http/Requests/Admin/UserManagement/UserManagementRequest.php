@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Http\Requests\Admin\UserManagement;
+
+use App\Models\MySQL\User;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class UserManagementRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        $action = $this->route()->getActionMethod();
+        $statuses = array_values(User::STATUS);
+        $types = array_values(User::TYPE);
+
+        $commonRules = [
+            "name" => ['required', 'string', 'max:50'],
+            "email" => ['required', 'string', 'email'],
+            "status" => ['required', Rule::in($statuses)],
+            "type" => ['required', Rule::in($types)],
+        ];
+
+        return match ($action) {
+            'add', 'update' => $commonRules,
+            default => [],
+        };
+    }
+}
