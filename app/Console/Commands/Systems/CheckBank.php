@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands\Systems;
 
-use App\Jobs\System\JobCheckBankAdmin;
-use App\Jobs\System\JobCheckBankUser;
+use App\Jobs\Systems\JobCheckBankAdmin;
+use App\Jobs\Systems\JobCheckBankUser;
 use App\Models\MySQL\PaymentMethods;
 use Illuminate\Console\Command;
 
@@ -31,9 +31,9 @@ class CheckBank extends Command
         $this->info("Start checking bank");
         PaymentMethods::where("type", PaymentMethods::TYPE["BANK"])->where('status', PaymentMethods::STATUS["ACTIVE"])->cursor()->each(function ($item) {
             if(empty($item->user) && $item->user_type == PaymentMethods::USER_TYPE["ADMIN"]){
-                JobCheckBankAdmin::dispatchSync($item->id);
+                // JobCheckBankAdmin::dispatch($item->id);
             }else{
-                JobCheckBankUser::dispatchSync($item->id);
+                JobCheckBankUser::dispatch($item->id);
             }
         });
        return $this->info("End checking bank");

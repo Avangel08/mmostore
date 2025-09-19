@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 
-class jobDepositCustomer implements ShouldQueue
+class JobDepositCustomer implements ShouldQueue
 {
     use Queueable;
 
@@ -34,6 +34,7 @@ class jobDepositCustomer implements ShouldQueue
         $this->amount = $amount;
         $this->transactionId = $transactionId;
         $this->paymentMethodId = $paymentMethodId;
+        $this->queue = 'deposit-customer';
     }
 
     /**

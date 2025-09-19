@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Jobs\System;
+namespace App\Jobs\Systems;
 
-use App\Jobs\Systems\jobDepositCustomer;
 use App\Models\Mongo\BankHistoryLogs;
 use App\Services\CheckBank\CheckBankService;
 use App\Services\PaymentMethod\PaymentMethodService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class JobCheckBankUser implements ShouldQueue
+class JobCheckBankAdmin implements ShouldQueue
 {
     use Queueable;
 
     protected $bankId;
     protected $formatTime = 'd/m/Y H:i:s'; // d/m/Y or d-m-Y
+    protected $checkBankService;
 
     /**
      * Create a new job instance.
@@ -22,6 +22,7 @@ class JobCheckBankUser implements ShouldQueue
     public function __construct($bankId)
     {
         $this->bankId = $bankId;
+        $this->queue = 'check-bank-admin';
     }
 
     /**
@@ -29,6 +30,8 @@ class JobCheckBankUser implements ShouldQueue
      */
     public function handle(PaymentMethodService $paymentMethodService, CheckBankService $checkBankService): void
     {
+        $this->checkBankService = $checkBankService;
+
         $bank = $paymentMethodService->findById($this->bankId);
         if (empty($bank)) {
             echo "Ngân hàng không hợp lệ";
@@ -39,6 +42,7 @@ class JobCheckBankUser implements ShouldQueue
             return;
         }
         $infoBank = $bank->details;
+
         $accountName = $infoBank['account_name'];
         $password = $infoBank['password'];
         $accountNumber = $infoBank['account_number'];
@@ -53,14 +57,16 @@ class JobCheckBankUser implements ShouldQueue
             echo $history['message'];
             return;
         }
+        $listTransaction = $history['data']->transactions;
 
-        if (count($history['data']) > 0) {
-            foreach ($history['data'] as $transaction) {
-                $dataLog = $checkBankService->bankClassification($bankCode, (array) $transaction);
+        if (count($listTransaction) > 0) {
+            foreach ($listTransaction as $transaction) {
+                $dataLog = $this->checkBankService->bankClassification($bankCode, $transaction);
                 if (empty($dataLog)) {
                     echo "Giao dịch không hợp lệ" . PHP_EOL;
                     continue;
                 }
+
                 //check giao dịch này đã tồn tại hay chưa
                 $checkExist = BankHistoryLogs::where('key_unique', $dataLog['key_unique'])->doesntExist();
                 if ($checkExist) {
@@ -68,7 +74,7 @@ class JobCheckBankUser implements ShouldQueue
                     BankHistoryLogs::insert($dataLog);
 
                     //Valid transaction 
-                    $validate = $checkBankService->validateTransaction($dataLog);
+                    $validate = $this->checkBankService->validateTransaction($dataLog);
                     if ($validate['success'] == false) {
                         echo "Giao dịch không hợp lệ" . PHP_EOL;
                         BankHistoryLogs::where('key_unique', $dataLog['key_unique'])->update(['error_info' => $validate['message']]);
@@ -77,10 +83,8 @@ class JobCheckBankUser implements ShouldQueue
 
                     $amount = $dataLog['amount'];
                     $userId = $dataLog['user_id'];
-                    $customerIdentifier = $dataLog['customer_identifier'];
-                    $transactionId = $dataLog['key_unique'];
 
-                    jobDepositCustomer::dispatchSync($userId, $customerIdentifier, $amount, $transactionId, $bank->id);
+                    //Do some thing
                 }
             }
         }
