@@ -61,8 +61,8 @@ export default function Login({}: any) {
 
         post(route('seller.login.post', { sub: subdomain }), {
             onSuccess: () => {
-                console.log(123);
-                console.log('Login successful, session maintained');
+                // Reload page to refresh CSRF token after successful login
+                window.location.reload();
             },
             onError: (errors: any) => {
                 console.error('Login failed:', errors);

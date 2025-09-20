@@ -45,19 +45,7 @@ export const ModalDetail = ({ show, onHide, dataEdit }: {
             };
 
             router[method](url, submissionData, {
-                onSuccess: (page: any) => {
-                    const errorMessage = page.props?.message?.error?.();
-                    const successMessage = page.props?.message?.success?.();
-                    
-                    if (errorMessage) {
-                        showToast(errorMessage, "error");
-                        return;
-                    }
-
-                    if (successMessage) {
-                        showToast(successMessage, "success");
-                    }
-
+                onSuccess: () => {
                     formik.resetForm();
                     onHide();
                 },

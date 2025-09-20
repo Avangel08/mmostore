@@ -7,7 +7,12 @@ function LoginPopup() {
   const [show, setShow] = useState(false);
   const { user } = usePage().props;
   const handleLogout = () => {
-    router.post(route("buyer.logout"));
+    router.post(route("buyer.logout"), {}, {
+      onSuccess: () => {
+        // Reload page to refresh CSRF token after successful logout
+        window.location.reload();
+      }
+    });
   }
   useEffect(() => {
     if (user) {

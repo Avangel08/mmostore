@@ -1,6 +1,6 @@
 import React, { useState} from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 //import images
 import avatar1 from "../../images/users/user-dummy-img.jpg";
 import { useTranslation } from 'react-i18next';
@@ -13,6 +13,15 @@ const CustomProfileDropdown = () => {
     const [isProfileDropdown, setIsProfileDropdown] = useState<boolean>(false);
     const toggleProfileDropdown = () => {
         setIsProfileDropdown(!isProfileDropdown);
+    };
+
+    const handleLogout = () => {
+        router.post(route('seller.logout', subdomain), {}, {
+            onSuccess: () => {
+                // Reload page to refresh CSRF token after successful logout
+                window.location.reload();
+            }
+        });
     };
     return (
         <React.Fragment>
@@ -36,9 +45,9 @@ const CustomProfileDropdown = () => {
                        <span className="align-middle">{t("Edit information")}</span>
                     </Dropdown.Item>
                     <div className="dropdown-divider"></div>
-                    <Link className="dropdown-item" as="button" method="post" href={route("seller.logout", subdomain)}><i
+                    <button className="dropdown-item" onClick={handleLogout}><i
                             className="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
-                                className="align-middle" data-key="t-logout">{t("Logout")}</span></Link>
+                                className="align-middle" data-key="t-logout">{t("Logout")}</span></button>
                 </Dropdown.Menu>
             </Dropdown>
         </React.Fragment>

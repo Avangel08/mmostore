@@ -36,9 +36,9 @@ class UserController extends Controller
             $data = $userRequest->validated();
             $this->userService->create($data);
 
-            return redirect()->back()->with('success', "User added successfully");
+            return back()->with('success', "User added successfully");
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -49,14 +49,14 @@ class UserController extends Controller
             $user = $this->userService->findById($id);
 
             if (!$user) {
-                return redirect()->back()->with('error', "User not found");
+                return back()->with('error', "User not found");
             }
 
             $this->userService->update($user, $data);
 
-            return redirect()->back()->with('success', "User updated successfully");
+            return back()->with('success', "User updated successfully");
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
+            return back()->with('error', $e->getMessage());
         }
     }
 }

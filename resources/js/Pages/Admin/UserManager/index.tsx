@@ -7,14 +7,25 @@ import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
 import { ModalDetail } from "../UserManager/ModalDetail";
 import Table from "../UserManager/Table";
+import { showToast } from "../../../utils/showToast";
 
 const UserManager = () => {
     const { t } = useTranslation();
     const titleWeb = t("User manager") + " - Admin";
-    const { users } = usePage().props;
+    const { users, message } = usePage().props as any;
     const [isOpenAddModal, setIsOpenAddModal] = useState(false);
     const [isOpenEditModal, setIsOpenEditModal] = useState(false);
     const [dataEdit, setDataEdit] = useState<any>(null);
+
+    // Handle flash messages from session
+    useEffect(() => {
+        if (message?.success) {
+            showToast(message.success, "success");
+        }
+        if (message?.error) {
+            showToast(message.error, "error");
+        }
+    }, [message]);
 
     const onReloadTable = (currentPage: number = 1, perPage: number = 10) => {
         router.reload({

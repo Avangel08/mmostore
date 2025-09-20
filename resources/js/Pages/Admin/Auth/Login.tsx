@@ -48,7 +48,12 @@ export default function Login({ status, canResetPassword }: any) {
             return;
         }
 
-        post(route('admin.login'));
+        post(route('admin.login'), {
+            onSuccess: () => {
+                // Reload page to refresh CSRF token after successful login
+                window.location.reload();
+            }
+        });
     };
 
     return (
