@@ -82,6 +82,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn() => $request->session()->get('error'),
                 'info' => fn() => $request->session()->get('info'),
             ],
+            "storageUrl" => request()->getSchemeAndHttpHost() . '/storage',
         ];
     }
 }

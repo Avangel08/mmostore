@@ -1,21 +1,23 @@
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
-import { Form } from "react-bootstrap";
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import moment from "moment";
 import { usePage } from "@inertiajs/react";
+import { Form } from "react-bootstrap";
 
-const TableCategory = ({
+const TableProduct = ({
   data,
   onReloadTable,
   onEdit,
+  onManageStock,
   onDelete,
-  onSelectionChange
+  onSelectionChange,
 }: {
   data: any;
   onReloadTable?: (page: number, perPage: number, filters?: any) => void;
   onEdit?: (id: number | string) => void;
+  onManageStock?: (id: number | string) => void;
   onDelete?: (id: number | string) => void;
   onSelectionChange?: (selectedItems: (string | number)[]) => void;
 }) => {
@@ -38,10 +40,19 @@ const TableCategory = ({
       .addCustomOption("permissions", t("Edit"), "ri-edit-2-fill", "", () => {
         onEdit && onEdit(rowData?.id);
       })
+      .addCustomOption(
+        "permissions",
+        t("Manage Stock"),
+        "ri-archive-2-fill",
+        "",
+        () => {
+          onManageStock && onManageStock(rowData?.id);
+        }
+      )
       .addDivider()
       .addDeleteOption(t("Delete"), "ri-delete-bin-fill", () => {
         onDelete && onDelete(rowData?.id);
-    })
+      })
       .build();
   };
 
@@ -55,14 +66,17 @@ const TableCategory = ({
     setSelectAll(!selectAll);
   }, [selectAll, data]);
 
-  const handleItemSelect = useCallback((id: string | number, checked: boolean) => {
-    if (checked) {
-      setSelectedItems(prev => [...prev, id]);
-    } else {
-      setSelectedItems(prev => prev.filter(item => item !== id));
-      setSelectAll(false);
-    }
-  }, []);
+  const handleItemSelect = useCallback(
+    (id: string | number, checked: boolean) => {
+      if (checked) {
+        setSelectedItems((prev) => [...prev, id]);
+      } else {
+        setSelectedItems((prev) => prev.filter((item) => item !== id));
+        setSelectAll(false);
+      }
+    },
+    []
+  );
 
   const columns = useMemo(
     () => [
@@ -91,11 +105,26 @@ const TableCategory = ({
         id: "#",
       },
       {
-        header: t("Category name"),
+        header: t("Product name"),
         cell: (cell: any) => {
           return <span className="fw-semibold">{cell.getValue()}</span>;
         },
         accessorKey: "name",
+        enableColumnFilter: false,
+        enableSorting: true,
+      },
+      {
+        header: t("Category"),
+        accessorKey: "categories",
+        enableColumnFilter: false,
+        enableSorting: true,
+        cell: (cell: any) => {
+          return <span>{cell.getValue()?.name || "-"}</span>;
+        }
+      },
+      {
+        header: t("Stock"),
+        accessorKey: "stock",
         enableColumnFilter: false,
         enableSorting: true,
       },
@@ -124,14 +153,25 @@ const TableCategory = ({
           } as any;
 
           return (
-            <span className={`badge ${className?.[statusLabel] || "bg-dark"} fs-6 fw-medium`}>
+            <span
+              className={`badge ${
+                className?.[statusLabel] || "bg-dark"
+              } fs-6 fw-medium`}
+            >
               {t(statusLabel)}
             </span>
           );
         },
       },
     ],
-    [t, selectedItems, selectAll, handleSelectAll, handleItemSelect, statusConst]
+    [
+      t,
+      selectedItems,
+      selectAll,
+      handleSelectAll,
+      handleItemSelect,
+      statusConst,
+    ]
   );
 
   return (
@@ -142,7 +182,6 @@ const TableCategory = ({
         divClass="table-responsive table-card mb-3"
         tableClass="table align-middle table-nowrap mb-0"
         theadClass="table-light"
-        SearchPlaceholder={t("Search...")}
         enableContextMenu={true}
         contextMenuOptions={contextMenuOptions}
         isPaginateTable={true}
@@ -151,4 +190,4 @@ const TableCategory = ({
     </div>
   );
 };
-export default TableCategory;
+export default TableProduct;
