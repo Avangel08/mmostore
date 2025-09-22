@@ -127,7 +127,7 @@ class ProductController extends Controller
         }
     }
 
-    public function deleteMultipleCategories(Request $request)
+    public function deleteMultipleProduct(Request $request)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_delete')) {
         //     return abort(403);
