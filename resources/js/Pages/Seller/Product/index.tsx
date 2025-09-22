@@ -75,7 +75,7 @@ const Product = () => {
     });
 
     if (confirmed) {
-      router.delete(route("seller.category.delete", { id }), {
+      router.delete(route("seller.product.delete", { id }), {
         onSuccess: (page: any) => {
           if (page.props?.message?.error) {
             showToast(t(page.props.message.error), "error");
@@ -96,7 +96,7 @@ const Product = () => {
     const confirmed = await confirmDelete({
       title: t("Delete selected items?"),
       text: t(
-        `You are about to delete {{count}} categories. Once deleted, you will not be able to recover them.`,
+        `You are about to delete {{count}} products. Once deleted, you will not be able to recover them.`,
         { count: selectedIds.length }
       ),
       confirmButtonText: t("Delete now"),
@@ -104,7 +104,7 @@ const Product = () => {
     });
 
     if (confirmed) {
-      router.delete(route("seller.category.delete-multiple"), {
+      router.delete(route("seller.product.delete-multiple"), {
         data: { ids: selectedIds },
         onSuccess: (page: any) => {
           if (page.props?.message?.error) {
