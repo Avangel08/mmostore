@@ -66,7 +66,7 @@ const Navdata = () => {
             id: "category",
             label: "Category Management",
             icon: "ri-file-list-fill",
-            link: route('seller.category'),
+            link: route('seller.category.index'),
             stateVariables: isCategory,
             click: function (e : any) {
                 e.preventDefault();
@@ -79,7 +79,7 @@ const Navdata = () => {
             id: "product",
             label: "Product Management",
             icon: "ri-box-3-fill",
-            link: route('seller.product'),
+            link: route('seller.product.index'),
             stateVariables: isProduct,
             click: function (e : any) {
                 e.preventDefault();

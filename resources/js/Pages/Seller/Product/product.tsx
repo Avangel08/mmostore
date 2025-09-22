@@ -74,7 +74,7 @@ export default function product() {
     onSubmit: (values) => {
       const url = isEditMode
         ? route("seller.product.update", { id: product.id })
-        : route("seller.product.create");
+        : route("seller.product.store");
 
       const method = isEditMode ? "put" : "post";
 
@@ -110,7 +110,7 @@ export default function product() {
             setFiles([]);
           } else {
             setTimeout(() => {
-              router.get(route("seller.product"));
+              router.get(route("seller.product.index"));
             }, 1500);
           }
         },
@@ -470,7 +470,7 @@ export default function product() {
                             onClick={() => {
                               formik.resetForm();
                               setFiles([]);
-                              router.visit(route("seller.product"));
+                              router.visit(route("seller.product.index"));
                             }}
                           >
                             {t("Back")}

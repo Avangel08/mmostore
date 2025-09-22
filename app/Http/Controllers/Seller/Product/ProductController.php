@@ -7,19 +7,21 @@ use App\Http\Requests\Seller\Product\ProductRequest;
 use App\Models\Mongo\Products;
 use App\Services\Category\CategoryService;
 use App\Services\Product\ProductService;
+use App\Services\Product\SubProductService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ProductController extends Controller
 {
     protected $productService;
-
     protected $categoryService;
+    protected $subProductService;
 
-    public function __construct(ProductService $productService, CategoryService $categoryService)
+    public function __construct(ProductService $productService, CategoryService $categoryService, SubProductService $subProductService)
     {
         $this->productService = $productService;
         $this->categoryService = $categoryService;
+        $this->subProductService = $subProductService;
     }
 
     public function index(ProductRequest $request)
@@ -35,10 +37,11 @@ class ProductController extends Controller
                 Products::STATUS['INACTIVE'] => 'Inactive',
             ],
             'products' => fn () => $this->productService->getForTable($request),
+            'subProduct' => fn () => $this->subProductService->getFromProductIdForTable($request),
         ]);
     }
 
-    public function addProduct()
+    public function create()
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_create')) {
         //     return abort(403);
@@ -49,7 +52,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function editProduct($sub, $id)
+    public function edit($sub, string $id)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_view')) {
         //     return abort(403);
@@ -66,7 +69,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function createProduct(ProductRequest $request)
+    public function store(ProductRequest $request)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_create')) {
         //     return abort(403);
@@ -83,7 +86,7 @@ class ProductController extends Controller
         }
     }
 
-    public function updateProduct($sub, $id, ProductRequest $request)
+    public function update($sub, $id, ProductRequest $request)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_create')) {
         //     return abort(403);
@@ -92,7 +95,7 @@ class ProductController extends Controller
             $product = $this->productService->getById($id);
 
             if (! $product) {
-                return back()->with('error', 'Category not found');
+                return back()->with('error', 'Product not found');
             }
 
             $data = $request->validated();
@@ -106,7 +109,7 @@ class ProductController extends Controller
         }
     }
 
-    public function deleteProduct($sub, $id)
+    public function destroy($sub, $id)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_delete')) {
         //     return abort(403);

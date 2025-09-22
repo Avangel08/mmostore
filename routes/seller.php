@@ -4,6 +4,7 @@ use App\Http\Controllers\Seller\Category\CategoryController;
 use App\Http\Controllers\Seller\DashBoardController;
 use App\Http\Controllers\Seller\LoginController;
 use App\Http\Controllers\Seller\Product\ProductController;
+use App\Http\Controllers\Seller\Product\SubProductController;
 use App\Http\Controllers\Seller\Profile\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,25 +34,21 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                     Route::put('/update-info', [ProfileController::class, 'updateInfo'])->name('seller.profile.update-info');
                     Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('seller.profile.change-password');
                 });
-                
+
+                // seller category
                 Route::group(['prefix' => 'category'], function () {
-                    Route::get('/', [CategoryController::class, 'index'])->name('seller.category');
-                    Route::get('/detail/{id}', [CategoryController::class, 'getDetailCategory'])->name('seller.category.detail');
-                    Route::post('/create', [CategoryController::class, 'createCategory'])->name('seller.category.create');
-                    Route::put('/update/{id}', [CategoryController::class, 'updateCategory'])->name('seller.category.update');
-                    Route::delete('/delete/{id}', [CategoryController::class, 'deleteCategory'])->name('seller.category.delete');
                     Route::delete('/delete-multiple', [CategoryController::class, 'deleteMultipleCategories'])->name('seller.category.delete-multiple');
                 });
+                Route::resource('category', CategoryController::class, ['as' => 'seller']);
 
+                // seller product
                 Route::group(['prefix' => 'product'], function () {
-                    Route::get('/', [ProductController::class, 'index'])->name('seller.product');
-                    Route::get('/add', [ProductController::class, 'addProduct'])->name('seller.product.add');
-                    Route::get('/edit/{id}', [ProductController::class, 'editProduct'])->name('seller.product.edit');
-                    Route::post('/create', [ProductController::class, 'createProduct'])->name('seller.product.create');
-                    Route::put('/update/{id}', [ProductController::class, 'updateProduct'])->name('seller.product.update');
-                    Route::delete('/delete/{id}', [ProductController::class, 'deleteProduct'])->name('seller.product.delete');
                     Route::delete('/delete-multiple', [ProductController::class, 'deleteMultipleProduct'])->name('seller.product.delete-multiple');
                 });
+                Route::resource('product', ProductController::class, ['as' => 'seller']);
+
+                // seller sub-product
+                Route::resource('sub-product', SubProductController::class, ['as' => 'seller']);
             });
 
         });

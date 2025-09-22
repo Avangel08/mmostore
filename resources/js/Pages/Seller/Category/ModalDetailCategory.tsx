@@ -38,7 +38,7 @@ export const ModalDetailCategory = ({
     onSubmit: (values) => {
       const url = isEditMode 
         ? route("seller.category.update", { id: dataEdit.id })
-        : route("seller.category.create");
+        : route("seller.category.store");
       
       const method = isEditMode ? "put" : "post";
       

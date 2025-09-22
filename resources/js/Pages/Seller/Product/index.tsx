@@ -58,7 +58,7 @@ const Product = () => {
   };
 
   const openAddPage = () => {
-    router.get(route("seller.product.add"));
+    router.get(route("seller.product.create"));
   }
 
   const openModalStock = (id: number | string) => {
@@ -75,7 +75,7 @@ const Product = () => {
     });
 
     if (confirmed) {
-      router.delete(route("seller.product.delete", { id }), {
+      router.delete(route("seller.product.destroy", { id }), {
         onSuccess: (page: any) => {
           if (page.props?.message?.error) {
             showToast(t(page.props.message.error), "error");

@@ -41,11 +41,11 @@ class ProductRequest extends FormRequest
                 'createdDateEnd' => ['nullable', 'string'],
                 'status' => ['nullable', Rule::in(array_values(Products::STATUS))],
             ],
-            'createProduct' => [
+            'store' => [
                 ...$productRules,
                 'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max: 2048'],
             ],
-            'updateProduct' => [
+            'update' => [
                 ...$productRules,
                 'image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max: 2048'],
             ],

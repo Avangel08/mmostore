@@ -34,7 +34,7 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function createCategory(CategoryRequest $request)
+    public function store(CategoryRequest $request)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_create')) {
         //     return abort(403);
@@ -51,7 +51,7 @@ class CategoryController extends Controller
         }
     }
 
-    public function updateCategory($sub, $id, CategoryRequest $request)
+    public function update($sub, $id, CategoryRequest $request)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_create')) {
         //     return abort(403);
@@ -75,7 +75,7 @@ class CategoryController extends Controller
     }
 
     
-    public function deleteCategory($sub, $id)
+    public function destroy($sub, $id)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_delete')) {
         //     return abort(403);

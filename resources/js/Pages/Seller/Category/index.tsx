@@ -72,7 +72,7 @@ const Category = () => {
     });
 
     if (confirmed) {
-      router.delete(route("seller.category.delete", { id }), {
+      router.delete(route("seller.category.destroy", { id }), {
         onSuccess: (page: any) => {
           if (page.props?.message?.error) {
             showToast(t(page.props.message.error), "error");
