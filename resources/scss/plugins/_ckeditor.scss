@@ -4,10 +4,9 @@
 
 .ck {
     font-family: $font-family-base !important;
-
-    &.ck-reset_all, &.ck-reset_all *{
-        color: var(--#{$prefix}body-color) !important;
-    }
+    // &.ck-reset_all, &.ck-reset_all *{
+    //     color: var(--#{$prefix}body-color) !important;
+    // }
     &.ck-toolbar{
         background: #{rgba(var(--#{$prefix}light-rgb), .75)} !important;
     }
@@ -23,9 +22,9 @@
             flex-wrap: wrap !important;
         }
 
-        .ck.ck-toolbar__separator {
-            background: transparent !important;
-        }
+        // .ck.ck-toolbar__separator {
+        //     background: transparent !important;
+        // }
     }
 
     &.ck-editor__main>.ck-editor__editable {
@@ -71,6 +70,7 @@
     }
 }
 
+/* 
 .ck.ck-button, 
 a.ck.ck-button{
 
@@ -89,6 +89,7 @@ a.ck.ck-button{
         background: var(--#{$prefix}light) !important;
     }
 }
+*/
 
 .ck-rounded-corners .ck.ck-editor__top .ck-sticky-panel .ck-toolbar, 
 .ck.ck-editor__top .ck-sticky-panel .ck-toolbar.ck-rounded-corners{

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Seller\Category\CategoryController;
 use App\Http\Controllers\Seller\DashBoardController;
 use App\Http\Controllers\Seller\LoginController;
+use App\Http\Controllers\Seller\Product\ProductController;
 use App\Http\Controllers\Seller\Profile\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,16 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                     Route::put('/update/{id}', [CategoryController::class, 'updateCategory'])->name('seller.category.update');
                     Route::delete('/delete/{id}', [CategoryController::class, 'deleteCategory'])->name('seller.category.delete');
                     Route::delete('/delete-multiple', [CategoryController::class, 'deleteMultipleCategories'])->name('seller.category.delete-multiple');
+                });
+
+                Route::group(['prefix' => 'product'], function () {
+                    Route::get('/', [ProductController::class, 'index'])->name('seller.product');
+                    Route::get('/add', [ProductController::class, 'addProduct'])->name('seller.product.add');
+                    Route::get('/edit/{id}', [ProductController::class, 'editProduct'])->name('seller.product.edit');
+                    Route::post('/create', [ProductController::class, 'createProduct'])->name('seller.product.create');
+                    Route::put('/update/{id}', [ProductController::class, 'updateProduct'])->name('seller.product.update');
+                    Route::delete('/delete/{id}', [ProductController::class, 'deleteProduct'])->name('seller.product.delete');
+                    Route::delete('/delete-multiple', [ProductController::class, 'deleteMultipleProduct'])->name('seller.product.delete-multiple');
                 });
             });
 
