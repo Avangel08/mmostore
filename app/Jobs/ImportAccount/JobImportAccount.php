@@ -65,8 +65,8 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
     {
         try {
             Config::set('database.connections.tenant_mongo', $this->dbConfig);
-            $fullPath = Storage::disk('public')->path($this->filePath);
             $chunkSize = 1000;
+            $fullPath = Storage::disk('public')->path($this->filePath);
             $timeStart = now();
             $listKey = [];
             $result = $this->processChunk($chunkSize, $fullPath, $timeStart, $listKey);

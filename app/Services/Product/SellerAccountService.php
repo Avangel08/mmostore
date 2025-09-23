@@ -18,11 +18,6 @@ class SellerAccountService
         return Accounts::select($select)->with($relation)->where('_id', $id)->first();
     }
 
-    public function findBySubProductId($id, $select = ['*'], $relation = [])
-    {
-        return Accounts::select($select)->with($relation)->where('sub_product_id', $id)->get();
-    }
-
     public function processAccountFile(array $data)
     {
         $file = $data['file'];

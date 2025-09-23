@@ -177,5 +177,11 @@
     "Account": "Tài Khoản",
     "File uploaded successfully and is pending processing": "Tải lên file thành công và đang chờ xử lý",
     "Upload": "Tải lên",
-    "Uploading...": "Đang tải lên..."
+    "Uploading...": "Đang tải lên...",
+    "Total": "Tổng cộng",
+    "Success": "Thành công",
+    "Error": "Lỗi",
+    "FINISH": "HOÀN THÀNH",
+    "RUNNING": "ĐANG CHẠY",
+    "PENDING": "ĐANG CHỜ"
 }

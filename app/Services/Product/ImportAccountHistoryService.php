@@ -6,12 +6,13 @@ use App\Models\Mongo\ImportAccountHistory;
 
 class ImportAccountHistoryService
 {
-    public function getForTable($request)
+    public function getForTable($subProductId, $request)
     {
         $page = $request->input('importPage', 1);
         $perPage = $request->input('importPerPage', 10);
 
-        return ImportAccountHistory::orderBy('_id', 'desc')
+        return ImportAccountHistory::where('sub_product_id', $subProductId)
+            ->orderBy('_id', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
 

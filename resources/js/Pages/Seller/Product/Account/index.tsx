@@ -95,7 +95,7 @@ const SellerAccount = () => {
                             type="file"
                             name="file"
                             accept=".txt"
-                            onChange={(e) => {
+                            onChange={(e: any) => {
                               const file = e.target.files?.[0] || null;
                               formik.setFieldValue("file", file);
                             }}
@@ -163,7 +163,7 @@ const SellerAccount = () => {
                       <h5>{t("Recent uploaded files")}</h5>
                     </Col>
                     <Col lg={12}>
-                      <TableRecentUpload data={[]} onReloadTable={() => {}} />
+                      <TableRecentUpload />
                     </Col>
                   </Row>
                   <hr />
@@ -181,7 +181,7 @@ const SellerAccount = () => {
                       </div>
                     </Col>
                     <Col lg={12} className="px-4">
-                      <TableSellingProduct data={[]} onReloadTable={() => {}} />
+                      <TableSellingProduct />
                     </Col>
                   </Row>
                 </Card.Body>
