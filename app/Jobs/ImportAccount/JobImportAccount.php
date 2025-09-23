@@ -55,7 +55,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
     {
         Config::set('database.connections.tenant_mongo', $this->dbConfig);
         $fullPath = Storage::disk('public')->path($this->filePath);
-        $chunkSize = 2;
+        $chunkSize = 500;
         $this->deleteOldKeyAccount($chunkSize, $fullPath);
         $this->processChunk($chunkSize, $fullPath);
     }
