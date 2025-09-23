@@ -4,6 +4,7 @@ use App\Http\Controllers\Seller\Category\CategoryController;
 use App\Http\Controllers\Seller\DashBoardController;
 use App\Http\Controllers\Seller\LoginController;
 use App\Http\Controllers\Seller\Product\ProductController;
+use App\Http\Controllers\Seller\Product\SellerAccountController;
 use App\Http\Controllers\Seller\Product\SubProductController;
 use App\Http\Controllers\Seller\Profile\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +50,9 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
 
                 // seller sub-product
                 Route::resource('sub-product', SubProductController::class, ['as' => 'seller']);
+
+                // seller account
+                Route::resource('account', SellerAccountController::class, ['as' => 'seller']);
             });
 
         });
