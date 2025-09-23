@@ -26,12 +26,18 @@ class AccountRequest extends FormRequest
 
         return match ($action) {
             'store' => [
-                'file' => ['required', 'file', 'mimes:txt', 'max:100000'],
-                'mimetypes' => ['text/plain'],
+                'file' => ['required', 'file', 'mimes:txt', 'max:50000'],
                 'product_id' => ['required', 'string', "exists:tenant_mongo.products,_id"],
                 'sub_product_id' => ['required', 'string', "exists:tenant_mongo.sub_products,_id"],
             ],
             default => [],
         };
+    }
+
+    public function messages(): array
+    {
+        return [
+            'file.max' => 'The file field must not be greater than 50MB',
+        ];
     }
 }

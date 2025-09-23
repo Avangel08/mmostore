@@ -75,7 +75,6 @@ class SellerAccountController extends Controller
         //     return abort(403);
         // }
         return Inertia::render('Product/Account/index', [
-            'accounts' => fn () => $this->sellerAccountService->findBySubProductId($subProductId),
             'subProduct' => fn () => $this->subProductService->getById($subProductId),
         ]);
     }

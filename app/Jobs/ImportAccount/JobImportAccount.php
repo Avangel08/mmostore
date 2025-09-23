@@ -3,7 +3,11 @@
 namespace App\Jobs\ImportAccount;
 
 use App\Models\Mongo\Accounts;
+use App\Models\Mongo\ImportAccountHistory;
+use App\Services\Product\SellerAccountService;
+use Carbon\Carbon;
 use Config;
+use Exception;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -22,6 +26,10 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
 
     protected $subProductId;
 
+    protected $accountService;
+
+    protected $importHistoryId;
+
     protected $dbConfig;
 
     public $uniqueFor = 3600;
@@ -29,12 +37,14 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($filePath, $productId, $subProductId, $dbConfig)
+    public function __construct($filePath, $productId, $subProductId, $importHistoryId, $dbConfig)
     {
         $this->filePath = $filePath;
         $this->productId = $productId;
         $this->subProductId = $subProductId;
+        $this->importHistoryId = $importHistoryId;
         $this->dbConfig = $dbConfig;
+        $this->accountService = new SellerAccountService;
         $this->queue = 'process_import_account';
     }
 
@@ -53,15 +63,46 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
      */
     public function handle(): void
     {
-        Config::set('database.connections.tenant_mongo', $this->dbConfig);
-        $fullPath = Storage::disk('public')->path($this->filePath);
-        $chunkSize = 500;
-        $this->deleteOldKeyAccount($chunkSize, $fullPath);
-        $this->processChunk($chunkSize, $fullPath);
+        try {
+            Config::set('database.connections.tenant_mongo', $this->dbConfig);
+            $fullPath = Storage::disk('public')->path($this->filePath);
+            $chunkSize = 1000;
+            $timeStart = now();
+            $listKey = [];
+            $result = $this->processChunk($chunkSize, $fullPath, $timeStart, $listKey);
+            $importAccountHistory = ImportAccountHistory::findOrFail($this->importHistoryId);
+            $importAccountHistory->update([
+                'status' => ImportAccountHistory::STATUS['FINISH'],
+                'result' => $result,
+                'ended_at' => now(),
+            ]);
+            $this->deleteOldAccount($timeStart, $listKey);
+        } catch (Exception $e) {
+            echo 'Error processing import account: '.$e->getMessage().PHP_EOL;
+            $importAccountHistory->update([
+                'status' => ImportAccountHistory::STATUS['ERROR'],
+                'ended_at' => now(),
+            ]);
+            throw $e;
+        }
     }
 
-    public function deleteOldKeyAccount($chunkSize, $fullPath)
+    public function deleteOldAccount(Carbon $timeStart, $listKey)
     {
+        return Accounts::where('sub_product_id', $this->subProductId)
+            ->where('status', Accounts::STATUS['LIVE'])
+            ->whereIn('key', array_keys($listKey))
+            ->where('created_at', '!=', new \MongoDB\BSON\UTCDateTime($timeStart))
+            ->delete();
+    }
+
+    public function processChunk($chunkSize, $fullPath, Carbon $timeStart, &$listKey)
+    {
+        $totalCount = 0;
+        $successCount = 0;
+        $errorCount = 0;
+        $errors = [];
+
         LazyCollection::make(function () use ($fullPath) {
             $handle = fopen($fullPath, 'r');
             while (($line = fgets($handle)) !== false) {
@@ -69,52 +110,44 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             }
             fclose($handle);
         })
-            ->map(function ($line) {
-                $parts = explode('|', trim($line), 2);
-                $key = $parts[0] ?? null;
-
-                return empty($key) ? null : $key;
-            })
-            ->filter()
-            ->chunk($chunkSize)
-            ->each(function (LazyCollection $keyChunk) {
-                Accounts::where('sub_product_id', $this->subProductId)
-                    ->whereIn('key', $keyChunk->values()->all())
-                    ->delete();
-            });
-    }
-
-    public function processChunk($chunkSize, $fullPath): void
-    {
-        LazyCollection::make(function () use ($fullPath) {
-            $handle = fopen($fullPath, 'r');
-            while (($line = fgets($handle)) !== false) {
-                yield $line;
-            }
-            fclose($handle);
-        })
-            ->map(function ($line) {
+            ->map(function ($line) use (&$totalCount, &$successCount, &$errorCount, &$errors, $timeStart, &$listKey) {
+                $totalCount++;
                 $line = trim($line);
                 if (empty($line)) {
+                    $errorCount++;
+                    $errors[] = "Line {$totalCount} is empty: ".$line;
+
                     return null;
                 }
 
                 $parts = explode('|', $line);
                 if (count($parts) < 2) {
+                    $errorCount++;
+                    $errors[] = "Line {$totalCount} does not have enough parts: ".$line;
+
                     return null;
                 }
 
                 $key = trim($parts[0]);
                 if (empty($key)) {
+                    $errorCount++;
+                    $errors[] = "Line {$totalCount} has an empty key: ".$line;
+
                     return null;
                 }
+                $listKey[$key] = $key;
 
                 $dataParts = array_slice($parts, 1);
-                foreach($dataParts as $part) {
+                foreach ($dataParts as $part) {
                     if (trim($part) === '') {
+                        $errorCount++;
+                        $errors[] = "Line {$totalCount} has empty data parts: ".$line;
+
                         return null;
                     }
                 }
+
+                unset($line);
 
                 return [
                     'key' => $key,
@@ -125,23 +158,47 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                     'note' => null,
                     'customer_id' => null,
                     'order_id' => null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'created_at' => $timeStart,
+                    'updated_at' => $timeStart,
                 ];
             })
             ->filter()
             ->chunk($chunkSize)
-            ->each(function (LazyCollection $data) {
-                $this->processInsert($data);
+            ->each(function (LazyCollection $data, $index) use (&$successCount, &$errorCount, &$errors) {
+                $isSuccess = $this->processInsert($data);
+                $dataCount = $data->count();
+                if ($isSuccess) {
+                    $successCount += $dataCount;
+                } else {
+                    $errorCount += $dataCount;
+                }
+                unset($data);
             });
+
+        return [
+            'total_count' => $totalCount,
+            'success_count' => $successCount,
+            'error_count' => $errorCount,
+        ];
     }
 
-    protected function processInsert(LazyCollection $data): void
+    public function processInsert(LazyCollection $data): bool
     {
         $accountData = $data->values()->all();
-
         if (! empty($accountData)) {
-            Accounts::insert($accountData);
+            return Accounts::insert($accountData);
         }
+
+        return false;
+    }
+
+    public function failed(Exception $exception): void
+    {
+        echo 'Job failed: '.$exception->getMessage().PHP_EOL;
+        $importAccountHistory = ImportAccountHistory::findOrFail($this->importHistoryId);
+        $importAccountHistory->update([
+            'status' => ImportAccountHistory::STATUS['ERROR'],
+            'ended_at' => now(),
+        ]);
     }
 }

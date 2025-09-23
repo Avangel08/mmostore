@@ -175,5 +175,7 @@
     "File name": "Tên file",
     "Upload date": "Ngày tải lên",
     "Account": "Tài Khoản",
-    "File uploaded successfully and is pending processing": "Tải lên file thành công và đang chờ xử lý"
+    "File uploaded successfully and is pending processing": "Tải lên file thành công và đang chờ xử lý",
+    "Upload": "Tải lên",
+    "Uploading...": "Đang tải lên..."
 }
