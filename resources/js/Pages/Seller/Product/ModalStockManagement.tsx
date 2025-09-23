@@ -25,29 +25,37 @@ export const ModalStockManagement = ({
   const [subProduct, setSubProduct] = useState<any>(null);
   const [product, setProduct] = useState<any>(null);
   const errors = usePage().props.errors;
-  const params = useQueryParams();
+  const [subProductPage, setSubProductPage] = useState(1);
+  const [subProductPerPage, setSubProductPerPage] = useState(10);
 
   const fetchSubProducts = (
-    subProductPage: number = 1,
-    subProductPerPage: number = 10
+    subProductPage?: number,
+    subProductPerPage?: number
   ) => {
     if (productId) {
-      router.reload({
-        only: ["subProduct"],
-        replace: true,
-        data: { product_id: productId, subProductPage, subProductPerPage },
-        onSuccess: (page: any) => {
-          const subProduct = page?.props?.subProduct;
-          if (subProduct) {
-            setSubProduct({ ...subProduct });
-          }
+      setTimeout(() => {
+        setStateSubProduct(subProductPage, subProductPerPage);
+        router.reload({
+          only: ["subProduct"],
+          data: { product_id: productId, subProductPage, subProductPerPage },
+          onSuccess: (page: any) => {
+            const subProduct = page?.props?.subProduct;
+            if (subProduct) {
+              setSubProduct(subProduct);
+            }
 
-          if (subProduct?.data?.[0]?.product) {
-            setProduct(subProduct?.data?.[0]?.product);
-          }
-        },
-      });
+            if (subProduct?.data?.[0]?.product) {
+              setProduct(subProduct?.data?.[0]?.product);
+            }
+          },
+        });
+      }, 500);
     }
+  };
+
+  const setStateSubProduct = (page?: number, perPage?: number) => {
+    setSubProductPage(page || 1);
+    setSubProductPerPage(perPage || 10);
   };
 
   useEffect(() => {
@@ -89,14 +97,14 @@ export const ModalStockManagement = ({
           onSuccess: (page: any) => {
             if (page?.props?.message?.error) {
               showToast(t(page.props.message.error), "error");
-              fetchSubProducts();
+              fetchSubProducts(subProductPage, subProductPerPage);
               return;
             }
 
             if (page.props?.message?.success) {
               showToast(t(page.props.message.success), "success");
               formik.resetForm();
-              fetchSubProducts();
+              fetchSubProducts(subProductPage, subProductPerPage);
             }
           },
           onError: (errors: any) => {
@@ -122,12 +130,12 @@ export const ModalStockManagement = ({
         onSuccess: (page: any) => {
           if (page?.props?.message?.error) {
             showToast(t(page.props.message.error), "error");
-            fetchSubProducts();
+            fetchSubProducts(subProductPage, subProductPerPage);
             return;
           }
           if (page.props?.message?.success) {
             showToast(t(page.props.message.success), "success");
-            fetchSubProducts();
+            fetchSubProducts(subProductPage, subProductPerPage);
           }
         },
         onError: (errors: any) => {
@@ -199,10 +207,18 @@ export const ModalStockManagement = ({
           const rowData = cellProps.row.original;
           return (
             <div className="d-flex gap-2">
+              <Button size="sm" variant="outline-success" onClick={() => {
+                if (rowData?.id) {
+                  router.get(route("seller.account.edit", { id: rowData?.id }));
+                }
+              }}>
+                <i className="ri-add-line"></i>
+              </Button>
+
               <Button
                 variant="outline-danger"
                 size="sm"
-                onClick={() => handleDelete(rowData.id)}
+                onClick={() => handleDelete(rowData?.id)}
               >
                 <i className="ri-delete-bin-fill"></i>
               </Button>
@@ -213,7 +229,7 @@ export const ModalStockManagement = ({
         enableSorting: false,
       },
     ],
-    [t]
+    [t, subProduct]
   );
 
   return (
@@ -297,8 +313,8 @@ export const ModalStockManagement = ({
                   </Form.Control.Feedback>
                 </Form.Group>
               </Col>
-              <Col md={4} className="d-flex">
-                <Button variant="primary" type="submit" className="mb-3">
+              <Col md={4} className="d-flex align-items-center">
+                <Button variant="primary" type="submit">
                   <i className="ri-add-line align-bottom me-1"></i>
                   {t("Add")}
                 </Button>
