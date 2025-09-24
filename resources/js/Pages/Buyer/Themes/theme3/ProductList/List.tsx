@@ -1,13 +1,41 @@
 import React from "react"
 import { Accordion, Card, Col, Container, Row } from "react-bootstrap"
 
+import product12 from "../../../../../../images/products/img12.png"
+import { Link } from "@inertiajs/react"
+
+
+const projectLists = [
+    {
+        label: "Gmail Việt Nam Đã Ngâm 1-20 Ngày Dùng Siêu Trâu Chưa Qua Dịch Vụ, Giá Rẻ",
+        image: product12,
+        description: "Gmail Việt Nam Đã Ngâm 1-20 Ngày Dùng Siêu Trâu Chưa Qua Dịch Vụ, Giá Siêu Rẻ, Mua SLL ib Shop Để Được Giảm Giá",
+        price: "2.500đ - 10.000đ",
+        quantity: 1000
+    },
+    {
+        label: "Gmail Việt Nam Đã Ngâm 1-20 Ngày Dùng Siêu Trâu Chưa Qua Dịch Vụ, Giá Rẻ",
+        image: product12,
+        description: "Gmail Việt Nam Đã Ngâm 1-20 Ngày Dùng Siêu Trâu Chưa Qua Dịch Vụ, Giá Siêu Rẻ, Mua SLL ib Shop Để Được Giảm Giá",
+        price: "2.500đ - 10.000đ",
+        quantity: 1000
+    },
+    {
+        label: "Gmail Việt Nam Đã Ngâm 1-20 Ngày Dùng Siêu Trâu Chưa Qua Dịch Vụ, Giá Rẻ",
+        image: product12,
+        description: "Gmail Việt Nam Đã Ngâm 1-20 Ngày Dùng Siêu Trâu Chưa Qua Dịch Vụ, Giá Siêu Rẻ, Mua SLL ib Shop Để Được Giảm Giá",
+        price: "2.500đ - 10.000đ",
+        quantity: 1000
+    }
+]
+
 const List = () => {
     return (
         <React.Fragment>
             <div className="product-content">
                 <Container fluid className="custom-container">
                     <Row>
-                        <Col lg={2} className="pe-3">
+                        <Col lg={2}>
                             <Accordion defaultActiveKey="1">
                                 <Accordion.Item eventKey="1">
                                     <Accordion.Header>
@@ -119,15 +147,60 @@ const List = () => {
                         </Col>
                         <Col lg={10}>
                             <Row>
-                                <Col xxl={3} sm={6} className="project-card">
-                                    <Card className="card-height-100">
-                                        <Card.Body>
-                                            <div className="d-flex flex-column">
-                                                <div className="d-flex"></div>
-                                            </div>
-                                        </Card.Body>
-                                    </Card>
-                                </Col>
+                                {(projectLists || []).map((item: any, index: any) => (
+                                    <React.Fragment key={index}>
+                                        <Col xxl={6} sm={6} className="project-card">
+                                            <Card className="card-height-100">
+                                                <Card.Body>
+                                                    <div className="d-flex flex-column">
+                                                        <div className="d-flex mb-2">
+                                                            <div className="flex-shrink-0 me-3">
+                                                                <div className="avatar-xxl">
+                                                                    <span className={"avatar-title bg-success-subtle rounded p-2"}>
+                                                                        <img src={product12} alt="" className="img-fluid p-1" />
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex-grow-1">
+                                                                <h5 className="mb-1 fs-15">
+                                                                    <div className="text-success fs-12 mb-1">Sản phẩm : Gmail</div>
+                                                                    <Link href="/apps-projects-overview" className="text-body">{item.label}</Link>
+                                                                </h5>
+                                                                <div className="d-flex flex-wrap gap-2 align-items-center mt-2">
+                                                                    <div className="text-muted fs-16">
+                                                                        <span className="mdi mdi-star text-warning"></span>
+                                                                        <span className="mdi mdi-star text-warning"></span>
+                                                                        <span className="mdi mdi-star text-warning"></span>
+                                                                        <span className="mdi mdi-star text-warning"></span>
+                                                                        <span className="mdi mdi-star text-warning"></span>
+                                                                    </div>
+                                                                    <div className="text-muted">
+                                                                        ( 5.50k Customer Review )
+                                                                    </div>
+                                                                </div>
+
+                                                                <p className="text-muted text-truncate-two-lines mt-1 mb-2">{item.description}</p>
+                                                                <div className="d-flex align-items-end justify-content-between">
+                                                                    <div>
+                                                                        <span className="text-center">
+                                                                            Tồn kho: 1000
+                                                                        </span>
+                                                                        <div className="mt-1 fw-bolder">
+                                                                            <span>{item.price}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div>
+                                                                        <button type="button" className="btn btn-sm btn-success">Mua</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </Card.Body>
+                                            </Card>
+                                        </Col>
+                                    </React.Fragment>
+                                ))}
                             </Row>
                         </Col>
                     </Row>
