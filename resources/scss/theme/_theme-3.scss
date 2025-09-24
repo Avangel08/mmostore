@@ -1,0 +1,12 @@
+[data-theme="theme3"] {
+    .navbar-landing {
+        background: rgba(58, 68, 75, 1);
+        &.is-sticky {
+            background: rgba(58, 68, 75, 1);
+        }
+    }
+
+    .product-content {
+        padding: 120px 0;
+    }
+}
