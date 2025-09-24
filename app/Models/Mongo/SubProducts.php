@@ -5,10 +5,11 @@ namespace App\Models\Mongo;
 use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
-class Accounts extends Model
+class SubProducts extends Model
 {
     use SoftDeletes;
-    protected $table = 'accounts';
+
+    protected $table = 'sub_products';
 
     protected $primaryKey = '_id';
 
@@ -16,16 +17,19 @@ class Accounts extends Model
 
     protected $fillable = [
         'product_id',
-        'sub_product_id',
-        'key',
-        'data',
+        'name',
         'status',
-        'note',
-        'customer_id',
-        'order_id',
+        'price',
+        'total_product',
     ];
 
+    public function product()
+    {
+        return $this->belongsTo(Products::class, 'product_id');
+    }
+
     const STATUS = [
-        'LIVE' => 'LIVE',
+        'ACTIVE' => 'ACTIVE',
+        'INACTIVE' => 'INACTIVE',
     ];
 }

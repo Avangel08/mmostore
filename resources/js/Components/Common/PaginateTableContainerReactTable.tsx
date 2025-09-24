@@ -97,6 +97,8 @@ interface TableContainerProps {
   divStyle?: React.CSSProperties;
   tableStyle?: React.CSSProperties;
   maxHeight?: string | number;
+  keyPageParam?: string;
+  keyPerPageParam?: string;
 }
 
 const PaginateTableContainer = ({
@@ -118,14 +120,16 @@ const PaginateTableContainer = ({
   divStyle,
   tableStyle,
   maxHeight = '500px',
+  keyPageParam = 'page',
+  keyPerPageParam = 'perPage',
 }: TableContainerProps) => {
   const {t} = useTranslation();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   
   const param = useQueryParams();
-  const page = param?.page ?? "1";
-  const perPage = param?.perPage ?? "10";
+  const page = param?.[keyPageParam] ?? "1";
+  const perPage = param?.[keyPerPageParam] ?? "10";
 
   const [selectedEntries, setSelectedEntries] = useState({ value: perPage, label: perPage });
 

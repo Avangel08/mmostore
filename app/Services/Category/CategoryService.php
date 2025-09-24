@@ -23,6 +23,11 @@ class CategoryService
         return Categories::select($select)->with($relation)->where('_id', $id)->first();
     }
 
+    public function getAll($select = ['*'], $relation = [])
+    {
+        return Categories::select($select)->with($relation)->get();
+    }
+
     public function createCategory(array $data)
     {
         return Categories::create([

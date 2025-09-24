@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Seller\Category;
+namespace App\Http\Requests\Seller\Product;
 
-use App\Models\Mongo\Categories;
+use App\Models\Mongo\SubProducts;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CategoryRequest extends FormRequest
+class SubProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,15 +23,20 @@ class CategoryRequest extends FormRequest
      */
     public function rules(): array
     {
+
         $action = $this->route()->getActionMethod();
+
         return match ($action) {
             'store' => [
-                'categoryName' => ['required', 'string', 'max:150', Rule::unique('tenant_mongo.categories', 'name')],
-                'categoryStatus' => ['required', Rule::in(array_values(Categories::STATUS))],
+                'subProductName' => ['required', 'string', 'max:50'],
+                'price' => ['required', 'numeric', 'min:1'],
+                'productId' => ['required', 'string', 'exists:tenant_mongo.products,_id'],
             ],
             'update' => [
-                'categoryName' => ['required', 'string', 'max:150', Rule::unique('tenant_mongo.categories', 'name')->ignore($this->route('id'))],
-                'categoryStatus' => ['required', Rule::in(array_values(Categories::STATUS))],
+                'subProductName' => ['required', 'string', 'max:50'],
+                'price' => ['required', 'numeric', 'min:1'],
+                'status' => ['required', Rule::in(array_values(SubProducts::STATUS))],
+                'productId' => ['required', 'string', 'exists:tenant_mongo.products,_id'],
             ],
             default => [],
         };

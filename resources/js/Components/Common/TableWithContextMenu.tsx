@@ -31,6 +31,8 @@ interface TableWithContextMenuProps {
   onReloadTable?: (page: number, perPage: number) => void;
   divStyle?: React.CSSProperties;
   tableStyle?: React.CSSProperties;
+  keyPageParam?: string;
+  keyPerPageParam?: string;
 }
 
 const TableWithContextMenu: React.FC<TableWithContextMenuProps> = (props) => {

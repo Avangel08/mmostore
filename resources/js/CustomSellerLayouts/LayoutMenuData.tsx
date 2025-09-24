@@ -7,6 +7,7 @@ const Navdata = () => {
     const subdomain = usePage().props.subdomain;
     const [isDashboard, setIsDashboard] = useState<boolean>(false);
     const [isCategory, setIsCategory] = useState<boolean>(false);
+    const [isProduct, setIsProduct] = useState<boolean>(false);
     const [iscurrentState, setIscurrentState] = useState('Dashboard');
 
     function updateIconSidebar(e : any) {
@@ -32,11 +33,15 @@ const Navdata = () => {
         if (iscurrentState !== 'Category') {
             setIsCategory(false);
         }
+        if (iscurrentState !== 'Product') {
+            setIsProduct(false);
+        }
     }, [
         history,
         iscurrentState,
         isDashboard,
         isCategory,
+        isProduct,
     ]);
 
     const menuItems : any = [
@@ -61,12 +66,25 @@ const Navdata = () => {
             id: "category",
             label: "Category Management",
             icon: "ri-file-list-fill",
-            link: route('seller.category'),
+            link: route('seller.category.index'),
             stateVariables: isCategory,
             click: function (e : any) {
                 e.preventDefault();
                 setIsCategory(!isCategory);
                 setIscurrentState('Category');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "product",
+            label: "Product Management",
+            icon: "ri-box-3-fill",
+            link: route('seller.product.index'),
+            stateVariables: isProduct,
+            click: function (e : any) {
+                e.preventDefault();
+                setIsProduct(!isProduct);
+                setIscurrentState('Product');
                 updateIconSidebar(e);
             },
         },
