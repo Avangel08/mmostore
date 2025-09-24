@@ -54,4 +54,15 @@ class SubProductService
     {
         return $subProduct->delete();
     }
+
+    public function isExistsNameSubProduct($name, $productId, $subProductId = null, bool $ignore = false)
+    {
+        $query = SubProducts::where('name', $name)->where('product_id', $productId);
+
+        if ($ignore) {
+            $query->where('_id', '!=', $subProductId);
+        }
+
+        return $query->exists();
+    }
 }

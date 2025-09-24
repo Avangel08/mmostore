@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\Product\SubProductRequest;
 use App\Services\Product\ProductService;
 use App\Services\Product\SubProductService;
+use Illuminate\Validation\ValidationException;
 
 class SubProductController extends Controller
 {
@@ -27,9 +28,17 @@ class SubProductController extends Controller
 
         try {
             $data = $request->validated();
+            $isExistsName = $this->subProductService->isExistsNameSubProduct($data['subProductName'], $data['productId']);
+            if ($isExistsName) {
+                throw ValidationException::withMessages([
+                    'subProductName' => ['The sub product name has already been taken for this product.'],
+                ]);
+            }
             $this->subProductService->createSubProduct($data);
 
             return back()->with('success', 'Sub product created successfully');
+        } catch (ValidationException $ve) {
+            throw $ve;
         } catch (\Exception $e) {
             \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
 
@@ -51,9 +60,17 @@ class SubProductController extends Controller
             }
 
             $data = $request->validated();
+            $isExistsName = $this->subProductService->isExistsNameSubProduct($data['subProductName'], $data['productId'], $id, true);
+            if ($isExistsName) {
+                throw ValidationException::withMessages([
+                    'subProductName' => ['The sub product name has already been taken for this product'],
+                ]);
+            }
             $this->subProductService->updateSubProduct($subProduct, $data);
 
             return back()->with('success', 'Sub product updated successfully');
+        } catch (ValidationException $ve) {
+            throw $ve;
         } catch (\Exception $e) {
             \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
 

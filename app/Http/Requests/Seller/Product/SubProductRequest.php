@@ -28,14 +28,15 @@ class SubProductRequest extends FormRequest
 
         return match ($action) {
             'store' => [
-                'subProductName' => ['required', 'string', 'max:50', Rule::unique('tenant_mongo.sub_products', 'name')],
+                'subProductName' => ['required', 'string', 'max:50'],
                 'price' => ['required', 'numeric', 'min:1'],
                 'productId' => ['required', 'string', 'exists:tenant_mongo.products,_id'],
             ],
             'update' => [
-                'subProductName' => ['required', 'string', 'max:50', Rule::unique('tenant_mongo.sub_products', 'name')->ignore($this->route('id'))],
+                'subProductName' => ['required', 'string', 'max:50'],
                 'price' => ['required', 'numeric', 'min:1'],
                 'status' => ['required', Rule::in(array_values(SubProducts::STATUS))],
+                'productId' => ['required', 'string', 'exists:tenant_mongo.products,_id'],
             ],
             default => [],
         };

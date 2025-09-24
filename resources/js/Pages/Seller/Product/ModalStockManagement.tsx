@@ -1,13 +1,21 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
-import { Modal, Button, Form, Row, Col, Container } from "react-bootstrap";
+import {
+  Modal,
+  Button,
+  Form,
+  Row,
+  Col,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Select from "react-select";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
 import { showToast } from "../../../utils/showToast";
 import { confirmDelete } from "../../../utils/sweetAlert";
 import { usePage, router } from "@inertiajs/react";
-import { useQueryParams } from "../../../hooks/useQueryParam";
 
 interface ModalStockManagementProps {
   show: boolean;
@@ -27,6 +35,8 @@ export const ModalStockManagement = ({
   const errors = usePage().props.errors;
   const [subProductPage, setSubProductPage] = useState(1);
   const [subProductPerPage, setSubProductPerPage] = useState(10);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingSubProduct, setEditingSubProduct] = useState<any>(null);
 
   const fetchSubProducts = (
     subProductPage?: number,
@@ -67,10 +77,16 @@ export const ModalStockManagement = ({
   const maxLengthName = 50;
   const maxPrice = 999999;
 
+  const statusOptions = [
+    { value: "ACTIVE", label: t("Active") },
+    { value: "INACTIVE", label: t("Inactive") },
+  ];
+
   const formik = useFormik({
     initialValues: {
       subProductName: "",
       price: "",
+      status: "ACTIVE",
     },
     validationSchema: Yup.object({
       subProductName: Yup.string()
@@ -80,14 +96,21 @@ export const ModalStockManagement = ({
         .positive(t("Price must be positive"))
         .max(maxPrice, `Price must be less than ${maxPrice}`)
         .required(t("Please enter price")),
+      status: Yup.string().required(t("Please select status")),
     }),
     onSubmit: (values) => {
       if (!productId) {
         showToast(t("Product ID is required"), "error");
         return;
       }
-      router.post(
-        route("seller.sub-product.store"),
+
+      const url =
+        isEditMode && editingSubProduct
+          ? route("seller.sub-product.update", { id: editingSubProduct?.id })
+          : route("seller.sub-product.store");
+      const method = isEditMode && editingSubProduct ? "put" : "post";
+      router[method](
+        url,
         {
           ...values,
           productId,
@@ -103,19 +126,38 @@ export const ModalStockManagement = ({
 
             if (page.props?.message?.success) {
               showToast(t(page.props.message.success), "success");
-              formik.resetForm();
+              if (isEditMode && editingSubProduct) {
+                handleCancelEdit();
+              } else {
+                formik.resetForm();
+              }
               fetchSubProducts(subProductPage, subProductPerPage);
             }
-          },
-          onError: (errors: any) => {
-            Object.keys(errors).forEach((key) => {
-              showToast(t(errors[key]), "error");
-            });
           },
         }
       );
     },
   });
+
+  useEffect(() => {
+    formik.setErrors(errors || {});
+  }, [errors]);
+
+  const handleEdit = (rowData: any) => {
+    setIsEditMode(true);
+    setEditingSubProduct(rowData);
+    formik.setValues({
+      subProductName: rowData.name || "",
+      price: rowData.price || "",
+      status: rowData.status || "ACTIVE",
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    setEditingSubProduct(null);
+    formik.resetForm();
+  };
 
   const handleDelete = async (id: number | string) => {
     const confirmed = await confirmDelete({
@@ -139,9 +181,9 @@ export const ModalStockManagement = ({
           }
         },
         onError: (errors: any) => {
-          const errorMessage =
-            errors?.message || t("Failed to delete sub-product");
-          showToast(t(errorMessage), "error");
+          Object.keys(errors).forEach((key) => {
+            showToast(t(errors[key]), "error");
+          });
         },
       });
     }
@@ -207,21 +249,50 @@ export const ModalStockManagement = ({
           const rowData = cellProps.row.original;
           return (
             <div className="d-flex gap-2">
-              <Button size="sm" variant="outline-success" onClick={() => {
-                if (rowData?.id) {
-                  router.get(route("seller.account.edit", { id: rowData?.id }));
-                }
-              }}>
-                <i className="ri-add-line"></i>
-              </Button>
-
-              <Button
-                variant="outline-danger"
-                size="sm"
-                onClick={() => handleDelete(rowData?.id)}
+              <OverlayTrigger
+                placement="top"
+                overlay={<Tooltip>{t("Add")}</Tooltip>}
               >
-                <i className="ri-delete-bin-fill"></i>
-              </Button>
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  onClick={() => {
+                    if (rowData?.id) {
+                      router.get(
+                        route("seller.account.edit", { id: rowData?.id })
+                      );
+                    }
+                  }}
+                >
+                  <i className="ri-add-line"></i>
+                </Button>
+              </OverlayTrigger>
+
+              <OverlayTrigger
+                placement="top"
+                overlay={<Tooltip>{t("Edit")}</Tooltip>}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-info"
+                  onClick={() => handleEdit(rowData)}
+                >
+                  <i className="ri-pencil-line"></i>
+                </Button>
+              </OverlayTrigger>
+
+              <OverlayTrigger
+                placement="top"
+                overlay={<Tooltip>{t("Delete")}</Tooltip>}
+              >
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => handleDelete(rowData?.id)}
+                >
+                  <i className="ri-delete-bin-fill"></i>
+                </Button>
+              </OverlayTrigger>
             </div>
           );
         },
@@ -236,7 +307,7 @@ export const ModalStockManagement = ({
     <Modal
       show={show}
       onHide={() => {
-        formik.resetForm();
+        handleCancelEdit();
         setSubProduct(null);
         setProduct(null);
         onHide();
@@ -263,7 +334,7 @@ export const ModalStockManagement = ({
         <div className="mb-5">
           <Form onSubmit={formik.handleSubmit} noValidate>
             <Row>
-              <Col md={4}>
+              <Col md={6}>
                 <Form.Group className="mb-3" controlId="subProductName">
                   <Form.Label>
                     {t("Sub-product name")}{" "}
@@ -278,18 +349,17 @@ export const ModalStockManagement = ({
                     value={formik.values.subProductName}
                     isInvalid={
                       !!(
-                        (formik.touched.subProductName &&
-                          formik.errors.subProductName) ||
-                        errors?.subProductName
+                        formik.touched.subProductName &&
+                        formik.errors.subProductName
                       )
                     }
                   />
                   <Form.Control.Feedback type="invalid">
-                    {formik.errors.subProductName || errors?.subProductName}
+                    {formik.errors.subProductName}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Col>
-              <Col md={4}>
+              <Col md={6}>
                 <Form.Group className="mb-3" controlId="price">
                   <Form.Label>
                     {t("Price")} <span className="text-danger">*</span>
@@ -301,49 +371,97 @@ export const ModalStockManagement = ({
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.price}
-                    isInvalid={
-                      !!(
-                        (formik.touched.price && formik.errors.price) ||
-                        errors?.price
-                      )
-                    }
+                    isInvalid={!!(formik.touched.price && formik.errors.price)}
                   />
                   <Form.Control.Feedback type="invalid">
-                    {formik.errors.price || errors?.price}
+                    {formik.errors.price}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Col>
-              <Col md={4} className="d-flex align-items-center">
-                <Button variant="primary" type="submit">
-                  <i className="ri-add-line align-bottom me-1"></i>
-                  {t("Add")}
-                </Button>
+            </Row>
+            {isEditMode && (
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3" controlId="status">
+                    <Form.Label>
+                      {t("Status")} <span className="text-danger">*</span>
+                    </Form.Label>
+                    <Select
+                      options={statusOptions}
+                      value={statusOptions.find(
+                        (option) => option.value === formik.values.status
+                      )}
+                      onChange={(selectedOption) => {
+                        formik.setFieldValue(
+                          "status",
+                          selectedOption?.value || "ACTIVE"
+                        );
+                      }}
+                      placeholder={t("Select status")}
+                      isClearable={false}
+                      isSearchable={false}
+                      className={
+                        formik.touched.status && formik.errors.status
+                          ? "is-invalid"
+                          : ""
+                      }
+                    />
+                    {formik.touched.status && formik.errors.status && (
+                      <div className="invalid-feedback d-block">
+                        {formik.errors.status}
+                      </div>
+                    )}
+                  </Form.Group>
+                </Col>
+              </Row>
+            )}
+            <Row>
+              <Col md={6} className="d-flex align-items-center gap-2">
+                {isEditMode ? (
+                  <>
+                    <Button variant="primary" type="submit">
+                      <i className="ri-save-line align-bottom me-1"></i>
+                      {t("Update")}
+                    </Button>
+                    <Button variant="secondary" onClick={handleCancelEdit}>
+                      <i className="ri-close-line align-bottom me-1"></i>
+                      {t("Cancel")}
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="primary" type="submit">
+                    <i className="ri-add-line align-bottom me-1"></i>
+                    {t("Add")}
+                  </Button>
+                )}
               </Col>
             </Row>
           </Form>
         </div>
 
-        <div className="mb-4 px-3">
-          <TableWithContextMenu
-            columns={columns}
-            data={subProduct}
-            divClass="table-responsive table-card mb-3"
-            tableClass="table align-middle table-nowrap mb-0"
-            theadClass="table-light"
-            enableContextMenu={false}
-            isPaginateTable={true}
-            onReloadTable={fetchSubProducts}
-            keyPageParam="subProductPage"
-            keyPerPageParam="subProductPerPage"
-          />
-        </div>
+        {!isEditMode && (
+          <div className="mb-4 px-3">
+            <TableWithContextMenu
+              columns={columns}
+              data={subProduct}
+              divClass="table-responsive table-card mb-3"
+              tableClass="table align-middle table-nowrap mb-0"
+              theadClass="table-light"
+              enableContextMenu={false}
+              isPaginateTable={true}
+              onReloadTable={fetchSubProducts}
+              keyPageParam="subProductPage"
+              keyPerPageParam="subProductPerPage"
+            />
+          </div>
+        )}
       </Modal.Body>
 
       <Modal.Footer>
         <Button
           variant="light"
           onClick={() => {
-            formik.resetForm();
+            handleCancelEdit();
             setSubProduct(null);
             setProduct(null);
             onHide();
