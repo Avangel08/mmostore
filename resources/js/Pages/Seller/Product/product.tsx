@@ -9,7 +9,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import Select from "react-select";
 import { showToast } from "../../../utils/showToast";
-import CustomCKEditor from "../../../Components/CustomCKEditor";
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
@@ -17,6 +16,8 @@ import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orien
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 // Register the plugins
 registerPlugin(
@@ -344,15 +345,19 @@ export default function product() {
                             {t("Detail description")}{" "}
                             <span className="text-danger">*</span>
                           </Form.Label>
-                          <CustomCKEditor
+                          <CKEditor
+                          editor={ClassicEditor as any}
                             data={formik.values.detailDescription}
-                            onChange={(data: string) => {
-                              formik.setFieldValue("detailDescription", data);
+                            onChange={(event: any, editor: any) => {
+                              const editorData = editor.getData();
+                              formik.setFieldValue(
+                                "detailDescription",
+                                editorData
+                              );
                             }}
                             onBlur={() =>
                               formik.setFieldTouched("detailDescription", true)
                             }
-                            placeholder={t("Enter detailed description")}
                           />
                           {((formik.touched.detailDescription &&
                             formik.errors.detailDescription) ||
