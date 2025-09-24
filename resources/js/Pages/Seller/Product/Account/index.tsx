@@ -1,4 +1,4 @@
-import { Head, router, usePage } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -17,6 +17,7 @@ import { showToast } from "../../../../utils/showToast";
 import Layout from "../../../../CustomSellerLayouts";
 import TableRecentUpload from "./TableRecentUpload";
 import TableSellingProduct from "./TableSellingProduct";
+import { confirmDelete } from "../../../../utils/sweetAlert";
 
 const SellerAccount = () => {
   const { t } = useTranslation();
@@ -69,7 +70,6 @@ const SellerAccount = () => {
       });
     },
   });
-
   return (
     <React.Fragment>
       <Head title={t("Account")} />
@@ -174,8 +174,53 @@ const SellerAccount = () => {
                     >
                       <h5>{t("Products for sale")}</h5>
                       <div className="d-flex gap-2">
-                        <Button variant="danger">{t("Delete all")}</Button>
-                        <Button variant="success">
+                        <Button
+                          variant="danger"
+                          onClick={async () => {
+                            const confirmed = await confirmDelete({
+                              title: t("Delete all unsold products?"),
+                              text: "",
+                              confirmButtonText: t("Delete now"),
+                              cancelButtonText: t("Cancel"),
+                            });
+                            if (!confirmed) {
+                              return;
+                            }
+
+                            router.delete(route("seller.account.destroy", { id: subProduct?.id ?? 0 }), {
+                              onSuccess: (page: any) => {
+                                if (page.props?.message?.error) {
+                                  showToast(
+                                    t(page.props.message.error),
+                                    "error"
+                                  );
+                                  return;
+                                }
+
+                                if (page.props?.message?.success) {
+                                  showToast(
+                                    t(page.props.message.success),
+                                    "success"
+                                  );
+                                }
+                              },
+                              onError: (errors: any) => {
+                                Object.keys(errors).forEach((key) => {
+                                  showToast(t(errors?.[key]), "error");
+                                });
+                              },
+                            });
+                          }}
+                        >
+                          {t("Delete all")}
+                        </Button>
+                        <Button
+                          as="a"
+                          href={route("seller.account.export-unsold-account", {
+                            subProductId: subProduct?.id || 0,
+                          })}
+                          variant="success"
+                        >
                           {t("Download unsold products")}
                         </Button>
                       </div>

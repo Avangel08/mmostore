@@ -54,7 +54,7 @@ class SellerAccountController extends Controller
             $data = $request->validated();
             $this->sellerAccountService->processAccountFile($data);
 
-            return back()->with('success', "File uploaded successfully and is pending processing");
+            return back()->with('success', 'File uploaded successfully and is pending processing');
         } catch (\Exception $e) {
             \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
 
@@ -78,9 +78,14 @@ class SellerAccountController extends Controller
         // if (auth(config('guard.seller'))->user()->cannot('account_edit')) {
         //     return abort(403);
         // }
+        $subProduct = $this->subProductService->getById($subProductId);
+        if (! $subProduct) {
+            abort(404);
+        }
+
         return Inertia::render('Product/Account/index', [
             'subProduct' => fn () => $this->subProductService->getById($subProductId),
-            'importHistory' => fn () => $this->importAccountHistoryService->getForTable($subProductId, $request)
+            'importHistory' => fn () => $this->importAccountHistoryService->getForTable($subProductId, $request),
         ]);
     }
 
@@ -95,8 +100,40 @@ class SellerAccountController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($sub, string $subProductId, Request $request)
     {
-        //
+        try {
+            $subProduct = $this->subProductService->getById($subProductId);
+            if (! $subProduct) {
+                throw new \Exception('Sub product not found');
+            }
+            $this->sellerAccountService->deleteUnsoldAccounts($subProductId);
+
+            return back()->with('success', 'Deleted successfully');
+        } catch (\Exception $e) {
+            \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
+
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function exportUnsoldAccounts($sub, $subProductId, Request $request)
+    {
+        try {
+            $result = $this->sellerAccountService->exportUnsoldAccounts($subProductId);
+
+            if (! file_exists($result['full_path'])) {
+                throw new \Exception('Export file was not created successfully');
+            }
+
+            return response()->download($result['full_path'], $result['file_name'], [
+                'Content-Type' => 'text/plain',
+            ])->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
+
+            return back()->with('error', $e->getMessage());
+        }
     }
 }

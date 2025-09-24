@@ -7,6 +7,7 @@ use App\Models\Mongo\Accounts;
 use App\Models\Mongo\ImportAccountHistory;
 use Config;
 use DB;
+use Storage;
 
 /**
  * Class SellerAccountService
@@ -82,5 +83,58 @@ class SellerAccountService
             'result' => null,
             'ended_at' => null,
         ]);
+    }
+
+    public function deleteUnsoldAccounts($subProductId)
+    {
+        return Accounts::where('sub_product_id', $subProductId)
+            ->whereNull('order_id')
+            ->delete();
+    }
+
+    public function exportUnsoldAccounts($subProductId)
+    {
+        $host = request()->getHost();
+        $fileName = 'unsold_accounts_' . $subProductId . '_' . time() . '.txt';
+        $filePath = "{$host}/exports/{$fileName}";
+        $fullPath = Storage::disk('public')->path($filePath);
+        
+        $directory = dirname($fullPath);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        $file = fopen($fullPath, 'w');
+        if (!$file) {
+            throw new \Exception('Cannot create export file');
+        }
+
+        $chunkSize = 1000;
+        $totalExported = 0;
+
+        try {
+            Accounts::select(['key', 'data'])
+                ->where('sub_product_id', $subProductId)
+                ->whereNull('order_id')
+                ->where('status', Accounts::STATUS['LIVE'])
+                ->chunk($chunkSize, function ($accounts) use ($file, &$totalExported) {
+                    foreach ($accounts as $account) {
+                        $line = $account->key . '|' . $account->data . PHP_EOL;
+                        fwrite($file, $line);
+                        $totalExported++;
+                    }
+                    unset($accounts);
+                });
+            
+        } finally {
+            fclose($file);
+        }
+        return [
+            'file_path' => $filePath,
+            'file_name' => $fileName,
+            'full_path' => $fullPath,
+            'total_exported' => $totalExported,
+            'download_url' => Storage::disk('public')->url($filePath)
+        ];
     }
 }

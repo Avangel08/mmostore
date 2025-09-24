@@ -190,5 +190,7 @@
     "FINISH": "HOÀN THÀNH",
     "RUNNING": "ĐANG CHẠY",
     "PENDING": "ĐANG CHỜ",
-    "Products": "Sản phẩm"
+    "Products": "Sản phẩm",
+    "Delete all unsold products?": "Xoá tất cả sản phẩm chưa bán?",
+    "Deleted successfully": "Đã xoá thành công"
 }

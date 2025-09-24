@@ -54,6 +54,9 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                 Route::resource('sub-product', SubProductController::class, ['as' => 'seller']);
 
                 // seller account
+                Route::group(['prefix' => 'account'], function () {
+                    Route::get('/export-unsold-account/{subProductId}', [SellerAccountController::class, 'exportUnsoldAccounts'])->name('seller.account.export-unsold-account');
+                });
                 Route::resource('account', SellerAccountController::class, ['as' => 'seller']);
 
                 Route::group(['prefix' => 'payment-history'], function () {
