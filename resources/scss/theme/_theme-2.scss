@@ -1,0 +1,49 @@
+[data-theme="Theme_2"] {
+    .page-header {
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 1);
+    }
+
+    .navbar-landing {
+        background: rgba(58, 68, 75, 1);
+        &.is-sticky {
+            background: rgba(58, 68, 75, 1);
+        }
+    }
+
+    .rounded-lg {
+        border-radius: 30px;
+    }
+
+    .job-hero-section {
+        padding-top: 110px;
+    }
+
+    .custom-table {
+        background: rgba(255, 255, 255, 1);
+        color: black;
+
+        thead {
+            background: black;
+            color: #fff;
+            tr {
+                th {
+                    padding: 0.875rem 0.6rem;
+                }
+            }
+        }
+
+        tbody {
+            tr {
+                td {
+                    align-content: center;
+                    border-color: black; // viền cho các ô body
+                }
+                &:hover {
+                    background: rgba(255, 255, 255, 0.1); // hiệu ứng hover
+                }
+            }
+        }
+    }
+}
