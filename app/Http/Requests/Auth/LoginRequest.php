@@ -79,13 +79,18 @@ class LoginRequest extends FormRequest
             }
         }
 
+        $acceptGuard = [
+            config('guard.admin') => User::TYPE['ADMIN'],
+            config('guard.seller') => User::TYPE['SELLER'],
+        ];
+
         $user = Auth::guard($guard)->user();
-        if ($guard === config('guard.admin') && $user && $user->type !== User::TYPE['ADMIN']) {
+        if ($user?->type !== ($acceptGuard[$guard] ?? null)) {
             Auth::guard($guard)->logout();
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => 'Access denied. Only administrators can access this area.',
+                'email' => 'Access denied. You cannot access this area.',
             ]);
         }
 
