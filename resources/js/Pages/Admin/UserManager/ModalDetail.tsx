@@ -21,30 +21,41 @@ export const ModalDetail = ({ show, onHide, dataEdit }: {
 }) => {
     const maxLengthName = 50;
     const maxLengthEmail = 50;
+    const maxLengthPassword = 20;
     const { t } = useTranslation();
     const isEditMode = !!dataEdit;
+
+    const validationSchema = Yup.object({
+        name: Yup.string().max(maxLengthName, `Must be ${maxLengthName} characters or less`).required(t("Please enter this field")),
+        email: Yup.string().max(maxLengthEmail, `Must be ${maxLengthEmail} characters or less`).required(t("Please enter this field")),
+        password: isEditMode ? Yup.string().min(8, t("Password must be at least 8 characters")).max(maxLengthPassword, `Must be ${maxLengthPassword} characters or less`).optional() : Yup.string().min(8, t("Password must be at least 8 characters")).max(maxLengthPassword, `Must be ${maxLengthPassword} characters or less`).required(t("Please enter this field")),
+        confirmPassword: isEditMode ? Yup.string().max(maxLengthPassword, `Must be ${maxLengthPassword} characters or less`).oneOf([Yup.ref('password')], t('Passwords must match')).optional() : Yup.string().max(maxLengthPassword, `Must be ${maxLengthPassword} characters or less`).oneOf([Yup.ref('password')], t('Passwords must match')).required(t("Please enter this field")),
+        type: Yup.string().required(t("Please enter this field")),
+        status: Yup.string().required(t("Please enter this field")),
+    });
 
     const formik = useFormik({
         initialValues: {
             name: "",
             email: "",
+            password: "",
+            confirmPassword: "",
             type: "",
             status: "",
         },
-        validationSchema: Yup.object({
-            name: Yup.string().max(maxLengthName, `Must be ${maxLengthName} characters or less`).required(t("Please enter this field")),
-            email: Yup.string().max(maxLengthEmail, `Must be ${maxLengthEmail} characters or less`).required(t("Please enter this field")),
-            type: Yup.string().required(t("Please enter this field")),
-            status: Yup.string().required(t("Please enter this field")),
-        }),
+        validationSchema,
         onSubmit: (values) => {
             const url = isEditMode ? route("admin.user.update", { id: dataEdit.id }) : route("admin.user.add");
             const method = isEditMode ? "put" : "post";
-            const submissionData = {
-                ...values,
-            };
+            const { confirmPassword, ...submissionData } = values;
+            
+            let finalSubmissionData: any = submissionData;
+            if (isEditMode && !submissionData.password) {
+                const { password, ...dataWithoutPassword } = submissionData;
+                finalSubmissionData = dataWithoutPassword;
+            }
 
-            router[method](url, submissionData, {
+            router[method](url, finalSubmissionData, {
                 onSuccess: () => {
                     formik.resetForm();
                     onHide();
@@ -67,13 +78,17 @@ export const ModalDetail = ({ show, onHide, dataEdit }: {
             formik.setValues({
                 name: dataEdit.name || "",
                 email: dataEdit.email || "",
+                password: "",
+                confirmPassword: "",
                 type: dataEdit.type || "",
-                status: dataEdit.status || "",
+                status: dataEdit.status ?? "",
             });
         } else {
             formik.setValues({
                 name: "",
                 email: "",
+                password: "",
+                confirmPassword: "",
                 type: "",
                 status: "",
             });
@@ -125,6 +140,42 @@ export const ModalDetail = ({ show, onHide, dataEdit }: {
                             isInvalid={ !!(formik.touched.email && formik.errors.email) }
                         />
                         <Form.Control.Feedback type="invalid">{ formik.errors.email }</Form.Control.Feedback>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="password">
+                        <Form.Label>
+                            {t("Password")} 
+                            {!isEditMode && <span className="text-danger">*</span>}
+                            {isEditMode && <small className="text-muted"> ({ t('Leave blank to keep current password') })</small>}
+                        </Form.Label>
+                        <Form.Control
+                            type="password"
+                            placeholder={ isEditMode ? t("Enter new password") : t("Enter password") }
+                            maxLength={ maxLengthPassword }
+                            onChange={ formik.handleChange }
+                            onBlur={ formik.handleBlur }
+                            value={ formik.values.password }
+                            isInvalid={ !!(formik.touched.password && formik.errors.password) }
+                        />
+                        <Form.Control.Feedback type="invalid">{ formik.errors.password }</Form.Control.Feedback>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="confirmPassword">
+                        <Form.Label>
+                            {t("Confirm Password")} 
+                            {!isEditMode && <span className="text-danger">*</span>}
+                            {isEditMode && <small className="text-muted"> ({ t('Leave blank to keep current password') })</small>}
+                        </Form.Label>
+                        <Form.Control
+                            type="password"
+                            placeholder={ isEditMode ? t("Confirm new password") : t("Confirm password") }
+                            maxLength={ maxLengthPassword }
+                            onChange={ formik.handleChange }
+                            onBlur={ formik.handleBlur }
+                            value={ formik.values.confirmPassword }
+                            isInvalid={ !!(formik.touched.confirmPassword && formik.errors.confirmPassword) }
+                        />
+                        <Form.Control.Feedback type="invalid">{ formik.errors.confirmPassword }</Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group className="mb-3" controlId="type">

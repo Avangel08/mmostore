@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, ComponentType } from "react";
 import {
   Modal,
   Button,
@@ -7,11 +7,13 @@ import {
   Col,
   OverlayTrigger,
   Tooltip,
+  FormControlProps,
 } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Select from "react-select";
+import { NumericFormat } from "react-number-format";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
 import { showToast } from "../../../utils/showToast";
 import { confirmDelete } from "../../../utils/sweetAlert";
@@ -75,7 +77,7 @@ export const ModalStockManagement = ({
   }, [productId, show]);
 
   const maxLengthName = 50;
-  const maxPrice = 999999;
+  const maxPrice = 999999999;
 
   const statusOptions = [
     { value: "ACTIVE", label: t("Active") },
@@ -206,7 +208,14 @@ export const ModalStockManagement = ({
         enableColumnFilter: false,
         enableSorting: true,
         cell: (cell: any) => {
-          return <span>${cell.getValue()?.toFixed(2)}</span>;
+          return (
+            <NumericFormat
+              value={cell.getValue()}
+              displayType="text"
+              thousandSeparator="."
+              decimalSeparator=","
+            />
+          );
         },
       },
       {
@@ -364,11 +373,20 @@ export const ModalStockManagement = ({
                   <Form.Label>
                     {t("Price")} <span className="text-danger">*</span>
                   </Form.Label>
-                  <Form.Control
-                    type="number"
-                    step="0.01"
+                  <NumericFormat
+                    customInput={Form.Control as React.ComponentType<FormControlProps>}
+                    decimalSeparator=","
                     placeholder={t("Enter price")}
-                    onChange={formik.handleChange}
+                    decimalScale={2}
+                    fixedDecimalScale={false}
+                    allowNegative={false}
+                    isAllowed={(values) => {
+                      const { floatValue } = values;
+                      return floatValue === undefined || floatValue <= maxPrice;
+                    }}
+                    onValueChange={(values) => {
+                      formik.setFieldValue("price", values.floatValue || "");
+                    }}
                     onBlur={formik.handleBlur}
                     value={formik.values.price}
                     isInvalid={!!(formik.touched.price && formik.errors.price)}

@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { router, usePage } from "@inertiajs/react";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
@@ -7,12 +7,24 @@ import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import moment from "moment";
 import { useQueryParams } from "../../../hooks/useQueryParam";
 
-const Table = ({ data, onReloadTable, onEdit }: {
+const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
     data: any;
     onReloadTable?: (page: number, perPage: number) => void;
     onEdit?: (id: number | string) => void;
+    onSelectionChange?: (selectedItems: (string | number)[]) => void;
 }) => {
     const { t } = useTranslation();
+    const [selectedItems, setSelectedItems] = useState<(string | number)[]>([]);
+    const [selectAll, setSelectAll] = useState(false);
+
+    useEffect(() => {
+        onSelectionChange && onSelectionChange(selectedItems);
+    }, [selectedItems, onSelectionChange]);
+
+    useEffect(() => {
+        setSelectedItems([]);
+        setSelectAll(false);
+    }, [data]);
 
     const contextMenuOptions = (rowData: any) => {
         return new ContextMenuBuilder()
@@ -25,18 +37,22 @@ const Table = ({ data, onReloadTable, onEdit }: {
             .build();
     };
 
-    const checkedAll = useCallback(() => {
-        const checkall: any = document.getElementById("checkBoxAll");
-        const ele = document.querySelectorAll(".roleCheckbox");
-
-        if (checkall.checked) {
-            ele.forEach((ele: any) => {
-                ele.checked = true;
-            });
+    const handleSelectAll = useCallback(() => {
+        if (!selectAll) {
+            const allIds = data?.data?.map((item: any) => item.id) || [];
+            setSelectedItems(allIds);
         } else {
-            ele.forEach((ele: any) => {
-                ele.checked = false;
-            });
+            setSelectedItems([]);
+        }
+        setSelectAll(!selectAll);
+    }, [selectAll, data]);
+
+    const handleItemSelect = useCallback((id: string | number, checked: boolean) => {
+        if (checked) {
+            setSelectedItems((prev) => [...prev, id]);
+        } else {
+            setSelectedItems((prev) => prev.filter((item) => item !== id));
+            setSelectAll(false);
         }
     }, []);
 
@@ -48,16 +64,19 @@ const Table = ({ data, onReloadTable, onEdit }: {
                         type="checkbox"
                         id="checkBoxAll"
                         className="form-check-input"
-                        onClick={() => checkedAll()}
+                        checked={selectAll}
+                        onChange={handleSelectAll}
                     />
                 ),
                 cell: (cellProps: any) => {
+                    const rowData = cellProps.row.original;
+                    const isChecked = selectedItems.includes(rowData.id);
                     return (
                         <Form.Check.Input
                             type="checkbox"
                             className="roleCheckbox form-check-input"
-                            value={cellProps.getValue()}
-                            onChange={() => {}}
+                            checked={isChecked}
+                            onChange={(e) => handleItemSelect(rowData.id, e.target.checked)}
                         />
                     );
                 },
@@ -109,7 +128,7 @@ const Table = ({ data, onReloadTable, onEdit }: {
                 },
             },
         ],
-        [t]
+        [t, selectAll, selectedItems, handleSelectAll, handleItemSelect]
     );
 
     return (

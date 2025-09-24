@@ -36,4 +36,9 @@ class StoreService
     {
         return Stores::select($select)->with($relation)->where('user_id', $userId)->first();
     }
+
+    public function updateByUserId($userId, $data)
+    {
+        return Stores::where('user_id', $userId)->update($data);
+    }
 }

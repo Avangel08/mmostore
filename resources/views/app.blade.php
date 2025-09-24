@@ -15,6 +15,7 @@
         <script>
             if (typeof Ziggy !== 'undefined') {
                 Ziggy.absolute = false;
+
                 try {
                     Ziggy.url = window.location.origin;
                 } catch (e) {}

@@ -2,6 +2,7 @@
 namespace App\Services\Home;
 
 use App\Models\MySQL\User;
+use App\Models\MySQL\Stores;
 use DB;
 
 
@@ -19,7 +20,18 @@ class UserService
 
     public function delete($id)
     {
-        return User::destroy($id);
+        return User::where('id', $id)->delete();
+    }
+
+    public function deletes(array $ids)
+    {
+        return DB::transaction(function () use ($ids) {
+            $deletedUsers = User::whereIn('id', $ids)->delete();
+
+            Stores::whereIn('user_id', $ids)->delete();
+
+            return $deletedUsers;
+        });
     }
 
     public function findById($id, $select = ["*"], $relation = [])
