@@ -1,11 +1,13 @@
 import { Inertia } from "@inertiajs/inertia";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const Navdata = () => {
     //state data
     const [isRoleManagement, setIsRoleManagement] = useState<boolean>(false);
     const [isPermissionManagement, setIsPermissionManagement] = useState<boolean>(false);
     const [iscurrentState, setIscurrentState] = useState('Role Management');
+    const { t } = useTranslation();
 
     function updateIconSidebar(e : any) {
         if (e && e.target && e.target.getAttribute("sub-items")) {
@@ -54,7 +56,7 @@ const Navdata = () => {
         },
         {
             id: "usermanagement",
-            label: "User",
+            label: t("User manager"),
             icon: "ri-user-star-fill",
             link: route("admin.user.index"),
             click: function (e : any) {

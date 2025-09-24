@@ -4,19 +4,26 @@ namespace App\Http\Controllers\Admin\UserManager;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserManagement\UserManagementRequest;
+use App\Models\MySQL\Stores;
+use App\Models\MySQL\User;
+use App\Services\Home\StoreService;
 use App\Services\Home\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
 class UserController extends Controller
 {
     protected $userService;
+    protected $storeService;
 
     public function __construct(
-        UserService $userService
+        UserService $userService,
+        StoreService $storeService,
     )
     {
         $this->userService = $userService;
+        $this->storeService = $storeService;
     }
 
     public function index(Request $request)
@@ -34,6 +41,7 @@ class UserController extends Controller
     {
         try {
             $data = $userRequest->validated();
+            $data['password'] = Hash::make($data['password']);
             $this->userService->create($data);
 
             return back()->with('success', "User added successfully");
@@ -52,9 +60,31 @@ class UserController extends Controller
                 return back()->with('error', "User not found");
             }
 
+            if ($data['status'] == User::STATUS['INACTIVE'] || $data['status'] == User::STATUS['BLOCK']) {
+                $this->storeService->updateByUserId($id, ['status' => Stores::STATUS['INACTIVE']]);
+            }
+
             $this->userService->update($user, $data);
 
             return back()->with('success', "User updated successfully");
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function delete(UserManagementRequest $userRequest)
+    {
+        try {
+            $data = $userRequest->validated();
+            $ids = $data['ids'] ?? [];
+
+            if (empty($ids)) {
+                return back()->with('error', "No users selected for deletion");
+            }
+
+            $this->userService->deletes($ids);
+
+            return back()->with('success', "Deleted selected " . count($ids) .  " user successfully");
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }

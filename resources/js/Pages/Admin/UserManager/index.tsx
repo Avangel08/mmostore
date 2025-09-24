@@ -16,6 +16,21 @@ const UserManager = () => {
     const [isOpenAddModal, setIsOpenAddModal] = useState(false);
     const [isOpenEditModal, setIsOpenEditModal] = useState(false);
     const [dataEdit, setDataEdit] = useState<any>(null);
+    const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+    const handleSelectionChange = (ids: (string | number)[]) => {
+        setSelectedIds(ids);
+    };
+
+    const handleBulkDelete = () => {
+        if (!selectedIds.length) return;
+        router.delete(route("admin.user.delete"), {
+            data: { ids: selectedIds },
+            onSuccess: () => {
+                setSelectedIds([]);
+                onReloadTable();
+            },
+        });
+    };
 
     // Handle flash messages from session
     useEffect(() => {
@@ -66,24 +81,26 @@ const UserManager = () => {
                     dataEdit={ dataEdit }
                 />
                 <Container fluid>
-                    <BreadCrumb title={ t("User") } pageTitle={ t("Homepage") } />
+                    <BreadCrumb title={ t("User manager") } pageTitle={ t("Homepage") } />
                     <Row>
                         <Col xs={12}>
                             <Card>
-                                <Card.Header>
-                                    <h5 className="card-title mb-0">{ t("User") }</h5>
-                                </Card.Header>
                                 <Card.Body>
                                     <Row style={{ marginBottom: "32px" }}>
                                         <Col>
-                                            <Button variant="success" onClick={ toggleOpenAddModal }>
-                                                <i className="ri-add-line align-bottom me-1"></i>{" "} {t("Add")}
+                                            <Button variant="success" onClick={ toggleOpenAddModal } className="me-2">
+                                                <i className="ri-add-line align-bottom me-1"></i>{" "} {t("Add user manager")}
                                             </Button>
+                                            {selectedIds.length > 0 && (
+                                                <Button variant="danger" onClick={ handleBulkDelete }>
+                                                    <i className="ri-delete-bin-5-line align-bottom me-1"></i>{" "} {t("Delete")}
+                                                </Button>
+                                            )}
                                         </Col>
                                     </Row>
                                     <Row>
                                         <Col>
-                                            <Table data={ users } onReloadTable={ onReloadTable } onEdit={ openModalEdit } />
+                                            <Table data={ users } onReloadTable={ onReloadTable } onEdit={ openModalEdit } onSelectionChange={ handleSelectionChange } />
                                         </Col>
                                     </Row>
                                 </Card.Body>

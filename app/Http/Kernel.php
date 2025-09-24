@@ -80,5 +80,6 @@ class Kernel extends HttpKernel
         'tenant.mongo' => \App\Http\Middleware\ResolveTenantMongo::class,
 
         'checkauth' => \App\Http\Middleware\CheckAuth::class,
+        'admin.user.type' => \App\Http\Middleware\AdminUserTypeMiddleware::class,
     ];
 }

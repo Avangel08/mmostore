@@ -29,13 +29,24 @@ class UserManagementRequest extends FormRequest
 
         $commonRules = [
             "name" => ['required', 'string', 'max:50'],
-            "email" => ['required', 'string', 'email'],
+            "email" => ['required', 'string', 'email', 'max:50'],
             "status" => ['required', Rule::in($statuses)],
             "type" => ['required', Rule::in($types)],
         ];
 
         return match ($action) {
-            'add', 'update' => $commonRules,
+            'add' => array_merge($commonRules, [
+                "email" => ['required', 'string', 'email', 'max:50', 'unique:users,email'],
+                "password" => ['required', 'string', 'min:8', 'max:20'],
+            ]),
+            'update' => array_merge($commonRules, [
+                "email" => ['required', 'string', 'email', 'max:50', Rule::unique('users', 'email')->ignore($this->route('id'))],
+                "password" => ['sometimes', 'string', 'min:8', 'max:20'],
+            ]),
+            'delete' => [
+                'ids' => ['required', 'array', 'min:1'],
+                'ids.*' => ['integer', Rule::exists('users', 'id')],
+            ],
             default => [],
         };
     }

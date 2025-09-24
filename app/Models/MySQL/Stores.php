@@ -3,9 +3,11 @@
 namespace App\Models\MySQL;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Stores extends Model
 {
+    use SoftDeletes;
     const STATUS = [
         'ACTIVE' => 1,
         'INACTIVE' => 0,

@@ -24,6 +24,7 @@
     "Invalid email": "Email không đúng định dạng",
     "Incorrect email or password": "Email hoặc Mật khẩu không đúng",
     "Your account has been locked or not yet activated": "Tài khoản của bạn đã bị khóa hoặc chưa được kích hoạt",
+    "Access denied. Only administrators can access this area.": "Truy cập bị từ chối. Chỉ quản trị viên mới có thể truy cập trang web này.",
     "Group permission name": "Tên nhóm quyền",
     "List permission": "Danh sách quyền",
     "Created date": "Ngày tạo",
@@ -83,6 +84,8 @@
     "Please confirm your password": "Vui lòng xác nhận mật khẩu của bạn",
     "Enter current password": "Nhập mật khẩu hiện tại",
     "Enter new password": "Nhập mật khẩu mới",
+    "Enter password": "Nhập mật khẩu",
+    "Confirm new password": "Xác nhận mật khẩu mới",
     "Old Password": "Mật Khẩu Cũ",
     "New Password": "Mật Khẩu Mới",
     "Confirm Password": "Xác Nhận Mật Khẩu",
@@ -123,5 +126,8 @@
     "Enter name": "Nhập tên",
     "Enter email": "Nhập email",
     "Block": "Khoá",
-    "Select type": "Chọn loại"
+    "Select type": "Chọn loại",
+    "Leave blank to keep current password": "Để trống nếu muốn giữ nguyên mật khẩu hiện tại",
+    "User manager": "Tài khoản",
+    "Add user manager": "Thêm tài khoản"
 }

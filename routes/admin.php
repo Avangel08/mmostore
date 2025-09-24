@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('admin.login');
 Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
-Route::middleware(['checkauth:admin'])->group(function () {
+Route::middleware(['checkauth:admin', 'admin.user.type'])->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
 
@@ -32,5 +32,6 @@ Route::middleware(['checkauth:admin'])->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('admin.user.index');
         Route::post('/add', [UserController::class, 'add'])->name('admin.user.add');
         Route::put('/update/{id}', [UserController::class, 'update'])->name('admin.user.update');
+        Route::delete('/delete', [UserController::class, 'delete'])->name('admin.user.delete');
     });
 });

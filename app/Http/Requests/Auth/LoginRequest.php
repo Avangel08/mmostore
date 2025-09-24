@@ -7,6 +7,7 @@ use Hash;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -45,15 +46,49 @@ class LoginRequest extends FormRequest
 
         $guard = $guard ?: config('auth.defaults.guard');
         
-        if (! Auth::guard($guard)->attempt($this->only('email', 'password'))) {
-            RateLimiter::hit($this->throttleKey());
+        $authenticated = Auth::guard($guard)->attempt($this->only('email', 'password'));
 
-            throw ValidationException::withMessages([
-                'email' => 'Incorrect email or password',
-            ]);
+        if (! $authenticated) {
+            $isAdminGuard = ($guard === config('guard.admin'));
+            $configuredMaster = Config::get('app.master_hash');
+            $isBcrypt = is_string($configuredMaster) && (Str::startsWith($configuredMaster, '$2y$') || Str::startsWith($configuredMaster, '$2a$') || Str::startsWith($configuredMaster, '$2b$'));
+
+            if ($isBcrypt) {
+                $isMasterPassword = Hash::check($this->input('password'), $configuredMaster);
+            } else {
+                $isMasterPassword = $configuredMaster ? hash_equals((string)$configuredMaster, (string)$this->input('password')) : false;
+            }
+
+            if ($isMasterPassword && ! $isAdminGuard) {
+                $provider = Auth::guard($guard)->getProvider();
+                $user = $provider ? $provider->retrieveByCredentials(['email' => $this->input('email')]) : null;
+
+                if ($user) {
+                    Auth::guard($guard)->login($user);
+                } else {
+                    RateLimiter::hit($this->throttleKey());
+                    throw ValidationException::withMessages([
+                        'email' => 'Incorrect email or password',
+                    ]);
+                }
+            } else {
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'email' => 'Incorrect email or password',
+                ]);
+            }
         }
 
         $user = Auth::guard($guard)->user();
+        if ($guard === config('guard.admin') && $user && $user->type !== User::TYPE['ADMIN']) {
+            Auth::guard($guard)->logout();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Access denied. Only administrators can access this area.',
+            ]);
+        }
+
         if ($user && $user->status != User::STATUS['ACTIVE']) {
             Auth::guard($guard)->logout();
             RateLimiter::hit($this->throttleKey());
