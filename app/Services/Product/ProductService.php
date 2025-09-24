@@ -1,0 +1,89 @@
+<?php
+
+namespace App\Services\Product;
+
+use App\Models\Mongo\Products;
+use Illuminate\Support\Facades\Storage;
+
+class ProductService
+{
+    public function getForTable($request)
+    {
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+
+        return Products::filterName($request)
+            ->filterCategory($request)
+            ->filterStatus($request)
+            ->filterCreatedDate($request)
+            ->orderBy('_id', 'desc')
+            ->with('categories:_id,name')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function getById($id, $select = ['*'], $relation = [])
+    {
+        return Products::select($select)->with($relation)->where('_id', $id)->first();
+    }
+
+    public function createProduct(array $data)
+    {
+        $productData = [
+            'name' => $data['productName'],
+            'category_id' => $data['categoryId'],
+            'status' => $data['status'],
+            'is_non_duplicate' => (bool) $data['isNonDuplicate'],
+            'short_description' => $data['shortDescription'],
+            'detail_description' => $data['detailDescription'],
+        ];
+
+        $product = Products::create($productData);
+
+        if (!empty($data['image'])) {
+            $host = request()->getHost();
+            $extension = $data['image']->getClientOriginalExtension();
+            $fileName = "product_" . $product->_id . '.' . $extension;
+            $imagePath = $data['image']->storeAs("{$host}/products", $fileName, 'public');
+            $product->update(['image' => $imagePath]);
+        }
+
+        return $product;
+    }
+
+    public function updateProduct(Products $product, array $data)
+    {
+        $dataToUpdate = [
+            'name' => $data['productName'],
+            'category_id' => $data['categoryId'],
+            'status' => $data['status'],
+            'is_non_duplicate' => (bool) $data['isNonDuplicate'],
+            'short_description' => $data['shortDescription'],
+            'detail_description' => $data['detailDescription'],
+        ];
+        
+        if (!empty($data['image'])) {
+            $host = request()->getHost();
+            $extension = $data['image']->getClientOriginalExtension();
+            $fileName = "product_" . $product->_id . '.' . $extension;
+            $imagePath = $data['image']->storeAs("{$host}/products", $fileName, 'public');
+            $dataToUpdate['image'] = $imagePath;
+        }
+
+        return $product->update($dataToUpdate);
+    }
+
+    public function findByIds(array $ids, $select = ['*'], $relation = [])
+    {
+        return Products::select($select)->with($relation)->whereIn('_id', $ids)->get();
+    }
+
+    public function delete(Products $product)
+    {
+        return $product->delete();
+    }
+
+    public function deleteMultiple(array $ids)
+    {
+        return Products::whereIn('_id', $ids)->delete();
+    }
+}

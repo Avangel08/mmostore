@@ -9,20 +9,22 @@ use Inertia\Response;
 
 class BuyerController extends Controller
 {
-    public function home(string $sub): Response
+    public function home(string $sub, $theme): Response
     {
+        // $theme = "Theme_2"; // This could be dynamic based on tenant settings 
         $user = auth('buyer')->user();
-        return Inertia::render('Home/index', [
+        return Inertia::render("Themes/{$theme}/Home/index", [
             'subdomain' => $sub,
             'user' => $user,
-            'isAuthenticated' => $user !== null
+            'isAuthenticated' => $user !== null,
+            'theme' => $theme
         ]);
     }
 
     public function products(string $sub): Response
     {
         $user = auth('buyer')->user();
-        
+         
         return Inertia::render('Products/Index', [
             'subdomain' => $sub,
             'user' => $user,

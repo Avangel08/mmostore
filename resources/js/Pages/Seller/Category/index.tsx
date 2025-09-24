@@ -9,7 +9,7 @@ import TableCategory from "./TableCategory";
 import { ModalDetailCategory } from "./ModalDetailCategory";
 import CategoryFilter from "./CategoryFilter";
 import { useQueryParams } from "../../../hooks/useQueryParam";
-import { confirmDelete, confirmDialog } from "../../../utils/sweetAlert";
+import { confirmDelete } from "../../../utils/sweetAlert";
 import { showToast } from "../../../utils/showToast";
 
 const Category = () => {
@@ -72,7 +72,7 @@ const Category = () => {
     });
 
     if (confirmed) {
-      router.delete(route("seller.category.delete", { id }), {
+      router.delete(route("seller.category.destroy", { id }), {
         onSuccess: (page: any) => {
           if (page.props?.message?.error) {
             showToast(t(page.props.message.error), "error");

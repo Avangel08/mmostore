@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
     ->group(function () {
         // Public routes (no authentication required)
-        Route::get('/', [BuyerController::class, 'home'])->name('buyer.home');
+        Route::get('/{theme}', [BuyerController::class, 'home'])->name('buyer.home');
         // Route::get('/products', [BuyerController::class, 'products'])->name('buyer.products');
         // Route::get('/product/{id}', [BuyerController::class, 'productDetail'])->name('buyer.product.detail');
         // Route::get('/about', [BuyerController::class, 'about'])->name('buyer.about');

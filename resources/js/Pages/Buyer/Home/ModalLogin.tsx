@@ -73,7 +73,7 @@ export default function ModalLogin({
   });
 
   return (
-    <Modal show={show} onHide={handleClose} centered>
+    <Modal show={show} onHide={handleClose} centered backdrop="static">
       <Modal.Header
         closeButton
         style={{

@@ -1,0 +1,44 @@
+.page-title {
+    background: linear-gradient(180deg, #014475 0%, #112d42 100%);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.custom-table {
+    background: linear-gradient(180deg, #014475 0%, #112d42 100%);
+    color: #fff;
+
+    thead {
+        background: linear-gradient(180deg, #014475 0%, #112d42 100%);
+        color: #fff;
+    }
+
+    tbody {
+        tr {
+            td {
+                align-content: center;
+            }
+            &:hover {
+                background: rgba(255, 255, 255, 0.1); // hiệu ứng hover
+            }
+        }
+    }
+}
+
+.navbar-landing.is-sticky {
+    background: #014475;
+}
+
+.navbar-landing {
+    .navbar-nav {
+        .nav-item {
+            .nav-link {
+                color: #fff; // màu chữ
+            }
+        }
+    }
+}
+
+.image-flag {
+    width: 30px;
+}

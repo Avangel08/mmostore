@@ -25,11 +25,11 @@ class CategoryRequest extends FormRequest
     {
         $action = $this->route()->getActionMethod();
         return match ($action) {
-            'createCategory' => [
+            'store' => [
                 'categoryName' => ['required', 'string', 'max:150', Rule::unique('tenant_mongo.categories', 'name')],
                 'categoryStatus' => ['required', Rule::in(array_values(Categories::STATUS))],
             ],
-            'updateCategory' => [
+            'update' => [
                 'categoryName' => ['required', 'string', 'max:150', Rule::unique('tenant_mongo.categories', 'name')->ignore($this->route('id'))],
                 'categoryStatus' => ['required', Rule::in(array_values(Categories::STATUS))],
             ],

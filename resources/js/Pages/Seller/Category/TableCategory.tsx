@@ -64,21 +64,6 @@ const TableCategory = ({
     }
   }, []);
 
-  const checkedAll = useCallback(() => {
-    const checkall: any = document.getElementById("checkBoxAll");
-    const ele = document.querySelectorAll(".categoryCheckbox");
-
-    if (checkall.checked) {
-      ele.forEach((ele: any) => {
-        ele.checked = true;
-      });
-    } else {
-      ele.forEach((ele: any) => {
-        ele.checked = false;
-      });
-    }
-  }, []);
-
   const columns = useMemo(
     () => [
       {
@@ -131,7 +116,7 @@ const TableCategory = ({
         enableColumnFilter: false,
         enableSorting: true,
         cell: (cell: any) => {
-          const statusLabel = statusConst[cell.getValue()] || "Unknown";
+          const statusLabel = statusConst?.[cell.getValue()] || "Unknown";
           const className = {
             Active: "bg-success",
             Inactive: "bg-danger",
@@ -139,7 +124,7 @@ const TableCategory = ({
           } as any;
 
           return (
-            <span className={`badge ${className[statusLabel]} fs-6 fw-medium`}>
+            <span className={`badge ${className?.[statusLabel] || "bg-dark"} fs-6 fw-medium`}>
               {t(statusLabel)}
             </span>
           );
