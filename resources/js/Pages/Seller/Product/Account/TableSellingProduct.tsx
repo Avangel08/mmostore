@@ -3,13 +3,7 @@ import { useTranslation } from "react-i18next";
 import moment from "moment";
 import TableWithContextMenu from "../../../../Components/Common/TableWithContextMenu";
 
-const TableSellingProduct = ({
-  data,
-  onReloadTable,
-}: {
-  data: any;
-  onReloadTable?: (page: number, perPage: number, filters?: any) => void;
-}) => {
+const TableSellingProduct = () => {
   const { t } = useTranslation();
 
   const columns = useMemo(
@@ -83,13 +77,12 @@ const TableSellingProduct = ({
     <div>
       <TableWithContextMenu
         columns={columns}
-        data={data || []}
+        data={[]}
         divClass="table-responsive table-card mb-3"
         tableClass="table align-middle table-nowrap mb-0"
         theadClass="table-light"
         enableContextMenu={false}
         isPaginateTable={true}
-        onReloadTable={onReloadTable}
       />
     </div>
   );

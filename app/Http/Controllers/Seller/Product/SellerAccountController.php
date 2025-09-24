@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Seller\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\Product\AccountRequest;
+use App\Services\Product\ImportAccountHistoryService;
 use App\Services\Product\SellerAccountService;
 use App\Services\Product\SubProductService;
 use Illuminate\Http\Request;
@@ -18,10 +19,13 @@ class SellerAccountController extends Controller
 
     public $subProductService;
 
-    public function __construct(SellerAccountService $sellerAccountService, SubProductService $subProductService)
+    public $importAccountHistoryService;
+
+    public function __construct(SellerAccountService $sellerAccountService, SubProductService $subProductService, ImportAccountHistoryService $importAccountHistoryService)
     {
         $this->sellerAccountService = $sellerAccountService;
         $this->subProductService = $subProductService;
+        $this->importAccountHistoryService = $importAccountHistoryService;
     }
 
     public function index()
@@ -75,8 +79,8 @@ class SellerAccountController extends Controller
         //     return abort(403);
         // }
         return Inertia::render('Product/Account/index', [
-            'accounts' => fn () => $this->sellerAccountService->findBySubProductId($subProductId),
             'subProduct' => fn () => $this->subProductService->getById($subProductId),
+            'importHistory' => fn () => $this->importAccountHistoryService->getForTable($subProductId, $request)
         ]);
     }
 
