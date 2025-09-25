@@ -5,6 +5,7 @@ namespace App\Services\Product;
 use App\Jobs\ImportAccount\JobImportAccount;
 use App\Models\Mongo\Accounts;
 use App\Models\Mongo\ImportAccountHistory;
+use Carbon\Carbon;
 use Config;
 use DB;
 use Storage;
@@ -68,11 +69,6 @@ class SellerAccountService
         return Accounts::insert($data);
     }
 
-    public function deleteOldAccounts($subProductId, $listKey)
-    {
-        return Accounts::where('sub_product_id', $subProductId)->whereIn('key', $listKey)->delete();
-    }
-
     public function createImportAccountHistory($subProductId, $filePath)
     {
         return ImportAccountHistory::create([
@@ -83,6 +79,20 @@ class SellerAccountService
             'result' => null,
             'ended_at' => null,
         ]);
+    }
+
+    public function getAccountCountBySubProductId($subProductId)
+    {
+        return Accounts::where('sub_product_id', $subProductId)->count();
+    }
+
+    public function deleteOldAccounts(Carbon $timeStart, array $listKey, $subProductId)
+    {
+        return Accounts::where('sub_product_id', $subProductId)
+            ->whereNull('order_id')
+            ->whereIn('key', $listKey)
+            ->where('created_at', '!=', new \MongoDB\BSON\UTCDateTime($timeStart))
+            ->delete();
     }
 
     public function deleteUnsoldAccounts($subProductId)

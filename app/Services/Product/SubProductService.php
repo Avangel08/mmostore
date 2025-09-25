@@ -65,4 +65,9 @@ class SubProductService
 
         return $query->exists();
     }
+
+    public function updateTotalProduct($subProductId, $totalProduct)
+    {
+        return SubProducts::where('_id', $subProductId)->update(['total_product' => $totalProduct]);
+    }
 }

@@ -5,8 +5,10 @@ namespace App\Jobs\ImportAccount;
 use App\Models\Mongo\Accounts;
 use App\Models\Mongo\ImportAccountHistory;
 use App\Services\Product\SellerAccountService;
+use App\Services\Product\SubProductService;
 use Carbon\Carbon;
 use Config;
+use DB;
 use Exception;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -28,6 +30,8 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
 
     protected $accountService;
 
+    protected $subProductService;
+
     protected $importHistoryId;
 
     protected $dbConfig;
@@ -44,7 +48,8 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
         $this->subProductId = $subProductId;
         $this->importHistoryId = $importHistoryId;
         $this->dbConfig = $dbConfig;
-        $this->accountService = new SellerAccountService;
+        $this->accountService = new SellerAccountService();
+        $this->subProductService = new SubProductService();
         $this->queue = 'process_import_account';
     }
 
@@ -69,6 +74,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             $fullPath = Storage::disk('public')->path($this->filePath);
             $timeStart = now();
             $listKey = [];
+            DB::beginTransaction();
             $result = $this->processChunk($chunkSize, $fullPath, $timeStart, $listKey);
             $importAccountHistory = ImportAccountHistory::findOrFail($this->importHistoryId);
             $importAccountHistory->update([
@@ -76,8 +82,11 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 'result' => $result,
                 'ended_at' => now(),
             ]);
-            $this->deleteOldAccount($timeStart, $listKey);
+            $this->accountService->deleteOldAccounts($timeStart, array_keys($listKey), $this->subProductId);
+            $this->updateTotalProduct();
+            DB::commit();
         } catch (Exception $e) {
+            DB::rollBack();
             echo 'Error processing import account: '.$e->getMessage().PHP_EOL;
             $importAccountHistory->update([
                 'status' => ImportAccountHistory::STATUS['ERROR'],
@@ -85,15 +94,6 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             ]);
             throw $e;
         }
-    }
-
-    public function deleteOldAccount(Carbon $timeStart, $listKey)
-    {
-        return Accounts::where('sub_product_id', $this->subProductId)
-            ->where('status', Accounts::STATUS['LIVE'])
-            ->whereIn('key', array_keys($listKey))
-            ->where('created_at', '!=', new \MongoDB\BSON\UTCDateTime($timeStart))
-            ->delete();
     }
 
     public function processChunk($chunkSize, $fullPath, Carbon $timeStart, &$listKey)
@@ -164,7 +164,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             })
             ->filter()
             ->chunk($chunkSize)
-            ->each(function (LazyCollection $data, $index) use (&$successCount, &$errorCount, &$errors) {
+            ->each(function (LazyCollection $data) use (&$successCount, &$errorCount, &$errors) {
                 $isSuccess = $this->processInsert($data);
                 $dataCount = $data->count();
                 if ($isSuccess) {
@@ -200,5 +200,11 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             'status' => ImportAccountHistory::STATUS['ERROR'],
             'ended_at' => now(),
         ]);
+    }
+
+    public function updateTotalProduct()
+    {
+        $totalProduct = $this->accountService->getAccountCountBySubProductId($this->subProductId);
+        $this->subProductService->updateTotalProduct($this->subProductId, $totalProduct);
     }
 }

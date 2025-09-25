@@ -15,9 +15,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { showToast } from "../../../../utils/showToast";
 import Layout from "../../../../CustomSellerLayouts";
-import TableRecentUpload from "./TableRecentUpload";
-import TableSellingProduct from "./TableSellingProduct";
-import { confirmDelete } from "../../../../utils/sweetAlert";
+import RecentUpload from "./RecentUpload";
+import SellingProduct from "./SellingProduct";
 
 const SellerAccount = () => {
   const { t } = useTranslation();
@@ -126,7 +125,7 @@ const SellerAccount = () => {
                                 aria-hidden="true"
                                 className="me-2"
                               />
-                              {t("Uploading...")}
+                              {t("Uploading")}...
                             </>
                           ) : (
                             t("Upload")
@@ -149,7 +148,7 @@ const SellerAccount = () => {
                             <strong>{t("Example")}:</strong>
                           </div>
                           <div className="font-monospace small bg-white p-2 rounded">
-                            email|abc@gmail.com|password123|2fa
+                            email|example@gmail.com|password123|2fa
                             <br />
                             another_key|some_data|more_info
                           </div>
@@ -159,75 +158,11 @@ const SellerAccount = () => {
                   </Row>
                   <hr />
                   <Row className="my-5">
-                    <Col lg={12} className="mb-4">
-                      <h5>{t("Recent uploaded files")}</h5>
-                    </Col>
-                    <Col lg={12}>
-                      <TableRecentUpload />
-                    </Col>
+                    <RecentUpload />
                   </Row>
                   <hr />
                   <Row className="my-5">
-                    <Col
-                      lg={12}
-                      className="d-flex justify-content-between mb-4"
-                    >
-                      <h5>{t("Products for sale")}</h5>
-                      <div className="d-flex gap-2">
-                        <Button
-                          variant="danger"
-                          onClick={async () => {
-                            const confirmed = await confirmDelete({
-                              title: t("Delete all unsold products?"),
-                              text: "",
-                              confirmButtonText: t("Delete now"),
-                              cancelButtonText: t("Cancel"),
-                            });
-                            if (!confirmed) {
-                              return;
-                            }
-
-                            router.delete(route("seller.account.destroy", { id: subProduct?.id ?? 0 }), {
-                              onSuccess: (page: any) => {
-                                if (page.props?.message?.error) {
-                                  showToast(
-                                    t(page.props.message.error),
-                                    "error"
-                                  );
-                                  return;
-                                }
-
-                                if (page.props?.message?.success) {
-                                  showToast(
-                                    t(page.props.message.success),
-                                    "success"
-                                  );
-                                }
-                              },
-                              onError: (errors: any) => {
-                                Object.keys(errors).forEach((key) => {
-                                  showToast(t(errors?.[key]), "error");
-                                });
-                              },
-                            });
-                          }}
-                        >
-                          {t("Delete all")}
-                        </Button>
-                        <Button
-                          as="a"
-                          href={route("seller.account.export-unsold-account", {
-                            subProductId: subProduct?.id || 0,
-                          })}
-                          variant="success"
-                        >
-                          {t("Download unsold products")}
-                        </Button>
-                      </div>
-                    </Col>
-                    <Col lg={12} className="px-4">
-                      <TableSellingProduct />
-                    </Col>
+                      <SellingProduct />
                   </Row>
                 </Card.Body>
               </Card>
