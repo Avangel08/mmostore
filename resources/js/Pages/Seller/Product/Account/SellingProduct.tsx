@@ -111,7 +111,7 @@ const SellingProduct = () => {
           </Button>
           <Button
             as="a"
-            href={route("seller.account.export-unsold-account", {
+            href={route("seller.account.download-unsold-account", {
               subProductId: subProduct?.id || 0,
             })}
             variant="success"

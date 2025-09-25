@@ -117,19 +117,10 @@ class SellerAccountController extends Controller
         }
     }
 
-    public function exportUnsoldAccounts($sub, $subProductId, Request $request)
+    public function downloadUnsoldAccounts($sub, $subProductId, Request $request)
     {
         try {
-            $result = $this->sellerAccountService->exportUnsoldAccounts($subProductId);
-
-            if (! file_exists($result['full_path'])) {
-                throw new \Exception('Export file was not created successfully');
-            }
-
-            return response()->download($result['full_path'], $result['file_name'], [
-                'Content-Type' => 'text/plain',
-            ])->deleteFileAfterSend(true);
-
+            return $this->sellerAccountService->streamDownloadUnsoldAccounts($subProductId);
         } catch (\Exception $e) {
             \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
 

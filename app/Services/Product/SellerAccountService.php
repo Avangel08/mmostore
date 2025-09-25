@@ -102,49 +102,30 @@ class SellerAccountService
             ->delete();
     }
 
-    public function exportUnsoldAccounts($subProductId)
+    public function streamDownloadUnsoldAccounts($subProductId)
     {
-        $host = request()->getHost();
-        $fileName = 'unsold_accounts_' . $subProductId . '_' . time() . '.txt';
-        $filePath = "{$host}/exports/{$fileName}";
-        $fullPath = Storage::disk('public')->path($filePath);
-        
-        $directory = dirname($fullPath);
-        if (!is_dir($directory)) {
-            mkdir($directory, 0755, true);
-        }
+        $fileName = 'unsold_accounts_'.$subProductId.'_'.time().'.txt';
 
-        $file = fopen($fullPath, 'w');
-        if (!$file) {
-            throw new \Exception('Cannot create export file');
-        }
+        $headers = [
+            'Content-Type' => 'text/plain',
+            'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ];
 
-        $chunkSize = 1000;
-        $totalExported = 0;
+        return response()->stream(function () use ($subProductId) {
+            $handle = fopen('php://output', 'w');
 
-        try {
             Accounts::select(['key', 'data'])
                 ->where('sub_product_id', $subProductId)
                 ->whereNull('order_id')
-                ->where('status', Accounts::STATUS['LIVE'])
-                ->chunk($chunkSize, function ($accounts) use ($file, &$totalExported) {
-                    foreach ($accounts as $account) {
-                        $line = $account->key . '|' . $account->data . PHP_EOL;
-                        fwrite($file, $line);
-                        $totalExported++;
-                    }
-                    unset($accounts);
+                ->cursor()
+                ->each(function ($account) use ($handle) {
+                    fwrite($handle, $account->key.'|'.$account->data.PHP_EOL);
                 });
-            
-        } finally {
-            fclose($file);
-        }
-        return [
-            'file_path' => $filePath,
-            'file_name' => $fileName,
-            'full_path' => $fullPath,
-            'total_exported' => $totalExported,
-            'download_url' => Storage::disk('public')->url($filePath)
-        ];
+
+            fclose($handle);
+        }, 200, $headers);
     }
 }
