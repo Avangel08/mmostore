@@ -32,7 +32,6 @@ class ProductService
             'name' => $data['productName'],
             'category_id' => $data['categoryId'],
             'status' => $data['status'],
-            'is_non_duplicate' => (bool) $data['isNonDuplicate'],
             'short_description' => $data['shortDescription'],
             'detail_description' => $data['detailDescription'],
         ];
@@ -56,7 +55,6 @@ class ProductService
             'name' => $data['productName'],
             'category_id' => $data['categoryId'],
             'status' => $data['status'],
-            'is_non_duplicate' => (bool) $data['isNonDuplicate'],
             'short_description' => $data['shortDescription'],
             'detail_description' => $data['detailDescription'],
         ];

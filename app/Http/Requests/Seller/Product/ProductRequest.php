@@ -27,7 +27,6 @@ class ProductRequest extends FormRequest
             'productName' => ['required', 'string', 'max:255'],
             'categoryId' => ['required', 'exists:tenant_mongo.categories,_id'],
             'status' => ['required', Rule::in(array_values(Products::STATUS))],
-            'isNonDuplicate' => ['required', 'boolean'],
             'shortDescription' => ['required', 'string', 'max:150'],
             'detailDescription' => ['required', 'string'],
         ];
