@@ -539,6 +539,7 @@ class VietCombank
             "clientId" => $this->clientId,
             "sessionId" => $this->sessionId
         );
+        dd($param);
         $result = $this->curlPost($this->url['getHistories'],$param);
         return $result;
     }
@@ -759,7 +760,8 @@ class VietCombank
 
         $key = $this->username . "6q93-@u9";
         $xlim = hash("sha256", $key);
-
+        // $user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36';
+        $user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36';
         return array(
             'Accept' =>  'application/json',
             'Accept-Encoding' =>   'gzip, deflate, br',

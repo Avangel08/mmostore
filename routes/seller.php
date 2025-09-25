@@ -3,6 +3,7 @@
 use App\Http\Controllers\Seller\Category\CategoryController;
 use App\Http\Controllers\Seller\DashBoardController;
 use App\Http\Controllers\Seller\LoginController;
+use App\Http\Controllers\Seller\PaymentHistory\PaymentHistoryController;
 use App\Http\Controllers\Seller\Product\ProductController;
 use App\Http\Controllers\Seller\Product\SellerAccountController;
 use App\Http\Controllers\Seller\Product\SubProductController;
@@ -46,6 +47,7 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                 Route::group(['prefix' => 'product'], function () {
                     Route::delete('/delete-multiple', [ProductController::class, 'deleteMultipleProduct'])->name('seller.product.delete-multiple');
                 });
+
                 Route::resource('product', ProductController::class, ['as' => 'seller']);
 
                 // seller sub-product
@@ -53,6 +55,12 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
 
                 // seller account
                 Route::resource('account', SellerAccountController::class, ['as' => 'seller']);
+
+                Route::group(['prefix' => 'payment-history'], function () {
+                    Route::get('/', [PaymentHistoryController::class, 'index'])->name('seller.payment-history');
+                    Route::post('/create', [PaymentHistoryController::class, 'store'])->name('seller.payment-history.store');
+                    Route::post('/verify-payment', [PaymentHistoryController::class, 'verifyPayment'])->name('seller.payment-history.verify-payment');
+                });
             });
 
         });

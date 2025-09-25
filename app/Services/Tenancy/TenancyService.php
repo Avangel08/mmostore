@@ -67,7 +67,8 @@ class TenancyService
         $authMechanism = $cfg['authentication_mechanism'] ?? null;
         $dsn = $cfg['dsn'] ?? null;
 
-        $database = $prefix !== '' ? ($prefix) : '';
+        // Determine application database name with sensible fallbacks
+        $database = $cfg['database_name'] ?? $cfg['database'] ?? ($prefix !== '' ? $prefix : '');
 
         $connection = [
             'driver' => 'mongodb',

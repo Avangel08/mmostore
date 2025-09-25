@@ -24,4 +24,30 @@ class BalanceHistories extends Model
         "date_at",
         "sale_channel_id" //Thông t
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customers::class, 'customer_id');
+    }
+
+    public function scopeFilterSearch($query, $request){
+        if(isset($request['search']) && $request['search'] != ''){
+            $query->whereHas('customer', function($q) use ($request){
+                $q->where('name', 'like', '%'.$request['search'].'%');
+            })->orWhere('transaction', 'like', '%'.$request['search'].'%');
+        }
+
+        return $query;
+    }
+
+    public function scopeFilterCreatedDate($query, $request){
+        if(isset($request['start_time']) && $request['start_time'] != ''){
+            $query->where('created_at', '>=', $request['start_time']);
+        }
+
+        if(isset($request['end_time']) && $request['end_time'] != ''){
+            $query->where('created_at', '<=', $request['end_time']);
+        }
+        return $query;
+    }
 }

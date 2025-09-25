@@ -8,6 +8,7 @@ const Navdata = () => {
     const [isDashboard, setIsDashboard] = useState<boolean>(false);
     const [isCategory, setIsCategory] = useState<boolean>(false);
     const [isProduct, setIsProduct] = useState<boolean>(false);
+    const [isPaymentHistory, setIsPaymentHistory] = useState<boolean>(false);
     const [iscurrentState, setIscurrentState] = useState('Dashboard');
 
     function updateIconSidebar(e : any) {
@@ -36,12 +37,16 @@ const Navdata = () => {
         if (iscurrentState !== 'Product') {
             setIsProduct(false);
         }
+        if (iscurrentState !== 'Payment History') {
+            setIsPaymentHistory(false);
+        }
     }, [
         history,
         iscurrentState,
         isDashboard,
         isCategory,
         isProduct,
+        isPaymentHistory,
     ]);
 
     const menuItems : any = [
@@ -85,6 +90,19 @@ const Navdata = () => {
                 e.preventDefault();
                 setIsProduct(!isProduct);
                 setIscurrentState('Product');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "payment-history",
+            label: "Payment History",
+            icon: "ri-box-3-fill",
+            link: route('seller.payment-history'),
+            stateVariables: isPaymentHistory,
+            click: function (e : any) {
+                e.preventDefault();
+                setIsPaymentHistory(!isPaymentHistory);
+                setIscurrentState('Payment History');
                 updateIconSidebar(e);
             },
         },
