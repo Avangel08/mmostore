@@ -101,8 +101,8 @@ const SellingProduct = () => {
   const onDeleteAll = async () => {
     const confirmed = await confirmDelete({
       title: t("Delete all unsold products?"),
-      text: "",
-      confirmButtonText: t("Delete now"),
+      text: t("Unsold products will be deleted after all uploaded files have been processed"),
+      confirmButtonText: t("Delete"),
       cancelButtonText: t("Cancel"),
     });
     if (!confirmed) {

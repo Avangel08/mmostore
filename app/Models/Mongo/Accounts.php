@@ -25,6 +25,7 @@ class Accounts extends Model
         'note',
         'customer_id',
         'order_id',
+        'import_account_history_id',
     ];
 
     const STATUS = [

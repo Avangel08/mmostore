@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\ImportAccount;
+namespace App\Jobs\SellerAccount;
 
 use App\Models\Mongo\Accounts;
 use App\Models\Mongo\ImportAccountHistory;
@@ -48,9 +48,9 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
         $this->subProductId = $subProductId;
         $this->importHistoryId = $importHistoryId;
         $this->dbConfig = $dbConfig;
-        $this->accountService = new SellerAccountService();
-        $this->subProductService = new SubProductService();
-        $this->queue = 'process_import_account';
+        $this->accountService = new SellerAccountService;
+        $this->subProductService = new SubProductService;
+        $this->queue = 'process_seller_account';
     }
 
     public function uniqueId(): string
@@ -69,21 +69,25 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
     public function handle(): void
     {
         try {
+            DB::beginTransaction();
+            echo "Start processing import account for sub_product_id {$this->subProductId}".PHP_EOL;
             Config::set('database.connections.tenant_mongo', $this->dbConfig);
             $chunkSize = 1000;
             $fullPath = Storage::disk('public')->path($this->filePath);
             $timeStart = now();
             $listKey = [];
-            DB::beginTransaction();
-            $result = $this->processChunk($chunkSize, $fullPath, $timeStart, $listKey);
             $importAccountHistory = ImportAccountHistory::findOrFail($this->importHistoryId);
+            $result = $this->processChunk($chunkSize, $fullPath, $timeStart, $listKey);
             $importAccountHistory->update([
                 'status' => ImportAccountHistory::STATUS['FINISH'],
                 'result' => $result,
                 'ended_at' => now(),
             ]);
+            echo "Finished processing import account for sub_product_id {$this->subProductId}: {$result['total_count']} total, {$result['success_count']} success, {$result['error_count']} errors".PHP_EOL;
+            echo 'Deleting old accounts...'.PHP_EOL;
             $this->accountService->deleteOldAccounts($timeStart, array_keys($listKey), $this->subProductId);
             $this->updateTotalProduct();
+            echo 'Delete old accounts done.'.PHP_EOL;
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
@@ -160,17 +164,19 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                     'order_id' => null,
                     'created_at' => $timeStart,
                     'updated_at' => $timeStart,
+                    'import_account_history_id' => $this->importHistoryId,
                 ];
             })
             ->filter()
             ->chunk($chunkSize)
-            ->each(function (LazyCollection $data) use (&$successCount, &$errorCount, &$errors) {
+            ->each(function (LazyCollection $data, $index) use (&$successCount, &$errorCount, &$errors) {
                 $isSuccess = $this->processInsert($data);
                 $dataCount = $data->count();
                 if ($isSuccess) {
                     $successCount += $dataCount;
                 } else {
                     $errorCount += $dataCount;
+                    $errors[] = "Failed to insert chunk {$index} of {$dataCount} records.";
                 }
                 unset($data);
             });
@@ -179,6 +185,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             'total_count' => $totalCount,
             'success_count' => $successCount,
             'error_count' => $errorCount,
+            'errors' => $errors,
         ];
     }
 
@@ -204,7 +211,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
 
     public function updateTotalProduct()
     {
-        $totalProduct = $this->accountService->getAccountCountBySubProductId($this->subProductId);
+        $totalProduct = $this->accountService->getUnsoldAccountCountBySubProductId($this->subProductId);
         $this->subProductService->updateTotalProduct($this->subProductId, $totalProduct);
     }
 }

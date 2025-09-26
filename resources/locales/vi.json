@@ -202,6 +202,8 @@
     "PENDING": "ĐANG CHỜ",
     "Products": "Sản phẩm",
     "Delete all unsold products?": "Xoá tất cả sản phẩm chưa bán?",
+    "Success. Unsold accounts will be deleted after a few minutes": "Tài khoản chưa bán của mặt hàng này sẽ được xoá sau ít phút",
+    "Unsold products will be deleted after all uploaded files have been processed": "Các sản phẩm chưa bán sẽ bị xóa sau khi tất cả các file tải lên được xử lí hoàn tất",
     "Deleted successfully": "Đã xoá thành công",
     "Order ID": "Mã đơn hàng",
     "Enter product": "Nhập sản phẩm",

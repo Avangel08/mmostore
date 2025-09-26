@@ -2,7 +2,8 @@
 
 namespace App\Services\Product;
 
-use App\Jobs\ImportAccount\JobImportAccount;
+use App\Jobs\SellerAccount\JobDeleteUnsoldAccount;
+use App\Jobs\SellerAccount\JobImportAccount;
 use App\Models\Mongo\Accounts;
 use App\Models\Mongo\ImportAccountHistory;
 use Carbon\Carbon;
@@ -46,17 +47,6 @@ class SellerAccountService
         JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $dbConfig);
     }
 
-    public function replaceOldAccounts($subProductId, $listKey, array $data)
-    {
-        DB::transaction(function () use ($subProductId, $listKey, $data) {
-            Accounts::where('sub_product_id', $subProductId)->whereIn('key', $listKey)->delete();
-
-            foreach ($data as $account) {
-                $this->createAccount($account);
-            }
-        });
-    }
-
     public function createAccount(array $data)
     {
         $accountData = [
@@ -95,25 +85,38 @@ class SellerAccountService
         ]);
     }
 
-    public function getAccountCountBySubProductId($subProductId)
+    public function getUnsoldAccountCountBySubProductId($subProductId)
     {
-        return Accounts::where('sub_product_id', $subProductId)->count();
+        return Accounts::where('sub_product_id', $subProductId)->whereNull('order_id')->count();
     }
 
     public function deleteOldAccounts(Carbon $timeStart, array $listKey, $subProductId)
     {
-        return Accounts::where('sub_product_id', $subProductId)
-            ->whereNull('order_id')
-            ->whereIn('key', $listKey)
-            ->where('created_at', '!=', new \MongoDB\BSON\UTCDateTime($timeStart))
-            ->delete();
+        $batchSize = 1000;
+        do {
+            $deletedCount = Accounts::where('sub_product_id', $subProductId)
+                ->whereNull('order_id')
+                ->whereIn('key', $listKey)
+                ->where('created_at', '<', new \MongoDB\BSON\UTCDateTime($timeStart))
+                ->limit($batchSize)
+                ->delete();
+        } while ($deletedCount > 0);
     }
 
     public function deleteUnsoldAccounts($subProductId)
     {
-        return Accounts::where('sub_product_id', $subProductId)
-            ->whereNull('order_id')
-            ->delete();
+        DB::transaction(function () use ($subProductId) {
+            $batchSize = 1000;
+            do {
+                $deletedCount = Accounts::where('sub_product_id', $subProductId)
+                    ->whereNull('order_id')
+                    ->limit($batchSize)
+                    ->delete();
+            } while ($deletedCount > 0);
+            $totalProduct = $this->getUnsoldAccountCountBySubProductId($subProductId);
+            $subProductService = new SubProductService;
+            $subProductService->updateTotalProduct($subProductId, $totalProduct);
+        });
     }
 
     public function streamDownloadUnsoldAccounts($subProductId)
@@ -141,5 +144,10 @@ class SellerAccountService
 
             fclose($handle);
         }, 200, $headers);
+    }
+
+    public function startDeleteUnsoldAccount($subProductId)
+    {
+        JobDeleteUnsoldAccount::dispatch($subProductId, Config::get('database.connections.tenant_mongo'));
     }
 }
