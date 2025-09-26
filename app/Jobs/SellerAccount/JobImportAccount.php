@@ -105,7 +105,6 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
         $totalCount = 0;
         $successCount = 0;
         $errorCount = 0;
-        $errors = [];
 
         LazyCollection::make(function () use ($fullPath) {
             $handle = fopen($fullPath, 'r');
@@ -114,20 +113,17 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             }
             fclose($handle);
         })
-            ->map(function ($line) use (&$totalCount, &$successCount, &$errorCount, &$errors, $timeStart, &$listKey) {
+            ->map(function ($line) use (&$totalCount, &$successCount, &$errorCount, $timeStart, &$listKey) {
                 $totalCount++;
                 $line = trim($line);
                 if (empty($line)) {
                     $errorCount++;
-                    $errors[] = "Line {$totalCount} is empty: ".$line;
-
                     return null;
                 }
 
                 $parts = explode('|', $line);
                 if (count($parts) < 2) {
                     $errorCount++;
-                    $errors[] = "Line {$totalCount} does not have enough parts: ".$line;
 
                     return null;
                 }
@@ -135,7 +131,6 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 $key = trim($parts[0]);
                 if (empty($key)) {
                     $errorCount++;
-                    $errors[] = "Line {$totalCount} has an empty key: ".$line;
 
                     return null;
                 }
@@ -145,8 +140,6 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 foreach ($dataParts as $part) {
                     if (trim($part) === '') {
                         $errorCount++;
-                        $errors[] = "Line {$totalCount} has empty data parts: ".$line;
-
                         return null;
                     }
                 }
@@ -185,7 +178,6 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             'total_count' => (int) $totalCount,
             'success_count' => (int) $successCount,
             'error_count' => (int) $errorCount,
-            'errors' => (int) $errors,
         ];
     }
 
