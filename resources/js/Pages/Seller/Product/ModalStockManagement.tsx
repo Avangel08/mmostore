@@ -210,7 +210,7 @@ export const ModalStockManagement = ({
         cell: (cell: any) => {
           return (
             <NumericFormat
-              value={cell.getValue()}
+              value={cell.getValue() || 0}
               displayType="text"
               thousandSeparator="."
               decimalSeparator=","
@@ -251,6 +251,9 @@ export const ModalStockManagement = ({
         accessorKey: "quantity",
         enableColumnFilter: false,
         enableSorting: true,
+        cell: (cell: any) => {
+          return <span>{cell.getValue() ?? 0}</span>;
+        }
       },
       {
         header: t("Actions"),
