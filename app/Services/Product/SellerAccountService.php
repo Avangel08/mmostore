@@ -115,7 +115,7 @@ class SellerAccountService
             } while ($deletedCount > 0);
             $totalProduct = $this->getUnsoldAccountCountBySubProductId($subProductId);
             $subProductService = new SubProductService;
-            $subProductService->updateTotalProduct($subProductId, $totalProduct);
+            $subProductService->updateSubProductQuantity($subProductId, $totalProduct);
         });
     }
 

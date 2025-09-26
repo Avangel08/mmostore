@@ -123,12 +123,6 @@ const TableProduct = ({
         }
       },
       {
-        header: t("Stock"),
-        accessorKey: "stock",
-        enableColumnFilter: false,
-        enableSorting: true,
-      },
-      {
         header: t("Created date"),
         accessorKey: "created_at",
         enableColumnFilter: false,

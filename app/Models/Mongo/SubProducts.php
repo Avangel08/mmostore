@@ -20,7 +20,7 @@ class SubProducts extends Model
         'name',
         'status',
         'price',
-        'total_product',
+        'quantity',
     ];
 
     public function product()

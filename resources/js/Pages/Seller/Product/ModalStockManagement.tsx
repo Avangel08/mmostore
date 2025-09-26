@@ -248,7 +248,7 @@ export const ModalStockManagement = ({
       },
       {
         header: t("Stock"),
-        accessorKey: "total_product",
+        accessorKey: "quantity",
         enableColumnFilter: false,
         enableSorting: true,
       },

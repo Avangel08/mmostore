@@ -32,8 +32,8 @@ class SubProductService
             'product_id' => $data['productId'],
             'name' => $data['subProductName'],
             'status' => SubProducts::STATUS['ACTIVE'],
-            'price' => $data['price'],
-            'total_product' => 0,
+            'price' => (double) $data['price'],
+            'quantity' => (int) 0,
         ];
 
         return SubProducts::create($productData);
@@ -43,7 +43,7 @@ class SubProductService
     {
         $dataToUpdate = [
             'name' => $data['subProductName'],
-            'price' => $data['price'],
+            'price' => (double) $data['price'],
             'status' => $data['status'],
         ];
 
@@ -66,8 +66,8 @@ class SubProductService
         return $query->exists();
     }
 
-    public function updateTotalProduct($subProductId, $totalProduct)
+    public function updateSubProductQuantity($subProductId, $quantity)
     {
-        return SubProducts::where('_id', $subProductId)->update(['total_product' => $totalProduct]);
+        return SubProducts::where('_id', $subProductId)->update(['quantity' => (int) $quantity]);
     }
 }

@@ -86,7 +86,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             echo "Finished processing import account for sub_product_id {$this->subProductId}: {$result['total_count']} total, {$result['success_count']} success, {$result['error_count']} errors".PHP_EOL;
             echo 'Deleting old accounts...'.PHP_EOL;
             $this->accountService->deleteOldAccounts($timeStart, array_keys($listKey), $this->subProductId);
-            $this->updateTotalProduct();
+            $this->updateSubProductQuantity();
             echo 'Delete old accounts done.'.PHP_EOL;
             DB::commit();
         } catch (Exception $e) {
@@ -182,10 +182,10 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             });
 
         return [
-            'total_count' => $totalCount,
-            'success_count' => $successCount,
-            'error_count' => $errorCount,
-            'errors' => $errors,
+            'total_count' => (int) $totalCount,
+            'success_count' => (int) $successCount,
+            'error_count' => (int) $errorCount,
+            'errors' => (int) $errors,
         ];
     }
 
@@ -209,9 +209,9 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
         ]);
     }
 
-    public function updateTotalProduct()
+    public function updateSubProductQuantity()
     {
         $totalProduct = $this->accountService->getUnsoldAccountCountBySubProductId($this->subProductId);
-        $this->subProductService->updateTotalProduct($this->subProductId, $totalProduct);
+        $this->subProductService->updateSubProductQuantity($this->subProductId, $totalProduct);
     }
 }
