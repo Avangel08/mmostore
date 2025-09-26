@@ -104,16 +104,18 @@ class SellerAccountService
 
     public function deleteUnsoldAccounts($subProductId)
     {
-        $batchSize = 1000;
-        do {
-            $deletedCount = Accounts::where('sub_product_id', $subProductId)
-                ->whereNull('order_id')
-                ->limit($batchSize)
-                ->delete();
-        } while ($deletedCount > 0);
-        $totalProduct = $this->getUnsoldAccountCountBySubProductId($subProductId);
-        $subProductService = new SubProductService;
-        $subProductService->updateSubProductQuantity($subProductId, $totalProduct);
+        // DB::transaction(function () use ($subProductId) {
+            $batchSize = 1000;
+            do {
+                $deletedCount = Accounts::where('sub_product_id', $subProductId)
+                    ->whereNull('order_id')
+                    ->limit($batchSize)
+                    ->delete();
+            } while ($deletedCount > 0);
+            $totalProduct = $this->getUnsoldAccountCountBySubProductId($subProductId);
+            $subProductService = new SubProductService;
+            $subProductService->updateSubProductQuantity($subProductId, $totalProduct);
+        // });
     }
 
     public function streamDownloadUnsoldAccounts($subProductId)

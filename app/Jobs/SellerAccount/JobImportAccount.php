@@ -69,7 +69,8 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
     public function handle(): void
     {
         try {
-            echo "Start processing import account for sub_product_id {$this->subProductId}".PHP_EOL;
+            // DB::beginTransaction();
+            // echo "Start processing import account for sub_product_id {$this->subProductId}".PHP_EOL;
             Config::set('database.connections.tenant_mongo', $this->dbConfig);
             $chunkSize = 1000;
             $fullPath = Storage::disk('public')->path($this->filePath);
@@ -82,13 +83,15 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 'result' => $result,
                 'ended_at' => now(),
             ]);
-            echo "Finished processing import account for sub_product_id {$this->subProductId}: {$result['total_count']} total, {$result['success_count']} success, {$result['error_count']} errors".PHP_EOL;
-            echo 'Deleting old accounts...'.PHP_EOL;
+            // echo "Finished processing import account for sub_product_id {$this->subProductId}: {$result['total_count']} total, {$result['success_count']} success, {$result['error_count']} errors".PHP_EOL;
+            // echo 'Deleting old accounts...'.PHP_EOL;
             $this->accountService->deleteOldAccounts($timeStart, array_keys($listKey), $this->subProductId);
             $this->updateSubProductQuantity();
-            echo 'Delete old accounts done.'.PHP_EOL;
+            // echo 'Delete old accounts done.'.PHP_EOL;
+            // DB::commit();
         } catch (Exception $e) {
-            echo 'Error processing import account: '.$e->getMessage().PHP_EOL;
+            DB::rollBack();
+            // echo 'Error processing import account: '.$e->getMessage().PHP_EOL;
             $importAccountHistory->update([
                 'status' => ImportAccountHistory::STATUS['ERROR'],
                 'ended_at' => now(),
@@ -190,7 +193,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
 
     public function failed(Exception $exception): void
     {
-        echo 'Job failed: '.$exception->getMessage().PHP_EOL;
+        // echo 'Job failed: '.$exception->getMessage().PHP_EOL;
         $importAccountHistory = ImportAccountHistory::findOrFail($this->importHistoryId);
         $importAccountHistory->update([
             'status' => ImportAccountHistory::STATUS['ERROR'],
