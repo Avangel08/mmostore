@@ -69,7 +69,6 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
     public function handle(): void
     {
         try {
-            DB::beginTransaction();
             echo "Start processing import account for sub_product_id {$this->subProductId}".PHP_EOL;
             Config::set('database.connections.tenant_mongo', $this->dbConfig);
             $chunkSize = 1000;
@@ -88,9 +87,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             $this->accountService->deleteOldAccounts($timeStart, array_keys($listKey), $this->subProductId);
             $this->updateSubProductQuantity();
             echo 'Delete old accounts done.'.PHP_EOL;
-            DB::commit();
         } catch (Exception $e) {
-            DB::rollBack();
             echo 'Error processing import account: '.$e->getMessage().PHP_EOL;
             $importAccountHistory->update([
                 'status' => ImportAccountHistory::STATUS['ERROR'],

@@ -8,7 +8,6 @@ use App\Models\Mongo\Accounts;
 use App\Models\Mongo\ImportAccountHistory;
 use Carbon\Carbon;
 use Config;
-use DB;
 
 /**
  * Class SellerAccountService
@@ -19,7 +18,7 @@ class SellerAccountService
     {
         $page = $request->input('accountPage', 1);
         $perPage = $request->input('accountPerPage', 10);
-        
+
         return Accounts::where('sub_product_id', $subProductId)
             ->filterProduct($request)
             ->filterStatus($request)
@@ -105,18 +104,16 @@ class SellerAccountService
 
     public function deleteUnsoldAccounts($subProductId)
     {
-        DB::transaction(function () use ($subProductId) {
-            $batchSize = 1000;
-            do {
-                $deletedCount = Accounts::where('sub_product_id', $subProductId)
-                    ->whereNull('order_id')
-                    ->limit($batchSize)
-                    ->delete();
-            } while ($deletedCount > 0);
-            $totalProduct = $this->getUnsoldAccountCountBySubProductId($subProductId);
-            $subProductService = new SubProductService;
-            $subProductService->updateSubProductQuantity($subProductId, $totalProduct);
-        });
+        $batchSize = 1000;
+        do {
+            $deletedCount = Accounts::where('sub_product_id', $subProductId)
+                ->whereNull('order_id')
+                ->limit($batchSize)
+                ->delete();
+        } while ($deletedCount > 0);
+        $totalProduct = $this->getUnsoldAccountCountBySubProductId($subProductId);
+        $subProductService = new SubProductService;
+        $subProductService->updateSubProductQuantity($subProductId, $totalProduct);
     }
 
     public function streamDownloadUnsoldAccounts($subProductId)
