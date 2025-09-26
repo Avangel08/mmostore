@@ -87,7 +87,7 @@ const SellerAccount = () => {
                       <Form onSubmit={formik.handleSubmit} noValidate>
                         <Form.Group className="mb-3">
                           <Form.Label>
-                            {t("Upload file")}{" "}
+                            {t("Upload .txt file")}{" "}
                             <span className="text-danger">*</span>
                           </Form.Label>
                           <Form.Control

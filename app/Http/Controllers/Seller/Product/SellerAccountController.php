@@ -86,6 +86,7 @@ class SellerAccountController extends Controller
         return Inertia::render('Product/Account/index', [
             'subProduct' => fn () => $this->subProductService->getById($subProductId),
             'importHistory' => fn () => $this->importAccountHistoryService->getForTable($subProductId, $request),
+            'accounts' => fn () => $this->sellerAccountService->getForTable($subProductId, $request),
         ]);
     }
 

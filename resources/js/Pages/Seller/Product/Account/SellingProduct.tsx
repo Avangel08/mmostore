@@ -6,19 +6,50 @@ import { Button, Col } from "react-bootstrap";
 import { confirmDelete } from "../../../../utils/sweetAlert";
 import { usePage, router } from "@inertiajs/react";
 import { showToast } from "../../../../utils/showToast";
+import SellerAccountFilter from "./SellerAccountFilter";
 
 const SellingProduct = () => {
   const { t } = useTranslation();
-  const { subProduct } = usePage().props as any;
+  const { subProduct, accounts } = usePage().props as any;
+
+  const [accountPage, setAccountPage] = useState(1);
+  const [accountPerPage, setAccountPerPage] = useState(10);
+
+  const fetchData = useCallback(
+    (accountPage: number = 1, accountPerPage: number = 10, filters?: any) => {
+      setStateAccountPage(accountPage, accountPerPage);
+      router.reload({
+        only: ["accounts"],
+        replace: true,
+        data: {
+          accountPage,
+          accountPerPage,
+          ...filters,
+        },
+      });
+    },
+    []
+  );
+
+  const handleFilter = (accountPage: number, accountPerPage: number, filters: any) => {
+    fetchData(accountPage, accountPerPage, filters);
+  };
+
+  const setStateAccountPage = (page: number, perPage: number) => {
+    setAccountPage(page || 1);
+    setAccountPerPage(perPage || 10);
+  };
+
 
   const columns = useMemo(
     () => [
       {
         header: t("Product"),
         cell: (cell: any) => {
-          return <span className="fw-semibold">{cell.getValue()}</span>;
+          const data = cell.row.original;
+          return <span>{`${data?.key}|${data?.data}`}</span>;
         },
-        accessorKey: "name",
+        accessorKey: "",
         enableColumnFilter: false,
         enableSorting: true,
       },
@@ -41,8 +72,8 @@ const SellingProduct = () => {
         cell: (cell: any) => {
           const statusLabel = cell.getValue() || "Unknown";
           const className = {
-            SUCCESS: "bg-success",
-            FAIL: "bg-danger",
+            LIVE: "bg-success",
+            BAN: "bg-danger",
             Unknown: "bg-dark",
           } as any;
 
@@ -58,8 +89,8 @@ const SellingProduct = () => {
         },
       },
       {
-        header: t("Result"),
-        accessorKey: "result",
+        header: t("Order ID"),
+        accessorKey: "order_id",
         enableColumnFilter: false,
         enableSorting: true,
       },
@@ -67,46 +98,51 @@ const SellingProduct = () => {
     [t]
   );
 
+  const onDeleteAll = async () => {
+    const confirmed = await confirmDelete({
+      title: t("Delete all unsold products?"),
+      text: "",
+      confirmButtonText: t("Delete now"),
+      cancelButtonText: t("Cancel"),
+    });
+    if (!confirmed) {
+      return;
+    }
+
+    router.delete(
+      route("seller.account.destroy", { id: subProduct?.id ?? 0 }),
+      {
+        replace: true,
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: (page: any) => {
+          if (page.props?.message?.error) {
+            showToast(t(page.props.message.error), "error");
+            return;
+          }
+
+          if (page.props?.message?.success) {
+            showToast(t(page.props.message.success), "success");
+          }
+        },
+        onError: (errors: any) => {
+          Object.keys(errors).forEach((key) => {
+            showToast(t(errors?.[key]), "error");
+          });
+        },
+      }
+    );
+  };
+
   return (
     <>
+      <Col lg={12} className="px-4">
+        <SellerAccountFilter onFilter={handleFilter} />
+      </Col>
       <Col lg={12} className="d-flex justify-content-between mb-4">
-        <h5>{t("Products for sale")}</h5>
+        <h5>{t("Product list")}</h5>
         <div className="d-flex gap-2">
-          <Button
-            variant="danger"
-            onClick={async () => {
-              const confirmed = await confirmDelete({
-                title: t("Delete all unsold products?"),
-                text: "",
-                confirmButtonText: t("Delete now"),
-                cancelButtonText: t("Cancel"),
-              });
-              if (!confirmed) {
-                return;
-              }
-
-              router.delete(
-                route("seller.account.destroy", { id: subProduct?.id ?? 0 }),
-                {
-                  onSuccess: (page: any) => {
-                    if (page.props?.message?.error) {
-                      showToast(t(page.props.message.error), "error");
-                      return;
-                    }
-
-                    if (page.props?.message?.success) {
-                      showToast(t(page.props.message.success), "success");
-                    }
-                  },
-                  onError: (errors: any) => {
-                    Object.keys(errors).forEach((key) => {
-                      showToast(t(errors?.[key]), "error");
-                    });
-                  },
-                }
-              );
-            }}
-          >
+          <Button variant="danger" onClick={onDeleteAll}>
             {t("Delete all")}
           </Button>
           <Button
@@ -120,16 +156,21 @@ const SellingProduct = () => {
           </Button>
         </div>
       </Col>
-      <Col lg={12} className="px-4">
+      <Col lg={12} className="">
         <div>
           <TableWithContextMenu
             columns={columns}
-            data={[]}
+            data={accounts || []}
             divClass="table-responsive table-card mb-3"
             tableClass="table align-middle table-nowrap mb-0"
             theadClass="table-light"
             enableContextMenu={false}
             isPaginateTable={true}
+            keyPageParam="accountPage"
+            keyPerPageParam="accountPerPage"
+            onReloadTable={fetchData}
+            showPaginationEllipsis={true}
+            maxVisiblePages={7}
           />
         </div>
       </Col>

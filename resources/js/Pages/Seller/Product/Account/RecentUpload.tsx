@@ -19,6 +19,7 @@ const RecentUpload = () => {
       setStateImportPage(importPage, importPerPage);
       router.reload({
         only: ["importHistory"],
+        replace: true,
         data: {
           importPage,
           importPerPage,

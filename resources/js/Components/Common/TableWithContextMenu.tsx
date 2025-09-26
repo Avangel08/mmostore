@@ -33,6 +33,8 @@ interface TableWithContextMenuProps {
   tableStyle?: React.CSSProperties;
   keyPageParam?: string;
   keyPerPageParam?: string;
+  showPaginationEllipsis?: boolean;
+  maxVisiblePages?: number;
 }
 
 const TableWithContextMenu: React.FC<TableWithContextMenuProps> = (props) => {

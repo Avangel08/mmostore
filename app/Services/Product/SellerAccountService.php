@@ -8,13 +8,27 @@ use App\Models\Mongo\ImportAccountHistory;
 use Carbon\Carbon;
 use Config;
 use DB;
-use Storage;
 
 /**
  * Class SellerAccountService
  */
 class SellerAccountService
 {
+    public function getForTable($subProductId, $request)
+    {
+        $page = $request->input('accountPage', 1);
+        $perPage = $request->input('accountPerPage', 10);
+        
+        return Accounts::where('sub_product_id', $subProductId)
+            ->filterProduct($request)
+            ->filterStatus($request)
+            ->filterCreatedDate($request)
+            ->filterOrderId($request)
+            ->filterSellStatus($request)
+            ->orderBy('_id', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
     public function getById($id, $select = ['*'], $relation = [])
     {
         return Accounts::select($select)->with($relation)->where('_id', $id)->first();
