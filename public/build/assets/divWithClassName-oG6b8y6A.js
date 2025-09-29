@@ -1,0 +1,1 @@
+import{d as e,j as m}from"./ContextMenuProvider-CES3zOYT.js";import{c as o}from"./ThemeProvider-D6xYM_tF.js";const i=a=>e.forwardRef((s,r)=>m.jsx("div",{...s,ref:r,className:o(s.className,a)}));export{i as d};
