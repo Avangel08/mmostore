@@ -93,7 +93,7 @@ export const ModalStockManagement = ({
     validationSchema: Yup.object({
       subProductName: Yup.string()
         .max(maxLengthName, `Must be ${maxLengthName} characters or less`)
-        .required(t("Please enter sub-product name")),
+        .required(t("Please enter item name")),
       price: Yup.number()
         .positive(t("Price must be positive"))
         .max(maxPrice, `Price must be less than ${maxPrice}`)
@@ -194,7 +194,7 @@ export const ModalStockManagement = ({
   const columns = useMemo(
     () => [
       {
-        header: t("Sub-product name"),
+        header: t("Item name"),
         cell: (cell: any) => {
           return <span className="fw-semibold">{cell.getValue()}</span>;
         },
@@ -210,7 +210,7 @@ export const ModalStockManagement = ({
         cell: (cell: any) => {
           return (
             <NumericFormat
-              value={cell.getValue()}
+              value={cell.getValue() || 0}
               displayType="text"
               thousandSeparator="."
               decimalSeparator=","
@@ -248,9 +248,12 @@ export const ModalStockManagement = ({
       },
       {
         header: t("Stock"),
-        accessorKey: "total_product",
+        accessorKey: "quantity",
         enableColumnFilter: false,
         enableSorting: true,
+        cell: (cell: any) => {
+          return <span>{cell.getValue() ?? 0}</span>;
+        }
       },
       {
         header: t("Actions"),
@@ -260,7 +263,7 @@ export const ModalStockManagement = ({
             <div className="d-flex gap-2">
               <OverlayTrigger
                 placement="top"
-                overlay={<Tooltip>{t("Add")}</Tooltip>}
+                overlay={<Tooltip>{t("Add account")}</Tooltip>}
               >
                 <Button
                   size="sm"
@@ -346,12 +349,12 @@ export const ModalStockManagement = ({
               <Col md={6}>
                 <Form.Group className="mb-3" controlId="subProductName">
                   <Form.Label>
-                    {t("Sub-product name")}{" "}
+                    {t("Item name")}{" "}
                     <span className="text-danger">*</span>
                   </Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder={t("Enter sub-product name")}
+                    placeholder={t("Enter item name")}
                     maxLength={maxLengthName}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}

@@ -51,7 +51,6 @@ export default function product() {
       productName: product?.name || "",
       categoryId: product?.category_id || "",
       status: product?.status || "ACTIVE",
-      isNonDuplicate: product?.is_non_duplicate || false,
       shortDescription: product?.short_description || "",
       detailDescription: product?.detail_description || "",
       image: null as File | null,
@@ -83,7 +82,6 @@ export default function product() {
       formData.append("productName", values.productName);
       formData.append("categoryId", values.categoryId);
       formData.append("status", values.status);
-      formData.append("isNonDuplicate", values.isNonDuplicate ? "1" : "0");
       formData.append("shortDescription", values.shortDescription);
       formData.append("detailDescription", values.detailDescription);
 
@@ -269,36 +267,6 @@ export default function product() {
                             errors?.status) && (
                             <div className="invalid-feedback d-block">
                               {t(formik.errors.status || errors?.status)}
-                            </div>
-                          )}
-                        </Form.Group>
-                      </Col>
-                    </Row>
-
-                    <Row className="mb-4">
-                      <Col md={12}>
-                        <Form.Group controlId="isNonDuplicate">
-                          <Form.Check
-                            type="checkbox"
-                            id="isNonDuplicate"
-                            name="isNonDuplicate"
-                            label={t("Non-duplicate product")}
-                            checked={formik.values.isNonDuplicate}
-                            onChange={formik.handleChange}
-                          />
-                          <Form.Text className="text-muted">
-                            {t(
-                              "Commitment the product is only sold once and only on the system"
-                            )}
-                          </Form.Text>
-                          {((formik.touched.isNonDuplicate &&
-                            formik.errors.isNonDuplicate) ||
-                            errors?.isNonDuplicate) && (
-                            <div className="invalid-feedback d-block">
-                              {t(
-                                formik.errors.isNonDuplicate ||
-                                  errors?.isNonDuplicate
-                              )}
                             </div>
                           )}
                         </Form.Group>

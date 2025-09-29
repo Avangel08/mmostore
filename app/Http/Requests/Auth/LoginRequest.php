@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\MySQL\Stores;
 use App\Models\MySQL\User;
 use Hash;
 use Illuminate\Auth\Events\Lockout;
@@ -79,28 +80,25 @@ class LoginRequest extends FormRequest
             }
         }
 
-        $acceptGuard = [
+        $acceptTypeByGuard = [
             config('guard.admin') => User::TYPE['ADMIN'],
             config('guard.seller') => User::TYPE['SELLER'],
         ];
 
         $user = Auth::guard($guard)->user();
-        if ($user?->type !== ($acceptGuard[$guard] ?? null)) {
-            Auth::guard($guard)->logout();
-            RateLimiter::hit($this->throttleKey());
+        if ($user?->type !== ($acceptTypeByGuard[$guard] ?? null)) {
+            $this->handleAccountException($guard, 'email', 'Access denied. You cannot access this area.');
+        }
 
-            throw ValidationException::withMessages([
-                'email' => 'Access denied. You cannot access this area.',
-            ]);
+        if ($user?->type == User::TYPE['SELLER']) {
+            $currentStoreDomain = Stores::where('user_id', $user->id)->where('status', 1)->whereJsonContains('domain', $this->getHost())->exists();
+            if (! $currentStoreDomain) {
+                $this->handleAccountException($guard, 'email', 'Incorrect email or password');
+            }
         }
 
         if ($user && $user->status != User::STATUS['ACTIVE']) {
-            Auth::guard($guard)->logout();
-            RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-                'email' => 'Your account has been locked or not yet activated',
-            ]);
+            $this->handleAccountException($guard, 'email', 'Your account has been locked or not yet activated');
         }
 
         RateLimiter::clear($this->throttleKey());
@@ -135,5 +133,15 @@ class LoginRequest extends FormRequest
     public function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
+    }
+
+    public function handleAccountException($guard, $field, $message)
+    {
+        Auth::guard($guard)->logout();
+        RateLimiter::hit($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            $field => $message,
+        ]);
     }
 }

@@ -31,6 +31,9 @@ class SellerProfileRequest extends FormRequest
                 'current_password' => ['required', 'current_password:'.config('guard.seller')],
                 'password' => ['required', 'string', 'min:8', 'confirmed'], 
             ],
+            'uploadImage' => [
+                'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+            ],
             default => [],
         };
     }

@@ -1,4 +1,4 @@
-import React, { useTransition } from "react";
+import React, { useTransition, useState } from "react";
 import {
   Card,
   Col,
@@ -9,12 +9,10 @@ import {
   Tab,
   Button,
 } from "react-bootstrap";
-import { useFormik } from "formik";
-import * as Yup from "yup";
 
 //import images
 import avatar1 from "../../../../images/users/user-dummy-img.jpg";
-import { Head, usePage, router } from "@inertiajs/react";
+import { Head, usePage, router, useForm } from "@inertiajs/react";
 import Layout from "../../../CustomSellerLayouts";
 import { useTranslation } from "react-i18next";
 import { Slide, toast, ToastContainer } from "react-toastify";
@@ -24,7 +22,96 @@ import { showToast } from "../../../utils/showToast";
 
 const EditProfile = () => {
   const { t } = useTranslation();
-  const user = usePage().props.auth.user;
+  const user = usePage().props.auth.user as any;
+  const storageUrl = usePage().props.storageUrl as string;
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
+
+  const { data, setData, post, processing, errors, progress } = useForm({
+    profile_image: null as File | null,
+  });
+
+  React.useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    if (user?.image) {
+      setOriginalImage(`${storageUrl}/${user.image}`);
+      setPreviewImage(`${storageUrl}/${user.image}`);
+    }
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, [user?.image]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const maxSize = 2 * 1024 * 1024; // 2MB = 2 * 1024 * 1024 bytes
+      if (file.size > maxSize) {
+        showToast(t('Image size must be less than 2MB'), 'error');
+        e.target.value = '';
+        return;
+      }
+
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        showToast(t('Please select a valid image file (JPEG, PNG, GIF, or WebP)'), 'error');
+        e.target.value = '';
+        return;
+      }
+
+      setData('profile_image', file);
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      uploadImage(file);
+    }
+  };
+
+  const uploadImage = (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    router.post(route('seller.profile.upload-image'), formData, {
+      forceFormData: true,
+      onSuccess: (page: any) => {
+        showToast(t('Profile image updated successfully'), 'success');
+        if (page.props?.auth?.user?.image) {
+          setOriginalImage(`${storageUrl}/${page.props.auth.user.image}`);
+        }
+      },
+      onError: (errors) => {
+        if (originalImage) {
+          setPreviewImage(originalImage);
+        } else {
+          setPreviewImage(null);
+        }
+        
+        setData('profile_image', null);
+        
+        const fileInput = document.getElementById('profile-img-file-input') as HTMLInputElement;
+        if (fileInput) {
+          fileInput.value = '';
+        }
+        
+        Object.keys(errors).forEach((key) => {
+          showToast(t(errors[key]), "error");
+        });
+      },
+    });
+  };
 
   return (
     <React.Fragment>
@@ -39,22 +126,58 @@ const EditProfile = () => {
                   <div className="text-center">
                     <div className="profile-user position-relative d-inline-block mx-auto  mb-4">
                       <img
-                        src={avatar1}
+                        src={previewImage || (user?.image ? `${storageUrl}/${user.image}` : avatar1)}
                         className="rounded-circle avatar-xl img-thumbnail user-profile-image material-shadow"
                         alt="user-profile"
+                        onClick={() => {
+                          const imageUrl = previewImage || (user?.image ? `${storageUrl}/${user.image}` : avatar1);
+                          window.open(imageUrl, '_blank');
+                        }}
+                        style={{ cursor: 'pointer' }}
                       />
-                      {/* <div className="avatar-xs p-0 rounded-circle profile-photo-edit">
-                                                <Form.Control id="profile-img-file-input" type="file"
-                                                    className="profile-img-file-input" />
-                                                <Form.Label htmlFor="profile-img-file-input"
-                                                    className="profile-photo-edit avatar-xs">
-                                                    <span className="avatar-title rounded-circle bg-light text-body material-shadow">
-                                                        <i className="ri-camera-fill"></i>
-                                                    </span>
-                                                </Form.Label>
-                          </div> */}
+                      <div className="avatar-xs p-0 rounded-circle profile-photo-edit">
+                        <Form.Control
+                          id="profile-img-file-input"
+                          type="file"
+                          className="profile-img-file-input"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          disabled={processing}
+                        />
+                        <Form.Label
+                          htmlFor="profile-img-file-input"
+                          className="profile-photo-edit avatar-xs"
+                        >
+                          <span className="avatar-title rounded-circle bg-light text-body material-shadow">
+                            {processing ? (
+                              <i
+                                className="ri-loader-2-line"
+                                style={{
+                                  animation: 'spin 1s linear infinite',
+                                  display: 'inline-block'
+                                }}
+                              ></i>
+                            ) : (
+                              <i className="ri-camera-fill"></i>
+                            )}
+                          </span>
+                        </Form.Label>
+                      </div>
                     </div>
+                    {progress && (
+                      <div className="progress mb-3" style={{ height: '6px' }}>
+                        <div
+                          className="progress-bar"
+                          style={{ width: `${progress.percentage}%` }}
+                        />
+                      </div>
+                    )}
                     <h5 className="fs-16 mb-1">{user?.name ?? ""}</h5>
+                    {errors.profile_image && (
+                      <div className="text-danger small mt-1">
+                        {errors.profile_image}
+                      </div>
+                    )}
                   </div>
                 </Card.Body>
               </Card>

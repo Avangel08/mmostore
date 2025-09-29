@@ -35,6 +35,7 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                     Route::get('/', [ProfileController::class, 'index'])->name('seller.profile');
                     Route::put('/update-info', [ProfileController::class, 'updateInfo'])->name('seller.profile.update-info');
                     Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('seller.profile.change-password');
+                    Route::post('/upload-image', [ProfileController::class, 'uploadImage'])->name('seller.profile.upload-image');
                 });
 
                 // seller category
@@ -54,6 +55,9 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                 Route::resource('sub-product', SubProductController::class, ['as' => 'seller']);
 
                 // seller account
+                Route::group(['prefix' => 'account'], function () {
+                    Route::get('/download-unsold-account/{subProductId}', [SellerAccountController::class, 'downloadUnsoldAccounts'])->name('seller.account.download-unsold-account');
+                });
                 Route::resource('account', SellerAccountController::class, ['as' => 'seller']);
 
                 Route::group(['prefix' => 'payment-history'], function () {

@@ -23,7 +23,6 @@ class Products extends Model
         'detail_description',
         'short_description',
         'image',
-        'is_non_duplicate', // san pham khong trung: true/false
     ];
 
     const STATUS = [

@@ -99,6 +99,8 @@ interface TableContainerProps {
   maxHeight?: string | number;
   keyPageParam?: string;
   keyPerPageParam?: string;
+  showPaginationEllipsis?: boolean;
+  maxVisiblePages?: number;
 }
 
 const PaginateTableContainer = ({
@@ -122,6 +124,8 @@ const PaginateTableContainer = ({
   maxHeight = '500px',
   keyPageParam = 'page',
   keyPerPageParam = 'perPage',
+  showPaginationEllipsis = false,
+  maxVisiblePages = 5,
 }: TableContainerProps) => {
   const {t} = useTranslation();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -198,6 +202,55 @@ const PaginateTableContainer = ({
   useEffect(() => {
     Number(customPageSize) && setPageSize(Number(customPageSize));
   }, [customPageSize, setPageSize]);
+
+  // Helper function to generate pagination with ellipsis
+  const generatePaginationItems = () => {
+    const totalPages = getPageOptions().length;
+    const currentPage = getState().pagination.pageIndex;
+    
+    if (!showPaginationEllipsis || totalPages <= maxVisiblePages) {
+      return getPageOptions();
+    }
+
+    const items = [];
+    const sidePages = Math.floor((maxVisiblePages - 3) / 2); // -3 for first, last, and current
+    
+    // Always show first page
+    items.push(0);
+    
+    let startPage = Math.max(1, currentPage - sidePages);
+    let endPage = Math.min(totalPages - 2, currentPage + sidePages);
+    
+    // Adjust range if we're near the beginning or end
+    if (currentPage <= sidePages + 1) {
+      endPage = Math.min(totalPages - 2, maxVisiblePages - 2);
+    }
+    if (currentPage >= totalPages - sidePages - 2) {
+      startPage = Math.max(1, totalPages - maxVisiblePages + 1);
+    }
+    
+    // Add ellipsis before if needed
+    if (startPage > 1) {
+      items.push('ellipsis-start');
+    }
+    
+    // Add middle pages
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(i);
+    }
+    
+    // Add ellipsis after if needed
+    if (endPage < totalPages - 2) {
+      items.push('ellipsis-end');
+    }
+    
+    // Always show last page if more than 1 page
+    if (totalPages > 1) {
+      items.push(totalPages - 1);
+    }
+    
+    return items;
+  };
 
   useEffect(() => {
     const handleUrlChange = () => {
@@ -354,11 +407,23 @@ const PaginateTableContainer = ({
             <li className={!getCanPreviousPage() ? "page-item disabled" : "page-item"}>
               <Button className="page-link" onClick={previousPage} variant="link">&lt;</Button>
             </li>
-            {getPageOptions().map((item: any, key: number) => (
+            {generatePaginationItems().map((item: any, key: number) => (
               <React.Fragment key={key}>
-                <li className="page-item">
-                  <Button variant="link" className={getState().pagination.pageIndex === item ? "page-link active" : "page-link"} onClick={() => setPageIndex(item)}>{item + 1}</Button>
-                </li>
+                {typeof item === 'string' ? (
+                  <li className="page-item disabled">
+                    <span className="page-link">...</span>
+                  </li>
+                ) : (
+                  <li className="page-item">
+                    <Button 
+                      variant="link" 
+                      className={getState().pagination.pageIndex === item ? "page-link active" : "page-link"} 
+                      onClick={() => setPageIndex(item)}
+                    >
+                      {item + 1}
+                    </Button>
+                  </li>
+                )}
               </React.Fragment>
             ))}
             <li className={!getCanNextPage() ? "page-item disabled" : "page-item"}>

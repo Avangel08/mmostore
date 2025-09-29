@@ -1,4 +1,4 @@
-import { Head, router, usePage } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -15,8 +15,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { showToast } from "../../../../utils/showToast";
 import Layout from "../../../../CustomSellerLayouts";
-import TableRecentUpload from "./TableRecentUpload";
-import TableSellingProduct from "./TableSellingProduct";
+import RecentUpload from "./RecentUpload";
+import SellingProduct from "./SellingProduct";
 
 const SellerAccount = () => {
   const { t } = useTranslation();
@@ -69,7 +69,6 @@ const SellerAccount = () => {
       });
     },
   });
-
   return (
     <React.Fragment>
       <Head title={t("Account")} />
@@ -88,7 +87,7 @@ const SellerAccount = () => {
                       <Form onSubmit={formik.handleSubmit} noValidate>
                         <Form.Group className="mb-3">
                           <Form.Label>
-                            {t("Upload file")}{" "}
+                            {t("Upload .txt file")}{" "}
                             <span className="text-danger">*</span>
                           </Form.Label>
                           <Form.Control
@@ -126,7 +125,7 @@ const SellerAccount = () => {
                                 aria-hidden="true"
                                 className="me-2"
                               />
-                              {t("Uploading...")}
+                              {t("Uploading")}...
                             </>
                           ) : (
                             t("Upload")
@@ -149,7 +148,7 @@ const SellerAccount = () => {
                             <strong>{t("Example")}:</strong>
                           </div>
                           <div className="font-monospace small bg-white p-2 rounded">
-                            email|abc@gmail.com|password123|2fa
+                            email|example@gmail.com|password123|2fa
                             <br />
                             another_key|some_data|more_info
                           </div>
@@ -159,30 +158,11 @@ const SellerAccount = () => {
                   </Row>
                   <hr />
                   <Row className="my-5">
-                    <Col lg={12} className="mb-4">
-                      <h5>{t("Recent uploaded files")}</h5>
-                    </Col>
-                    <Col lg={12}>
-                      <TableRecentUpload />
-                    </Col>
+                    <RecentUpload />
                   </Row>
                   <hr />
                   <Row className="my-5">
-                    <Col
-                      lg={12}
-                      className="d-flex justify-content-between mb-4"
-                    >
-                      <h5>{t("Products for sale")}</h5>
-                      <div className="d-flex gap-2">
-                        <Button variant="danger">{t("Delete all")}</Button>
-                        <Button variant="success">
-                          {t("Download unsold products")}
-                        </Button>
-                      </div>
-                    </Col>
-                    <Col lg={12} className="px-4">
-                      <TableSellingProduct />
-                    </Col>
+                      <SellingProduct />
                   </Row>
                 </Card.Body>
               </Card>

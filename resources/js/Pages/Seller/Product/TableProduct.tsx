@@ -1,10 +1,9 @@
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
-import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import moment from "moment";
 import { usePage } from "@inertiajs/react";
-import { Form } from "react-bootstrap";
+import { Form, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const TableProduct = ({
   data,
@@ -34,27 +33,6 @@ const TableProduct = ({
     setSelectedItems([]);
     setSelectAll(false);
   }, [data]);
-
-  const contextMenuOptions = (rowData: any) => {
-    return new ContextMenuBuilder()
-      .addCustomOption("permissions", t("Edit"), "ri-edit-2-fill", "", () => {
-        onEdit && onEdit(rowData?.id);
-      })
-      .addCustomOption(
-        "permissions",
-        t("Manage Stock"),
-        "ri-archive-2-fill",
-        "",
-        () => {
-          onManageStock && onManageStock(rowData?.id);
-        }
-      )
-      .addDivider()
-      .addDeleteOption(t("Delete"), "ri-delete-bin-fill", () => {
-        onDelete && onDelete(rowData?.id);
-      })
-      .build();
-  };
 
   const handleSelectAll = useCallback(() => {
     if (!selectAll) {
@@ -123,12 +101,6 @@ const TableProduct = ({
         }
       },
       {
-        header: t("Stock"),
-        accessorKey: "stock",
-        enableColumnFilter: false,
-        enableSorting: true,
-      },
-      {
         header: t("Created date"),
         accessorKey: "created_at",
         enableColumnFilter: false,
@@ -163,6 +135,56 @@ const TableProduct = ({
           );
         },
       },
+      {
+        header: t("Actions"),
+        cell: (cellProps: any) => {
+          const rowData = cellProps.row.original;
+          return (
+            <div className="d-flex gap-2">
+              <OverlayTrigger
+                placement="top"
+                overlay={<Tooltip>{t("Edit")}</Tooltip>}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-info"
+                  onClick={() => onEdit && onEdit(rowData?.id)}
+                >
+                  <i className="ri-edit-2-fill"></i>
+                </Button>
+              </OverlayTrigger>
+
+              <OverlayTrigger
+                placement="top"
+                overlay={<Tooltip>{t("Manage Stock")}</Tooltip>}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-primary"
+                  onClick={() => onManageStock && onManageStock(rowData?.id)}
+                >
+                  <i className="ri-archive-2-fill"></i>
+                </Button>
+              </OverlayTrigger>
+
+              <OverlayTrigger
+                placement="top"
+                overlay={<Tooltip>{t("Delete")}</Tooltip>}
+              >
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => onDelete && onDelete(rowData?.id)}
+                >
+                  <i className="ri-delete-bin-fill"></i>
+                </Button>
+              </OverlayTrigger>
+            </div>
+          );
+        },
+        id: "actions",
+        enableSorting: false,
+      },
     ],
     [
       t,
@@ -171,6 +193,9 @@ const TableProduct = ({
       handleSelectAll,
       handleItemSelect,
       statusConst,
+      onEdit,
+      onManageStock,
+      onDelete,
     ]
   );
 
@@ -182,8 +207,7 @@ const TableProduct = ({
         divClass="table-responsive table-card mb-3"
         tableClass="table align-middle table-nowrap mb-0"
         theadClass="table-light"
-        enableContextMenu={true}
-        contextMenuOptions={contextMenuOptions}
+        enableContextMenu={false}
         isPaginateTable={true}
         onReloadTable={onReloadTable}
       />

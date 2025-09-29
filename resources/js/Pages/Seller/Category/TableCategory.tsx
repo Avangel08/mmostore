@@ -1,8 +1,7 @@
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
-import { Form } from "react-bootstrap";
-import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
+import { Form, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import moment from "moment";
 import { usePage } from "@inertiajs/react";
 
@@ -32,18 +31,6 @@ const TableCategory = ({
     setSelectedItems([]);
     setSelectAll(false);
   }, [data]);
-
-  const contextMenuOptions = (rowData: any) => {
-    return new ContextMenuBuilder()
-      .addCustomOption("permissions", t("Edit"), "ri-edit-2-fill", "", () => {
-        onEdit && onEdit(rowData?.id);
-      })
-      .addDivider()
-      .addDeleteOption(t("Delete"), "ri-delete-bin-fill", () => {
-        onDelete && onDelete(rowData?.id);
-    })
-      .build();
-  };
 
   const handleSelectAll = useCallback(() => {
     if (!selectAll) {
@@ -130,8 +117,45 @@ const TableCategory = ({
           );
         },
       },
+      {
+        header: t("Actions"),
+        cell: (cellProps: any) => {
+          const rowData = cellProps.row.original;
+          return (
+            <div className="d-flex gap-2">
+              <OverlayTrigger
+                placement="top"
+                overlay={<Tooltip>{t("Edit")}</Tooltip>}
+              >
+                <Button
+                  size="sm"
+                  variant="outline-info"
+                  onClick={() => onEdit && onEdit(rowData?.id)}
+                >
+                  <i className="ri-edit-2-fill"></i>
+                </Button>
+              </OverlayTrigger>
+
+              <OverlayTrigger
+                placement="top"
+                overlay={<Tooltip>{t("Delete")}</Tooltip>}
+              >
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => onDelete && onDelete(rowData?.id)}
+                >
+                  <i className="ri-delete-bin-fill"></i>
+                </Button>
+              </OverlayTrigger>
+            </div>
+          );
+        },
+        id: "actions",
+        enableSorting: false,
+      },
     ],
-    [t, selectedItems, selectAll, handleSelectAll, handleItemSelect, statusConst]
+    [t, selectedItems, selectAll, handleSelectAll, handleItemSelect, statusConst, onEdit, onDelete]
   );
 
   return (
@@ -143,8 +167,7 @@ const TableCategory = ({
         tableClass="table align-middle table-nowrap mb-0"
         theadClass="table-light"
         SearchPlaceholder={t("Search...")}
-        enableContextMenu={true}
-        contextMenuOptions={contextMenuOptions}
+        enableContextMenu={false}
         isPaginateTable={true}
         onReloadTable={onReloadTable}
       />
