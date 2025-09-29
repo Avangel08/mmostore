@@ -1,1 +1,0 @@
-import{X as c,d as n}from"./ContextMenuProvider-INnE3nXi.js";function m(){const{url:r}=c();return n.useMemo(()=>{const a=r.split("?")[1]||"",o=new URLSearchParams(a),s={};return o.forEach((t,e)=>{s[e]=t}),s},[r])}export{m as u};
