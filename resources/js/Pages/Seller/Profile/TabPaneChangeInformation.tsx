@@ -13,8 +13,8 @@ export default function TabPaneChangeInformation() {
 
   const personalInfoFormik = useFormik({
     initialValues: {
-      first_name: user?.first_name || user?.name?.split(" ")[0] || "",
-      last_name: user?.last_name || user?.name?.split(" ")[1] || "",
+      first_name: user?.first_name || user?.name || "",
+      last_name: user?.last_name || "",
       email: user?.email || "",
     },
     validationSchema: Yup.object({
@@ -24,8 +24,7 @@ export default function TabPaneChangeInformation() {
         .required(t("Please enter your first name")),
       last_name: Yup.string()
         .min(2, t("Must be at least 2 characters"))
-        .max(50, t("Must be 50 characters or less"))
-        .required(t("Please enter your last name")),
+        .max(50, t("Must be 50 characters or less")),
       email: Yup.string()
         .email(t("Invalid email address"))
         .required(t("Please enter your email")),
@@ -91,7 +90,7 @@ export default function TabPaneChangeInformation() {
             <div className="mb-3">
               <Form.Group controlId="last_name">
                 <Form.Label>
-                  {t("Last Name")} <span className="text-danger">*</span>
+                  {t("Last Name")}
                 </Form.Label>
                 <Form.Control
                   type="text"
