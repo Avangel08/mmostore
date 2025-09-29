@@ -140,7 +140,7 @@ const SellingProduct = () => {
         <SellerAccountFilter onFilter={handleFilter} />
       </Col>
       <Col lg={12} className="d-flex justify-content-between mb-4">
-        <h5>{t("Product list")}</h5>
+        <h5>{t("Product list")} ({subProduct?.quantity ?? 0} {t("products")})</h5>
         <div className="d-flex gap-2">
           <Button variant="danger" onClick={onDeleteAll}>
             {t("Delete all")}
@@ -166,11 +166,13 @@ const SellingProduct = () => {
             theadClass="table-light"
             enableContextMenu={false}
             isPaginateTable={true}
+            isCursorPaginateTable={true}
             keyPageParam="accountPage"
             keyPerPageParam="accountPerPage"
             onReloadTable={fetchData}
             showPaginationEllipsis={true}
             maxVisiblePages={7}
+            perPageEntries={[100, 200, 500, 1000]}
           />
         </div>
       </Col>

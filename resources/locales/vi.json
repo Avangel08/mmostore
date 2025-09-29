@@ -212,7 +212,9 @@
     "Select sell status": "Chọn trạng thái bán",
     "Unsold": "Chưa bán",
     "Sold": "Đã bán",
-    "Product list": "Danh Sách sản phẩm",
+    "Product list": "Danh sách sản phẩm",
     "Profile image updated successfully": "Cập nhật ảnh đại diện thành công",
-    "New password must be different from the current password": "Mật khẩu mới phải khác với mật khẩu hiện tại"
+    "New password must be different from the current password": "Mật khẩu mới phải khác với mật khẩu hiện tại",
+    "per page": "mỗi trang",
+    "products": "sản phẩm"
 }

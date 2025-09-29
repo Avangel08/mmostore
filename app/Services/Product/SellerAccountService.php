@@ -26,7 +26,7 @@ class SellerAccountService
             ->filterOrderId($request)
             ->filterSellStatus($request)
             ->orderBy('_id', 'desc')
-            ->paginate($perPage, ['*'], 'page', $page);
+            ->cursorPaginate($perPage, ['*'], 'page', $page);
     }
 
     public function getById($id, $select = ['*'], $relation = [])
@@ -98,7 +98,7 @@ class SellerAccountService
                 ->whereIn('key', $listKey)
                 ->where('created_at', '<', new \MongoDB\BSON\UTCDateTime($timeStart))
                 ->limit($batchSize)
-                ->delete();
+                ->forceDelete();
         } while ($deletedCount > 0);
     }
 
@@ -110,7 +110,7 @@ class SellerAccountService
                 $deletedCount = Accounts::where('sub_product_id', $subProductId)
                     ->whereNull('order_id')
                     ->limit($batchSize)
-                    ->delete();
+                    ->forceDelete();
             } while ($deletedCount > 0);
             $totalProduct = $this->getUnsoldAccountCountBySubProductId($subProductId);
             $subProductService = new SubProductService;
@@ -120,6 +120,7 @@ class SellerAccountService
 
     public function streamDownloadUnsoldAccounts($subProductId)
     {
+        set_time_limit(0);
         $fileName = 'unsold_accounts_'.$subProductId.'_'.time().'.txt';
 
         $headers = [
