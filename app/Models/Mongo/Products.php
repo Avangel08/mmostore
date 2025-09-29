@@ -36,6 +36,11 @@ class Products extends Model
         return $this->belongsTo(Categories::class, 'category_id');
     }
 
+    public function subProducts()
+    {
+        return $this->hasMany(SubProducts::class, 'product_id', 'id');
+    }
+
     public function scopeFilterName($query, $request)
     {
         if (isset($request['name']) && $request['name'] != '') {

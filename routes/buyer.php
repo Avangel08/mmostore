@@ -3,6 +3,7 @@
 use App\Http\Controllers\Buyer\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Buyer\Auth\RegisteredUserController;
 use App\Http\Controllers\Buyer\BuyerController;
+use App\Http\Controllers\Seller\Product\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
@@ -20,6 +21,9 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
         Route::get('/register', [RegisteredUserController::class, 'create'])->name('buyer.register');
         Route::post('/register', [RegisteredUserController::class, 'store']);
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('buyer.logout');
+
+        Route::get('/products', [ProductController::class, 'show'])->name('buyer-product.show');
+        Route::get('/product/detail/{id}', [ProductController::class, 'detail'])->name('buyer-product.detail');
 
         // Protected routes (authentication required)
         Route::middleware('unified.auth')->group(function () {

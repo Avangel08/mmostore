@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Seller\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\Product\ProductRequest;
+use App\Models\Mongo\Categories;
 use App\Models\Mongo\Products;
 use App\Services\Category\CategoryService;
 use App\Services\Product\ProductService;
@@ -31,13 +32,13 @@ class ProductController extends Controller
         // }
 
         return Inertia::render('Product/index', [
-            'categories' => Inertia::optional(fn () => $this->categoryService->getAll(['_id', 'name'])),
-            'statusConst' => fn () => [
+            'categories' => Inertia::optional(fn() => $this->categoryService->getAll(['_id', 'name'])),
+            'statusConst' => fn() => [
                 Products::STATUS['ACTIVE'] => 'Active',
                 Products::STATUS['INACTIVE'] => 'Inactive',
             ],
-            'products' => fn () => $this->productService->getForTable($request),
-            'subProduct' => fn () => $this->subProductService->getFromProductIdForTable($request),
+            'products' => fn() => $this->productService->getForTable($request),
+            'subProduct' => fn() => $this->subProductService->getFromProductIdForTable($request),
         ]);
     }
 
@@ -48,7 +49,7 @@ class ProductController extends Controller
         // }
 
         return Inertia::render('Product/product', [
-            'categories' => fn () => $this->categoryService->getAll(['_id', 'name']),
+            'categories' => fn() => $this->categoryService->getAll(['_id', 'name']),
         ]);
     }
 
@@ -64,8 +65,8 @@ class ProductController extends Controller
         }
 
         return Inertia::render('Product/product', [
-            'product' => fn () => $product,
-            'categories' => fn () => $this->categoryService->getAll(['_id', 'name']),
+            'product' => fn() => $product,
+            'categories' => fn() => $this->categoryService->getAll(['_id', 'name']),
         ]);
     }
 
@@ -151,5 +152,45 @@ class ProductController extends Controller
 
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    public function show(Request $request)
+    {
+        $categories = Categories::with([
+            'products' => function ($query) {
+                $query->latest()->with(['subProducts']);
+            }
+        ])->get();
+        $result = $categories->map(function ($category) {
+            return [
+                'id' => $category->_id,
+                'name' => $category->name,
+                'columns' => [
+                    ['key' => 'id', 'name' => 'ID'],
+                    ['key' => 'title', 'name' => $category->name],
+                    ['key' => 'price', 'name' => 'Price'],
+                    ['key' => 'quantity', 'name' => 'Quantity'],
+                    ['key' => 'action', 'name' => 'Action']
+                ],
+                'products' => $category->products->map(function ($product) {
+                    return [
+                        'id' => $product->_id,
+                        'title' => $product->name,
+                        'short_description' => $product->short_description,
+                        'price' => $product->subProducts->min('price') ?? 0,
+                        'quantity' => $product->subProducts->min('total_product') ?? 0,
+                        'sub_products' => $product->subProducts
+                    ];
+                })
+            ];
+        });
+
+        return response()->json($result);
+    }
+
+    public function detail(String $productId)
+    {
+        $product = $this->productService->getById($productId);
+        dd($productId);
     }
 }

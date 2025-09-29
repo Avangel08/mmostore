@@ -23,6 +23,11 @@ class Categories extends Model
         'status',
     ];
 
+    public function products()
+    {
+        return $this->hasMany(Products::class, 'category_id', 'id');
+    }
+
     public function scopeFilterName($query, $request)
     {
         if (isset($request['name']) && $request['name'] != '') {
