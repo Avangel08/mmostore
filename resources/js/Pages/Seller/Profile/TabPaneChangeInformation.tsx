@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Tab, Form, Row, Col, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
@@ -9,7 +9,7 @@ import { showToast } from "../../../utils/showToast";
 export default function TabPaneChangeInformation() {
   const { t } = useTranslation();
   const user = usePage().props.auth.user as any;
-  const errors = usePage().props.errors;
+  const errors = usePage().props.errors as any;
 
   const personalInfoFormik = useFormik({
     initialValues: {
@@ -45,6 +45,10 @@ export default function TabPaneChangeInformation() {
       });
     },
   });
+
+  useEffect(() => {
+    personalInfoFormik.setErrors(errors || {});
+  }, [errors]);
   return (
     <Tab.Pane eventKey="personal-info">
       <Form onSubmit={personalInfoFormik.handleSubmit} noValidate>
@@ -52,62 +56,61 @@ export default function TabPaneChangeInformation() {
           <Col lg={12} className="mb-3">
             <div className="mb-3">
               <div>
-                <span className="fw-semibold">Email:</span> {personalInfoFormik.values.email}
+                <span className="fw-semibold">Email:</span>{" "}
+                {personalInfoFormik.values.email}
               </div>
             </div>
           </Col>
           <Col lg={6}>
             <div className="mb-3">
-              <Form.Label htmlFor="first_name" className="form-label">
-                {t("First Name")} <span className="text-danger">*</span>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                className="form-control"
-                id="first_name"
-                name="first_name"
-                placeholder={t("Enter your first name")}
-                value={personalInfoFormik.values.first_name}
-                onChange={personalInfoFormik.handleChange}
-                onBlur={personalInfoFormik.handleBlur}
-                isInvalid={
-                  !!(
-                    (personalInfoFormik.touched.first_name &&
-                      personalInfoFormik.errors.first_name) ||
-                    errors?.first_name
-                  )
-                }
-              />
-              <Form.Control.Feedback type="invalid">
-                {personalInfoFormik.errors.first_name || errors?.first_name}
-              </Form.Control.Feedback>
+              <Form.Group controlId="first_name">
+                <Form.Label>
+                  {t("First Name")} <span className="text-danger">*</span>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  className="form-control"
+                  placeholder={t("Enter your first name")}
+                  value={personalInfoFormik.values.first_name}
+                  onChange={personalInfoFormik.handleChange}
+                  onBlur={personalInfoFormik.handleBlur}
+                  isInvalid={
+                    !!(
+                      personalInfoFormik.touched.first_name &&
+                      personalInfoFormik.errors.first_name
+                    )
+                  }
+                />
+                <Form.Control.Feedback type="invalid">
+                  {personalInfoFormik?.errors?.first_name ?? ""}
+                </Form.Control.Feedback>
+              </Form.Group>
             </div>
           </Col>
           <Col lg={6}>
             <div className="mb-3">
-              <Form.Label htmlFor="last_name" className="form-label">
-                {t("Last Name")} <span className="text-danger">*</span>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                className="form-control"
-                id="last_name"
-                name="last_name"
-                placeholder={t("Enter your last name")}
-                value={personalInfoFormik.values.last_name}
-                onChange={personalInfoFormik.handleChange}
-                onBlur={personalInfoFormik.handleBlur}
-                isInvalid={
-                  !!(
-                    (personalInfoFormik.touched.last_name &&
-                      personalInfoFormik.errors.last_name) ||
-                    errors?.last_name
-                  )
-                }
-              />
-              <Form.Control.Feedback type="invalid">
-                {personalInfoFormik.errors.last_name || errors?.last_name}
-              </Form.Control.Feedback>
+              <Form.Group controlId="last_name">
+                <Form.Label>
+                  {t("Last Name")} <span className="text-danger">*</span>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  className="form-control"
+                  placeholder={t("Enter your last name")}
+                  value={personalInfoFormik.values.last_name}
+                  onChange={personalInfoFormik.handleChange}
+                  onBlur={personalInfoFormik.handleBlur}
+                  isInvalid={
+                    !!(
+                      personalInfoFormik.touched.last_name &&
+                      personalInfoFormik.errors.last_name
+                    )
+                  }
+                />
+                <Form.Control.Feedback type="invalid">
+                  {personalInfoFormik?.errors?.last_name ?? ""}
+                </Form.Control.Feedback>
+              </Form.Group>
             </div>
           </Col>
 

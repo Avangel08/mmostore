@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { router, usePage } from "@inertiajs/react";
 import { showToast } from "../../../utils/showToast";
+import { useEffect } from "react";
 export default function TabPaneChangePassword() {
   const { t } = useTranslation();
   const errors = usePage().props.errors;
@@ -40,6 +41,11 @@ export default function TabPaneChangePassword() {
       });
     },
   });
+
+
+  useEffect(() => {
+    passwordFormik.setErrors(errors || {});
+  }, [errors]);
   return (
     <Tab.Pane eventKey="change-password">
       <Form onSubmit={passwordFormik.handleSubmit} noValidate>
@@ -61,14 +67,12 @@ export default function TabPaneChangePassword() {
                 isInvalid={
                   !!(
                     (passwordFormik.touched.current_password &&
-                      passwordFormik.errors.current_password) ||
-                    errors?.current_password
+                      passwordFormik.errors.current_password)
                   )
                 }
               />
               <Form.Control.Feedback type="invalid">
-                {passwordFormik.errors.current_password ||
-                  errors?.current_password}
+                {t(passwordFormik.errors.current_password ?? "")}
               </Form.Control.Feedback>
             </div>
           </Col>
@@ -90,13 +94,12 @@ export default function TabPaneChangePassword() {
                 isInvalid={
                   !!(
                     (passwordFormik.touched.password &&
-                      passwordFormik.errors.password) ||
-                    errors?.password
+                      passwordFormik.errors.password)
                   )
                 }
               />
               <Form.Control.Feedback type="invalid">
-                {passwordFormik.errors.password || errors?.password}
+                {t(passwordFormik.errors.password ?? "")}
               </Form.Control.Feedback>
             </div>
           </Col>
@@ -121,14 +124,12 @@ export default function TabPaneChangePassword() {
                 isInvalid={
                   !!(
                     (passwordFormik.touched.password_confirmation &&
-                      passwordFormik.errors.password_confirmation) ||
-                    errors?.password_confirmation
+                      passwordFormik.errors.password_confirmation)
                   )
                 }
               />
               <Form.Control.Feedback type="invalid">
-                {passwordFormik.errors.password_confirmation ||
-                  errors?.password_confirmation}
+                {t(passwordFormik.errors.password_confirmation ?? "")}
               </Form.Control.Feedback>
             </div>
           </Col>
