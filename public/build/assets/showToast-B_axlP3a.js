@@ -1,0 +1,1 @@
+import{B as s,F as r}from"./react-toastify.esm-Cm0IYqj3.js";const a=(o,e)=>{s[e](o,{position:"top-center",autoClose:2500,hideProgressBar:!1,closeOnClick:!1,pauseOnHover:!0,draggable:!0,progress:void 0,theme:"colored",transition:r})};export{a as s};
