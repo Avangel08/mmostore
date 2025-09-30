@@ -2668,7 +2668,7 @@
     ]
   },
   "resources/js/Pages/Admin/PermissionManagement/ModalAddNewGroupPermission.tsx": {
-    "file": "assets/ModalAddNewGroupPermission-DRyJuZXs.js",
+    "file": "assets/ModalAddNewGroupPermission-pCiVHSIU.js",
     "name": "ModalAddNewGroupPermission",
     "src": "resources/js/Pages/Admin/PermissionManagement/ModalAddNewGroupPermission.tsx",
     "isDynamicEntry": true,
@@ -2770,7 +2770,7 @@
     ]
   },
   "resources/js/Pages/Admin/PermissionManagement/index.tsx": {
-    "file": "assets/index-fQWEMzYA.js",
+    "file": "assets/index-Q1Q78qcp.js",
     "name": "index",
     "src": "resources/js/Pages/Admin/PermissionManagement/index.tsx",
     "isDynamicEntry": true,
@@ -5303,7 +5303,7 @@
     ]
   },
   "resources/js/app-admin.tsx": {
-    "file": "assets/app-admin-Dm-Zgktc.js",
+    "file": "assets/app-admin-kuFcxuWM.js",
     "name": "app-admin",
     "src": "resources/js/app-admin.tsx",
     "isEntry": true,
