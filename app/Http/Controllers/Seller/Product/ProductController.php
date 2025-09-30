@@ -188,9 +188,9 @@ class ProductController extends Controller
         return response()->json($result);
     }
 
-    public function detail(String $productId)
+    public function detail($sub, String $productId)
     {
-        $product = $this->productService->getById($productId);
-        dd($productId);
+        $product = $this->productService->getById($productId, ['*'], ['subProducts']);
+        return response()->json($product);
     }
 }

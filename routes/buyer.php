@@ -22,8 +22,10 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
         Route::post('/register', [RegisteredUserController::class, 'store']);
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('buyer.logout');
 
-        Route::get('/products', [ProductController::class, 'show'])->name('buyer-product.show');
-        Route::get('/product/detail/{id}', [ProductController::class, 'detail'])->name('buyer-product.detail');
+        Route::group(['prefix' => '/products'], function () {
+            Route::get('/', [ProductController::class, 'show'])->name('buyer-product.show');
+            Route::get('/detail/{id}', [ProductController::class, 'detail'])->name('buyer-product.detail');
+        });
 
         // Protected routes (authentication required)
         Route::middleware('unified.auth')->group(function () {
