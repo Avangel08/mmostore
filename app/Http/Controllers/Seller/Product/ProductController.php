@@ -32,7 +32,7 @@ class ProductController extends Controller
         // }
 
         return Inertia::render('Product/index', [
-            'categories' => Inertia::optional(fn() => $this->categoryService->getAll(['_id', 'name'])),
+            'categories' => Inertia::optional(fn() => $this->categoryService->getActive(['_id', 'name'])),
             'statusConst' => fn() => [
                 Products::STATUS['ACTIVE'] => 'Active',
                 Products::STATUS['INACTIVE'] => 'Inactive',
@@ -49,7 +49,7 @@ class ProductController extends Controller
         // }
 
         return Inertia::render('Product/product', [
-            'categories' => fn() => $this->categoryService->getAll(['_id', 'name']),
+            'categories' => fn() => $this->categoryService->getActive(['_id', 'name']),
         ]);
     }
 
@@ -66,7 +66,7 @@ class ProductController extends Controller
 
         return Inertia::render('Product/product', [
             'product' => fn() => $product,
-            'categories' => fn() => $this->categoryService->getAll(['_id', 'name']),
+            'categories' => fn() => $this->categoryService->getActive(['_id', 'name']),
         ]);
     }
 

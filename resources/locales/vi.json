@@ -216,5 +216,12 @@
     "Profile image updated successfully": "Cập nhật ảnh đại diện thành công",
     "New password must be different from the current password": "Mật khẩu mới phải khác với mật khẩu hiện tại",
     "per page": "mỗi trang",
-    "products": "sản phẩm"
+    "products": "sản phẩm",
+    "or": "hoặc",
+    "Note": "Ghi chú",
+    "status is optional": "status là tùy chọn",
+    "If not provided, LIVE will be used as default": "Nếu không cung cấp, LIVE sẽ được sử dụng làm mặc định",
+    "LIVE means the product is ready for sale": "LIVE có nghĩa là sản phẩm đã sẵn sàng để bán",
+    "status will be LIVE by default": "status sẽ là LIVE theo mặc định",
+    "Define the state after the 'status:' keyword": "Định nghĩa trạng thái sau từ khóa 'status:'"
 }

@@ -12,12 +12,8 @@ const SellingProduct = () => {
   const { t } = useTranslation();
   const { subProduct, accounts } = usePage().props as any;
 
-  const [accountPage, setAccountPage] = useState(1);
-  const [accountPerPage, setAccountPerPage] = useState(10);
-
   const fetchData = useCallback(
     (accountPage: number = 1, accountPerPage: number = 10, filters?: any) => {
-      setStateAccountPage(accountPage, accountPerPage);
       router.reload({
         only: ["accounts"],
         replace: true,
@@ -34,12 +30,6 @@ const SellingProduct = () => {
   const handleFilter = (accountPage: number, accountPerPage: number, filters: any) => {
     fetchData(accountPage, accountPerPage, filters);
   };
-
-  const setStateAccountPage = (page: number, perPage: number) => {
-    setAccountPage(page || 1);
-    setAccountPerPage(perPage || 10);
-  };
-
 
   const columns = useMemo(
     () => [
