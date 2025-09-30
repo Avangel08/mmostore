@@ -2,21 +2,25 @@
 
 namespace App\Http\Controllers\Buyer\Auth;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\Mongo\Customers;
-use App\Models\MySQL\User;
-use App\Providers\RouteServiceProvider;
+use App\Services\Customer\CustomerService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
+    protected $customerService;
+    public function __construct(CustomerService $customerService)
+    {
+        $this->customerService = $customerService;
+    }
     /**
      * Display the registration view.
      */
@@ -39,13 +43,27 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
+        $identifier = Helpers::genIdentifier(8);
+        $retryCount = 0;
+        $maxRetries = 10;
+        while($retryCount++ < $maxRetries) {
+            $existingUser = $this->customerService->findByIdentifier($identifier);
+            if (!$existingUser) {
+                break;
+            }
+        }
+        if ($retryCount >= $maxRetries) {
+            return back()->withErrors(['identifier' => 'Could not generate unique identifier, please try again.']);
+        }
+
         $user = Customers::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'name' => $request->first_name . ($request?->last_name ?? ''),
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'status' => Customers::STATUS['ACTIVE'],
+            'status' => (int) Customers::STATUS['ACTIVE'],
+            'identifier' => (string) $identifier,
         ]);
 
         event(new Registered($user));
