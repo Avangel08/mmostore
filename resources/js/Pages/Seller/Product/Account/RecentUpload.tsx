@@ -15,7 +15,7 @@ const RecentUpload = () => {
   const fetchData = useCallback(
     (importPage: number = 1, importPerPage: number = 10, filters?: any) => {
       router.reload({
-        only: ["importHistory", "accounts"],
+        only: ["importHistory", "accounts", "subProduct"],
         replace: true,
         data: {
           importPage,
@@ -44,7 +44,7 @@ const RecentUpload = () => {
     const startTime = Date.now();
     
     router.reload({
-      only: ["importHistory", "accounts"],
+      only: ["importHistory", "accounts", "subProduct"],
       replace: true,
       onFinish: () => {
         const elapsedTime = Date.now() - startTime;

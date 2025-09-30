@@ -219,11 +219,7 @@
     "products": "sản phẩm",
     "or": "hoặc",
     "Note": "Ghi chú",
-    "status is optional": "status là tùy chọn",
-    "If not provided, LIVE will be used as default": "Nếu không cung cấp, LIVE sẽ được sử dụng làm mặc định",
     "LIVE means the product is ready for sale": "LIVE có nghĩa là sản phẩm đã sẵn sàng để bán",
-    "status will be LIVE by default": "status sẽ là LIVE theo mặc định",
-    "Define the state after the 'status:' keyword": "Định nghĩa trạng thái sau từ khóa 'status:'",
     "Payment History": "Lịch sử thanh toán",
     "Setting Payment": "Cài đặt thanh toán",
     "Bank": "Ngân hàng",
@@ -240,5 +236,11 @@
     "OTP": "OTP",
     "Enter OTP": "Nhập OTP",
     "OTP is required": "OTP là bắt buộc",
-    "OTP is invalid": "OTP không hợp lệ"
+    "OTP is invalid": "OTP không hợp lệ",
+    "The file must not be greater than 50MB": "File không được lớn hơn 50MB",
+    "Define status after 'status:' keyword": "Định nghĩa trạng thái sau từ khóa 'status:'",
+    "If no status specified, default status is LIVE": "Nếu không có trạng thái được chỉ định, trạng thái mặc định là LIVE",
+    "Examples": "Ví dụ",
+    "default status is LIVE": "trạng thái mặc định là LIVE",
+    "status is BAN": "trạng thái là BAN"
 }
