@@ -11,12 +11,10 @@ export const ModalDetailCategory = ({
   show,
   onHide,
   dataEdit,
-  refetchData
 }: {
   show: boolean;
   onHide: () => void;
   dataEdit?: any;
-  refetchData: () => void;
 }) => {
   const maxLengthName = 150;
   const { t } = useTranslation();
@@ -43,6 +41,9 @@ export const ModalDetailCategory = ({
       const method = isEditMode ? "put" : "post";
       
       router[method](url, values, {
+        replace: true,
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: (success: any) => {
           if (success.props?.message?.error) {
             showToast(t(success.props.message.error), "error");
@@ -54,7 +55,6 @@ export const ModalDetailCategory = ({
           if (success.props?.message?.success) {
             showToast(t(success.props.message.success), "success");
           }
-          refetchData();
         },
       });
     },

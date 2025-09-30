@@ -28,7 +28,7 @@ const EditProfile = () => {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
 
   const { data, setData, post, processing, errors, progress } = useForm({
-    profile_image: null as File | null,
+    image: null as File | null,
   });
 
   React.useEffect(() => {
@@ -68,7 +68,7 @@ const EditProfile = () => {
         return;
       }
 
-      setData('profile_image', file);
+      setData('image', file);
 
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -99,7 +99,7 @@ const EditProfile = () => {
           setPreviewImage(null);
         }
         
-        setData('profile_image', null);
+        setData('image', null);
         
         const fileInput = document.getElementById('profile-img-file-input') as HTMLInputElement;
         if (fileInput) {
@@ -172,10 +172,10 @@ const EditProfile = () => {
                         />
                       </div>
                     )}
-                    <h5 className="fs-16 mb-1">{user?.name ?? ""}</h5>
-                    {errors.profile_image && (
+                    <h5 className="fs-16 mb-1">{(user?.first_name || user?.last_name) ? ((user?.first_name ?? "") + ' ' + (user?.last_name ?? "")) : (user?.name ?? "")}</h5>
+                    {errors?.image && (
                       <div className="text-danger small mt-1">
-                        {errors.profile_image}
+                        {errors?.image}
                       </div>
                     )}
                   </div>

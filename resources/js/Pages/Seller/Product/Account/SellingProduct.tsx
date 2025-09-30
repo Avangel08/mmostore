@@ -12,12 +12,8 @@ const SellingProduct = () => {
   const { t } = useTranslation();
   const { subProduct, accounts } = usePage().props as any;
 
-  const [accountPage, setAccountPage] = useState(1);
-  const [accountPerPage, setAccountPerPage] = useState(10);
-
   const fetchData = useCallback(
     (accountPage: number = 1, accountPerPage: number = 10, filters?: any) => {
-      setStateAccountPage(accountPage, accountPerPage);
       router.reload({
         only: ["accounts"],
         replace: true,
@@ -34,12 +30,6 @@ const SellingProduct = () => {
   const handleFilter = (accountPage: number, accountPerPage: number, filters: any) => {
     fetchData(accountPage, accountPerPage, filters);
   };
-
-  const setStateAccountPage = (page: number, perPage: number) => {
-    setAccountPage(page || 1);
-    setAccountPerPage(perPage || 10);
-  };
-
 
   const columns = useMemo(
     () => [
@@ -140,7 +130,7 @@ const SellingProduct = () => {
         <SellerAccountFilter onFilter={handleFilter} />
       </Col>
       <Col lg={12} className="d-flex justify-content-between mb-4">
-        <h5>{t("Product list")}</h5>
+        <h5>{t("Product list")} ({subProduct?.quantity ?? 0} {t("products")})</h5>
         <div className="d-flex gap-2">
           <Button variant="danger" onClick={onDeleteAll}>
             {t("Delete all")}
@@ -166,11 +156,13 @@ const SellingProduct = () => {
             theadClass="table-light"
             enableContextMenu={false}
             isPaginateTable={true}
+            isCursorPaginateTable={true}
             keyPageParam="accountPage"
             keyPerPageParam="accountPerPage"
             onReloadTable={fetchData}
             showPaginationEllipsis={true}
             maxVisiblePages={7}
+            perPageEntries={[100, 200, 500, 1000]}
           />
         </div>
       </Col>

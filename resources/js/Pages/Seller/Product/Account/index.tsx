@@ -142,15 +142,20 @@ const SellerAccount = () => {
                             )}
                           </h5>
                           <div className="mb-2">
-                            <strong>{t("Format")}:</strong> key|data1|data2|...
+                            <strong>{t("Format")}:</strong> key|data1|data2| {t('or')} status:ANYTHING|key|data1|data2
+                          </div>
+                          <div className="mb-2 text-muted">
+                            <small>
+                              {t("Note")}: {t("Define the state after the 'status:' keyword")}. {t("status is optional")}. {t("If not provided, LIVE will be used as default")}. {t("LIVE means the product is ready for sale")}.
+                            </small>
                           </div>
                           <div className="mb-2">
                             <strong>{t("Example")}:</strong>
                           </div>
                           <div className="font-monospace small bg-white p-2 rounded">
-                            email|example@gmail.com|password123|2fa
+                            status:LIVE|email|example@gmail.com|password123|2fa
                             <br />
-                            another_key|some_data|more_info
+                            another_key|some_data|more_info ({t("status will be LIVE by default")})
                           </div>
                         </Card.Body>
                       </Card>
@@ -162,7 +167,7 @@ const SellerAccount = () => {
                   </Row>
                   <hr />
                   <Row className="my-5">
-                      <SellingProduct />
+                    <SellingProduct />
                   </Row>
                 </Card.Body>
               </Card>

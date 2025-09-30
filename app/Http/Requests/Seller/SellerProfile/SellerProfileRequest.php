@@ -25,7 +25,7 @@ class SellerProfileRequest extends FormRequest
         return match ($action) {
             'updateInfo' => [
                 'first_name' => ['required', 'string', 'min:2', 'max:50'],
-                'last_name' => ['required', 'string', 'min:2', 'max:50'],
+                'last_name' => ['nullable', 'string', 'min:2', 'max:50'],
             ],
             'changePassword' => [
                 'current_password' => ['required', 'current_password:'.config('guard.seller')],

@@ -8,7 +8,6 @@ import { ToastContainer } from "react-toastify";
 import TableCategory from "./TableCategory";
 import { ModalDetailCategory } from "./ModalDetailCategory";
 import CategoryFilter from "./CategoryFilter";
-import { useQueryParams } from "../../../hooks/useQueryParam";
 import { confirmDelete } from "../../../utils/sweetAlert";
 import { showToast } from "../../../utils/showToast";
 
@@ -18,15 +17,6 @@ const Category = () => {
   const [showModal, setShowModal] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
-  const params = useQueryParams();
-  const refetchData = () => {
-    router.reload({
-      only: ["categories"],
-      data: {
-        ...params,
-      },
-    });
-  };
 
   const fetchData = (
     currentPage: number = 1,
@@ -35,6 +25,7 @@ const Category = () => {
   ) => {
     router.reload({
       only: ["categories"],
+      replace: true,
       data: {
         page: currentPage,
         perPage: perPage,
@@ -73,6 +64,9 @@ const Category = () => {
 
     if (confirmed) {
       router.delete(route("seller.category.destroy", { id }), {
+        replace: true,
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: (page: any) => {
           if (page.props?.message?.error) {
             showToast(t(page.props.message.error), "error");
@@ -81,7 +75,6 @@ const Category = () => {
           if (page.props?.message?.success) {
             showToast(t(page.props.message.success), "success");
           }
-          refetchData();
         },
       });
     }
@@ -112,7 +105,6 @@ const Category = () => {
             showToast(t(page.props.message.success), "success");
           }
           setSelectedIds([]);
-          refetchData();
         },
       });
     }
@@ -134,7 +126,6 @@ const Category = () => {
             setDataEdit(null);
           }}
           dataEdit={dataEdit}
-          refetchData={refetchData}
         />
         <Container fluid>
           <BreadCrumb

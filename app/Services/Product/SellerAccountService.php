@@ -26,7 +26,7 @@ class SellerAccountService
             ->filterOrderId($request)
             ->filterSellStatus($request)
             ->orderBy('_id', 'desc')
-            ->paginate($perPage, ['*'], 'page', $page);
+            ->cursorPaginate($perPage, ['*'], 'page', $page);
     }
 
     public function getById($id, $select = ['*'], $relation = [])
@@ -39,7 +39,7 @@ class SellerAccountService
         $file = $data['file'];
         $host = request()->getHost();
 
-        $fileName = 'accounts_'.time().'_'.$file->getClientOriginalName();
+        $fileName = 'accounts_' . time() . '_' . $file->getClientOriginalName();
         $filePath = $file->storeAs("{$host}/accounts", $fileName, 'public');
         $dbConfig = Config::get('database.connections.tenant_mongo');
         $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
@@ -98,33 +98,34 @@ class SellerAccountService
                 ->whereIn('key', $listKey)
                 ->where('created_at', '<', new \MongoDB\BSON\UTCDateTime($timeStart))
                 ->limit($batchSize)
-                ->delete();
+                ->forceDelete();
         } while ($deletedCount > 0);
     }
 
     public function deleteUnsoldAccounts($subProductId)
     {
         // DB::transaction(function () use ($subProductId) {
-            $batchSize = 1000;
-            do {
-                $deletedCount = Accounts::where('sub_product_id', $subProductId)
-                    ->whereNull('order_id')
-                    ->limit($batchSize)
-                    ->delete();
-            } while ($deletedCount > 0);
-            $totalProduct = $this->getUnsoldAccountCountBySubProductId($subProductId);
-            $subProductService = new SubProductService;
-            $subProductService->updateSubProductQuantity($subProductId, $totalProduct);
+        $batchSize = 1000;
+        do {
+            $deletedCount = Accounts::where('sub_product_id', $subProductId)
+                ->whereNull('order_id')
+                ->limit($batchSize)
+                ->forceDelete();
+        } while ($deletedCount > 0);
+        $totalProduct = $this->getUnsoldAccountCountBySubProductId($subProductId);
+        $subProductService = new SubProductService;
+        $subProductService->updateSubProductQuantity($subProductId, $totalProduct);
         // });
     }
 
     public function streamDownloadUnsoldAccounts($subProductId)
     {
-        $fileName = 'unsold_accounts_'.$subProductId.'_'.time().'.txt';
+        set_time_limit(0);
+        $fileName = 'unsold_accounts_' . $subProductId . '_' . time() . '.txt';
 
         $headers = [
             'Content-Type' => 'text/plain',
-            'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
@@ -138,7 +139,9 @@ class SellerAccountService
                 ->whereNull('order_id')
                 ->cursor()
                 ->each(function ($account) use ($handle) {
-                    fwrite($handle, $account->key.'|'.$account->data.PHP_EOL);
+                    if (isset($account->status) && isset($account->key) && isset($account->data)) {
+                        fwrite($handle, "status:{$account->status}|{$account->key}|{$account->data}" . PHP_EOL);
+                    }
                 });
 
             fclose($handle);
