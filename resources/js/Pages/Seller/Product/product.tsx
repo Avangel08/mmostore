@@ -206,12 +206,6 @@ export default function product() {
                                 },
                               });
                             }}
-                            classNamePrefix="react-select"
-                            isSearchable={true}
-                            menuPortalTarget={document.body}
-                            styles={{
-                              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                            }}
                             className={
                               (formik.touched.categoryId &&
                                 formik.errors.categoryId) ||
@@ -254,7 +248,6 @@ export default function product() {
                             onBlur={() =>
                               formik.setFieldTouched("status", true)
                             }
-                            classNamePrefix="react-select"
                             className={
                               (formik.touched.status && formik.errors.status) ||
                               errors?.status
