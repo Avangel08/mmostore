@@ -24,7 +24,7 @@ export const ModalDetailCategory = ({
   const formik = useFormik({
     initialValues: {
       categoryName: dataEdit?.name || "",
-      categoryStatus: dataEdit?.status ? dataEdit.status : 1,
+      categoryStatus: dataEdit?.status ?? 1,
     },
     validationSchema: Yup.object({
       categoryName: Yup.string()
@@ -59,13 +59,12 @@ export const ModalDetailCategory = ({
       });
     },
   });
-
   // Reset form when modal opens/closes or when dataEdit changes
   useEffect(() => {
     if (show) {
       formik.setValues({
         categoryName: dataEdit?.name || "",
-        categoryStatus: dataEdit?.status ? dataEdit.status : 1,
+        categoryStatus: dataEdit?.status ?? 1,
       });
     } else {
       formik.resetForm();
