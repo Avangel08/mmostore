@@ -3,7 +3,7 @@
 use App\Http\Controllers\Buyer\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Buyer\Auth\RegisteredUserController;
 use App\Http\Controllers\Buyer\BuyerController;
-use App\Http\Controllers\Seller\Product\ProductController;
+use App\Http\Controllers\Buyer\Product\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])

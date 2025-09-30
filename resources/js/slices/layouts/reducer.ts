@@ -57,7 +57,6 @@ const LayoutSlice = createSlice({
       state.layoutType = action.payload;
     },
     changeLayoutThemeAction(state: any, action: any) {
-      console.log(action.payload)
       state.layoutThemeType = action.payload;
     },
     changeLayoutThemeColorAction(state: any, action: any) {

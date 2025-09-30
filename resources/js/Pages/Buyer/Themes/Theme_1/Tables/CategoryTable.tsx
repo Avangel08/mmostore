@@ -1,28 +1,21 @@
-import { ColumnDef } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import TableContainer from "./TableContainer";
 import { columnsApi } from "./columns";
+import { usePage } from "@inertiajs/react";
 
 function CategoryTable({ category, setShow, setSelectedProduct }: { category: any, setShow: (show: boolean) => void, setSelectedProduct: (product: any) => void; }) {
-    // ✅ Generate columns từ API
-    // const columns = useMemo<ColumnDef<any>[]>(
-    //     () =>
-    //         category.columns.map((col: any) => ({
-    //             accessorKey: col.key,
-    //             header: col.name,
-    //             cell: (info: any) => String(info.getValue() ?? ""),
-    //         })),
-    //     [category]
-    // );
+    const storageUrl = usePage().props.storageUrl as string;
 
-    const columns = useMemo(
-        () => columnsApi(category.columns, {
+    const columns = useMemo(() => columnsApi(
+        category.columns,
+        {
             onBuy: (row: any) => {
                 setSelectedProduct(row)
                 setShow(true)
             }
-        }),
-        [category.columns]
+        },
+        storageUrl
+    ), [category.columns, storageUrl]
     );
 
     return (

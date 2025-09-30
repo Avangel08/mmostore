@@ -1,68 +1,74 @@
-.page-title {
-    background: linear-gradient(180deg, #014475 0%, #112d42 100%);
-    padding: 20px;
-    border-radius: 10px;
-}
+[data-theme="Theme_1"] {
+    .page-title {
+        background: linear-gradient(180deg, #014475 0%, #112d42 100%);
+        padding: 20px;
+        border-radius: 10px;
+    }
 
-.custom-table {
-    background: linear-gradient(180deg, #014475 0%, #112d42 100%);
-    color: #fff;
-
-    thead {
+    .custom-table {
         background: linear-gradient(180deg, #014475 0%, #112d42 100%);
         color: #fff;
-    }
 
-    tbody {
-        tr {
-            td {
-                align-content: center;
-            }
-            &:hover {
-                background: rgba(255, 255, 255, 0.1); // hiệu ứng hover
-            }
+        thead {
+            background: linear-gradient(180deg, #014475 0%, #112d42 100%);
+            color: #fff;
         }
-    }
-}
 
-.navbar-landing.is-sticky {
-    background: #014475;
-}
-
-.navbar-landing {
-    .navbar-nav {
-        .nav-item {
-            .nav-link {
-                color: #fff; // màu chữ
+        tbody {
+            tr {
+                td {
+                    align-content: center;
+                }
+                &:hover {
+                    background: rgba(255, 255, 255, 0.1); // hiệu ứng hover
+                }
             }
         }
     }
-}
 
-.image-flag {
-    width: 30px;
-}
+    .navbar-landing.is-sticky {
+        background: #014475;
+    }
 
-.custom-radio {
-    margin-bottom: 10px;
-
-    label {
-        padding: 4px 10px;
-        border-radius: 4px;
-        display: inline-block;
-        box-sizing: border-box;
-        border: 1px solid #dee2e6; // ✅ luôn có border 1px
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &.active {
-            color: #0d6efd;
-            border-color: #0d6efd; // chỉ đổi màu, ko đổi kích thước
-            background-color: rgba(13, 110, 253, 0.05);
+    .navbar-landing {
+        .navbar-nav {
+            .nav-item {
+                .nav-link {
+                    color: #fff; // màu chữ
+                }
+            }
         }
     }
-}
 
-.card {
-    box-shadow: 0px 1px 2px 1px rgba(56,65,74,.15);
+    .image-flag {
+        width: 30px;
+    }
+
+    .custom-radio {
+        margin-bottom: 10px;
+
+        label {
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            box-sizing: border-box;
+            border: 1px solid #dee2e6; // ✅ luôn có border 1px
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &.active {
+                color: #0d6efd;
+                border-color: #0d6efd; // chỉ đổi màu, ko đổi kích thước
+                background-color: rgba(13, 110, 253, 0.05);
+            }
+        }
+    }
+
+    .card {
+        box-shadow: 0px 1px 2px 1px rgba(56, 65, 74, 0.15);
+    }
+    
+    .text-body {
+        color: #ced4da !important;
+    }
 }
