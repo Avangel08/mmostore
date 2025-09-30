@@ -1,5 +1,5 @@
 import { Head, router, usePage } from "@inertiajs/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../../CustomSellerLayouts";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
@@ -8,7 +8,6 @@ import { ToastContainer } from "react-toastify";
 import TableProduct from "./TableProduct";
 import { ModalStockManagement } from "./ModalStockManagement";
 import ProductFilter from "./ProductFilter";
-import { useQueryParams } from "../../../hooks/useQueryParam";
 import { confirmDelete } from "../../../utils/sweetAlert";
 import { showToast } from "../../../utils/showToast";
 
@@ -20,15 +19,7 @@ const Product = () => {
   const [selectedProductId, setSelectedProductId] = useState<
     number | string | null
   >(null);
-  const params = useQueryParams();
-  const refetchData = () => {
-    router.reload({
-      only: ["products"],
-      data: {
-        ...params,
-      },
-    });
-  };
+  const [selectedProductName, setSelectedProductName] = useState<string>("");
 
   const fetchData = (
     currentPage: number = 1,
@@ -37,6 +28,7 @@ const Product = () => {
   ) => {
     router.reload({
       only: ["products"],
+      replace: true,
       data: {
         page: currentPage,
         perPage: perPage,
@@ -59,10 +51,11 @@ const Product = () => {
 
   const openAddPage = () => {
     router.get(route("seller.product.create"));
-  }
+  };
 
-  const openModalStock = (id: number | string) => {
+  const openModalStock = (id: number | string, name: string) => {
     setSelectedProductId(id);
+    setSelectedProductName(name);
     setShowStockModal(true);
   };
 
@@ -84,7 +77,6 @@ const Product = () => {
           if (page.props?.message?.success) {
             showToast(t(page.props.message.success), "success");
           }
-          refetchData();
         },
       });
     }
@@ -116,7 +108,6 @@ const Product = () => {
             showToast(t(page.props.message.success), "success");
           }
           setSelectedIds([]);
-          refetchData();
         },
       });
     }
@@ -138,7 +129,7 @@ const Product = () => {
             setSelectedProductId(null);
           }}
           productId={selectedProductId}
-          refetchData={refetchData}
+          productName={selectedProductName}
         />
         <Container fluid>
           <BreadCrumb

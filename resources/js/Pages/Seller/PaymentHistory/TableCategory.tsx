@@ -67,30 +67,6 @@ const TableCategory = ({
   const columns = useMemo(
     () => [
       {
-        header: (
-          <Form.Check.Input
-            type="checkbox"
-            id="checkBoxAll"
-            className="form-check-input"
-            checked={selectAll}
-            onChange={handleSelectAll}
-          />
-        ),
-        cell: (cellProps: any) => {
-          const rowData = cellProps.row.original;
-          const isChecked = selectedItems.includes(rowData.id);
-          return (
-            <Form.Check.Input
-              type="checkbox"
-              className="categoryCheckbox form-check-input"
-              checked={isChecked}
-              onChange={(e) => handleItemSelect(rowData.id, e.target.checked)}
-            />
-          );
-        },
-        id: "#",
-      },
-      {
         header: t("Customer"),
         cell: (cell: any) => {
           return <span className="fw-semibold">{cell.getValue()}</span>;
@@ -137,26 +113,6 @@ const TableCategory = ({
           );
         },
       },
-      // {
-      //   header: t("Status"),
-      //   accessorKey: "status",
-      //   enableColumnFilter: false,
-      //   enableSorting: true,
-      //   cell: (cell: any) => {
-      //     const statusLabel = statusConst?.[cell.getValue()] || "Unknown";
-      //     const className = {
-      //       Active: "bg-success",
-      //       Inactive: "bg-danger",
-      //       Unknown: "bg-dark",
-      //     } as any;
-
-      //     return (
-      //       <span className={`badge ${className?.[statusLabel] || "bg-dark"} fs-6 fw-medium`}>
-      //         {t(statusLabel)}
-      //       </span>
-      //     );
-      //   },
-      // },
     ],
     [t, selectedItems, selectAll, handleSelectAll, handleItemSelect, statusConst]
   );

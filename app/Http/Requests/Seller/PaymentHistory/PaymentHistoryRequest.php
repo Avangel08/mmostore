@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Seller\PaymentHistory;
 
+use App\Models\MySQL\PaymentMethods;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PaymentHistoryRequest extends FormRequest
 {
@@ -23,11 +25,20 @@ class PaymentHistoryRequest extends FormRequest
     {
         $action = $this->route()->getActionMethod();
         return match ($action) {
+            'store' => [
+                'key' => ['required', 'string', 'max:255', Rule::in(array_values(PaymentMethods::KEY))],
+                'account_name' => ['required', 'string', 'max:255'],
+                'account_number' => ['required', 'string'],
+                'user_name' => ['required', 'numeric'],
+                'password' => ['required', 'string'],
+                'otp' => ['nullable', 'numeric']
+            ],
             'verifyPayment' => [
                 'account_name' => ['required', 'string', 'max:255'],
                 'account_number' => ['required', 'string'],
                 'user_name' => ['required', 'numeric'],
-                'password' => ['required', 'string']
+                'password' => ['required', 'string'],
+                'otp' => ['nullable', 'numeric']
             ],
             default => [],
         };

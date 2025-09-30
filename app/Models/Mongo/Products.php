@@ -23,6 +23,7 @@ class Products extends Model
         'detail_description',
         'short_description',
         'image',
+        'slug',
     ];
 
     const STATUS = [

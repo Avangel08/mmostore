@@ -1,11 +1,12 @@
 import { router, usePage } from "@inertiajs/react";
 import { useFormik } from "formik";
 import { max } from "moment";
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import { Modal, Form, Button, Row, Col, Container } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import * as Yup from "yup";
 import { showToast } from "../../../utils/showToast";
+import { er } from "@fullcalendar/core/internal-common";
 export const ModalAddNewGroupPermission = ({
   show,
   onHide,
@@ -17,7 +18,8 @@ export const ModalAddNewGroupPermission = ({
   const maxLengthDescription = 1000;
   const { t } = useTranslation();
   const groupPermissionValueRef = React.useRef<HTMLDivElement>(null);
-  const {guards} = usePage().props;
+  const { guards } = usePage().props;
+  const { errors } = usePage().props as any;
   const [currentPermissionList, setCurrentPermissionList] = React.useState<
     string[]
   >(["view", "create", "edit", "delete"]);
@@ -67,13 +69,13 @@ export const ModalAddNewGroupPermission = ({
             showToast(t(success.props.message.success), "success");
           }
         },
-        onError: (error) => {
-          const message = Object.values(error).join(", ");
-          showToast(message, "error");
-        },
       });
     },
   });
+
+  useEffect(() => {
+    formik.setErrors(errors || {});
+  }, [errors]);
 
   const handleChangeKey = (e: React.ChangeEvent<any>) => {
     const cleanValue = e.target.value.replace(/[^A-Za-z-.0-9]/g, "");

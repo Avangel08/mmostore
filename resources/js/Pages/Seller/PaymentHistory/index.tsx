@@ -1,23 +1,21 @@
 import { Head, router, usePage } from "@inertiajs/react";
 import React, { useEffect, useState } from "react";
 import Layout from "../../../CustomSellerLayouts";
-import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
 import TableCategory from "./TableCategory";
 import { useQueryParams } from "../../../hooks/useQueryParam";
-import { confirmDelete, confirmDialog } from "../../../utils/sweetAlert";
-import { showToast } from "../../../utils/showToast";
 import Filter from "./Filter";
 import { ModalSettingPayment } from "./Modal/ModalSettingPayment";
+import axios from "axios";
 
 const PaymentHistory = () => {
   const { t } = useTranslation();
-  const { paymentHistories } = usePage().props;
+  const { paymentHistories, listBank, paymentMethod } = usePage().props;
   const [showModal, setShowModal] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
-  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   const params = useQueryParams();
   const buildQuery = (p: any = {}) => ({
     page: Number(p.page || 1),
@@ -26,13 +24,6 @@ const PaymentHistory = () => {
     start_time: p.createdDateStart || "",
     end_time: p.createdDateEnd || "",
   });
-
-  const refetchData = () => {
-    router.reload({
-      only: ["paymentHistories"],
-      data: buildQuery(params),
-    });
-  };
 
   const fetchData = (
     currentPage: number = 1,
@@ -57,76 +48,21 @@ const PaymentHistory = () => {
     fetchData(currentPage, perPage, filters);
   };
 
-  const openModalEdit = (id: number | string) => {
-    router.reload({
-      only: ["detailCategory"],
-      data: { id },
-      replace: true,
-      onSuccess: (page) => {
-        setDataEdit(page.props.detailCategory);
-        setShowModal(true);
-      },
-    });
-  };
-
-  const onDelete = async (id: number | string) => {
-    const confirmed = await confirmDelete({
-      title: t("Delete this item?"),
-      text: t("Once deleted, you will not be able to recover it."),
-      confirmButtonText: t("Delete now"),
-      cancelButtonText: t("Cancel"),
-    });
-
-    if (confirmed) {
-      router.delete(route("seller.category.delete", { id }), {
-        onSuccess: (page: any) => {
-          if (page.props?.message?.error) {
-            showToast(t(page.props.message.error), "error");
-            return;
-          }
-          if (page.props?.message?.success) {
-            showToast(t(page.props.message.success), "success");
-          }
-          refetchData();
-        },
-      });
+  const openModalEdit = async () => {
+    try {
+      const response = await axios.get(route("seller.payment-history.edit"));
+      setDataEdit(response.data.paymentMethod);
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error fetching payment method:", error);
     }
   };
 
-  const onDeleteMultiple = async () => {
-    if (selectedIds.length === 0) return;
-
-    const confirmed = await confirmDelete({
-      title: t("Delete selected items?"),
-      text: t(
-        `You are about to delete {{count}} categories. Once deleted, you will not be able to recover them.`, { count: selectedIds.length }
-      ),
-      confirmButtonText: t("Delete now"),
-      cancelButtonText: t("Cancel"),
-    });
-
-    if (confirmed) {
-      router.delete(route("seller.category.delete-multiple"), {
-        data: { ids: selectedIds },
-        onSuccess: (page: any) => {
-          if (page.props?.message?.error) {
-            showToast(t(page.props.message.error), "error");
-            return;
-          }
-
-          if (page.props?.message?.success) {
-            showToast(t(page.props.message.success), "success");
-          }
-          setSelectedIds([]);
-          refetchData();
-        },
-      });
+  useEffect(() => {
+    if (paymentMethod) {
+      setDataEdit(paymentMethod);
     }
-  };
-
-  const handleSelectionChange = (selectedItems: (string | number)[]) => {
-    setSelectedIds(selectedItems);
-  };
+  }, [paymentMethod]);
 
   return (
     <React.Fragment>
@@ -137,10 +73,9 @@ const PaymentHistory = () => {
           show={showModal}
           onHide={() => {
             setShowModal(false);
-            setDataEdit(null);
           }}
           dataEdit={dataEdit}
-          refetchData={refetchData}
+          listBank={listBank}
         />
         <Container fluid>
           <BreadCrumb
@@ -160,20 +95,11 @@ const PaymentHistory = () => {
                       <div className="d-flex gap-2">
                         <Button
                           variant="success"
-                          onClick={() => {
-                            setDataEdit(null);
-                            setShowModal(true);
-                          }}
+                          onClick={openModalEdit}
                         >
                           <i className="ri-add-line align-bottom me-1"></i>{" "}
-                          {t("Setting payment")}
+                          {t("Setting Payment")}
                         </Button>
-                        {selectedIds.length > 0 && (
-                          <Button variant="danger" onClick={onDeleteMultiple}>
-                            <i className="ri-delete-bin-line align-bottom me-1"></i>{" "}
-                            {t("Delete selected")} ({selectedIds.length})
-                          </Button>
-                        )}
                       </div>
                     </Col>
                   </Row>
@@ -182,9 +108,6 @@ const PaymentHistory = () => {
                       <TableCategory
                         data={paymentHistories || []}
                         onReloadTable={fetchData}
-                        onEdit={openModalEdit}
-                        onDelete={onDelete}
-                        onSelectionChange={handleSelectionChange}
                       />
                     </Col>
                   </Row>

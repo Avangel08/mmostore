@@ -73,13 +73,11 @@ const Filter = ({ onFilter }: CategoryFilterProps) => {
   };
 
   const hasActiveFilters = () => {
-    const name = paramsUrl?.name || "";
-    const createdDateStart = paramsUrl?.createdDateStart || "";
-    const createdDateEnd = paramsUrl?.createdDateEnd || "";
-    return (
-      (name !== null && name !== "") ||
-      (createdDateStart !== null && createdDateStart !== "") ||
-      (createdDateEnd !== null && createdDateEnd !== ""));
+    return Boolean(
+      (filters.name && filters.name.trim() !== "") ||
+      (filters.createdDateStart && filters.createdDateStart !== "") ||
+      (filters.createdDateEnd && filters.createdDateEnd !== "")
+    );
   };
 
   const handleReset = () => {

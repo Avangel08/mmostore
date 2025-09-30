@@ -11,23 +11,26 @@ export const ModalSettingPayment = ({
   show,
   onHide,
   dataEdit,
-  refetchData
+  listBank,
 }: {
   show: boolean;
   onHide: () => void;
   dataEdit?: any;
-  refetchData: () => void;
+  listBank?: any;
 }) => {
+
   const maxLengthName = 150;
   const { t } = useTranslation();
-  const isEditMode = !!dataEdit;
   const errors = usePage().props.errors as any;
 
   const [isVerifying, setIsVerifying] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(false);
 
   const validationSchema = useMemo(() => {
     return Yup.object({
+      key: Yup.string()
+        .required(t("Please select a bank")),
       account_name: Yup.string()
         .max(maxLengthName, `Must be ${maxLengthName} characters or less`)
         .required(t("Please enter this field")),
@@ -39,25 +42,25 @@ export const ModalSettingPayment = ({
         .required(t("Please enter this field")),
       ...(showOtp
         ? {
-            otp: Yup.string().required(t("Please enter this field")),
-          }
+          otp: Yup.string().required(t("Please enter this field")),
+        }
         : {}),
     });
   }, [showOtp, t]);
 
   const formik = useFormik({
     initialValues: {
-      account_name: dataEdit?.account_name || "",
-      account_number: dataEdit?.account_number ?? "",
-      user_name: dataEdit?.user_name ?? "",
-      password: dataEdit?.password ?? "",
-      otp: dataEdit?.otp ?? "",
+      key: dataEdit?.key || "",
+      account_name: dataEdit?.details?.account_name || "",
+      account_number: dataEdit?.details?.account_number ?? "",
+      user_name: dataEdit?.details?.user_name ?? "",
+      password: dataEdit?.details?.password ?? "",
+      otp: "",
     },
     validationSchema,
     onSubmit: (values) => {
       const url = route("seller.payment-history.store");
-
-      const method = isEditMode ? "put" : "post";
+      const method = "post";
 
       router[method](url, values, {
         onSuccess: (success: any) => {
@@ -67,11 +70,9 @@ export const ModalSettingPayment = ({
           }
           formik.resetForm();
           onHide();
-
           if (success.props?.message?.success) {
             showToast(t(success.props.message.success), "success");
           }
-          refetchData();
         },
       });
     },
@@ -81,15 +82,18 @@ export const ModalSettingPayment = ({
   useEffect(() => {
     if (show) {
       formik.setValues({
-        account_name: dataEdit?.account_name || "",
-        account_number: dataEdit?.account_number ?? "",
-        user_name: dataEdit?.user_name ?? "",
-        password: dataEdit?.password ?? "",
-        otp: dataEdit?.otp ?? "",
+        key: dataEdit?.key || "",
+        account_name: dataEdit?.details?.account_name || "",
+        account_number: dataEdit?.details?.account_number ?? "",
+        user_name: dataEdit?.details?.user_name ?? "",
+        password: dataEdit?.details?.password ?? "",
+        otp: "",
       });
       setShowOtp(false);
+      setCanSubmit(false);
+      setIsVerifying(false);
     } else {
-      formik.resetForm(); 
+      formik.resetForm();
     }
   }, [show, dataEdit]);
 
@@ -109,6 +113,28 @@ export const ModalSettingPayment = ({
           <h5>{t("Setting Payment")}</h5>
         </Modal.Header>
         <Modal.Body>
+          {/* Bank key */}
+          <Form.Group className="mb-3" controlId="key">
+            <Form.Label>
+              {t("Bank")} <span className="text-danger">*</span>
+            </Form.Label>
+            <Form.Select
+              name="key"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.key}
+              isInvalid={!!((formik.touched.key && formik.errors.key) || errors?.key)}
+            >
+              <option value="">{t("Select bank")}</option>
+              {listBank && Object.keys(listBank).map((key: string) => (
+                <option key={key} value={key} selected={formik.values.key === key}>{t(listBank[key])}</option>
+              ))}
+            </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {t(formik.errors.key || errors?.key)}
+            </Form.Control.Feedback>
+          </Form.Group>
+
           {/* Account name */}
           <Form.Group className="mb-3" controlId="categoryName">
             <Form.Label>
@@ -203,17 +229,21 @@ export const ModalSettingPayment = ({
             type="button"
             className="mb-3"
             disabled={isVerifying}
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
+              e.stopPropagation();
               setIsVerifying(true);
               formik.setTouched({
+                key: true,
                 account_name: true,
                 account_number: true,
                 user_name: true,
                 password: true,
                 otp: formik.touched.otp || false,
               });
+
               const currentErrors = await formik.validateForm();
-              if (currentErrors.account_name || currentErrors.account_number || currentErrors.user_name || currentErrors.password) {
+              if (currentErrors.key || currentErrors.account_name || currentErrors.account_number || currentErrors.user_name || currentErrors.password) {
                 showToast(t("Please enter this field"), "error");
                 setIsVerifying(false);
                 return;
@@ -221,26 +251,44 @@ export const ModalSettingPayment = ({
               router.post(
                 route("seller.payment-history.verify-payment"),
                 {
+                  key: formik.values.key,
                   account_name: formik.values.account_name,
                   account_number: formik.values.account_number,
                   user_name: formik.values.user_name,
                   password: formik.values.password,
+                  otp: formik.values.otp ?? null,
                 },
                 {
                   preserveScroll: true,
-                  onSuccess: (success: any) => {
-                    if (success.props?.message?.error) {
-                      showToast(t(success.props.message.error), "error");
+                  preserveState: true,
+                  only: [],
+                  onSuccess: (props: any) => {
+                    if (props.props?.message?.error) {
+                      showToast(t(props.props.message.error), "error");
+                      setCanSubmit(false);
+                      setIsVerifying(false);
                       return;
                     }
-                    setShowOtp(true);
-                    showToast(t(success.props?.message?.success || "Verified successfully"), "success");
+
+                    if (props.props?.message?.info) {
+                      showToast(t(props.props.message.info), "success");
+                      setShowOtp(true);
+                      setCanSubmit(true);
+                      setIsVerifying(true);
+                      return;
+                    }
+
+                    showToast(t(props.props?.message?.success || "Verified successfully"), "success");
+                    setCanSubmit(true);
+                    setIsVerifying(true);
+                    return;
                   },
                   onError: () => {
                     showToast(t("Verification failed"), "error");
+                    setIsVerifying(false);
                   },
                   onFinish: () => {
-                    setIsVerifying(false);
+                    // setIsVerifying(false);
                   },
                 }
               );
@@ -284,8 +332,8 @@ export const ModalSettingPayment = ({
           >
             {t("Close")}
           </Button>
-          <Button variant="primary" type="submit">
-            {isEditMode ? t("Update") : t("Save changes")}
+          <Button variant="primary" type="submit" disabled={!canSubmit}>
+            {t("Save changes")}
           </Button>
         </Modal.Footer>
       </Form>

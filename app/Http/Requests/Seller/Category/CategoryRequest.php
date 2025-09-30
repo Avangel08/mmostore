@@ -30,7 +30,7 @@ class CategoryRequest extends FormRequest
                 'categoryStatus' => ['required', Rule::in(array_values(Categories::STATUS))],
             ],
             'update' => [
-                'categoryName' => ['required', 'string', 'max:150', Rule::unique('tenant_mongo.categories', 'name')->ignore($this->route('id'))],
+                'categoryName' => ['required', 'string', 'max:150', Rule::unique('tenant_mongo.categories', 'name')->ignore($this->route('category'))],
                 'categoryStatus' => ['required', Rule::in(array_values(Categories::STATUS))],
             ],
             default => [],
