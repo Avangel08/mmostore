@@ -55,7 +55,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
 
     public function uniqueId(): string
     {
-        return 'process_import_account_'.md5($this->filePath);
+        return 'process_import_account_' . $this->importHistoryId;
     }
 
     public function uniqueVia(): Repository
@@ -124,19 +124,27 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 $parts = explode('|', $line);
                 if (count($parts) < 2) {
                     $errorCount++;
-
                     return null;
                 }
 
-                $key = trim($parts[0]);
+                $status = Accounts::STATUS['LIVE'];
+                $dataParts = [];
+                $explodedFirstPart = explode(':', trim($parts[0] ?? ''));
+                $isStatusSection = $this->checkFirstPartIsStatus($explodedFirstPart);
+                if ($isStatusSection && empty(trim($explodedFirstPart[1] ?? ''))) {
+                    $explodedFirstPart[1] = Accounts::STATUS['LIVE'];
+                }
+
+                $status = strtoupper($isStatusSection ? trim($explodedFirstPart[1] ?? '') : Accounts::STATUS['LIVE']);
+                $key = strtolower(trim($parts[$isStatusSection ? 1 : 0] ?? ''));
+                $dataParts = array_slice($parts, $isStatusSection ? 2 : 1);
+
                 if (empty($key)) {
                     $errorCount++;
-
                     return null;
                 }
                 $listKey[$key] = $key;
 
-                $dataParts = array_slice($parts, 1);
                 foreach ($dataParts as $part) {
                     if (trim($part) === '') {
                         $errorCount++;
@@ -147,29 +155,28 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 unset($line);
 
                 return [
-                    'key' => $key,
-                    'data' => implode('|', array_map('trim', $dataParts)),
-                    'status' => Accounts::STATUS['LIVE'],
-                    'product_id' => $this->productId,
-                    'sub_product_id' => $this->subProductId,
+                    'key' => (string) $key,
+                    'data' => (string) implode('|', array_map('trim', $dataParts)),
+                    'status' => (string) $status,
+                    'product_id' => (string) $this->productId,
+                    'sub_product_id' => (string) $this->subProductId,
                     'note' => null,
                     'customer_id' => null,
                     'order_id' => null,
                     'created_at' => $timeStart,
                     'updated_at' => $timeStart,
-                    'import_account_history_id' => $this->importHistoryId,
+                    'import_account_history_id' => (string) $this->importHistoryId,
                 ];
             })
             ->filter()
             ->chunk($chunkSize)
-            ->each(function (LazyCollection $data, $index) use (&$successCount, &$errorCount, &$errors) {
+            ->each(function (LazyCollection $data) use (&$successCount, &$errorCount) {
                 $isSuccess = $this->processInsert($data);
                 $dataCount = $data->count();
                 if ($isSuccess) {
                     $successCount += $dataCount;
                 } else {
                     $errorCount += $dataCount;
-                    $errors[] = "Failed to insert chunk {$index} of {$dataCount} records.";
                 }
                 unset($data);
             });
@@ -184,11 +191,24 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
     public function processInsert(LazyCollection $data): bool
     {
         $accountData = $data->values()->all();
-        if (! empty($accountData)) {
+        if (!empty($accountData)) {
             return Accounts::insert($accountData);
         }
 
         return false;
+    }
+
+    public function checkFirstPartIsStatus(array &$explodedParts)
+    {
+        if (count($explodedParts) != 2) {
+            return false;
+        }
+
+        if (strtolower(trim($explodedParts[0] ?? '')) != 'status') {
+            return false;
+        }
+
+        return true;
     }
 
     public function failed(Exception $exception): void

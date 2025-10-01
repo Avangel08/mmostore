@@ -1,26 +1,66 @@
-import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
+import { Link, usePage } from "@inertiajs/react";
 
 type columns = {
   key: string;
   name: string;
 }
 
-
-export function columnsApi(columnsApi: columns[], actions: { onBuy: (row: any) => void }): ColumnDef<columns>[] {
-  return columnsApi.map((col) => {
+export function columnsApi(columns: columns[], actions: { onBuy: (row: any) => void }, storageUrl: string): ColumnDef<columns>[] {
+  return columns.map((col) => {
     switch (col.key) {
-      case "ID":
+      case "id":
+        return {
+          accessorKey: col.key,
+          header: col.name,
+          enableColumnFilter: false,
+          cell: ({ row }: any) => {
+            return (
+              <span className="fw-semibold">{row.index + 1}</span>
+            );
+          },
+        };
+      case "title":
         return {
           accessorKey: col.key,
           header: col.name,
           enableColumnFilter: false,
           cell: (cell: any) => {
             return (
-              <span className="fw-semibold">{cell.getValue()}</span>
+              <>
+                <div className="d-flex align-items-center">
+                  <div className="flex-shrink-0 me-3">
+                    <div className="avatar-sm bg-light rounded p-1">
+                      <img
+                        src={`${storageUrl}/${cell.row.original.image}`}
+                        alt=""
+                        className="img-fluid d-block"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-grow-1">
+                    <h5 className="fs-14 mb-1">
+                      <Link
+                        target="_blank"
+                        href={`https://coco.mmostore.local/products/detail/${cell.row.original.slug ?? ''}`}
+                        className="text-body"
+                      >
+                        {" "}
+                        {cell.getValue()}
+                      </Link>
+                    </h5>
+                    <p className="text-muted mb-0">
+                      <span className="fw-medium">
+                        {" "}
+                        {cell.row.original.short_description}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </>
             );
           },
-        };
+        }
       case "quantity":
         return {
           accessorKey: col.key,

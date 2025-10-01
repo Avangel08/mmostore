@@ -17,7 +17,7 @@ class CheckBankService
         try {
             $bankCode = $bank->key;
             $accountNumber = $bank->details['account_number'];
-            $user = $bank->details['account_name'];
+            $user = $bank->details['user_name'];
             $password = $bank->details['password'];
             $fromDate = $bank->details['from_date'] ?? Carbon::now()->subDays(7)->format('d/m/Y');
             $toDate = $bank->details['to_date'] ?? Carbon::now()->format('d/m/Y');
@@ -31,7 +31,6 @@ class CheckBankService
                     'data' => null
                 ];
             }
-
             return $this->$methodName($user, $password, $accountNumber, $fromDate, $toDate);
 
         } catch (\Throwable $th) {

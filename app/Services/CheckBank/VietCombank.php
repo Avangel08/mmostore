@@ -539,7 +539,6 @@ class VietCombank
             "clientId" => $this->clientId,
             "sessionId" => $this->sessionId
         );
-        dd($param);
         $result = $this->curlPost($this->url['getHistories'],$param);
         return $result;
     }

@@ -3,6 +3,7 @@ import { useContextMenu, ContextMenuOption } from "./ContextMenu";
 import { ContextMenuConfig } from "./ContextMenu/types";
 import TableContainer from "./TableContainerReactTable";
 import PaginateTableContainer from "./PaginateTableContainerReactTable";
+import CursorPaginateTable from "./CursorPaginateTable";
 
 interface TableWithContextMenuProps {
   columns?: any;
@@ -23,8 +24,8 @@ interface TableWithContextMenuProps {
   handleTicketClick?: any;
   onSubmit?: any;
   contextMenuOptions?:
-    | ContextMenuOption[]
-    | ((rowData: any) => ContextMenuOption[]);
+  | ContextMenuOption[]
+  | ((rowData: any) => ContextMenuOption[]);
   enableContextMenu?: boolean;
   contextMenuConfig?: ContextMenuConfig;
   isPaginateTable?: boolean;
@@ -35,6 +36,8 @@ interface TableWithContextMenuProps {
   keyPerPageParam?: string;
   showPaginationEllipsis?: boolean;
   maxVisiblePages?: number;
+  isCursorPaginateTable?: boolean;
+  perPageEntries?: number[];
 }
 
 const TableWithContextMenu: React.FC<TableWithContextMenuProps> = (props) => {
@@ -66,7 +69,11 @@ const TableWithContextMenu: React.FC<TableWithContextMenuProps> = (props) => {
   };
 
   return props?.isPaginateTable ? (
-    <PaginateTableContainer {...props} onRowContextMenu={handleRowContextMenu} />
+    props?.isCursorPaginateTable ? (
+      <CursorPaginateTable {...props} onRowContextMenu={handleRowContextMenu} />
+    ) : (
+      <PaginateTableContainer {...props} onRowContextMenu={handleRowContextMenu} />
+    )
   ) : (
     <TableContainer {...props} onRowContextMenu={handleRowContextMenu} />
   );

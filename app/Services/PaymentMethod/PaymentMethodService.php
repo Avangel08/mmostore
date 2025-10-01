@@ -10,9 +10,14 @@ use App\Models\MySQL\PaymentMethods;
  */
 class PaymentMethodService
 {
-    public function create($data)
+    public function updateOrCreate($data)
     {
-        return PaymentMethods::create($data);
+        return PaymentMethods::updateOrCreate([
+            'user_id' => $data['user_id'],
+            'user_type' => $data['user_type'],
+            'type' => $data['type'],
+            'key' => $data['key']
+        ],$data);
     }
 
     public function update($item, $data)
@@ -31,4 +36,12 @@ class PaymentMethodService
         return PaymentMethods::find($id);
     }
 
+    public function findByUserId($userId)
+    {
+        return PaymentMethods::where('user_id', $userId)
+        ->where('user_type', PaymentMethods::USER_TYPE['SELLER'])
+        ->where('type', PaymentMethods::TYPE['BANK'])
+        ->where('status', PaymentMethods::STATUS['ACTIVE'])
+        ->first();
+    }
 }

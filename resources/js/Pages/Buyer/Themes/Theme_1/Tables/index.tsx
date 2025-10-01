@@ -54,7 +54,7 @@ const Table = () => {
                 ))}
             </Container>
             <ModalBuy
-                productId={selectedProduct}
+                productId={selectedProduct?.id}
                 show={show}
                 onClose={() => {
                     setShow(false)

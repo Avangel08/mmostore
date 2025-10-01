@@ -23,16 +23,16 @@ class CategoryService
         return Categories::select($select)->with($relation)->where('_id', $id)->first();
     }
 
-    public function getAll($select = ['*'], $relation = [])
+    public function getActive($select = ['*'], $relation = [])
     {
-        return Categories::select($select)->with($relation)->get();
+        return Categories::where('status', Categories::STATUS['ACTIVE'])->select($select)->with($relation)->get();
     }
 
     public function createCategory(array $data)
     {
         return Categories::create([
             'name' => $data['categoryName'],
-            'status' => $data['categoryStatus'],
+            'status' => (int) $data['categoryStatus'],
         ]);
     }
 
@@ -40,7 +40,7 @@ class CategoryService
     {
         return $category->update([
             'name' => $data['categoryName'],
-            'status' => $data['categoryStatus'],
+            'status' => (int) $data['categoryStatus'],
         ]);
     }
 

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Seller\PaymentHistory;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\PaymentHistory\PaymentHistoryRequest;
+use App\Models\MySQL\PaymentMethods;
 use App\Services\BalanceHistory\BalanceHistoryService;
 use App\Services\CheckBank\VietCombank;
+use App\Services\PaymentMethod\PaymentMethodService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
@@ -13,10 +15,12 @@ use Inertia\Inertia;
 class PaymentHistoryController extends Controller
 {
     private $balanceHistoryService;
-    
-    public function __construct(BalanceHistoryService $balanceHistoryService)
+    private $paymentMethodService;
+
+    public function __construct(BalanceHistoryService $balanceHistoryService, PaymentMethodService $paymentMethodService)
     {
         $this->balanceHistoryService = $balanceHistoryService;
+        $this->paymentMethodService = $paymentMethodService;
     }
 
     /**
@@ -29,8 +33,11 @@ class PaymentHistoryController extends Controller
         // }
 
         $request = $request->all();
+        $listBank = PaymentMethods::LIST_BANK;
+
         return Inertia::render('PaymentHistory/index', [
-            'paymentHistories' => fn () => $this->balanceHistoryService->getForTable($request),
+            'paymentHistories' => fn() => $this->balanceHistoryService->getForTable($request),
+            'listBank' => $listBank,
         ]);
     }
 
@@ -45,10 +52,59 @@ class PaymentHistoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(PaymentHistoryRequest $request)
     {
-        $data = $request->all();
-        return back()->with('success', 'Category created successfully');
+        $data = $request->validated();
+        $vietcombankService = new VietCombank(trim($data['user_name']), trim($data['password']), trim($data['account_number']));
+
+        //Send OTP
+        if (isset($data['otp']) && !empty($data['otp'])) {
+            $otpResult = $vietcombankService->submitOtpLogin($data['otp']);
+            \Log::info(json_encode($otpResult));
+            if (isset($otpResult) && $otpResult['success']) {
+                return back()->with('success', 'Verified successfully');
+            } else {
+                return back()->with('error', 'Verified failed. OTP invalid');
+            }
+        }
+        $loginResult = $vietcombankService->doLogin();
+        if (isset($loginResult) && !$loginResult['success']) {
+            return back()->with('error', 'Verified failed');
+        }
+
+        $fromDate = Carbon::now()->subDays(7)->format('d/m/Y');
+        $toDate = Carbon::now()->format('d/m/Y');
+        $history = $vietcombankService->getHistories($fromDate, $toDate, $data['account_number']);
+        if (isset($history) && $history->code != '00' && $history->code != '108') {
+            return back()->with('error', 'Verified failed');
+        }
+
+        if (isset($history) && $history->code == '108') {
+            return back()->with('info', 'Verified successfully. Please enter OTP');
+        }
+
+        if (isset($history) && $history->code == '00') {
+            $result = $this->paymentMethodService->updateOrCreate([
+                "user_id" => auth(config('guard.seller'))->user()->id,
+                "user_type" => PaymentMethods::USER_TYPE['SELLER'],
+                "type" => PaymentMethods::TYPE['BANK'],
+                "key" => $data['key'],
+                "name" => PaymentMethods::LIST_BANK[$data['key']],
+                "details" => [
+                    "account_name" => trim($data['account_name']),
+                    "account_number" => trim($data['account_number']),
+                    "user_name" => trim($data['user_name']),
+                    "password" => trim($data['password']),
+                ],
+                "status" => PaymentMethods::STATUS['ACTIVE'],
+                "icon" => null,
+                "is_verify_otp" => true,
+            ]);
+            if ($result) {
+                return back()->with('success', 'Update successfully');
+            }
+        }
+        return back()->with('error', 'Verified failed');
     }
 
     /**
@@ -62,9 +118,12 @@ class PaymentHistoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit()
     {
-        //
+        $paymentMethod = $this->paymentMethodService->findByUserId(auth(config('guard.seller'))->user()->id);
+        return response()->json([
+            'paymentMethod' => $paymentMethod
+        ]);
     }
 
     /**
@@ -87,30 +146,37 @@ class PaymentHistoryController extends Controller
     {
         $data = $request->validated();
         $vietcombankService = new VietCombank(trim($data['user_name']), trim($data['password']), trim($data['account_number']));
-        $loginResult = $vietcombankService->doLogin();
-        if(isset($loginResult) && !$loginResult['success']){
-            return back()->with('error', 'Verified failed');
+
+        //Send OTP
+        if (isset($data['otp']) && !empty($data['otp'])) {
+            $otpResult = $vietcombankService->submitOtpLogin($data['otp']);
+            \Log::info(json_encode($otpResult));
+            if (isset($otpResult) && $otpResult['success']) {
+                return back()->with('success', 'Verified successfully');
+            } else {
+                return back()->with('error', 'Verified failed. OTP invalid');
+            }
         }
-        $listAccountResult = $vietcombankService->getlistAccount();
-        if(isset($listAccountResult) && !$listAccountResult->code == '00'){
+        $loginResult = $vietcombankService->doLogin();
+        if (isset($loginResult) && !$loginResult['success']) {
+            return back()->with('error', $loginResult['message']);
+        }
+
+        $fromDate = Carbon::now()->subDays(7)->format('d/m/Y');
+        $toDate = Carbon::now()->format('d/m/Y');
+        $history = $vietcombankService->getHistories($fromDate, $toDate, $data['account_number']);
+        if (isset($history) && $history->code != '00' && $history->code != '108') {
             return back()->with('error', 'Verified failed');
         }
 
-        dd($loginResult);
-        $listAcc = $listAccountResult->DDAccounts;
-        $checkAcc = array_filter($listAcc, function($item) use ($data){
-            return $item->accountNumber == trim($data['account_number']) && $item->customerName == trim($data['account_name']);
-        });
-        if(empty($checkAcc) || count($checkAcc) == 0){
-            return back()->with('error', 'Verified failed');
+        if (isset($history) && $history->code == '108') {
+            return back()->with('info', 'Verified successfully. Please enter OTP');
         }
-    
-        $history = $vietcombankService->getHistories(Carbon::now()->subDays(7)->format('d/m/Y'), Carbon::now()->format('d/m/Y'), $data['account_number']);
-        dd($history);
-        if($loginResult['success']){
+
+        if (isset($history) && $history->code == '00') {
             return back()->with('success', 'Verified successfully');
-        }else{
-            return back()->with('error', 'Verified failed');
         }
+
+        return back()->with('error', 'Verified failed');
     }
 }

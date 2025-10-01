@@ -7,9 +7,9 @@
     // &.ck-reset_all, &.ck-reset_all *{
     //     color: var(--#{$prefix}body-color) !important;
     // }
-    &.ck-toolbar{
-        background: #{rgba(var(--#{$prefix}light-rgb), .75)} !important;
-    }
+    // &.ck-toolbar{
+    //     background: #{rgba(var(--#{$prefix}light-rgb), .75)} !important;
+    // }
 
     p {
         margin-bottom: 0;

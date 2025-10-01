@@ -16,7 +16,7 @@ const TableProduct = ({
   data: any;
   onReloadTable?: (page: number, perPage: number, filters?: any) => void;
   onEdit?: (id: number | string) => void;
-  onManageStock?: (id: number | string) => void;
+  onManageStock?: (id: number | string, name: string) => void;
   onDelete?: (id: number | string) => void;
   onSelectionChange?: (selectedItems: (string | number)[]) => void;
 }) => {
@@ -161,7 +161,7 @@ const TableProduct = ({
                 <Button
                   size="sm"
                   variant="outline-primary"
-                  onClick={() => onManageStock && onManageStock(rowData?.id)}
+                  onClick={() => onManageStock && onManageStock(rowData?.id, rowData?.name)}
                 >
                   <i className="ri-archive-2-fill"></i>
                 </Button>

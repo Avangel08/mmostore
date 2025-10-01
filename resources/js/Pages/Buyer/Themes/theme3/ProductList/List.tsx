@@ -1,7 +1,7 @@
 import React from "react"
 import { Accordion, Card, Col, Container, Row } from "react-bootstrap"
 
-import product12 from "../../../../../../images/products/img12.png"
+import product12 from "../../../../../../images/products/product12.png"
 import { Link } from "@inertiajs/react"
 
 

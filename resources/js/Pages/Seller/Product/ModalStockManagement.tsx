@@ -23,58 +23,40 @@ interface ModalStockManagementProps {
   show: boolean;
   onHide: () => void;
   productId: number | string | null;
-  refetchData: () => void;
+  productName?: string;
 }
 
 export const ModalStockManagement = ({
   show,
   onHide,
   productId,
+  productName,
 }: ModalStockManagementProps) => {
   const { t } = useTranslation();
-  const [subProduct, setSubProduct] = useState<any>(null);
-  const [product, setProduct] = useState<any>(null);
   const errors = usePage().props.errors;
-  const [subProductPage, setSubProductPage] = useState(1);
-  const [subProductPerPage, setSubProductPerPage] = useState(10);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingSubProduct, setEditingSubProduct] = useState<any>(null);
+  const { subProduct } = usePage().props as any;
 
   const fetchSubProducts = (
     subProductPage?: number,
-    subProductPerPage?: number
+    subProductPerPage?: number,
+    filters?: any
   ) => {
     if (productId) {
-      setTimeout(() => {
-        setStateSubProduct(subProductPage, subProductPerPage);
-        router.reload({
-          only: ["subProduct"],
-          data: { product_id: productId, subProductPage, subProductPerPage },
-          onSuccess: (page: any) => {
-            const subProduct = page?.props?.subProduct;
-            if (subProduct) {
-              setSubProduct(subProduct);
-            }
-
-            if (subProduct?.data?.[0]?.product) {
-              setProduct(subProduct?.data?.[0]?.product);
-            }
-          },
-        });
-      }, 500);
+      router.reload({
+        only: ["subProduct"],
+        replace: true,
+        data: { product_id: productId, subProductPage, subProductPerPage, ...filters },
+      });
     }
-  };
-
-  const setStateSubProduct = (page?: number, perPage?: number) => {
-    setSubProductPage(page || 1);
-    setSubProductPerPage(perPage || 10);
   };
 
   useEffect(() => {
-    if (productId && show) {
+    if (show && productId) {
       fetchSubProducts();
     }
-  }, [productId, show]);
+  }, [show, productId]);
 
   const maxLengthName = 50;
   const maxPrice = 999999999;
@@ -122,7 +104,6 @@ export const ModalStockManagement = ({
           onSuccess: (page: any) => {
             if (page?.props?.message?.error) {
               showToast(t(page.props.message.error), "error");
-              fetchSubProducts(subProductPage, subProductPerPage);
               return;
             }
 
@@ -133,7 +114,6 @@ export const ModalStockManagement = ({
               } else {
                 formik.resetForm();
               }
-              fetchSubProducts(subProductPage, subProductPerPage);
             }
           },
         }
@@ -174,12 +154,10 @@ export const ModalStockManagement = ({
         onSuccess: (page: any) => {
           if (page?.props?.message?.error) {
             showToast(t(page.props.message.error), "error");
-            fetchSubProducts(subProductPage, subProductPerPage);
             return;
           }
           if (page.props?.message?.success) {
             showToast(t(page.props.message.success), "success");
-            fetchSubProducts(subProductPage, subProductPerPage);
           }
         },
         onError: (errors: any) => {
@@ -237,9 +215,8 @@ export const ModalStockManagement = ({
 
           return (
             <span
-              className={`badge ${
-                className?.[status] || "bg-dark"
-              } fs-6 fw-medium`}
+              className={`badge ${className?.[status] || "bg-dark"
+                } fs-6 fw-medium`}
             >
               {t(labelName?.[status] || "Unknown")}
             </span>
@@ -320,8 +297,6 @@ export const ModalStockManagement = ({
       show={show}
       onHide={() => {
         handleCancelEdit();
-        setSubProduct(null);
-        setProduct(null);
         onHide();
       }}
       centered
@@ -337,7 +312,7 @@ export const ModalStockManagement = ({
             <Col>
               <div className="d-flex items-center gap-2">
                 <span className="fw-bold">{t("Product name")}:</span>
-                <span>{product?.name ?? ""}</span>
+                <span>{productName ?? ""}</span>
               </div>
             </Col>
           </Row>
@@ -483,8 +458,6 @@ export const ModalStockManagement = ({
           variant="light"
           onClick={() => {
             handleCancelEdit();
-            setSubProduct(null);
-            setProduct(null);
             onHide();
           }}
         >

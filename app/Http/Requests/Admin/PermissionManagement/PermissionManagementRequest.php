@@ -24,17 +24,17 @@ class PermissionManagementRequest extends FormRequest
         $action = $this->route()->getActionMethod();
         return match ($action) {
             'addNewGroupPermission' => [
-                'groupPermissionName' => ['required', 'string', 'max:50'],
+                'groupPermissionName' => ['required', 'string', 'max:50', 'unique:group_permissions,name'],
                 'groupPermissionDescription' => ['nullable', 'string', 'max:1000'],
-                'groupPermissionKey' => ['required', 'string', 'max:50'],
+                'groupPermissionKey' => ['required', 'string', 'max:50', 'unique:group_permissions,key'],
                 'groupPermissionGuard' => ['required', 'string', 'in:'.implode(',', array_values(config('guard', [])))],
                 'groupPermissionValue' => ['required', 'array', 'min:1'],
                 'groupPermissionValue.*' => ['required', 'string', 'max:50'],
             ],
             'updateGroupPermission' => [
-                'groupPermissionName' => ['required', 'string', 'max:50'],
+                'groupPermissionName' => ['required', 'string', 'max:50', 'unique:group_permissions,name,'.$this->route('id')],
                 'groupPermissionDescription' => ['nullable', 'string', 'max:1000'],
-                'groupPermissionKey' => ['required', 'string', 'max:50'],
+                'groupPermissionKey' => ['required', 'string', 'max:50', 'unique:group_permissions,key,'.$this->route('id')],
                 'groupPermissionGuard' => ['required', 'string', 'in:'.implode(',', array_values(config('guard', [])))],
                 'groupPermissionValue' => ['required', 'array', 'min:1'],
                 'groupPermissionValue.*' => ['required', 'string', 'max:50'],

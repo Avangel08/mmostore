@@ -8,17 +8,14 @@ import { Badge, Button, Col, Spinner } from "react-bootstrap";
 const RecentUpload = () => {
   const { t } = useTranslation();
   const { importHistory } = usePage().props as any;
-  const [importPage, setImportPage] = useState(1);
-  const [importPerPage, setImportPerPage] = useState(10);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState(0);
   const [canRefresh, setCanRefresh] = useState(true);
 
   const fetchData = useCallback(
     (importPage: number = 1, importPerPage: number = 10, filters?: any) => {
-      setStateImportPage(importPage, importPerPage);
       router.reload({
-        only: ["importHistory"],
+        only: ["importHistory", "accounts", "subProduct"],
         replace: true,
         data: {
           importPage,
@@ -47,11 +44,8 @@ const RecentUpload = () => {
     const startTime = Date.now();
     
     router.reload({
-      only: ["importHistory"],
-      data: {
-        importPage,
-        importPerPage,
-      },
+      only: ["importHistory", "accounts", "subProduct"],
+      replace: true,
       onFinish: () => {
         const elapsedTime = Date.now() - startTime;
         const minLoadingTime = 1000;
@@ -69,12 +63,8 @@ const RecentUpload = () => {
         }, 2000);
       },
     });
-  }, [lastRefreshTime, importPage, importPerPage]);
+  }, [lastRefreshTime]);
 
-  const setStateImportPage = (page: number, perPage: number) => {
-    setImportPage(page || 1);
-    setImportPerPage(perPage || 10);
-  };
 
   const columns = useMemo(
     () => [

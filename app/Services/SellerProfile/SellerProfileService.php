@@ -16,9 +16,8 @@ class SellerProfileService
     public function updateInfo(User $user, array $data)
     {
         return $user->update([
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'name' => $data['first_name'] . ' ' . $data['last_name'],
+            'first_name' => $data['first_name'] ?? null,
+            'last_name' => $data['last_name'] ?? null,
         ]);
     }
 
@@ -35,9 +34,9 @@ class SellerProfileService
             Storage::disk('public')->delete($user->image);
         }
         $host = request()->getHost();
-        $filename = 'avatar_' . $user->id . '_' . Carbon::now()->format("Ymd") . '.' . $image->getClientOriginalExtension();
+        $filename = 'avatar_' . $user->id . '_' . Carbon::now()->format("Ymd_His") . '.' . $image->getClientOriginalExtension();
 
-        $path = $image->storeAs("{$host}/avatar/" . config('guard.seller') . "/", $filename, 'public');
+        $path = $image->storeAs("{$host}/avatar/" . config('guard.seller'), $filename, 'public');
 
         return $user->update([
             'image' => $path,

@@ -26,6 +26,14 @@ class ProductService
         return Products::select($select)->with($relation)->where('_id', $id)->first();
     }
 
+    public function generateProductSlug($productName)
+    {
+        $slug = \Str::slug($productName);
+        $count = Products::where('slug', 'LIKE', "%{$slug}%")->count();
+
+        return $count ? "{$slug}-" . ($count + 1) : $slug;
+    }
+
     public function createProduct(array $data)
     {
         $productData = [
@@ -34,6 +42,7 @@ class ProductService
             'status' => $data['status'],
             'short_description' => $data['shortDescription'],
             'detail_description' => $data['detailDescription'],
+            'slug' => (string) $this->generateProductSlug($data['productName']),
         ];
 
         $product = Products::create($productData);
@@ -58,6 +67,10 @@ class ProductService
             'short_description' => $data['shortDescription'],
             'detail_description' => $data['detailDescription'],
         ];
+
+        if ($product['name'] != $data['productName']) {
+            $dataToUpdate['slug'] = (string) $this->generateProductSlug($data['productName']);
+        }
         
         if (!empty($data['image'])) {
             $host = request()->getHost();
@@ -73,6 +86,11 @@ class ProductService
     public function findByIds(array $ids, $select = ['*'], $relation = [])
     {
         return Products::select($select)->with($relation)->whereIn('_id', $ids)->get();
+    }
+
+    public function findBySlug(string $slug, $select = ['*'], $relation = [])
+    {
+        return Products::select($select)->with($relation)->where('slug', $slug)->first();
     }
 
     public function delete(Products $product)

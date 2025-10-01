@@ -1,15 +1,17 @@
 import { Link, router, usePage } from "@inertiajs/react";
-import { useFormik } from "formik";
+import { Field, useFormik } from "formik";
 import * as Yup from "yup";
 import { Modal, Form, Button, Card, Row } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 interface Product {
     id: number;
-    title: string;
+    name: string;
     price: number;
-    description: string;
+    short_description: string;
     image: string;
+    sub_products: any;
 }
 
 interface ProductModalProps {
@@ -20,7 +22,7 @@ interface ProductModalProps {
 
 // ⚡ fetch products detail (TanStack Query)
 const fetchProduct = async (id: number): Promise<Product> => {
-    const res = await fetch(`https://coco.mmostore.local//products/${id}`);
+    const res = await fetch(`https://coco.mmostore.local/products/detail/${id}`);
     if (!res.ok) throw new Error("Failed to fetch products");
     return res.json();
 };
@@ -30,40 +32,41 @@ const ModalBuy: React.FC<ProductModalProps> = ({
     show,
     onClose,
 }) => {
-
-    const { data, isLoading, error } = useQuery({
+    const { t } = useTranslation()
+    const { data: product, isLoading, error } = useQuery({
         queryKey: ["product", productId],
         queryFn: () => fetchProduct(productId!),
         enabled: !!productId && show, // chỉ fetch khi modal mở và có id
     });
-
     const { errors } = usePage().props;
-
-
-    if (!show) return null;
+    const storageUrl = usePage().props.storageUrl as string;
 
     const formik = useFormik({
         initialValues: {
-            quantity: "",
-            email: "",
-            password: "",
-            rememberMe: true,
+            quantity: 0,
+            subProduct: "",
+            price: 0
         },
+        validateOnChange: true,
+        validateOnBlur: true,
         validationSchema: Yup.object({
-            email: Yup.string()
-                .email("Email không hợp lệ")
-                .matches(/^[^@]+@[^@]+\.[^@]+$/, "Email không hợp lệ"),
-            password: Yup.string()
-                .required("Mật khẩu là bắt buộc"),
-            rememberMe: Yup.boolean(),
+            subProduct: Yup.string().required(
+                t("Please choose your sub product")
+            ),
         }),
         onSubmit: (values) => {
-            router.post(route("buyer.login"), values);
+            console.log({ values, productId })
         },
     });
 
+    // ✅ wrapper: reset form trước, gọi onClose sau
+    const handleClose = () => {
+        formik.resetForm();
+        onClose();
+    };
+
     return (
-        <Modal show={show} onHide={onClose} centered backdrop="static" size="lg">
+        <Modal show={show} onHide={handleClose} centered backdrop="static" size="lg">
             <Modal.Header
                 closeButton
                 style={{
@@ -94,7 +97,7 @@ const ModalBuy: React.FC<ProductModalProps> = ({
                                 <div className="col-sm-auto">
                                     <div className="avatar-xl bg-light rounded p-1">
                                         <img
-                                            src={data && data.image}
+                                            src={product && `${storageUrl}/${product.image}`}
                                             alt=""
                                             className="img-fluid d-block"
                                         />
@@ -102,69 +105,68 @@ const ModalBuy: React.FC<ProductModalProps> = ({
                                 </div>
 
                                 <div className="col-sm">
-                                    <h5 className="fs-14">
-                                        {data && data.title}
+                                    <h5 className="">
+                                        {product && product.name}
                                     </h5>
-                                    <ul className="list-inline text-muted">
-                                        <li className="list-inline-item">
-                                            Color :{" "}
-                                            <span className="fw-medium">
-                                                Red
-                                            </span>
-                                        </li>
-                                        <li className="list-inline-item">
-                                            Size :{" "}
-                                            <span className="fw-medium">12</span>
-                                        </li>
-                                        <li className="list-inline-item">
-                                            Color :{" "}
-                                            <span className="fw-medium">
-                                                Red
-                                            </span>
-                                        </li>
-                                        <li className="list-inline-item">
-                                            Color :{" "}
-                                            <span className="fw-medium">
-                                                Red
-                                            </span>
-                                        </li>
-                                        <li className="list-inline-item">
-                                            Color :{" "}
-                                            <span className="fw-medium">
-                                                Red
-                                            </span>
-                                        </li>
-                                        <li className="list-inline-item">
-                                            Color :{" "}
-                                            <span className="fw-medium">
-                                                Red
-                                            </span>
-                                        </li>
-                                        <li className="list-inline-item">
-                                            Color :{" "}
-                                            <span className="fw-medium">
-                                                Red
-                                            </span>
-                                        </li>
-                                    </ul>
+                                    <p className="text-muted mb-2">
+                                        {product && product.short_description}
+                                    </p>
+                                    <Form.Group>
+                                        <div className="d-flex gap-2">
+                                            {product?.sub_products.map((sub: any) => (
+                                                <div key={sub.id} className="custom-radio">
+                                                    <Form.Control
+                                                        type="radio"
+                                                        name="subProduct"
+                                                        value={String(sub.id)}
+                                                        className="form-check-input d-none"
+                                                        id={`sub-${sub.id}`}
+                                                        onChange={(e) => {
+                                                            formik.handleChange(e);
+                                                            formik.setFieldValue("quantity", sub.quantity ?? 1);
+                                                            formik.setFieldValue("price", sub.price ?? 1);
+                                                        }}
+                                                        onBlur={formik.handleBlur}
+                                                        checked={formik.values.subProduct === String(sub.id)} // ✅ chỉ chọn 1
+                                                    />
+                                                    <Form.Label
+                                                        htmlFor={`sub-${sub.id}`}
+                                                        className={`form-check-label ${formik.values.subProduct === String(sub.id) ? "active" : ""
+                                                            }`}
+                                                    >
+                                                        {sub.name}
+                                                    </Form.Label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        {formik.touched.subProduct && formik.errors.subProduct && (
+                                            <div className="text-danger small">{formik.errors.subProduct}</div>
+                                        )}
+                                    </Form.Group>
 
-                                    <div className="input-step">
+                                    <div className="input-step mb-3">
                                         <button
                                             type="button"
                                             className="minus material-shadow"
-                                        // onClick={() => {
-                                        //     countDown(cartItem.id, cartItem.data_attr, cartItem.price);
-                                        // }}
+                                            disabled={!formik.values.subProduct}
+                                            onClick={() =>
+                                                formik.setFieldValue(
+                                                    "quantity",
+                                                    Math.max(1, Number(formik.values.quantity) - 1)
+                                                )
+                                            }
                                         >
                                             –
                                         </button>
                                         <Form.Group>
                                             <Form.Control
                                                 type="text"
-                                                className="quantity"
-                                                value={1}
-                                                name="demo_vertical"
-                                                readOnly
+                                                className="text-center"
+                                                name="quantity"
+                                                value={formik.values.quantity}
+                                                onChange={formik.handleChange}
+                                                disabled={!formik.values.subProduct}
+                                                min={1}
                                             />
                                             <Form.Control.Feedback type="invalid">
                                                 {formik.errors.quantity || errors?.quantity}
@@ -172,22 +174,26 @@ const ModalBuy: React.FC<ProductModalProps> = ({
                                         </Form.Group>
                                         <button
                                             type="button"
+                                            disabled={!formik.values.subProduct}
                                             className="plus material-shadow"
-                                        // onClick={() => {
-                                        //     countUP(cartItem.id, cartItem.data_attr, cartItem.price);
-                                        // }}
+                                            onClick={() =>
+                                                formik.setFieldValue(
+                                                    "quantity",
+                                                    Number(formik.values.quantity) + 1
+                                                )
+                                            }
                                         >
                                             +
                                         </button>
                                     </div>
-                                    <div className="text">
-                                        <p className="text-muted mb-1">Item Price:</p>
-                                        <h5 className="fs-14">
+                                    <div className="d-flex align-items-center">
+                                        <p className="text-muted mb-0 me-2">Price:</p>
+                                        <span className="fs-18 text-danger">
                                             $
                                             <span id="ticket_price" className="product-price">
-                                                12
+                                                {formik.values.price * formik.values.quantity}
                                             </span>
-                                        </h5>
+                                        </span>
                                     </div>
                                     <div className="col-sm-auto">
                                     </div>
@@ -201,15 +207,14 @@ const ModalBuy: React.FC<ProductModalProps> = ({
                         <Button
                             variant="light"
                             type="button"
-                            // size=""
                             style={{ fontWeight: "bold" }}
+                            onClick={handleClose}
                         >
                             Close
                         </Button>
                         <Button
                             variant="success"
                             type="submit"
-                            // size=""
                             style={{ fontWeight: "bold" }}
                         >
                             Buy

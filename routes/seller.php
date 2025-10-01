@@ -63,6 +63,7 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
 
                 Route::group(['prefix' => 'payment-history'], function () {
                     Route::get('/', [PaymentHistoryController::class, 'index'])->name('seller.payment-history');
+                    Route::get('/edit', [PaymentHistoryController::class, 'edit'])->name('seller.payment-history.edit');
                     Route::post('/create', [PaymentHistoryController::class, 'store'])->name('seller.payment-history.store');
                     Route::post('/verify-payment', [PaymentHistoryController::class, 'verifyPayment'])->name('seller.payment-history.verify-payment');
                 });

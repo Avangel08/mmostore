@@ -23,6 +23,11 @@ class PaymentMethods extends Model
         'CRYPTO' => 1,
     ];
 
+    const LIST_BANK = [
+        'VCB' => 'Vietcombank',
+        // 'MB' => 'MB Bank',
+    ];
+
     const STATUS = [
         'ACTIVE' => 1,
         'INACTIVE' => 0,

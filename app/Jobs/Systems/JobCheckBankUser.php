@@ -42,11 +42,11 @@ class JobCheckBankUser implements ShouldQueue
             return;
         }
         $infoBank = $bank->details;
-        $accountName = $infoBank['account_name'];
+        $userName = $infoBank['user_name'];
         $password = $infoBank['password'];
         $accountNumber = $infoBank['account_number'];
         $bankCode = $bank->key;
-        if (empty($accountName) || empty($password) || empty($accountNumber) || empty($bankCode)) {
+        if (empty($userName) || empty($password) || empty($accountNumber) || empty($bankCode)) {
             echo "Thông tin ngân hàng không hợp lệ";
             return;
         }
