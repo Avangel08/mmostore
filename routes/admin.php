@@ -33,5 +33,6 @@ Route::middleware(['checkauth:admin', 'admin.user.type'])->group(function () {
         Route::post('/add', [UserController::class, 'add'])->name('admin.user.add');
         Route::put('/update/{id}', [UserController::class, 'update'])->name('admin.user.update');
         Route::delete('/delete', [UserController::class, 'delete'])->name('admin.user.delete');
+        Route::get('/{id}/login-as', [UserController::class, 'loginAs'])->name('admin.user.login-as');
     });
 });

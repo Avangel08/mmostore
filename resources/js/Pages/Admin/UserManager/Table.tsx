@@ -6,6 +6,7 @@ import { Button, OverlayTrigger, Tooltip, Form } from "react-bootstrap";
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import moment from "moment";
 import { useQueryParams } from "../../../hooks/useQueryParam";
+// Using global route() helper injected by Ziggy/Inertia
 
 const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
     data: any;
@@ -124,6 +125,24 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                 cell: (cell: any) => {
                     return (
                         <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
+                    );
+                },
+            },
+            {
+                header: t("Action"),
+                enableColumnFilter: false,
+                cell: (cell: any) => {
+                    const row = cell.row.original;
+                    return (
+                        <Button
+                            variant="link"
+                            onClick={() => {
+                                const url = route("admin.user.login-as", { id: row.id });
+                                window.open(url, "_blank");
+                            }}
+                        >
+                            {t("Login as")} <i className="ri-login-box-line"></i>
+                        </Button>
                     );
                 },
             },
