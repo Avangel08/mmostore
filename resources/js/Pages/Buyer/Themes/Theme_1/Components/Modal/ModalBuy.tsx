@@ -1,5 +1,5 @@
-import { Link, router, usePage } from "@inertiajs/react";
-import { Field, useFormik } from "formik";
+import { usePage } from "@inertiajs/react";
+import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Modal, Form, Button, Card, Row } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
@@ -22,7 +22,7 @@ interface ProductModalProps {
 
 // ⚡ fetch products detail (TanStack Query)
 const fetchProduct = async (id: number): Promise<Product> => {
-    const res = await fetch(`https://coco.mmostore.local/products/detail/${id}`);
+    const res = await fetch(`https://owner2.mmostores.shop/products/detail/${id}`);
     if (!res.ok) throw new Error("Failed to fetch products");
     return res.json();
 };
