@@ -37,7 +37,7 @@ class AccountRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'file.max' => 'The file field must not be greater than 50MB',
+            'file.max' => 'The file must not be greater than 50MB',
         ];
     }
 }

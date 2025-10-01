@@ -29,7 +29,16 @@ const SellerAccount = () => {
       file: null as File | null,
     },
     validationSchema: Yup.object({
-      file: Yup.mixed().required(t("Please select a file to upload")),
+      file: Yup.mixed()
+        .required(t("Please select a file to upload"))
+        .test('fileType', t('Only .txt files are allowed'), (value: any) => {
+          if (!value) return true;
+          return value.name.toLowerCase().endsWith('.txt');
+        })
+        .test('fileSize', t('The file must not be greater than 50MB'), (value: any) => {
+          if (!value) return true;
+          return value.size <= 50 * 1024 * 1024; // 50MB
+        }),
     }),
     onSubmit: (values) => {
       setLoading(true);
@@ -137,25 +146,31 @@ const SellerAccount = () => {
                       <Card bg="light" className="mb-3">
                         <Card.Body>
                           <h5>
-                            {t(
-                              "Note: Each line in the uploaded file will be 1 product"
-                            )}
+                            {t("Note: Each line in the uploaded file will be 1 product")}
                           </h5>
-                          <div className="mb-2">
-                            <strong>{t("Format")}:</strong> key|data1|data2| {t('or')} status:ANYTHING|key|data1|data2
+                          <div className="mb-3">
+                            <strong>{t("Format")}:</strong> 
+                            <div className="ms-2">
+                              • <code>key|data1|data2|...</code><br/>
+                              • <code>status:STATUS|key|data1|data2|...</code>
+                            </div>
                           </div>
-                          <div className="mb-2 text-muted">
+                          <div className="mb-3">
                             <small>
-                              {t("Note")}: {t("Define the state after the 'status:' keyword")}. {t("status is optional")}. {t("If not provided, LIVE will be used as default")}. {t("LIVE means the product is ready for sale")}.
+                              {t("Define status after 'status:' keyword")}. {t("If no status specified, default status is LIVE")}.
+                              <br />
+                              <strong>{t("LIVE means the product is ready for sale")}</strong>.
                             </small>
                           </div>
-                          <div className="mb-2">
-                            <strong>{t("Example")}:</strong>
+                          <div className="mb-1">
+                            <strong>{t("Examples")}:</strong>
                           </div>
                           <div className="font-monospace small bg-white p-2 rounded">
-                            status:LIVE|email|example@gmail.com|password123|2fa
+                            status:LIVE|gameacc01|username123|password456|2fa_code
                             <br />
-                            another_key|some_data|more_info ({t("status will be LIVE by default")})
+                            email001|john@example.com|mypass123|2fa_code ({t("default status is LIVE")})
+                            <br />
+                            status:Ban|social01|@username|pass789|verified ({t("status is BAN")})
                           </div>
                         </Card.Body>
                       </Card>

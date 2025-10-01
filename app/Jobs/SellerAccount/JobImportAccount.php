@@ -132,8 +132,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 $explodedFirstPart = explode(':', trim($parts[0] ?? ''));
                 $isStatusSection = $this->checkFirstPartIsStatus($explodedFirstPart);
                 if ($isStatusSection && empty(trim($explodedFirstPart[1] ?? ''))) {
-                    $errorCount++;
-                    return null;
+                    $explodedFirstPart[1] = Accounts::STATUS['LIVE'];
                 }
 
                 $status = strtoupper($isStatusSection ? trim($explodedFirstPart[1] ?? '') : Accounts::STATUS['LIVE']);
@@ -156,17 +155,17 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 unset($line);
 
                 return [
-                    'key' => $key,
-                    'data' => implode('|', array_map('trim', $dataParts)),
-                    'status' => $status,
-                    'product_id' => $this->productId,
-                    'sub_product_id' => $this->subProductId,
+                    'key' => (string) $key,
+                    'data' => (string) implode('|', array_map('trim', $dataParts)),
+                    'status' => (string) $status,
+                    'product_id' => (string) $this->productId,
+                    'sub_product_id' => (string) $this->subProductId,
                     'note' => null,
                     'customer_id' => null,
                     'order_id' => null,
                     'created_at' => $timeStart,
                     'updated_at' => $timeStart,
-                    'import_account_history_id' => $this->importHistoryId,
+                    'import_account_history_id' => (string) $this->importHistoryId,
                 ];
             })
             ->filter()

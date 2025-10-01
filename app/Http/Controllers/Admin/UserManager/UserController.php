@@ -9,6 +9,8 @@ use App\Models\MySQL\User;
 use App\Services\Home\StoreService;
 use App\Services\Home\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
@@ -88,5 +90,44 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * Generate a signed login-as URL and redirect to the seller domain.
+     */
+    public function loginAs($id)
+    {
+        $user = $this->userService->findById($id);
+        if (!$user) {
+            return back()->with('error', 'User not found');
+        }
+
+        $store = $this->storeService->findByUserId($user->id);
+        if (!$store || empty($store->domain) || !is_array($store->domain)) {
+            return back()->with('error', 'Store domain not found for this user');
+        }
+
+        $domains = is_array($store->domain) ? $store->domain : [(string)$store->domain];
+        $mainDomain = (string) config('app.main_domain');
+        $host = collect($domains)->first(function ($d) use ($mainDomain) {
+            return is_string($d) && $mainDomain !== '' && str_ends_with($d, '.' . $mainDomain);
+        }) ?? $domains[0];
+
+        $hostParts = explode('.', (string) $host);
+        $sub = $hostParts[0] ?? null;
+        if (!$sub) {
+            return back()->with('error', 'Invalid store domain');
+        }
+
+        $signedUrl = URL::temporarySignedRoute(
+            'seller.magic-login',
+            now()->addMinutes(2),
+            [
+                'sub' => $sub,
+                'user_id' => $user->id,
+            ]
+        );
+
+        return Redirect::away($signedUrl);
     }
 }

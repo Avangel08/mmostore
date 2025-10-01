@@ -17,6 +17,7 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
             Route::group(['prefix' => 'login'], function () {
                 Route::get('/', [LoginController::class, 'login'])->name('seller.login');
                 Route::post('/', [LoginController::class, 'authenticate'])->name('seller.login.post');
+                Route::get('/magic', [LoginController::class, 'magicLogin'])->name('seller.magic-login')->middleware('signed');
             });
 
             // Protected routes (need auth middleware)
