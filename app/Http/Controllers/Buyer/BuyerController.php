@@ -17,7 +17,10 @@ class BuyerController extends Controller
             'subdomain' => $sub,
             'user' => $user,
             'isAuthenticated' => $user !== null,
-            'theme' => $theme
+            'configTheme' => [
+                'nameTheme' => $theme,
+                'titleHeader' => "Hello"
+            ]
         ]);
     }
 

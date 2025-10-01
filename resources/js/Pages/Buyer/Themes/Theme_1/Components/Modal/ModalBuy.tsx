@@ -22,7 +22,7 @@ interface ProductModalProps {
 
 // ⚡ fetch products detail (TanStack Query)
 const fetchProduct = async (id: number): Promise<Product> => {
-    const res = await fetch(`https://owner2.mmostores.shop/products/detail/${id}`);
+    const res = await fetch(`/products/detail/${id}`);
     if (!res.ok) throw new Error("Failed to fetch products");
     return res.json();
 };

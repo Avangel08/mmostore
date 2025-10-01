@@ -38,12 +38,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         }
     }, [layoutModeType, dispatch]);
 
-    useEffect(() => {
-        if (theme) {
-            dispatch(changeLayoutTheme(theme));
-        }
-    }, [theme, dispatch])
-
     /*
     call dark/light mode
     */

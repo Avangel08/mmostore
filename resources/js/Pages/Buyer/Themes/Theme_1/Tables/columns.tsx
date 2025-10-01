@@ -42,7 +42,7 @@ export function columnsApi(columns: columns[], actions: { onBuy: (row: any) => v
                     <h5 className="fs-14 mb-1">
                       <Link
                         target="_blank"
-                        href={`https://owner2.mmostores.shop/products/detail/${cell.row.original.slug ?? ''}`}
+                        href={`/products/detail/${cell.row.original.slug ?? ''}`}
                         className="text-body"
                       >
                         {" "}

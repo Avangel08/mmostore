@@ -21,7 +21,7 @@ type product = {
 
 // ⚡ fetch products (TanStack Query)
 const fetchCategories = async () => {
-    const res = await fetch("https://owner2.mmostores.shop/products");
+    const res = await fetch("/products");
     if (!res.ok) throw new Error("Failed to fetch products");
     return res.json();
 };
