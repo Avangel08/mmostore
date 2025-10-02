@@ -8,7 +8,7 @@ use App\Models\Mongo\Deposits;
 use App\Services\Deposits\DepositService;
 use App\Services\CurrencyRate\CurrencyRateService;
 use App\Services\PaymentMethod\PaymentMethodService;
-use App\Services\UserService;
+use App\Services\Customer\CustomerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -18,14 +18,17 @@ class DepositController extends Controller
     protected $depositService;
     protected $paymentMethodService;
     protected $currencyRateService;
+    protected $customerService;
     public function __construct(
         DepositService $depositService,
         PaymentMethodService $paymentMethodService,
-        CurrencyRateService $currencyRateService
+        CurrencyRateService $currencyRateService,
+        CustomerService $customerService
     ) {
         $this->depositService = $depositService;
         $this->paymentMethodService = $paymentMethodService;
         $this->currencyRateService = $currencyRateService;
+        $this->customerService = $customerService;
     }
     /**
      * Display a listing of the resource.
@@ -105,6 +108,7 @@ class DepositController extends Controller
     {
         $customer = Auth::guard(config('guard.buyer'))->user();
         if (isset($customer) && isset($customer->deposit_amount) && $customer->deposit_amount > 0) {
+            $this->customerService->update($customer, ['deposit_amount' => 0]);
             return response()->json([
                 "status" => "success",
                 "message" => "Ping deposit",
