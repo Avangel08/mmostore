@@ -3,6 +3,7 @@
 namespace App\Services\Plan;
 
 use App\Models\MySQL\Plans;
+use Carbon\Carbon;
 
 /**
  * Class PlanService
@@ -102,7 +103,7 @@ class PlanService
     public function duplicatePlan(Plans $plan)
     {
         $newPlan = $plan->replicate();
-        $newPlan->name = $plan->name . ' (Copy)';
+        $newPlan->name = $plan->name . ' (Copy_' . Carbon::now()->getTimestamp(). ')';
         $newPlan->status = Plans::STATUS['INACTIVE'];
         $newPlan->type = $newPlan?->type == Plans::TYPE['DEFAULT'] ? Plans::TYPE['NORMAL'] : $newPlan->type;
         $newPlan->creator_id = auth(config('guard.admin'))->id();
