@@ -61,9 +61,7 @@ class PlanController extends Controller
         try {
             $data = $request->validated();
             $type = $data['type'];
-            if ($type != Plans::TYPE['DEFAULT']) {
-                $this->planService->createPlan($data);
-            } else {
+            if ($type == Plans::TYPE['DEFAULT']) {
                 $plansDefaultType = $this->planService->getDefaultPlans();
                 if ($plansDefaultType->isNotEmpty()) {
                     throw ValidationException::withMessages([
@@ -71,7 +69,7 @@ class PlanController extends Controller
                     ]);
                 }
             }
-
+            $this->planService->createPlan($data);
             return back()->with('success', 'Plan added successfully');
         } catch (ValidationException $ve) {
             throw $ve;
@@ -118,17 +116,15 @@ class PlanController extends Controller
             }
 
             $type = $data['type'];
-            if ($type != Plans::TYPE['DEFAULT']) {
-                $this->planService->updatePlan($plan, $data);
-            } else {
+            if ($type == Plans::TYPE['DEFAULT']) {
                 $plansDefaultType = $this->planService->getDefaultPlans();
-                if ($plansDefaultType->count() > 1) {
+                if ($plansDefaultType->isNotEmpty()) {
                     throw ValidationException::withMessages([
-                        'type' => ['Only one Default type plan is allowed']
+                        'type' => ['Default plan already exists. Only one Default type plan is allowed']
                     ]);
                 }
             }
-
+            $this->planService->updatePlan($plan, $data);
             return back()->with('success', 'Plan updated successfully');
         } catch (\Exception $e) {
             \Log::error($e, [
