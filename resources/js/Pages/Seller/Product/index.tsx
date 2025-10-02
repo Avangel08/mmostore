@@ -59,9 +59,9 @@ const Product = () => {
     setShowStockModal(true);
   };
 
-  const onDelete = async (id: number | string) => {
+  const onDelete = async (id: number | string, name: string) => {
     const confirmed = await confirmDelete({
-      title: t("Delete this item?"),
+      title: t("Delete product {{name}}?", { name }),
       text: t("Once deleted, you will not be able to recover it."),
       confirmButtonText: t("Delete now"),
       cancelButtonText: t("Cancel"),

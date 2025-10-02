@@ -292,5 +292,7 @@
     "The new plan will be a Normal plan": "Gói mới sẽ là gói Normal",
     "Price range": "Khoảng giá",
     "From": "Từ",
-    "To": "Đến"
+    "To": "Đến",
+    "Delete product {{name}}?": "Xoá sản phẩm {{name}}?",
+    "Product deleted successfully": "Xoá sản phẩm thành công"
 }
