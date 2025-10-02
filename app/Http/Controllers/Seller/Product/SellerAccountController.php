@@ -79,14 +79,14 @@ class SellerAccountController extends Controller
         //     return abort(403);
         // }
         $subProduct = $this->subProductService->getById($subProductId);
-        if (! $subProduct) {
+        if (!$subProduct) {
             abort(404);
         }
 
         return Inertia::render('Product/Account/index', [
-            'subProduct' => fn () => $this->subProductService->getById($subProductId),
-            'importHistory' => fn () => $this->importAccountHistoryService->getForTable($subProductId, $request),
-            'accounts' => fn () => $this->sellerAccountService->getForTable($subProductId, $request),
+            'subProduct' => fn() => $this->subProductService->getById($subProductId),
+            'importHistory' => fn() => $this->importAccountHistoryService->getForTable($subProductId, $request),
+            'accounts' => Inertia::optional(fn() => $this->sellerAccountService->getForTable($subProductId, $request)),
         ]);
     }
 
@@ -105,7 +105,7 @@ class SellerAccountController extends Controller
     {
         try {
             $subProduct = $this->subProductService->getById($subProductId);
-            if (! $subProduct) {
+            if (!$subProduct) {
                 throw new \Exception('Sub product not found');
             }
             $this->sellerAccountService->startDeleteUnsoldAccount($subProductId);

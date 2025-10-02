@@ -27,6 +27,12 @@ const SellingProduct = () => {
     []
   );
 
+  useEffect(() => {
+    setTimeout(() => {
+      fetchData(1, 100);
+    }, 100);
+  }, []);
+
   const handleFilter = (accountPage: number, accountPerPage: number, filters: any) => {
     fetchData(accountPage, accountPerPage, filters);
   };
@@ -69,9 +75,8 @@ const SellingProduct = () => {
 
           return (
             <span
-              className={`badge ${
-                className?.[statusLabel] || "bg-dark"
-              } fs-6 fw-medium`}
+              className={`badge ${className?.[statusLabel] || "bg-dark"
+                } fs-6 fw-medium`}
             >
               {t(statusLabel)}
             </span>
