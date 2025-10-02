@@ -31,5 +31,16 @@ class AppServiceProvider extends ServiceProvider
             }
             return [];
         });
+
+        $theme = session('theme') ?? 'Theme_1';
+        $subdomain = session('subdomain') ?? request()->getHost();
+        $isAuthenticated = session('isAuthenticated') ?? auth()->user() !== null;
+        $ownerStoreId = session('ownerStoreId') ?? null;
+
+        Inertia::share([
+            'theme' => $theme,
+            'subdomain' => $subdomain,
+            'isAuthenticated' => $isAuthenticated,
+        ]);
     }
 }
