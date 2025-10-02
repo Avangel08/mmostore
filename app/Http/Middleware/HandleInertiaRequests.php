@@ -76,7 +76,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => AuthHelper::getCurrentUser(),
             ],
             'subdomain' => $subdomain,
-            'domainSuffix' => env('DOMAIN_STORE', '.mmostore.local'),
+            'domainSuffix' => env('APP_MAIN_DOMAIN', 'mmostore.local'),
             'message' => [
                 'success' => fn() => $request->session()->get('success'),
                 'error' => fn() => $request->session()->get('error'),
