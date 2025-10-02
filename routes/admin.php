@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Dashboard\DashboardController;
 use App\Http\Controllers\Admin\PermissionManagement\PermissionManagementController;
+use App\Http\Controllers\Admin\Plan\PlanController;
 use App\Http\Controllers\Admin\RoleManagement\RoleManagementController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\UserManager\UserController;
@@ -35,4 +36,9 @@ Route::middleware(['checkauth:admin', 'admin.user.type'])->group(function () {
         Route::delete('/delete', [UserController::class, 'delete'])->name('admin.user.delete');
         Route::get('/{id}/login-as', [UserController::class, 'loginAs'])->name('admin.user.login-as');
     });
+
+    Route::group(['prefix' => 'plans'], function () {
+        Route::post('/duplicate-plan/{id}', [PlanController::class, 'duplicatePlan'])->name('admin.plans.duplicate-plan');
+    });
+    Route::resource('plans', PlanController::class, ['as' => 'admin']);
 });
