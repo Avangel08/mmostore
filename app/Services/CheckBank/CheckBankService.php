@@ -169,7 +169,7 @@ class CheckBankService
                 $result = [
                     'bank' => $bankCode,
                     'user_id' => $parseDescription['user_id'],
-                    'customer_identifier' => $parseDescription['customer_identifier'],
+                    'content_bank' => $parseDescription['content_bank'],
                     'amount' => $amountVND,
                     'date' => $activeDateTime->format($format),
                     'description' => $description,
@@ -237,23 +237,21 @@ class CheckBankService
     }
 
     public static function parseDescription(string $description)
-    {
-        $userId = $customerIdentifier = null;
-        // Lấy user = 2 chữ số ngay sau 'U' và trước 'C'
-        preg_match('/U(\d+)C/', $description, $output_array);
-        if (isset($output_array[1])) {
+    {   
+        // $description =  "MBVCB.11080700971.5270BFTVG21KSY14.PHAM THI NHAN chuyen tien QR2SMTISH.CT tu 1042333709 PHAM THI NHAN toi 3310088686 NGUYEN THI MAU tai TECHCOMBANK";
+        $userId = $contentBank = null;
+        // Lấy contentBank theo mẫu bắt đầu bằng 'QR' + chuỗi chữ/số liền kề, ví dụ: 'QR2SMTISH'
+        if (preg_match('/\b(QR[0-9A-Z]+)\b/i', $description, $output_array)) {
+            $contentBank = $output_array[1];
+        }
+
+        if (preg_match('/\bQR(\d+)/i', $description, $output_array)) {
             $userId = $output_array[1];
         }
 
-        preg_match('/U\d+C(\d+)/', $description, $output_array);
-        if (isset($output_array[1])) {
-            $customerIdentifier = $output_array[1];
-        }
-        // Lấy customer = 5 chữ số ngay sau 'C'
-
         return [
             'user_id' => $userId,
-            'customer_identifier' => $customerIdentifier,
+            'content_bank' => $contentBank,
         ];
     }
 }

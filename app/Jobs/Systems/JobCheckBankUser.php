@@ -31,7 +31,6 @@ class JobCheckBankUser implements ShouldQueue
     public function handle(PaymentMethodService $paymentMethodService, CheckBankService $checkBankService): void
     {
         echo "Start checking bank user" . PHP_EOL;
-
         $bank = $paymentMethodService->findById($this->bankId);
         if (empty($bank)) {
             echo "Ngân hàng không hợp lệ";
@@ -80,10 +79,10 @@ class JobCheckBankUser implements ShouldQueue
 
                     $amount = $dataLog['amount'];
                     $userId = $dataLog['user_id'];
-                    $customerIdentifier = $dataLog['customer_identifier'];
+                    $contentBank = $dataLog['content_bank'];
                     $transactionId = $dataLog['key_unique'];
 
-                    JobDepositCustomer::dispatch($userId, $customerIdentifier, $amount, $transactionId, $bank->id);
+                    JobDepositCustomer::dispatch($userId, $contentBank, $amount, $transactionId, $bank->id);
                 }
             }
         }

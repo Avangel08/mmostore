@@ -32,15 +32,8 @@ class DepositService
         ->first();
     }
 
-    public function updateOrCreate($data)
+    public function findByContentBank($contentBank)
     {
-        return Deposits::updateOrCreate([
-            'customer_id' => $data['customer_id'],
-            'email' => $data['email'],
-            'payment_method_id' => $data['payment_method_id'],
-            'amount' => $data['amount'],
-            'amount_vnd' => $data['amount_vnd'],
-            'status' => $data['status'],
-        ], $data);
+        return Deposits::where('content_bank', $contentBank)->where('status', Deposits::STATUS['PENDING'])->first();
     }
 }

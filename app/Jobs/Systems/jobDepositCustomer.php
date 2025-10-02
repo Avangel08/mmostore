@@ -3,9 +3,11 @@
 namespace App\Jobs\Systems;
 
 use App\Models\Mongo\BalanceHistories;
+use App\Models\Mongo\Deposits;
 use App\Services\BalanceHistory\BalanceHistoryService;
 use App\Services\Customer\CustomerService;
 use App\Services\CurrencyRate\CurrencyRateService;
+use App\Services\Deposits\DepositService;
 use App\Services\Home\StoreService;
 use App\Services\Home\UserService;
 use App\Services\Tenancy\TenancyService;
@@ -20,17 +22,17 @@ class JobDepositCustomer implements ShouldQueue
     use Queueable;
 
     protected $userId;
-    protected $customerIdentifier;
+    protected $contentBank;
     protected $amount;
     protected $transactionId;
     protected $paymentMethodId;
     /**
      * Create a new job instance.
      */
-    public function __construct($userId, $customerIdentifier, $amount, $transactionId, $paymentMethodId)
+    public function __construct($userId, $contentBank, $amount, $transactionId, $paymentMethodId)
     {
         $this->userId = $userId;
-        $this->customerIdentifier = $customerIdentifier;
+        $this->contentBank = $contentBank;
         $this->amount = $amount;
         $this->transactionId = $transactionId;
         $this->paymentMethodId = $paymentMethodId;
@@ -46,7 +48,8 @@ class JobDepositCustomer implements ShouldQueue
         StoreService $storeService,
         BalanceHistoryService $balanceHistoryService,
         CurrencyRateService $currencyRateService,
-        TenancyService $tenancyService
+        TenancyService $tenancyService,
+        DepositService $depositService,
     ): void {
         echo "==========================================Start jobDepositCustomer==========================================".PHP_EOL;
         $store = $storeService->findByUserId($this->userId);
@@ -64,17 +67,30 @@ class JobDepositCustomer implements ShouldQueue
         }
 
         try {
-            $customer = $customerService->findByIdentifier($this->customerIdentifier);
+
+            $deposit = $depositService->findByContentBank($this->contentBank);
+            if (empty($deposit)) {
+                echo "Deposit not found".PHP_EOL;
+                echo "content_bank: " . $this->contentBank.PHP_EOL;
+                return;
+            }
+
+            $customerId = $deposit->customer_id;
+            $customer = $customerService->findById($customerId);
             if (empty($customer)) {
                 echo "Customer not found".PHP_EOL;
-                echo "customer_identifier: " . $this->customerIdentifier.PHP_EOL;
+                echo "customer_id: " . $customerId.PHP_EOL;
                 return;
             }
             $before = $customer->balance;
             $after = $customer->balance + $this->amount;
-            $customerUpdated = $customerService->update($customer, ['balance' => $customer->balance + $this->amount]);
+            $customerUpdated = $customerService->update($customer, [
+                'balance' => $customer->balance + $this->amount,
+                'deposit_amount' => $this->amount,
+            ]);
 
             if ($customerUpdated) {
+                //save history balance
                 $balanceHistoryService->create([
                     'customer_id' => $customer->_id,
                     'payment_method_id' => $this->paymentMethodId,
@@ -87,7 +103,11 @@ class JobDepositCustomer implements ShouldQueue
                     'description' => 'Nạp tiền từ bank',
                     'date_at' => Carbon::now()->toDateTimeString(),
                 ]);
+                
+                //update deposit status
+                $depositService->update($deposit, ['status' => Deposits::STATUS['COMPLETE']]);
             }
+
         } catch (\Throwable $th) {
             echo 'Lỗi jobDepositCustomer update customer: ' . $th->getMessage().PHP_EOL;
             throw $th;
