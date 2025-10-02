@@ -276,7 +276,7 @@ const ProductFilter = ({ onFilter }: ProductFilterProps) => {
               />
             </Col>
 
-            <Col md={12} className="d-flex justify-content-end">
+            <Col md={12}>
               <Button variant="primary" onClick={handleFilter}>
                 <i className="ri-search-line align-bottom me-1"></i>
                 {t("Filter")}

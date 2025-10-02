@@ -3,6 +3,7 @@
 use App\Http\Controllers\Buyer\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Buyer\Auth\RegisteredUserController;
 use App\Http\Controllers\Buyer\BuyerController;
+use App\Http\Controllers\Buyer\Deposit\DepositController;
 use App\Http\Controllers\Buyer\Product\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,13 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
             // Route::get('/cart', [BuyerCartController::class, 'index'])->name('buyer.cart');
             // Route::get('/checkout', [BuyerCheckoutController::class, 'index'])->name('buyer.checkout');
         });
+
+        Route::group(['prefix' => 'deposits'], function () {
+            Route::get('/', [DepositController::class, 'index'])->name('buyer.deposits');
+            Route::post('/checkout', [DepositController::class, 'checkout'])->name('buyer.deposit.checkout');
+            Route::get('/ping', [DepositController::class, 'pingDeposit'])->name('buyer.deposit.ping');
+        });
+
     });
 
 

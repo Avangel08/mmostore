@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from 'reselect';
 import Navbar from "./Navbar";
 import { usePage } from "@inertiajs/react";
+import { LayoutProvider } from "./LayoutContext";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     const dispatch: any = useDispatch();
@@ -49,14 +50,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <React.Fragment>
-            <div id="layout-wrapper">
-                <Navbar
-                    layoutModeType={layoutModeType}
-                    onChangeLayoutMode={onChangeLayoutMode} />
-                <div className="main-page">
-                    {children}
+            <LayoutProvider>
+                <div id="layout-wrapper">
+                    <Navbar
+                        layoutModeType={layoutModeType}
+                        onChangeLayoutMode={onChangeLayoutMode} />
+                    <div className="main-page">
+                        {children}
+                    </div>
                 </div>
-            </div>
+            </LayoutProvider>
         </React.Fragment>
     )
 }

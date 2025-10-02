@@ -36,5 +36,16 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         $this->app->useLangPath(resource_path('locales'));
+
+        $theme = session('theme') ?? 'Theme_1';
+        $subdomain = session('subdomain') ?? request()->getHost();
+        $isAuthenticated = session('isAuthenticated') ?? auth()->user() !== null;
+        $ownerStoreId = session('ownerStoreId') ?? null;
+
+        Inertia::share([
+            'theme' => $theme,
+            'subdomain' => $subdomain,
+            'isAuthenticated' => $isAuthenticated,
+        ]);
     }
 }

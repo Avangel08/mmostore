@@ -32,6 +32,7 @@ class Customers extends Authenticatable
         'phone_number',
         'balance',
         'identifier',
+        'deposit_amount', 
     ];
 
     protected $hidden = [
