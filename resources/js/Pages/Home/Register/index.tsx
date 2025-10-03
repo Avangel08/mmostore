@@ -13,6 +13,7 @@ export default function Register() {
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
     const [confirmPasswordShow, setConfirmPasswordShow] = useState<boolean>(false);
     const [serverError, setServerError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const validation = useFormik({
         enableReinitialize: true,
@@ -33,9 +34,14 @@ export default function Register() {
                 .max(20, t("Store name must be at most 20 characters"))
                 .required(t("Store name is required")),
             domain_store: Yup.string()
-                .transform((value) => (value ? value.replace(new RegExp(`\\${DOMAIN_SUFFIX}$`, 'i'), '') : value))
+                .transform((value) => {
+                    if (!value) return value;
+                    let cleaned = value.replace(new RegExp(`\\.?${DOMAIN_SUFFIX.replace(/\./g, '\\.')}$`, 'i'), '');
+                    cleaned = cleaned.replace(/^\.+/, '');
+                    return cleaned;
+                })
                 .min(3, t("Domain store must be at least 3 characters"))
-                .max(10, t("Domain store must be at most 10 characters"))
+                .max(15, t("Domain store must be at most 15 characters"))
                 .required(t("Domain store is required")),
             password: Yup.string()
                 .min(8, t("Password must be at least 8 characters"))
@@ -47,19 +53,22 @@ export default function Register() {
         onSubmit: (values) => {
             const payload = {
                 ...values,
-                domain_store: values.domain_store.replace(new RegExp(`\\${DOMAIN_SUFFIX}$`, 'i'), ''),
+                domain_store: values.domain_store
+                    .replace(new RegExp(`\\.?${DOMAIN_SUFFIX.replace(/\./g, '\\.')}$`, 'i'), '')
+                    .replace(/^\.+/, ''),
             };
+            setIsSubmitting(true);
             router.post(route('home.register.post'), payload, {
                 preserveScroll: true,
                 onSuccess: () => {
                     setServerError(null);
+                    setIsSubmitting(false);
                 },
                 onError: (errors: any) => {
-                    // Map field errors to formik
                     validation.setErrors(errors);
-                    // Show a top-level message if provided by backend
                     const topMessage = Array.isArray(errors?.register) ? errors.register[0] : errors?.register;
                     setServerError(topMessage || t('Something went wrong. Please try again.'));
+                    setIsSubmitting(false);
                 }
             });
         },
@@ -157,19 +166,22 @@ export default function Register() {
                                                             name="domain_store"
                                                             value={validation.values.domain_store}
                                                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                                const rawValue = e.target.value.replace(new RegExp(`\\${DOMAIN_SUFFIX}$`, 'i'), '');
+                                                                let rawValue = e.target.value.replace(new RegExp(`\\.?${DOMAIN_SUFFIX.replace(/\./g, '\\.')}$`, 'i'), '');
+                                                                rawValue = rawValue.replace(/^\.+/, '');
                                                                 validation.setFieldValue('domain_store', rawValue);
                                                             }}
                                                             onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
                                                                 validation.handleBlur(e);
-                                                                const rawValue = validation.values.domain_store.trim();
+                                                                let rawValue = validation.values.domain_store.trim();
+                                                                rawValue = rawValue.replace(/^\.+/, '');
                                                                 if (rawValue && !rawValue.toLowerCase().endsWith(DOMAIN_SUFFIX)) {
-                                                                    validation.setFieldValue('domain_store', `${rawValue}${DOMAIN_SUFFIX}`);
+                                                                    validation.setFieldValue('domain_store', `${rawValue}.${DOMAIN_SUFFIX}`);
                                                                 }
                                                             }}
                                                             onFocus={() => {
                                                                 const currentValue = validation.values.domain_store;
-                                                                const stripped = currentValue.replace(new RegExp(`\\${DOMAIN_SUFFIX}$`, 'i'), '');
+                                                                let stripped = currentValue.replace(new RegExp(`\\.?${DOMAIN_SUFFIX.replace(/\./g, '\\.')}$`, 'i'), '');
+                                                                stripped = stripped.replace(/^\.+/, '');
                                                                 if (stripped !== currentValue) {
                                                                     validation.setFieldValue('domain_store', stripped);
                                                                 }
@@ -244,7 +256,7 @@ export default function Register() {
                                                 </div>
 
                                                 <div className="mt-4">
-                                                    <button className="btn btn-success w-100" type="submit">{ t("Sign up store") }</button>
+                                                    <button className="btn btn-success w-100" type="submit" disabled={isSubmitting}>{ t("Sign up store") }</button>
                                                 </div>
 
                                                 {/*<div className="mt-4 text-center">*/}
@@ -268,6 +280,20 @@ export default function Register() {
                     </Container>
                 </div>
             </GuestLayout>
+
+            {isSubmitting && (
+                <div
+                    className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                    style={{ backgroundColor: 'rgba(0,0,0,0.45)', zIndex: 2000 }}
+                >
+                    <div className="text-center text-white">
+                        <div className="spinner-border text-light" role="status" style={{ width: 48, height: 48 }}>
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <div className="mt-3 fw-medium">{ t('Processing') }</div>
+                    </div>
+                </div>
+            )}
         </React.Fragment>
     );
 }

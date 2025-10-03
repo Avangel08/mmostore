@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
+use App\Mail\StoreRegistered;
 
 class RegisteredStoreController extends Controller
 {
@@ -59,7 +61,7 @@ class RegisteredStoreController extends Controller
                 'server_id' => $server['id'],
                 'status' => Stores::STATUS['ACTIVE'],
                 'domain' => [
-                    $data['domain_store'] . env('DOMAIN_STORE'),
+                    $data['domain_store'] . '.' .env('APP_MAIN_DOMAIN'),
                 ],
                 'database_config' => [
                     "host" => $server['host'],
@@ -83,7 +85,15 @@ class RegisteredStoreController extends Controller
             ]);
 
             $scheme = request()->isSecure() ? 'https://' : 'http://';
-            $redirectUrl = $scheme . $data['domain_store'] . env('DOMAIN_STORE') . '/admin';
+            $redirectUrl = $scheme . $data['domain_store'] . '.' .env('APP_MAIN_DOMAIN') . '/admin';
+
+			Mail::to($data['email'])->send(new StoreRegistered([
+				'email' => $data['email'],
+				'password' => $data['password'],
+				'store_name' => $data['store_name'],
+				'domain' => $data['domain_store'] . '.' . env('APP_MAIN_DOMAIN'),
+				'redirect_url' => $redirectUrl,
+			]));
 
             return Inertia::render('Register/Redirect', [
                 'redirectUrl' => $redirectUrl,
