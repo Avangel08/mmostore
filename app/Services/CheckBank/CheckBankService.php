@@ -231,14 +231,18 @@ class CheckBankService
         ];
     }
 
-    public function genTransferCode($userId, $identifierCustomer)
+    public static function genContentBank(int $userId, string $id, int $length = 6): string
     {
-        return 'U' . $userId . 'C' . $identifierCustomer;
+        $hash = hash('sha256', $id, true); // 32 bytes nhị phân, luôn ổn định theo $id
+        $code = '';
+        for ($i = 0; strlen($code) < $length && $i < strlen($hash); $i++) {
+            $code .= chr(ord('A') + (ord($hash[$i]) % 26));
+        }
+        return "QR{$userId}{$code}";
     }
 
     public static function parseDescription(string $description)
     {   
-        // $description =  "MBVCB.11080700971.5270BFTVG21KSY14.PHAM THI NHAN chuyen tien QR2SMTISH.CT tu 1042333709 PHAM THI NHAN toi 3310088686 NGUYEN THI MAU tai TECHCOMBANK";
         $userId = $contentBank = null;
         // Lấy contentBank theo mẫu bắt đầu bằng 'QR' + chuỗi chữ/số liền kề, ví dụ: 'QR2SMTISH'
         if (preg_match('/\b(QR[0-9A-Z]+)\b/i', $description, $output_array)) {
