@@ -52,6 +52,27 @@ class SellerAccountController extends Controller
 
         try {
             $data = $request->validated();
+            $subProduct = $this->subProductService->getById(
+                $data['sub_product_id'],
+                ['id', 'product_id'],
+                [
+                    'product:id,name,category_id,product_type_id',
+                    'product.productType:id,name',
+                    'product.category:id,name'
+                ]
+            );
+            if (!$subProduct) {
+                return back()->with('error', 'Sub product not exists');
+            }
+            if (!$subProduct->product) {
+                return back()->with('error', 'Product not exists');
+            }
+            if (!$subProduct?->product?->productType) {
+                return back()->with('error', 'Product type not configured for this product');
+            }
+            if (!$subProduct?->product?->category) {
+                return back()->with('error', 'Category not configured for this product');
+            }
             $this->sellerAccountService->processAccountFile($data);
 
             return back()->with('success', 'File uploaded successfully and is pending processing');
@@ -84,7 +105,15 @@ class SellerAccountController extends Controller
         }
 
         return Inertia::render('Product/Account/index', [
-            'subProduct' => fn() => $this->subProductService->getById($subProductId),
+            'subProduct' => fn() => $this->subProductService->getById(
+                $subProductId,
+                ['id', 'product_id'],
+                [
+                    'product:id,name,category_id,product_type_id',
+                    'product.productType:id,name',
+                    'product.category:id,name'
+                ]
+            ),
             'importHistory' => fn() => $this->importAccountHistoryService->getForTable($subProductId, $request),
             'accounts' => Inertia::optional(fn() => $this->sellerAccountService->getForTable($subProductId, $request)),
         ]);

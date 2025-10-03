@@ -93,7 +93,7 @@ const TableProduct = ({
       },
       {
         header: t("Category"),
-        accessorKey: "categories",
+        accessorKey: "category",
         enableColumnFilter: false,
         enableSorting: true,
         cell: (cell: any) => {

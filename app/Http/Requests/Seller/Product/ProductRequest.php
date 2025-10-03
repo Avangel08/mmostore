@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Seller\Product;
 
 use App\Models\Mongo\Products;
+use App\Models\MySQL\ProductType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,21 +26,15 @@ class ProductRequest extends FormRequest
     {
         $productRules = [
             'productName' => ['required', 'string', 'max:255'],
-            'categoryId' => ['required', 'exists:tenant_mongo.categories,_id'],
-            'status' => ['required', Rule::in(array_values(Products::STATUS))],
+            'categoryId' => ['required', 'string', 'exists:tenant_mongo.categories,_id'],
+            'status' => ['required', 'string', Rule::in(array_values(Products::STATUS))],
             'shortDescription' => ['required', 'string', 'max:150'],
             'detailDescription' => ['required', 'string'],
+            'productTypeId' => ['required', 'string', 'exists:mysql.product_types,id'],
         ];
         $action = $this->route()->getActionMethod();
 
         return match ($action) {
-            'index' => [
-                'productName' => ['nullable', 'string', 'max:255'],
-                'category' => ['nullable', 'exists:tenant_mongo.categories,_id'],
-                'createdDateStart' => ['nullable', 'string'],
-                'createdDateEnd' => ['nullable', 'string'],
-                'status' => ['nullable', Rule::in(array_values(Products::STATUS))],
-            ],
             'store' => [
                 ...$productRules,
                 'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max: 2048'],
