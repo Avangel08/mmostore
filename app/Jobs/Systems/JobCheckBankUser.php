@@ -8,14 +8,18 @@ use App\Services\CheckBank\CheckBankService;
 use App\Services\PaymentMethod\PaymentMethodService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\Repository;
 
-class JobCheckBankUser implements ShouldQueue
+class JobCheckBankUser implements ShouldQueue, ShouldBeUnique
 {
     use Queueable;
 
     protected $bankId;
     protected $formatTime = 'd/m/Y H:i:s'; // d/m/Y or d-m-Y
 
+    public $uniqueFor = 3600;
     /**
      * Create a new job instance.
      */
@@ -25,13 +29,23 @@ class JobCheckBankUser implements ShouldQueue
         $this->queue = 'check-bank-user';
     }
 
+    public function uniqueId(): string
+    {
+        return "check_bank_user_" . $this->bankId;
+    }
+    //noi luu key unique
+    public function uniqueVia(): Repository
+    {
+        return Cache::driver('redis');
+    }
+
+
     /**
      * Execute the job.
      */
     public function handle(PaymentMethodService $paymentMethodService, CheckBankService $checkBankService): void
     {
         echo "Start checking bank user" . PHP_EOL;
-
         $bank = $paymentMethodService->findById($this->bankId);
         if (empty($bank)) {
             echo "Ngân hàng không hợp lệ";
@@ -60,6 +74,7 @@ class JobCheckBankUser implements ShouldQueue
         if (count($history['data']) > 0) {
             foreach ($history['data'] as $transaction) {
                 $dataLog = $checkBankService->bankClassification($bankCode, (array) $transaction);
+  
                 if (empty($dataLog)) {
                     echo "Giao dịch không hợp lệ" . PHP_EOL;
                     continue;
@@ -80,10 +95,10 @@ class JobCheckBankUser implements ShouldQueue
 
                     $amount = $dataLog['amount'];
                     $userId = $dataLog['user_id'];
-                    $customerIdentifier = $dataLog['customer_identifier'];
+                    $contentBank = $dataLog['content_bank'];
                     $transactionId = $dataLog['key_unique'];
 
-                    JobDepositCustomer::dispatch($userId, $customerIdentifier, $amount, $transactionId, $bank->id);
+                    JobDepositCustomer::dispatch($userId, $contentBank, $amount, $transactionId, $bank->id);
                 }
             }
         }

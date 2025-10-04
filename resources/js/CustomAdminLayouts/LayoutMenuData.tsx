@@ -6,6 +6,7 @@ const Navdata = () => {
     //state data
     const [isRoleManagement, setIsRoleManagement] = useState<boolean>(false);
     const [isPermissionManagement, setIsPermissionManagement] = useState<boolean>(false);
+    const [isPlanManagement, setIsPlanManagement] = useState<boolean>(false);
     const [iscurrentState, setIscurrentState] = useState('Role Management');
     const { t } = useTranslation();
 
@@ -31,6 +32,9 @@ const Navdata = () => {
         }
         if (iscurrentState !== 'Permission Management') {
             setIsPermissionManagement(false);
+        }
+        if (iscurrentState !== 'Plan Management') {
+            setIsPlanManagement(false);
         }
     }, [
         history,
@@ -67,7 +71,7 @@ const Navdata = () => {
         },
         {
             id: "rolemanagement",
-            label: "Role",
+            label: t("Role Management"),
             icon: "ri-user-star-fill",
             link: route("admin.roles.index"),
             stateVariables: isRoleManagement,
@@ -80,7 +84,7 @@ const Navdata = () => {
         },
         {
             id: "permissionmanagement",
-            label: "Permission",
+            label: t("Permission Management"),
             icon: "ri-lock-2-fill",
             link: route("admin.permissions.index"),
             stateVariables: isPermissionManagement,
@@ -88,6 +92,19 @@ const Navdata = () => {
                 e.preventDefault();
                 setIsPermissionManagement(!isPermissionManagement);
                 setIscurrentState('Permission Management');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "planmanagement",
+            label: t("Plan management"),
+            icon: "ri-money-dollar-box-fill",
+            link: route("admin.plans.index"),
+            stateVariables: isRoleManagement,
+            click: function (e : any) {
+                e.preventDefault();
+                setIsPlanManagement(!isPlanManagement);
+                setIscurrentState('Plan Management');
                 updateIconSidebar(e);
             },
         },

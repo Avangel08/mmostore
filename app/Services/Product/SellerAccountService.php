@@ -134,7 +134,7 @@ class SellerAccountService
         return response()->stream(function () use ($subProductId) {
             $handle = fopen('php://output', 'w');
 
-            Accounts::select(['key', 'data'])
+            Accounts::select(['key', 'data', 'status'])
                 ->where('sub_product_id', $subProductId)
                 ->whereNull('order_id')
                 ->cursor()

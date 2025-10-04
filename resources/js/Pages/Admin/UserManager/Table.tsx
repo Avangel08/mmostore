@@ -129,7 +129,7 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                 },
             },
             {
-                header: t("Action"),
+                header: " ",
                 enableColumnFilter: false,
                 cell: (cell: any) => {
                     const row = cell.row.original;
@@ -141,7 +141,7 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                                 window.open(url, "_blank");
                             }}
                         >
-                            {t("Login as")} <i className="ri-login-box-line"></i>
+                            {t("Login")} <i className="ri-login-box-line"></i>
                         </Button>
                     );
                 },
