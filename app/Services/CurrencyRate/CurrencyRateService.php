@@ -2,7 +2,7 @@
 
 namespace App\Services\CurrencyRate;
 
-use App\Models\Mysql\CurrencyRates;
+use App\Models\MySQL\CurrencyRates;
 
 /**
  * Class CurrencyRateService
