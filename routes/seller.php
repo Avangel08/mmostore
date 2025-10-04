@@ -8,6 +8,7 @@ use App\Http\Controllers\Seller\Product\ProductController;
 use App\Http\Controllers\Seller\Product\SellerAccountController;
 use App\Http\Controllers\Seller\Product\SubProductController;
 use App\Http\Controllers\Seller\Profile\ProfileController;
+use App\Http\Controllers\Seller\Setting\ThemeSettingController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
@@ -66,6 +67,10 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                     Route::get('/edit', [PaymentHistoryController::class, 'edit'])->name('seller.payment-history.edit');
                     Route::post('/create', [PaymentHistoryController::class, 'store'])->name('seller.payment-history.store');
                     Route::post('/verify-payment', [PaymentHistoryController::class, 'verifyPayment'])->name('seller.payment-history.verify-payment');
+                });
+
+                Route::group(['prefix' => 'theme-settings'], function() {
+                    Route::get('/', [ThemeSettingController::class, 'index'])->name('seller.theme-settings');
                 });
             });
 

@@ -10,6 +10,7 @@ const Navdata = () => {
     const [isProduct, setIsProduct] = useState<boolean>(false);
     const [isPaymentHistory, setIsPaymentHistory] = useState<boolean>(false);
     const [iscurrentState, setIscurrentState] = useState('Dashboard');
+    const [isSettings, setIsSettings] = useState<boolean>(false)
 
     function updateIconSidebar(e : any) {
         if (e && e.target && e.target.getAttribute("sub-items")) {
@@ -40,6 +41,9 @@ const Navdata = () => {
         if (iscurrentState !== 'Payment History') {
             setIsPaymentHistory(false);
         }
+        if (iscurrentState !== 'Theme Settings') {
+            setIsSettings(false)
+        }
     }, [
         history,
         iscurrentState,
@@ -47,6 +51,7 @@ const Navdata = () => {
         isCategory,
         isProduct,
         isPaymentHistory,
+        isSettings
     ]);
 
     const menuItems : any = [
@@ -103,6 +108,19 @@ const Navdata = () => {
                 e.preventDefault();
                 setIsPaymentHistory(!isPaymentHistory);
                 setIscurrentState('Payment History');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "setting",
+            label: "Theme settings",
+            icon: "ri-settings-2-line",
+            link: route('seller.theme-settings'),
+            stateVariables: isSettings,
+            click: function (e : any) {
+                e.preventDefault();
+                setIsDashboard(!isSettings);
+                setIscurrentState('Theme Settings');
                 updateIconSidebar(e);
             },
         },

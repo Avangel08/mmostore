@@ -9,6 +9,7 @@ use App\Models\MySQL\User;
 use App\Services\Home\ServerService;
 use App\Services\Home\StoreService;
 use App\Services\Home\UserService;
+use App\Services\Setting\SettingService;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -20,16 +21,19 @@ class RegisteredStoreController extends Controller
     protected $userService;
     protected $storeService;
     protected $serverService;
+    protected $settingService;
 
     public function __construct(
         UserService $userService,
         StoreService $storeService,
         ServerService $serverService,
+        SettingService $settingService,
     )
     {
         $this->userService = $userService;
         $this->storeService = $storeService;
         $this->serverService = $serverService;
+        $this->settingService = $settingService;
     }
 
     public function register(): Response
@@ -71,6 +75,14 @@ class RegisteredStoreController extends Controller
 
             $store = $this->storeService->create($dataStore);
 
+            // Create default theme
+            $defaultSettings = [
+                'user_id' => $user['id'],
+                'theme' => "theme_1",
+                'store_settings' => []
+            ];
+            $settings = $this->settingService->createSetting($defaultSettings);
+            dd($settings);
             $this->storeService->update($store, [
                 'database_config' => [
                     "host" => $server['host'],
@@ -79,6 +91,7 @@ class RegisteredStoreController extends Controller
                     "password" => $server['password'],
                     "database_name" => date('Y_m_d') . '_' . $store['id'],
                     "prefix" => $store['id'],
+                    "setting_id" => $settings->id
                 ]
             ]);
 
