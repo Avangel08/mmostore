@@ -24,6 +24,8 @@ const SellerAccount = () => {
   const { subProduct } = usePage().props as any;
   const [loading, setLoading] = useState(false);
 
+  const canImport = subProduct?.product?.category && subProduct?.product?.product_type;
+
   const formik = useFormik({
     initialValues: {
       file: null as File | null,
@@ -91,8 +93,75 @@ const SellerAccount = () => {
                   <h5 className="card-title mb-0">{t("Account")}</h5>
                 </Card.Header>
                 <Card.Body>
+                  {(!subProduct?.product?.category || !subProduct?.product?.product_type) && (
+                    <Row style={{ marginBottom: "32px" }}>
+                      <Col xs={12}>
+                        <Card bg="warning" text="dark" className="border-warning">
+                          <Card.Body>
+                            <div className="d-flex align-items-center gap-5">
+                              <div>
+                                <h6 className="mb-2">
+                                  <i className="ri-alert-line me-2"></i>
+                                  {t("Product Configuration Required")}
+                                </h6>
+                                <div className="mb-1">
+                                  {!subProduct?.product?.category && !subProduct?.product?.product_type && (
+                                    <span>{t("Category and Product Type are not defined for this product")}</span>
+                                  )}
+                                  {!subProduct?.product?.category && subProduct?.product?.product_type && (
+                                    <span>{t("Category is not defined for this product")}</span>
+                                  )}
+                                  {subProduct?.product?.category && !subProduct?.product?.product_type && (
+                                    <span>{t("Product Type is not defined for this product")}</span>
+                                  )}
+                                </div>
+                                <small className="text-muted">
+                                  {t("Please configure the missing information to ensure proper product management")}
+                                </small>
+                              </div>
+                              <div>
+                                <Button
+                                  variant="dark"
+                                  size="sm"
+                                  onClick={() => {
+                                    window.open(
+                                      route("seller.product.edit", { id: subProduct?.product_id }),
+                                      "_blank"
+                                    );
+                                  }}
+                                >
+                                  <i className="ri-edit-line me-1"></i>
+                                  {t("Edit Product")}
+                                </Button>
+                              </div>
+                            </div>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    </Row>
+                  )}
+
                   <Row style={{ marginBottom: "32px" }}>
                     <Col lg={6}>
+                      {!canImport && (
+                        <Card bg="danger" text="white" className="mb-3 border-danger">
+                          <Card.Body>
+                            <h6 className="mb-2">
+                              <i className="ri-error-warning-line me-2"></i>
+                              {t("Import Disabled")}
+                            </h6>
+                            <p className="mb-0">
+                              {t("You cannot import accounts until the product category and product type are configured.")} <a
+                                href={route("seller.product.edit", { id: subProduct?.product_id })}
+                                className="text-white text-decoration-underline"
+                                target="_blank"
+                              >
+                                {t("Please edit the product first.")}
+                              </a>
+                            </p>
+                          </Card.Body>
+                        </Card>
+                      )}
                       <Form onSubmit={formik.handleSubmit} noValidate>
                         <Form.Group className="mb-3">
                           <Form.Label>
@@ -103,6 +172,7 @@ const SellerAccount = () => {
                             type="file"
                             name="file"
                             accept=".txt"
+                            disabled={!canImport}
                             onChange={(e: any) => {
                               const file = e.target.files?.[0] || null;
                               formik.setFieldValue("file", file);
@@ -118,11 +188,16 @@ const SellerAccount = () => {
                           <Form.Control.Feedback type="invalid">
                             {t(formik.errors.file || errors?.file)}
                           </Form.Control.Feedback>
+                          {!canImport && (
+                            <Form.Text className="text-muted">
+                              {t("File upload is disabled until product configuration is complete")}
+                            </Form.Text>
+                          )}
                         </Form.Group>
                         <Button
                           variant="primary"
                           type="submit"
-                          disabled={loading}
+                          disabled={loading || !canImport}
                         >
                           {loading ? (
                             <>
@@ -149,9 +224,9 @@ const SellerAccount = () => {
                             {t("Note: Each line in the uploaded file will be 1 product")}
                           </h5>
                           <div className="mb-3">
-                            <strong>{t("Format")}:</strong> 
+                            <strong>{t("Format")}:</strong>
                             <div className="ms-2">
-                              • <code>key|data1|data2|...</code><br/>
+                              • <code>key|data1|data2|...</code><br />
                               • <code>status:STATUS|key|data1|data2|...</code>
                             </div>
                           </div>

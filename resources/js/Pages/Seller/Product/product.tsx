@@ -28,7 +28,7 @@ registerPlugin(
 
 export default function product() {
   const { t } = useTranslation();
-  const { product, categories } = usePage().props as any;
+  const { product, categories, productTypes } = usePage().props as any;
   const isEditMode = !!product;
   const errors = usePage().props.errors as any;
   const storageUrl = usePage().props.storageUrl as string;
@@ -45,11 +45,17 @@ export default function product() {
     { value: "INACTIVE", label: t("Inactive") },
   ];
 
+  const productTypeOptions = productTypes.map((type: any) => ({
+    value: type?.id ?? "",
+    label: t(type?.name ?? ""),
+  }));
+
   const formik = useFormik({
     initialValues: {
       productName: product?.name || "",
       categoryId: product?.category_id || "",
       status: product?.status || "ACTIVE",
+      productTypeId: product?.product_type_id || "",
       shortDescription: product?.short_description || "",
       detailDescription: product?.detail_description || "",
       image: null as File | null,
@@ -60,6 +66,7 @@ export default function product() {
         .required(t("Please enter product name")),
       categoryId: Yup.string().required(t("Please select a category")),
       status: Yup.string().required(t("Please select status")),
+      productTypeId: Yup.string().required(t("Please select product type")),
       shortDescription: Yup.string()
         .max(150, t("Must be 150 characters or less"))
         .required(t("Please enter short description")),
@@ -81,6 +88,7 @@ export default function product() {
       formData.append("productName", values.productName);
       formData.append("categoryId", values.categoryId);
       formData.append("status", values.status);
+      formData.append("productTypeId", values.productTypeId);
       formData.append("shortDescription", values.shortDescription);
       formData.append("detailDescription", values.detailDescription);
 
@@ -209,7 +217,7 @@ export default function product() {
                             className={
                               (formik.touched.categoryId &&
                                 formik.errors.categoryId) ||
-                              errors?.categoryId
+                                errors?.categoryId
                                 ? "is-invalid"
                                 : ""
                             }
@@ -217,18 +225,59 @@ export default function product() {
                           {((formik.touched.categoryId &&
                             formik.errors.categoryId) ||
                             errors?.categoryId) && (
-                            <div className="invalid-feedback d-block">
-                              {t(
-                                formik.errors.categoryId || errors?.categoryId
-                              )}
-                            </div>
-                          )}
+                              <div className="invalid-feedback d-block">
+                                {t(
+                                  formik.errors.categoryId || errors?.categoryId
+                                )}
+                              </div>
+                            )}
                         </Form.Group>
                       </Col>
                     </Row>
 
                     <Row className="mb-4">
-                      <Col md={12}>
+                      <Col md={6}>
+                        <Form.Group controlId="productType">
+                          <Form.Label>
+                            {t("Product type")} <span className="text-danger">*</span>
+                          </Form.Label>
+                          <Select
+                            options={productTypeOptions}
+                            placeholder={t("Select product type")}
+                            onMenuOpen={() => {
+                              router.reload({
+                                only: ["productTypes"],
+                                replace: true,
+                              });
+                            }}
+                            value={productTypeOptions.find(
+                              (option: any) => option.value == formik.values.productTypeId
+                            )}
+                            onChange={(selectedOption: any) => {
+                              formik.setFieldValue(
+                                "productTypeId",
+                                selectedOption?.value || ""
+                              );
+                            }}
+                            onBlur={() =>
+                              formik.setFieldTouched("productTypeId", true)
+                            }
+                            className={
+                              (formik.touched.productTypeId && formik.errors.productTypeId) ||
+                                errors?.productTypeId
+                                ? "is-invalid"
+                                : ""
+                            }
+                          />
+                          {((formik.touched.productTypeId && formik.errors.productTypeId) ||
+                            errors?.productTypeId) && (
+                              <div className="invalid-feedback d-block">
+                                {t(formik.errors.productTypeId || errors?.productTypeId)}
+                              </div>
+                            )}
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
                         <Form.Group controlId="status">
                           <Form.Label>
                             {t("Status")} <span className="text-danger">*</span>
@@ -250,19 +299,20 @@ export default function product() {
                             }
                             className={
                               (formik.touched.status && formik.errors.status) ||
-                              errors?.status
+                                errors?.status
                                 ? "is-invalid"
                                 : ""
                             }
                           />
                           {((formik.touched.status && formik.errors.status) ||
                             errors?.status) && (
-                            <div className="invalid-feedback d-block">
-                              {t(formik.errors.status || errors?.status)}
-                            </div>
-                          )}
+                              <div className="invalid-feedback d-block">
+                                {t(formik.errors.status || errors?.status)}
+                              </div>
+                            )}
                         </Form.Group>
                       </Col>
+
                     </Row>
 
                     <Row className="mb-4">
@@ -291,7 +341,7 @@ export default function product() {
                           <Form.Control.Feedback type="invalid">
                             {t(
                               formik.errors.shortDescription ||
-                                errors?.shortDescription
+                              errors?.shortDescription
                             )}
                           </Form.Control.Feedback>
                         </Form.Group>
@@ -318,13 +368,13 @@ export default function product() {
                           {((formik.touched.detailDescription &&
                             formik.errors.detailDescription) ||
                             errors?.detailDescription) && (
-                            <div className="invalid-feedback d-block">
-                              {t(
-                                formik.errors.detailDescription ||
+                              <div className="invalid-feedback d-block">
+                                {t(
+                                  formik.errors.detailDescription ||
                                   errors?.detailDescription
-                              )}
-                            </div>
-                          )}
+                                )}
+                              </div>
+                            )}
                         </Form.Group>
                       </Col>
                     </Row>
@@ -342,9 +392,8 @@ export default function product() {
                                 href={`${storageUrl}/${product.image}`}
                               >
                                 <img
-                                  src={`${storageUrl}/${
-                                    product.image
-                                  }?v=${Date.now()}`}
+                                  src={`${storageUrl}/${product.image
+                                    }?v=${Date.now()}`}
                                   alt={product.name || t("Product image")}
                                   style={{
                                     maxWidth: "200px",
@@ -408,17 +457,17 @@ export default function product() {
                             credits={false}
                             className={
                               (formik.touched.image && formik.errors.image) ||
-                              errors?.image
+                                errors?.image
                                 ? "is-invalid"
                                 : ""
                             }
                           />
                           {((formik.touched.image && formik.errors.image) ||
                             errors?.image) && (
-                            <div className="invalid-feedback d-block">
-                              {t(formik.errors.image || errors?.image)}
-                            </div>
-                          )}
+                              <div className="invalid-feedback d-block">
+                                {t(formik.errors.image || errors?.image)}
+                              </div>
+                            )}
                         </Form.Group>
                       </Col>
                     </Row>

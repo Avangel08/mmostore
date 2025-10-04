@@ -17,7 +17,7 @@ class ProductService
             ->filterStatus($request)
             ->filterCreatedDate($request)
             ->orderBy('_id', 'desc')
-            ->with('categories:_id,name')
+            ->with('category:_id,name')
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
@@ -37,12 +37,13 @@ class ProductService
     public function createProduct(array $data)
     {
         $productData = [
-            'name' => $data['productName'],
-            'category_id' => $data['categoryId'],
-            'status' => $data['status'],
-            'short_description' => $data['shortDescription'],
-            'detail_description' => $data['detailDescription'],
+            'name' => (string) $data['productName'],
+            'category_id' => (string) $data['categoryId'],
+            'status' => (string) $data['status'],
+            'short_description' => (string) $data['shortDescription'],
+            'detail_description' => (string) $data['detailDescription'],
             'slug' => (string) $this->generateProductSlug($data['productName']),
+            'product_type_id' => (int) $data['productTypeId']
         ];
 
         $product = Products::create($productData);
@@ -61,17 +62,18 @@ class ProductService
     public function updateProduct(Products $product, array $data)
     {
         $dataToUpdate = [
-            'name' => $data['productName'],
-            'category_id' => $data['categoryId'],
-            'status' => $data['status'],
-            'short_description' => $data['shortDescription'],
-            'detail_description' => $data['detailDescription'],
+            'name' => (string) $data['productName'],
+            'category_id' => (string) $data['categoryId'],
+            'status' => (string) $data['status'],
+            'short_description' => (string) $data['shortDescription'],
+            'detail_description' => (string) $data['detailDescription'],
+            'product_type_id' => (int) $data['productTypeId']
         ];
 
         if ($product['name'] != $data['productName']) {
             $dataToUpdate['slug'] = (string) $this->generateProductSlug($data['productName']);
         }
-        
+
         if (!empty($data['image'])) {
             $host = request()->getHost();
             $extension = $data['image']->getClientOriginalExtension();

@@ -28,6 +28,10 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
 
     protected $subProductId;
 
+    protected $categoryId;
+
+    protected $productTypeId;
+
     protected $accountService;
 
     protected $subProductService;
@@ -36,20 +40,25 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
 
     protected $dbConfig;
 
+    protected $cacheTag;
+
     public $uniqueFor = 3600;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($filePath, $productId, $subProductId, $importHistoryId, $dbConfig)
+    public function __construct($filePath, $productId, $subProductId, $categoryId, $productTypeId, $importHistoryId, $dbConfig)
     {
         $this->filePath = $filePath;
         $this->productId = $productId;
         $this->subProductId = $subProductId;
+        $this->categoryId = $categoryId;
+        $this->productTypeId = $productTypeId;
         $this->importHistoryId = $importHistoryId;
         $this->dbConfig = $dbConfig;
         $this->accountService = new SellerAccountService;
         $this->subProductService = new SubProductService;
+        $this->cacheTag = 'import_account_' . $this->importHistoryId;
         $this->queue = 'process_seller_account';
     }
 
@@ -75,9 +84,9 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             $chunkSize = 1000;
             $fullPath = Storage::disk('public')->path($this->filePath);
             $timeStart = now();
-            $listKey = [];
             $importAccountHistory = ImportAccountHistory::findOrFail($this->importHistoryId);
-            $result = $this->processChunk($chunkSize, $fullPath, $timeStart, $listKey);
+            $maxChunkIndex = 0;
+            $result = $this->processChunk($chunkSize, $fullPath, $timeStart, $maxChunkIndex);
             $importAccountHistory->update([
                 'status' => ImportAccountHistory::STATUS['FINISH'],
                 'result' => $result,
@@ -85,22 +94,25 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             ]);
             // echo "Finished processing import account for sub_product_id {$this->subProductId}: {$result['total_count']} total, {$result['success_count']} success, {$result['error_count']} errors".PHP_EOL;
             // echo 'Deleting old accounts...'.PHP_EOL;
-            $this->accountService->deleteOldAccounts($timeStart, array_keys($listKey), $this->subProductId);
+            $this->deleteOldAccountByChunk($timeStart, $maxChunkIndex);
             $this->updateSubProductQuantity();
             // echo 'Delete old accounts done.'.PHP_EOL;
             // DB::commit();
         } catch (Exception $e) {
-            DB::rollBack();
+            // DB::rollBack();
             // echo 'Error processing import account: '.$e->getMessage().PHP_EOL;
             $importAccountHistory->update([
                 'status' => ImportAccountHistory::STATUS['ERROR'],
                 'ended_at' => now(),
             ]);
             throw $e;
+        } finally {
+            Cache::tags($this->cacheTag)->flush();
+            // echo 'Cleared cache for tag '.$this->cacheTag.PHP_EOL;
         }
     }
 
-    public function processChunk($chunkSize, $fullPath, Carbon $timeStart, &$listKey)
+    public function processChunk($chunkSize, $fullPath, Carbon $timeStart, int &$maxChunkIndex): array
     {
         $totalCount = 0;
         $successCount = 0;
@@ -113,7 +125,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             }
             fclose($handle);
         })
-            ->map(function ($line) use (&$totalCount, &$successCount, &$errorCount, $timeStart, &$listKey) {
+            ->map(function ($line) use (&$totalCount, &$successCount, &$errorCount, $timeStart) {
                 $totalCount++;
                 $line = trim($line);
                 if (empty($line)) {
@@ -143,7 +155,11 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                     $errorCount++;
                     return null;
                 }
-                $listKey[$key] = $key;
+
+                if (empty($dataParts)) {
+                    $errorCount++;
+                    return null;
+                }
 
                 foreach ($dataParts as $part) {
                     if (trim($part) === '') {
@@ -154,12 +170,22 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
 
                 unset($line);
 
+                $mainData = $dataParts[0];
+                $dataCacheKey = $this->getInsertDataCache($mainData);
+                if (!Cache::tags($this->cacheTag)->add($dataCacheKey, true, now()->endOfDay())) {
+                    $errorCount++;
+                    return null;
+                }
+
                 return [
                     'key' => (string) $key,
                     'data' => (string) implode('|', array_map('trim', $dataParts)),
+                    'main_data' => (string) $mainData,
                     'status' => (string) $status,
                     'product_id' => (string) $this->productId,
                     'sub_product_id' => (string) $this->subProductId,
+                    'category_id' => (string) $this->categoryId,
+                    'product_type_id' => (int) $this->productTypeId,
                     'note' => null,
                     'customer_id' => null,
                     'order_id' => null,
@@ -170,9 +196,30 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             })
             ->filter()
             ->chunk($chunkSize)
-            ->each(function (LazyCollection $data) use (&$successCount, &$errorCount) {
+            ->each(function (LazyCollection $data, $chunkIndex) use (&$successCount, &$errorCount, &$maxChunkIndex) {
+                $maxChunkIndex = $chunkIndex;
+                $listCheckUniqueData = $this->accountService->checkUniqueData($this->categoryId, $this->productTypeId, $data->pluck('main_data')->all());
+
+                $filteredData = $data->filter(function ($item) use ($listCheckUniqueData, &$errorCount) {
+                    $isUniqueData = $listCheckUniqueData[$item['main_data']] ?? false;
+                    if (!$isUniqueData) {
+                        $dataCacheKey = $this->getInsertDataCache($item['main_data']);
+                        Cache::tags($this->cacheTag)->add($dataCacheKey, true, now()->endOfDay());
+                    }
+                    return $isUniqueData;
+                });
+
+                $keysCache = $this->getInsertKeyCache($chunkIndex);
+                $allKey = $filteredData->pluck('key')->all();
+                Cache::tags($this->cacheTag)->put($keysCache, $allKey, now()->endOfDay());
+
+                $originalDataCount = $data->count();
+                $filteredDataCount = $filteredData->count();
+                $cannotInsertCount = $originalDataCount - $filteredDataCount;
+                $errorCount += $cannotInsertCount;
+
                 $isSuccess = $this->processInsert($data);
-                $dataCount = $data->count();
+                $dataCount = $filteredDataCount;
                 if ($isSuccess) {
                     $successCount += $dataCount;
                 } else {
@@ -225,5 +272,26 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
     {
         $totalProduct = $this->accountService->getUnsoldAccountCountBySubProductId($this->subProductId);
         $this->subProductService->updateSubProductQuantity($this->subProductId, $totalProduct);
+    }
+
+    public function getInsertKeyCache(int $maxChunkIndex): string
+    {
+        return $this->cacheTag . '_keys-chunk_' . $maxChunkIndex;
+    }
+
+    public function getInsertDataCache($data): string
+    {
+        return $this->cacheTag . '_data_' . $data;
+    }
+
+    public function deleteOldAccountByChunk(Carbon $timeStart, int $maxChunkIndex)
+    {
+        for ($chunkIndex = 0; $chunkIndex <= $maxChunkIndex; $chunkIndex++) {
+            $keysDataFromCache = $this->getInsertKeyCache($chunkIndex);
+            $keysDataToDelete = Cache::tags($this->cacheTag)->get($keysDataFromCache, []);
+            if (!empty($keysDataToDelete)) {
+                $this->accountService->deleteOldAccounts($timeStart, $keysDataToDelete, $this->subProductId);
+            }
+        }
     }
 }

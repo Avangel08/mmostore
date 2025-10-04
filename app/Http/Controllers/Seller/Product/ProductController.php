@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Seller\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\Product\ProductRequest;
 use App\Models\Mongo\Products;
+use App\Models\MySQL\ProductType;
 use App\Services\Category\CategoryService;
 use App\Services\Product\ProductService;
 use App\Services\Product\SubProductService;
+use App\Services\ProductType\ProductTypeService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -16,12 +18,14 @@ class ProductController extends Controller
     protected $productService;
     protected $categoryService;
     protected $subProductService;
+    protected $productTypeService;
 
-    public function __construct(ProductService $productService, CategoryService $categoryService, SubProductService $subProductService)
+    public function __construct(ProductService $productService, CategoryService $categoryService, SubProductService $subProductService, ProductTypeService $productTypeService)
     {
         $this->productService = $productService;
         $this->categoryService = $categoryService;
         $this->subProductService = $subProductService;
+        $this->productTypeService = $productTypeService;
     }
 
     public function index(ProductRequest $request)
@@ -49,6 +53,7 @@ class ProductController extends Controller
 
         return Inertia::render('Product/product', [
             'categories' => fn() => $this->categoryService->getActive(['_id', 'name']),
+            'productTypes' => fn() => $this->productTypeService->findByStatus(ProductType::STATUS['ACTIVE'], ['id', 'name']),
         ]);
     }
 
@@ -59,13 +64,14 @@ class ProductController extends Controller
         // }
 
         $product = $this->productService->getById($id);
-        if (! $product) {
+        if (!$product) {
             abort(404);
         }
 
         return Inertia::render('Product/product', [
             'product' => fn() => $product,
             'categories' => fn() => $this->categoryService->getActive(['_id', 'name']),
+            'productTypes' => fn() => $this->productTypeService->findByStatus(ProductType::STATUS['ACTIVE'], ['id', 'name']),
         ]);
     }
 
@@ -94,7 +100,7 @@ class ProductController extends Controller
         try {
             $product = $this->productService->getById($id);
 
-            if (! $product) {
+            if (!$product) {
                 return back()->with('error', 'Product not found');
             }
 
@@ -116,7 +122,7 @@ class ProductController extends Controller
         // }
         try {
             $product = $this->productService->getById($id);
-            if (! $product) {
+            if (!$product) {
                 return back()->with('error', 'Product not found');
             }
 
