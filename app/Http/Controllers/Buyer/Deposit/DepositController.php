@@ -46,7 +46,7 @@ class DepositController extends Controller
     {
         try {
             $data = $request->all();
-            $ownerStoreId = session('ownerStoreId') ?? 3;
+            $ownerStoreId = session('ownerStoreId');
             $customer = Auth::guard(config('guard.buyer'))->user();
             //payment method của user setting
             $paymentMethod = $this->paymentMethodService->findByUserId($ownerStoreId);
