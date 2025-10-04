@@ -73,7 +73,7 @@ class SellerAccountController extends Controller
             if (!$subProduct?->product?->category) {
                 return back()->with('error', 'Category not configured for this product');
             }
-            $this->sellerAccountService->processAccountFile($data);
+            $this->sellerAccountService->processAccountFile($subProduct->product->category_id, $subProduct->product->product_type_id, $data);
 
             return back()->with('success', 'File uploaded successfully and is pending processing');
         } catch (\Exception $e) {
@@ -107,7 +107,7 @@ class SellerAccountController extends Controller
         return Inertia::render('Product/Account/index', [
             'subProduct' => fn() => $this->subProductService->getById(
                 $subProductId,
-                ['id', 'product_id'],
+                ['id', 'product_id', 'quantity'],
                 [
                     'product:id,name,category_id,product_type_id',
                     'product.productType:id,name',
