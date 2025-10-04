@@ -46,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
             'theme' => $theme,
             'subdomain' => $subdomain,
             'isAuthenticated' => $isAuthenticated,
+            'ownerStoreId' => $ownerStoreId,
         ]);
     }
 }
