@@ -23,8 +23,10 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
     const [isOpenMenu, setisOpenMenu] = useState<boolean>(false);
     const [navClass, setnavClass] = useState<any>("");
     const [show, setShow] = useState(false);
-    const { user } = usePage().props;
+    const { user } = usePage().props.auth;
     const { t } = useTranslation();
+
+    console.log(user);
 
     const handleLogout = () => {
         router.post(route("buyer.logout"), {}, {
@@ -156,7 +158,14 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                                     </NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    {user && (
+                                    {!!user && (
+                                        <NavLink className="fs-16" href="/profile">
+                                            {t("Personal profile")}
+                                        </NavLink>
+                                    )}
+                                </li>
+                                <li className="nav-item">
+                                    {!!user && (
                                         <NavLink className="fs-16" href="/deposits">
                                             {t("Deposits")}
                                         </NavLink>

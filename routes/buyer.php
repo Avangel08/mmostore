@@ -5,6 +5,7 @@ use App\Http\Controllers\Buyer\Auth\RegisteredUserController;
 use App\Http\Controllers\Buyer\BuyerController;
 use App\Http\Controllers\Buyer\Deposit\DepositController;
 use App\Http\Controllers\Buyer\Product\ProductController;
+use App\Http\Controllers\Buyer\Profile\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
@@ -41,6 +42,13 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
             Route::get('/', [DepositController::class, 'index'])->name('buyer.deposits');
             Route::post('/checkout', [DepositController::class, 'checkout'])->name('buyer.deposit.checkout');
             Route::get('/ping', [DepositController::class, 'pingDeposit'])->name('buyer.deposit.ping');
+        });
+
+        Route::group(['prefix' => 'profile'], function () {
+            Route::get('/', [ProfileController::class, 'index'])->name('buyer.profile');
+            Route::put('/update-info', [ProfileController::class, 'updateInfo'])->name('buyer.profile.update-info');
+            Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('buyer.profile.change-password');
+            Route::post('/upload-image', [ProfileController::class, 'uploadImage'])->name('buyer.profile.upload-image');
         });
 
     });

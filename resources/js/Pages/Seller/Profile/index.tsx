@@ -63,7 +63,7 @@ const EditProfile = () => {
 
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
-        showToast(t('Please select a valid image file (JPEG, PNG, GIF, or WebP)'), 'error');
+        showToast(t('Please select a valid image file') + ' (JPEG, PNG, GIF, WebP)', 'error');
         e.target.value = '';
         return;
       }
