@@ -21,6 +21,7 @@ class Accounts extends Model
         'sub_product_id',
         'key',
         'data',
+        'main_data',
         'status',
         'note',
         'customer_id',
@@ -31,6 +32,11 @@ class Accounts extends Model
     const STATUS = [
         'LIVE' => 'LIVE',
     ];
+
+    public function subProduct()
+    {
+        return $this->belongsTo(SubProducts::class, 'sub_product_id');
+    }
 
     public function scopeFilterProduct($query, $request)
     {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, ProgressBar, Dropdown, Form, Button } from "react-bootstrap";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { ClassicEditor } from "ckeditor5";
 
 //SimpleBar
 import SimpleBar from "simplebar-react";
@@ -280,6 +280,9 @@ const EmailSidebar = () => {
             </div>
             <div className="ck-editor-reverse">
               <CKEditor
+                config={{
+                  licenseKey: "GPL",
+                }}
                 editor={ClassicEditor as any}
                 onReady={(editor) => {}}
               />

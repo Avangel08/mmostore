@@ -3,7 +3,7 @@ import { Card, Col, Row, Form, Container } from "react-bootstrap";
 import UiContent from "../../../../Components/Common/UiContent";
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { ClassicEditor } from "ckeditor5";
 import BreadCrumb from "../../../../Components/Common/BreadCrumb";
 import { Head } from "@inertiajs/react";
 import Layout from "../../../../Layouts";
@@ -26,6 +26,9 @@ const FormEditor = () => {
                 <Card.Body>
                   <Form method="post">
                     <CKEditor
+                      config={{
+                        licenseKey: "GPL",
+                      }}
                       editor={ClassicEditor as any}
                       data="<p>Hello from CKEditor 5!</p>"
                       onReady={(editor) => {

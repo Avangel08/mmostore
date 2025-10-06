@@ -57,6 +57,7 @@ const CustomCKEditor: React.FC<CustomCKEditorProps> = ({
   ...props
 }) => {
   const editorConfig: EditorConfig = {
+    licenseKey: "GPL",
     fontSize: {
       options: [9, 11, 13, "default", 17, 19, 21, 36, 48, 62, 80],
     },
