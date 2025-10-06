@@ -1,4 +1,4 @@
-import { Head, usePage } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import React from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -11,6 +11,7 @@ import DomainConfig from "./domainConfig";
 //formik
 import { FormikProps, FormikProvider, useFormik } from "formik";
 import * as Yup from "yup";
+import { showToast } from "../../../utils/showToast";
 
 type StoreFormValues = {
     theme: string;
@@ -25,11 +26,10 @@ export type Props = {
     validation: FormikProps<StoreFormValues>;
 };
 
-
 const ThemeSettings = () => {
     const { t } = useTranslation()
     const { settings } = usePage().props as any
-    console.log({settings})
+    console.log({ settings })
     const validation = useFormik({
         enableReinitialize: true,
 
@@ -38,7 +38,7 @@ const ThemeSettings = () => {
             storeName: settings?.store_settings?.storeName || "MMOShop",
             storeLogo: settings?.store_settings?.storeLogo || "https://coco.mmostore.local/storage/coco.mmostore.local/logo-light.png",
             pageHeaderImage: settings?.store_settings?.pageHeaderImage || "",
-            pageHeaderText: settings?.store_settings?.pageHeaderText || "",
+            pageHeaderText: settings?.store_settings?.pageHeaderText || "Hello, welcome to my store",
             domains: settings?.domain || [""],
         },
         validationSchema: Yup.object({
@@ -52,8 +52,36 @@ const ThemeSettings = () => {
             )
         }),
         onSubmit: (values) => {
-            console.log({ values })
-            validation.resetForm();
+            const formData = new FormData();
+            formData.append("theme", values.theme);
+            formData.append("store_settings", JSON.stringify({
+                storeName: values.storeName,
+                storeLogo: values.storeLogo,
+                pageHeaderImage: values.pageHeaderImage,
+                pageHeaderText: values.pageHeaderText
+            }));
+            formData.append("domains", JSON.stringify(values.domains));
+            const url = route("seller.theme-settings.update", { id: settings.id })
+            return;
+            router.put(url, formData, {
+                preserveScroll: true,
+                onSuccess: (success: any) => {
+                    if (success.props?.message?.error) {
+                        showToast(t(success.props.message.error), "error");
+                        return;
+                    }
+
+                    if (success.props?.message?.success) {
+                        showToast(t(success.props.message.success), "success");
+                        validation.resetForm();
+                    }
+                },
+                onError: (errors: any) => {
+                    Object.keys(errors).forEach((key) => {
+                        showToast(t(errors[key]), "error");
+                    });
+                },
+            });
         },
     });
 

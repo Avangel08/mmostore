@@ -15,14 +15,16 @@ import logoDark from "../../../../../images/logo-dark.png";
 import logoLight from "../../../../../images/logo-light.png";
 import NotificationDropdown from "../../../../Components/Common/NotificationDropdown";
 import ModalLogin from "../../Home/ModalLogin";
+import { useTranslation } from "react-i18next";
 
 const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
     const dispatch: any = useDispatch();
     const [isOpenMenu, setisOpenMenu] = useState<boolean>(false);
     const [navClass, setnavClass] = useState<any>("");
     const [show, setShow] = useState(false);
-
     const { user } = usePage().props;
+    const { t } = useTranslation();
+
     const handleLogout = () => {
         router.post(route("buyer.logout"), {}, {
             onSuccess: () => {
@@ -97,6 +99,7 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
             document.body.classList.contains('twocolumn-panel') ? document.body.classList.remove('twocolumn-panel') : document.body.classList.add('twocolumn-panel');
         }
     };
+
     return (
         <React.Fragment>
             <nav
@@ -170,9 +173,15 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
 
                                 {/* User Login/Register */}
                                 <div className="ms-sm-3 header-item d-none d-sm-flex">
-                                    <Button variant="primary" onClick={() => { setShow(true) }}>
-                                        Đăng nhập
-                                    </Button>
+                                    {user ? (
+                                        <Button variant="primary" onClick={handleLogout}>
+                                            {t("Logout")}
+                                        </Button>
+                                    ) : (
+                                        <Button variant="primary" onClick={() => { setShow(true) }}>
+                                            {t("Login")}
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         </div>

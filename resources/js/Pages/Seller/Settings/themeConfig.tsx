@@ -47,7 +47,10 @@ const ThemeConfigs = ({ validation }: Props) => {
     const [selectedImage, setSelectedImage] = useState<any>(validation?.values.storeLogo ?? null);
     const [files, setFiles] = useState<any>([]);
     const errors = usePage().props.errors as any;
-
+    const storageUrl = usePage().props.storageUrl as string;
+    const { settings } = usePage().props as any
+    const isEditMode = Boolean(settings);
+    
     const handleImageChange = (event: any) => {
         const file = event.target.files[0];
         const reader = new FileReader();
@@ -58,20 +61,6 @@ const ThemeConfigs = ({ validation }: Props) => {
         };
         reader.readAsDataURL(file);
     };
-
-
-    /**
-     * Formats the size
-    */
-    function formatBytes(bytes: any, decimals = 2) {
-        if (bytes === 0) return "0 Bytes";
-        const k = 1024;
-        const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-    }
 
     return (
         <React.Fragment>
@@ -91,7 +80,9 @@ const ThemeConfigs = ({ validation }: Props) => {
                     <Row>
                         <Col>
                             <div className="mb-3">
-                                <h6 className="fs-14 mb-3">{t('Choose theme')}{" "}<span className="text-danger">*</span></h6>
+                                <div className="fs-13 mb-3 fw-medium">
+                                    <span>{t('Choose theme')}{" "}<span className="text-danger">*</span></span>
+                                </div>
                                 <Row>
                                     {LIST_THEMES.map(sub => (
                                         <Col key={sub.key} xs="4">
@@ -203,6 +194,36 @@ const ThemeConfigs = ({ validation }: Props) => {
                                     // </Form.Control.Feedback>
                                 ) : null}
                             </div>
+
+                            {isEditMode && settings?.image && (
+                                <Row className="mb-4">
+                                    <Col md={12}>
+                                        <Form.Group>
+                                            <div className="mb-3">
+                                                <div className="fs-13 mb-3 fw-medium">
+                                                    <span>{t("Current product image")}</span>
+                                                </div>
+                                                <a
+                                                    target="_blank"
+                                                    href={`${storageUrl}/${settings?.store_settings?.pageHeaderImage}`}
+                                                >
+                                                    <img
+                                                        src={`${storageUrl}/${settings?.store_settings?.pageHeaderImage}?v=${Date.now()}`}
+                                                        style={{
+                                                            maxWidth: "200px",
+                                                            maxHeight: "200px",
+                                                            objectFit: "contain",
+                                                            border: "1px solid #dee2e6",
+                                                            borderRadius: "4px",
+                                                        }}
+                                                    />
+                                                </a>
+                                            </div>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                            )}
+
                             {/** Page header image */}
                             <div className="mb-3">
                                 <Form.Label>{t("Page header image")}{" "}<span className="text-danger">*</span></Form.Label>

@@ -69,8 +69,10 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                     Route::post('/verify-payment', [PaymentHistoryController::class, 'verifyPayment'])->name('seller.payment-history.verify-payment');
                 });
 
+                // seller theme settings
                 Route::group(['prefix' => 'theme-settings'], function() {
                     Route::get('/', [ThemeSettingController::class, 'index'])->name('seller.theme-settings');
+                    Route::put('/update', [ThemeSettingController::class, 'update'])->name('seller.theme-settings.update');
                 });
             });
 
