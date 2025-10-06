@@ -348,5 +348,6 @@
     "Please select a valid image file": "Vui lòng chọn file hình ảnh hợp lệ",
     "Registration date": "Ngày đăng ký",
     "Purchased": "Đã mua",
-    "Loading": "Đang tải"
+    "Loading": "Đang tải",
+    "The email has already been taken.": "Email đã được sử dụng."
 }
