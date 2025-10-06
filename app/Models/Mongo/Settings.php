@@ -8,7 +8,7 @@ class Settings extends Model
 {
     protected $table = 'settings';
 
-    // protected $connection = 'tenant_mongo';
+    protected $connection = 'mongodb';
 
     protected $fillable = [
         'user_id',

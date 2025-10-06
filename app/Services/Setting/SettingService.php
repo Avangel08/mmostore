@@ -15,6 +15,11 @@ class SettingService
         return Settings::select($select)->with($relation)->where('_id', $id)->first();
     }
 
+    public function getByUserId($id, $select = ['*'], $relation = [])
+    {
+        return Settings::select($select)->with($relation)->where('user_id', $id)->first();
+    }
+
     public function createSetting(array $data)
     {
         return Settings::create($data);

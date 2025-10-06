@@ -81,10 +81,15 @@ class RegisteredStoreController extends Controller
             $defaultSettings = [
                 'user_id' => $user['id'],
                 'theme' => "theme_1",
-                'store_settings' => []
+                'store_settings' => [
+                    "storeName" => "",
+                    "storeLogo" => "",
+                    "pageHeaderImage" => "",
+                    "pageHeaderText" => ""
+                ]
             ];
             $settings = $this->settingService->createSetting($defaultSettings);
-            dd($settings);
+            
             $this->storeService->update($store, [
                 'database_config' => [
                     "host" => $server['host'],
@@ -92,9 +97,9 @@ class RegisteredStoreController extends Controller
                     "user" => $server['user'],
                     "password" => $server['password'],
                     "database_name" => date('Y_m_d') . '_' . $store['id'],
-                    "prefix" => $store['id'],
-                    "setting_id" => $settings->id
-                ]
+                    "prefix" => $store['id']
+                ],
+                'setting_id' => $settings->id
             ]);
 
             $scheme = request()->isSecure() ? 'https://' : 'http://';

@@ -26,17 +26,17 @@ import CustomCKEditor from "../../../Components/CustomCKEditor";
 
 const LIST_THEMES = [
     {
-        key: "theme1",
+        key: "theme_1",
         label: "Theme 1",
         image: img1
     },
     {
-        key: "theme2",
+        key: "theme_2",
         label: "Theme 2",
         image: img2
     },
     {
-        key: "theme3",
+        key: "theme_3",
         label: "Theme 3",
         image: img3
     },
@@ -46,7 +46,7 @@ const LIST_THEMES = [
 
 const ThemeConfigs = ({ validation }: Props) => {
     const { t } = useTranslation()
-    const [selectedImage, setSelectedImage] = useState<any>();
+    const [selectedImage, setSelectedImage] = useState<any>(validation?.values.storeLogo ?? null);
     const [files, setFiles] = useState<any>([]);
     const errors = usePage().props.errors as any;
 
