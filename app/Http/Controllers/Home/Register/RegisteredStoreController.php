@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use App\Mail\StoreRegistered;
+use App\Services\Tenancy\TenancyService;
 
 class RegisteredStoreController extends Controller
 {
@@ -24,18 +25,21 @@ class RegisteredStoreController extends Controller
     protected $storeService;
     protected $serverService;
     protected $settingService;
+    protected $tenancyService;
 
     public function __construct(
         UserService $userService,
         StoreService $storeService,
         ServerService $serverService,
         SettingService $settingService,
+        TenancyService $tenancyService
     )
     {
         $this->userService = $userService;
         $this->storeService = $storeService;
         $this->serverService = $serverService;
         $this->settingService = $settingService;
+        $this->tenancyService = $tenancyService;
     }
 
     public function register(): Response
@@ -77,19 +81,6 @@ class RegisteredStoreController extends Controller
 
             $store = $this->storeService->create($dataStore);
 
-            // Create default theme
-            $defaultSettings = [
-                'user_id' => $user['id'],
-                'theme' => "theme_1",
-                'store_settings' => [
-                    "storeName" => "",
-                    "storeLogo" => "",
-                    "pageHeaderImage" => "",
-                    "pageHeaderText" => ""
-                ]
-            ];
-            $settings = $this->settingService->createSetting($defaultSettings);
-            
             $this->storeService->update($store, [
                 'database_config' => [
                     "host" => $server['host'],
@@ -98,9 +89,27 @@ class RegisteredStoreController extends Controller
                     "password" => $server['password'],
                     "database_name" => date('Y_m_d') . '_' . $store['id'],
                     "prefix" => $store['id']
-                ],
-                'setting_id' => $settings->id
+                ]
             ]);
+
+            // Create default theme
+            $defaultSettings = [
+                'theme' => "theme_1",
+                "storeName" => "",
+                "storeLogo" => "",
+                "pageHeaderImage" => "",
+                "pageHeaderText" => "",
+            ];
+
+            $connection = $this->tenancyService->buildConnectionFromStore($store);
+            $this->tenancyService->applyConnection($connection, false);
+
+            foreach ($defaultSettings as $key => $value) {
+                $dataSetting['key'] = $key;
+                $dataSetting['value'] = $value;
+                $dataSetting['auto_load'] = true;
+                $this->settingService->createSetting($dataSetting);
+            }
 
             $scheme = request()->isSecure() ? 'https://' : 'http://';
             $redirectUrl = $scheme . $data['domain_store'] . '.' .env('APP_MAIN_DOMAIN') . '/admin';

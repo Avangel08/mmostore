@@ -67,8 +67,44 @@
     .card {
         box-shadow: 0px 1px 2px 1px rgba(56, 65, 74, 0.15);
     }
-    
+
     .text-body {
         color: #ced4da !important;
+    }
+
+    .btn-ghost-secondary {
+        color: #fff;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+    }
+
+    .text-success {
+        color: #3dd007 !important;
+    }
+
+    .btn-success {
+        background-color: #3dd007;
+        border-color: #3dd007;
+
+        &:hover {
+            background-color: #36b006;
+            border-color: #36b006;
+        }
+    }
+
+    .badge-w {
+        width: 60px;
+    }
+
+    .badge-h {
+        height: 30px;
+    }
+
+    .badge-warning {
+        background-color: #ff8500;
+        color: #212529;
     }
 }

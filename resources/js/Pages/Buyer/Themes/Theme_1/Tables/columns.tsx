@@ -64,16 +64,19 @@ export function columnsApi(columns: columns[], actions: { onBuy: (row: any) => v
       case "quantity":
         return {
           accessorKey: col.key,
-          header: col.name,
+          header: () => (
+            <>
+              <i className="ri-shopping-cart-line me-1"></i>
+              {col.name}
+            </>
+          ),
           enableColumnFilter: false,
           enableSorting: false,
           cell: (info) => {
             const value = info.getValue<number>() ?? 0;
             return (
               <span
-                className={
-                  value === 0 ? "text-red-500 font-bold" : "text-gray-800"
-                }
+                className="badge badge-warning text-white fs-14 badge-w badge-h d-flex align-items-center justify-content-center"
               >
                 {value}
               </span>
@@ -96,6 +99,26 @@ export function columnsApi(columns: columns[], actions: { onBuy: (row: any) => v
             )
           }
         }
+      case "price":
+        return {
+          accessorKey: col.key,
+          header: () => (
+            <>
+              <i className="ri-price-tag-3-line me-1"></i>
+              {col.name}
+            </>
+          ),
+          enableColumnFilter: false,
+          enableSorting: false,
+          cell: (info) => {
+            const value = info.getValue<number>() ?? 0;
+            return (
+              <span className="text-success">
+                {value}VNĐ
+              </span>
+            );
+          },
+        };
       default:
         return {
           accessorKey: col.key,

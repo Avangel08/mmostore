@@ -16,6 +16,7 @@ import logoLight from "../../../../../images/logo-light.png";
 import NotificationDropdown from "../../../../Components/Common/NotificationDropdown";
 import ModalLogin from "../../Home/ModalLogin";
 import { useTranslation } from "react-i18next";
+import ProfileDropdown from "../../../../Components/Common/ProfileDropdown";
 
 const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
     const dispatch: any = useDispatch();
@@ -110,7 +111,7 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                 id="navbar"
             >
                 <Container fluid className="custom-container">
-                    <Link className="navbar-brand" href="/dashboard">
+                    <Link className="navbar-brand" href="/">
                         <img
                             src={logoLight}
                             className="card-logo card-logo-dark"
@@ -173,11 +174,23 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                                 {/* NotificationDropdown */}
                                 <NotificationDropdown />
 
+                                {/* ProfileDropdown */}
+                                {user && (
+                                    <div className="ms-sm-2 text-white">
+                                        <span className="d-flex align-items-center">
+                                            <i className="ri-user-line fs-22"></i>
+                                            <span className="text-start">
+                                                <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{user?.name}</span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                )}
+
                                 {/* User Login/Register */}
                                 <div className="ms-sm-3 header-item d-none d-sm-flex">
                                     {user ? (
                                         <Button variant="primary" onClick={handleLogout}>
-                                           <i className="ri-logout-box-r-line"></i>{" "}{t("Logout")}
+                                            <i className="ri-logout-box-r-line"></i>{" "}{t("Logout")}
                                         </Button>
                                     ) : (
                                         <Button variant="primary" onClick={() => { setShow(true) }}>
