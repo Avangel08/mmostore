@@ -8,7 +8,7 @@ import { Inertia } from "@inertiajs/inertia";
 import { useDispatch } from "react-redux";
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { ClassicEditor } from "ckeditor5";
 import Dropzone from "react-dropzone";
 
 //formik
@@ -269,6 +269,9 @@ const EcommerceAddProduct = (props: any) => {
                       <Form.Label>Product Description</Form.Label>
 
                       <CKEditor
+                        config={{
+                          licenseKey: "GPL",
+                        }}
                         editor={ClassicEditor as any}
                         data="<p>
                       Tommy Hilfiger men striped pink sweatshirt. Crafted with
