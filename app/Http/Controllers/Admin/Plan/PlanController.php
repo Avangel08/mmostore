@@ -29,7 +29,7 @@ class PlanController extends Controller
         // }
 
         return Inertia::render('Plan/index', [
-            'plans' => fn() => $this->planService->getForTable($request),
+            'plans' => fn() => $this->planService->adminGetForTable($request),
             'statusConst' => fn() => [
                 Plans::STATUS['ACTIVE'] => 'Active',
                 Plans::STATUS['INACTIVE'] => 'Inactive',

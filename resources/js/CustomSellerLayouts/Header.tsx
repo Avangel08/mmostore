@@ -1,5 +1,6 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import React, { useState } from "react";
+import moment from "moment";
 
 //import images
 import logoSm from "../../images/logo-sm.png";
@@ -8,6 +9,7 @@ import logoLight from "../../images/logo-light.png";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
 import { Dropdown, Form } from "react-bootstrap";
+import { useTranslation } from 'react-i18next';
 import { changeSidebarVisibility } from "../slices/thunk";
 import SearchOption from "../Components/Common/SearchOption";
 import LanguageDropdown from "../Components/Common/LanguageDropdown";
@@ -20,7 +22,13 @@ import CustomProfileDropdown from "./CustomProfileDropdown";
 
 const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
     const dispatch : any = useDispatch();
+    const { t } = useTranslation();
+    const user = usePage().props.auth.user as any;
 
+    const currentPlan = user?.plan || { name: "Basic Plan", expires_at: "2024-12-31" };
+    const formatExpiryDate = (dateString: string) => {
+        return moment(dateString).format('DD/MM/YYYY');
+    };
 
     const selectDashboardData = createSelector(
         (state:any) => state.Layout,
@@ -33,6 +41,13 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
     const [search, setSearch] = useState<boolean>(false);
     const toogleSearch = () => {
         setSearch(!search);
+    };
+
+    const handlePlanClick = () => {
+        // TODO: Navigate to plan details page or open plan modal
+        // You can replace this with your actual navigation logic
+        console.log('Navigating to plan details...');
+        // Example: router.visit(route('seller.plan-details'));
     };
 
     const toogleMenuBtn = () => {
@@ -106,6 +121,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                                     <span></span>
                                 </span>
                             </button>
+
                         </div>
 
                         <div className="d-flex align-items-center">
@@ -127,6 +143,30 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                                     </Form>
                                 </Dropdown.Menu>
                             </Dropdown>
+
+                            {/* Plan Display - Before Language */}
+                            <div className="header-item">
+                                <button 
+                                    type="button" 
+                                    className="btn btn-outline-primary btn-sm me-2"
+                                    onClick={handlePlanClick}
+                                    style={{ 
+                                        borderRadius: '20px',
+                                        fontSize: '0.75rem',
+                                        padding: '0.375rem 0.75rem'
+                                    }}
+                                >
+                                    <div className="d-flex align-items-center">
+                                        <i className="mdi mdi-crown text-warning me-1"></i>
+                                        <div className="d-flex flex-column text-start">
+                                            <span className="fw-semibold">{currentPlan.name}</span>
+                                            <small className="text-muted" style={{fontSize: '0.65rem'}}>
+                                                {t("Exp")}: {formatExpiryDate(currentPlan.expires_at)}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
 
                             {/* LanguageDropdown */}
                             <LanguageDropdown />
