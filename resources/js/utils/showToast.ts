@@ -1,6 +1,6 @@
 import { Slide, toast } from "react-toastify";
 
-export const showToast = (message: string, type: "success" | "error") => {
+export const showToast = (message: string, type: "success" | "error" | "info") => {
   toast[type](message, {
     position: "top-center",
     autoClose: 2500,

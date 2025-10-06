@@ -337,5 +337,9 @@
     "Sub product not exists": "SubProduct không tồn tại",
     "Product not exists": "Sản phẩm không tồn tại",
     "Product type not configured for this product": "Loại sản phẩm chưa được cấu hình cho sản phẩm này",
-    "Category not configured for this product": "Danh mục chưa được cấu hình cho sản phẩm này"
+    "Category not configured for this product": "Danh mục chưa được cấu hình cho sản phẩm này",
+    "Exp": "Hết hạn",
+    "Expires": "Hết hạn",
+    "Select Plan": "Chọn gói",
+    "Current Plan": "Gói hiện tại"
 }

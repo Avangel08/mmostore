@@ -10,6 +10,16 @@ use App\Models\Mongo\Customers;
  */
 class CustomerService
 {
+    public function getForTable(array $request){
+        $page = $request['page'] ?? 1;
+        $perPage = $request['perPage'] ?? 10;
+
+        return Customers::filterSearch($request)
+            ->filterCreatedDate($request)
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
     public function findByIdentifier($identifier)
     {
         return Customers::where('identifier', $identifier)->first();

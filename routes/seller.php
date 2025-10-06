@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Seller\Category\CategoryController;
+use App\Http\Controllers\Seller\CustomerManager\CustomerManagerController;
 use App\Http\Controllers\Seller\DashBoardController;
 use App\Http\Controllers\Seller\LoginController;
 use App\Http\Controllers\Seller\PaymentHistory\PaymentHistoryController;
+use App\Http\Controllers\Seller\Plan\PlanController;
 use App\Http\Controllers\Seller\Product\ProductController;
 use App\Http\Controllers\Seller\Product\SellerAccountController;
 use App\Http\Controllers\Seller\Product\SubProductController;
@@ -73,6 +75,13 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                 Route::group(['prefix' => 'theme-settings'], function() {
                     Route::get('/', [ThemeSettingController::class, 'index'])->name('seller.theme-settings');
                     Route::put('/update', [ThemeSettingController::class, 'update'])->name('seller.theme-settings.update');
+                });
+
+                Route::resource('customer-manager', CustomerManagerController::class, ['as' => 'seller']);
+
+
+                Route::group(['prefix' => 'plans'], function () {
+                    Route::get("/", [PlanController::class, 'index'])->name('seller.plan.index');
                 });
             });
 
