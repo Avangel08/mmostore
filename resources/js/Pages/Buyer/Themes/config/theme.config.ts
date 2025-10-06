@@ -1,19 +1,21 @@
 import { storage } from "../../../../localStorage/storage";
 
 export interface ThemeConfig {
-    logo: string;
-    headerImage: string;
-    titleHeader: string;
-    nameTheme: string;
+    theme: string;
+    pageHeaderImage: string;
+    pageHeaderText: string;
+    storeLogo: string;
+    storeName: string;
 }
 
 const THEME_KEY = "app_theme";
 
 const defaultTheme: ThemeConfig = {
-    logo: "/images/default-logo.png",
-    headerImage: "/images/default-header.png",
-    titleHeader: "My Website",
-    nameTheme: "Theme_1"
+    theme: "Theme_1",
+    pageHeaderImage: "/images/default-header.png",
+    pageHeaderText: "Hello, welcome to MMO Store",
+    storeLogo: "/images/default-logo.png",
+    storeName: "MMO Store"
 };
 
 export const themeStorage = {

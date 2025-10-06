@@ -150,14 +150,16 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                                 id="navbar-example"
                             >
                                 <li className="nav-item">
-                                    <NavLink className="fs-16" href="#hero">
-                                        Sản phẩm
+                                    <NavLink className="fs-16" href="/">
+                                        {t("Home")}
                                     </NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <NavLink className="fs-16" href="#process">
-                                        Nạp tiền
-                                    </NavLink>
+                                    {user && (
+                                        <NavLink className="fs-16" href="/deposits">
+                                            {t("Deposits")}
+                                        </NavLink>
+                                    )}
                                 </li>
                             </Scrollspy>
 
@@ -175,7 +177,7 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                                 <div className="ms-sm-3 header-item d-none d-sm-flex">
                                     {user ? (
                                         <Button variant="primary" onClick={handleLogout}>
-                                            {t("Logout")}
+                                           <i className="ri-logout-box-r-line"></i>{" "}{t("Logout")}
                                         </Button>
                                     ) : (
                                         <Button variant="primary" onClick={() => { setShow(true) }}>

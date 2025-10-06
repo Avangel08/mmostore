@@ -15,9 +15,9 @@ import { LayoutProvider } from "./LayoutContext";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     const dispatch: any = useDispatch();
-    const { subdomain, user, isAuthenticated, theme } = usePage().props;
+    const { subdomain, user, isAuthenticated, theme, store_settings } = usePage().props;
 
-    console.log({ subdomain, user, isAuthenticated, theme })
+    console.log({ subdomain, user, isAuthenticated, theme, store_settings })
 
     const selectLayoutState = (state: any) => state.Layout;
     const selectLayoutProperties = createSelector(

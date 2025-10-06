@@ -3,14 +3,14 @@ import { usePage } from "@inertiajs/react";
 import { ThemeConfig, themeStorage } from "../config/theme.config";
 
 export function useThemeConfig() {
-    const { configTheme } = usePage().props;
+    const { store_settings } = usePage().props;
     const [theme, setTheme] = useState<ThemeConfig | null>(null);
 
     useEffect(() => {
-        if (configTheme) {
+        if (store_settings) {
             // ✅ Nếu server trả về theme mới → update state + localStorage
-            setTheme(configTheme as ThemeConfig);
-            themeStorage.set(configTheme as ThemeConfig)
+            setTheme(store_settings as ThemeConfig);
+            themeStorage.set(store_settings as ThemeConfig);    
         } else {
             // ✅ Nếu không có từ server → lấy từ localStorage
             const stored = themeStorage.get();
@@ -18,7 +18,7 @@ export function useThemeConfig() {
                 setTheme(stored);
             }
         }
-    }, [configTheme]);
+    }, [store_settings]);
 
     return theme;
 }

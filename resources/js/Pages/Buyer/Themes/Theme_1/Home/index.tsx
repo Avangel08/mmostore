@@ -15,14 +15,14 @@ const Index = () => {
 
     useEffect(() => {
         if (theme) {
-            dispatch(changeLayoutTheme(theme?.nameTheme));
+            dispatch(changeLayoutTheme(theme?.theme));
         }
     }, [theme, dispatch])
 
     return (
         <React.Fragment>
-            <Head title="MMO Store" />
-            <PageHeader title={theme?.titleHeader ?? ""} />
+            <Head title={theme?.storeName ?? ""} />
+            <PageHeader title={theme?.pageHeaderText ?? ""} />
             <Table />
         </React.Fragment>
     )

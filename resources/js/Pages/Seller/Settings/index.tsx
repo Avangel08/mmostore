@@ -62,6 +62,7 @@ const ThemeSettings = () => {
             }));
             formData.append("domains", JSON.stringify(values.domains));
             const url = route("seller.theme-settings.update", { id: settings.id })
+            console.log({values})
             return;
             router.put(url, formData, {
                 preserveScroll: true,
