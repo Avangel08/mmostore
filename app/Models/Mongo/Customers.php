@@ -32,12 +32,27 @@ class Customers extends Authenticatable
         'phone_number',
         'balance',
         'identifier',
-        'deposit_amount', 
+        'deposit_amount',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
-    
+
+    public function scopeFilterSearch($query, $request)
+    {
+        if (isset($request['search']) && $request['search'] != '') {
+            $query->where('name', 'like', '%' . $request['search'] . '%')
+                ->orWhere('email', 'like', '%' . $request['search'] . '%');
+        }
+        return $query;
+    }
+
+    public function scopeFilterCreatedDate($query, $request)
+    {
+        if (isset($request['start_time']) && $request['start_time'] != '' && isset($request['end_time']) && $request['end_time'] != '') {
+            $query->whereBetween('created_at', [$request['start_time'], $request['end_time']]);
+        }
+    }
 }
