@@ -82,9 +82,6 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
 
                 Route::group(['prefix' => 'plans'], function () {
                     Route::get("/", [PlanController::class, 'index'])->name('seller.plan.index');
-                    // Route::post("/select-plan", [PlanController::class, 'selectPlan'])->name('seller.plan.select-plan');
-                    // Route::post("/select-method", [PlanController::class, 'selectMethod'])->name('seller.plan.select-payment-method');
-                    // Route::post("/checkout", action: [PlanController::class, 'checkout'])->name('seller.plan.checkout');
                 });
             });
 
