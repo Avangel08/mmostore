@@ -218,7 +218,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 $cannotInsertCount = $originalDataCount - $filteredDataCount;
                 $errorCount += $cannotInsertCount;
 
-                $isSuccess = $this->processInsert($data);
+                $isSuccess = $this->processInsert($filteredData);
                 $dataCount = $filteredDataCount;
                 if ($isSuccess) {
                     $successCount += $dataCount;
