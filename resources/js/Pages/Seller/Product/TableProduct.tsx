@@ -21,7 +21,7 @@ const TableProduct = ({
   onSelectionChange?: (selectedItems: (string | number)[]) => void;
 }) => {
   const { t } = useTranslation();
-  const { statusConst } = usePage().props as any;
+  const { statusConst, storageUrl } = usePage().props as any;
   const [selectedItems, setSelectedItems] = useState<(string | number)[]>([]);
   const [selectAll, setSelectAll] = useState(false);
 
@@ -85,7 +85,11 @@ const TableProduct = ({
       {
         header: t("Product name"),
         cell: (cell: any) => {
-          return <span className="fw-semibold">{cell.getValue()}</span>;
+          const imageUrl = cell?.row?.original?.image;
+
+          return <div className="d-flex align-items-center gap-2">
+            <img src={`${storageUrl}/${imageUrl}`} className="object-fit-contain cursor-pointer" style={{ width: "50px", height: "50px" }} onClick={() => { window.open(`${storageUrl}/${imageUrl}`) }} /> <span className="fw-semibold">{cell.getValue()}</span>
+          </div>
         },
         accessorKey: "name",
         enableColumnFilter: false,
@@ -97,7 +101,7 @@ const TableProduct = ({
         enableColumnFilter: false,
         enableSorting: true,
         cell: (cell: any) => {
-          return <span>{cell.getValue()?.name || "-"}</span>;
+          return <span>{cell?.getValue()?.name || "-"}</span>;
         }
       },
       {
@@ -107,7 +111,7 @@ const TableProduct = ({
         enableSorting: true,
         cell: (cell: any) => {
           return (
-            <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
+            <span>{moment(cell?.getValue()).format("DD/MM/YYYY HH:mm")}</span>
           );
         },
       },
@@ -117,7 +121,7 @@ const TableProduct = ({
         enableColumnFilter: false,
         enableSorting: true,
         cell: (cell: any) => {
-          const statusLabel = statusConst?.[cell.getValue()] || "Unknown";
+          const statusLabel = statusConst?.[cell?.getValue()] || "Unknown";
           const className = {
             Active: "bg-success",
             Inactive: "bg-danger",
@@ -126,9 +130,8 @@ const TableProduct = ({
 
           return (
             <span
-              className={`badge ${
-                className?.[statusLabel] || "bg-dark"
-              } fs-6 fw-medium`}
+              className={`badge ${className?.[statusLabel] || "bg-dark"
+                } fs-6 fw-medium`}
             >
               {t(statusLabel)}
             </span>

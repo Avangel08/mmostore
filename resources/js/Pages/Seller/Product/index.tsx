@@ -143,23 +143,25 @@ const Product = () => {
                   <h5 className="card-title mb-0">{t("Products")}</h5>
                 </Card.Header>
                 <Card.Body>
-                  <ProductFilter onFilter={handleFilter} />
-                  <Row style={{ marginBottom: "32px" }}>
-                    <Col>
-                      <div className="d-flex gap-2">
-                        <Button variant="success" onClick={openAddPage}>
-                          <i className="ri-add-line align-bottom me-1"></i>{" "}
-                          {t("Add product")}
-                        </Button>
-                        {selectedIds.length > 0 && (
-                          <Button variant="danger" onClick={onDeleteMultiple}>
-                            <i className="ri-delete-bin-line align-bottom me-1"></i>{" "}
-                            {t("Delete selected")} ({selectedIds.length})
+                  <div className="mb-4">
+                    <ProductFilter 
+                      onFilter={handleFilter}
+                      additionalButtons={
+                        <>
+                          <Button variant="success" onClick={openAddPage}>
+                            <i className="ri-add-line align-bottom me-1"></i>{" "}
+                            {t("Add product")}
                           </Button>
-                        )}
-                      </div>
-                    </Col>
-                  </Row>
+                          {selectedIds.length > 0 && (
+                            <Button variant="danger" onClick={onDeleteMultiple}>
+                              <i className="ri-delete-bin-line align-bottom me-1"></i>{" "}
+                              {t("Delete selected")} ({selectedIds.length})
+                            </Button>
+                          )}
+                        </>
+                      }
+                    />
+                  </div>
                   <Row>
                     <Col>
                       <TableProduct

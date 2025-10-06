@@ -16,6 +16,7 @@ interface ProductFilterProps {
     perPage: number,
     filters: ProductFilters
   ) => void;
+  additionalButtons?: React.ReactNode;
 }
 
 interface ProductFilters {
@@ -26,7 +27,7 @@ interface ProductFilters {
   status: string;
 }
 
-const ProductFilter = ({ onFilter }: ProductFilterProps) => {
+const ProductFilter = ({ onFilter, additionalButtons }: ProductFilterProps) => {
   const { t, i18n } = useTranslation();
   const flatpickrRef = useRef<any>(null);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
@@ -163,36 +164,9 @@ const ProductFilter = ({ onFilter }: ProductFilterProps) => {
 
   return (
     <div className="filter-container mb-3">
-      {/* Filter Button and Reset Button */}
-      <div className="mb-3 d-flex align-items-center gap-2">
-        <Button
-          variant="outline-primary"
-          onClick={toggleFilterVisibility}
-          className="d-flex align-items-center"
-        >
-          <i
-            className={`ri-filter-${
-              isFilterVisible ? "off" : "2"
-            }-line align-bottom me-2`}
-          ></i>
-          {isFilterVisible ? t("Hide Filters") : t("Show Filters")}
-        </Button>
-
-        {hasActiveFilters() && (
-          <Button
-            variant="outline-secondary"
-            onClick={handleReset}
-            className="d-flex align-items-center"
-          >
-            <i className="ri-refresh-line align-bottom me-1"></i>
-            {t("Reset")}
-          </Button>
-        )}
-      </div>
-
       {/* Filter Form - Only visible when toggled */}
       {isFilterVisible && (
-        <div className="p-3 border rounded bg-light">
+        <div className="p-3 border rounded bg-light mb-3">
           <Row className="g-3">
             <Col md={3}>
               <Form.Label htmlFor="filter-name">{t("Product Name")}</Form.Label>
@@ -285,6 +259,40 @@ const ProductFilter = ({ onFilter }: ProductFilterProps) => {
           </Row>
         </div>
       )}
+
+      <div className="d-flex align-items-center justify-content-between">
+        <div className="d-flex align-items-center gap-2">
+          <Button
+            variant="outline-primary"
+            onClick={toggleFilterVisibility}
+            className="d-flex align-items-center"
+          >
+            <i
+              className={`ri-filter-${
+                isFilterVisible ? "off" : "2"
+              }-line align-bottom me-2`}
+            ></i>
+            {isFilterVisible ? t("Hide Filters") : t("Show Filters")}
+          </Button>
+
+          {hasActiveFilters() && (
+            <Button
+              variant="outline-danger"
+              onClick={handleReset}
+              className="d-flex align-items-center"
+            >
+              <i className="ri-refresh-line align-bottom me-1"></i>
+              {t("Reset")}
+            </Button>
+          )}
+        </div>
+
+        {additionalButtons && (
+          <div className="d-flex align-items-center gap-2">
+            {additionalButtons}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
