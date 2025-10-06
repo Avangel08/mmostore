@@ -1,4 +1,4 @@
-import { usePage } from "@inertiajs/react";
+import { usePage, router } from "@inertiajs/react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Modal, Form, Button, Card, Row } from "react-bootstrap";
@@ -55,7 +55,19 @@ const ModalBuy: React.FC<ProductModalProps> = ({
             ),
         }),
         onSubmit: (values) => {
-            console.log({ values, productId })
+            router.post(route('buyer-product.checkout'), {
+                product_id: productId,
+                sub_product_id: values.subProduct,
+                quantity: values.quantity,
+                price: values.price
+            }, {
+                onSuccess: () => {
+                    handleClose();
+                },
+                onError: (errors) => {
+                    console.error('Checkout errors:', errors);
+                }
+            });
         },
     });
 

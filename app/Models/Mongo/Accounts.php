@@ -26,10 +26,13 @@ class Accounts extends Model
         'customer_id',
         'order_id',
         'import_account_history_id',
+        'reserved_at',
+        'reserved_by_job',
     ];
 
     const STATUS = [
         'LIVE' => 'LIVE',
+        'SOLD' => 'SOLD',
     ];
 
     public function scopeFilterProduct($query, $request)
