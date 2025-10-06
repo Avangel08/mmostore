@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Seller\Category\CategoryController;
+use App\Http\Controllers\Seller\CustomerManager\CustomerManagerController;
 use App\Http\Controllers\Seller\DashBoardController;
 use App\Http\Controllers\Seller\LoginController;
 use App\Http\Controllers\Seller\PaymentHistory\PaymentHistoryController;
@@ -74,6 +75,8 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                     Route::get('/', [ThemeSettingController::class, 'index'])->name('seller.theme-settings');
                     Route::put('/update', [ThemeSettingController::class, 'update'])->name('seller.theme-settings.update');
                 });
+
+                Route::resource('customer-manager', CustomerManagerController::class, ['as' => 'seller']);
             });
 
         });
