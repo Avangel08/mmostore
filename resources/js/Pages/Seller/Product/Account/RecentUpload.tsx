@@ -15,7 +15,7 @@ const RecentUpload = () => {
   const fetchData = useCallback(
     (importPage: number = 1, importPerPage: number = 10, filters?: any) => {
       router.reload({
-        only: ["importHistory", "accounts", "subProduct"],
+        only: ["importHistory", "subProduct"],
         replace: true,
         data: {
           importPage,

@@ -29,7 +29,7 @@ class PlanController extends Controller
         // }
 
         return Inertia::render('Plan/index', [
-            'plans' => fn() => $this->planService->getForTable($request),
+            'plans' => fn() => $this->planService->adminGetForTable($request),
             'statusConst' => fn() => [
                 Plans::STATUS['ACTIVE'] => 'Active',
                 Plans::STATUS['INACTIVE'] => 'Inactive',
@@ -116,7 +116,7 @@ class PlanController extends Controller
             }
 
             $type = $data['type'];
-            if ($type == Plans::TYPE['DEFAULT']) {
+            if ($plan?->type != Plans::TYPE['DEFAULT'] && $type == Plans::TYPE['DEFAULT']) {
                 $plansDefaultType = $this->planService->getDefaultPlans();
                 if ($plansDefaultType->isNotEmpty()) {
                     throw ValidationException::withMessages([

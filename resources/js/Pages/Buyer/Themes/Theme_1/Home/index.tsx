@@ -1,14 +1,12 @@
 import React, { useEffect } from "react";
-import { Head, usePage } from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
 import Layout from "../../Layouts";
 import { Table } from "../Tables";
 import PageHeader from "../PageHeader/PageHeader";
-import { themeStorage, ThemeConfig } from "../../config/theme.config";
 import { useThemeConfig } from "../../hooks/useThemeConfig";
 
 //redux
-import { useSelector, useDispatch } from "react-redux";
-import { createSelector } from 'reselect';
+import { useDispatch } from "react-redux";
 import { changeLayoutTheme } from "../../../../../slices/thunk";
 
 const Index = () => {
@@ -17,14 +15,14 @@ const Index = () => {
 
     useEffect(() => {
         if (theme) {
-            dispatch(changeLayoutTheme(theme?.nameTheme));
+            dispatch(changeLayoutTheme(theme?.theme));
         }
     }, [theme, dispatch])
 
     return (
         <React.Fragment>
-            <Head title="MMO Store" />
-            <PageHeader title={theme?.titleHeader ?? ""} />
+            <Head title={theme?.storeName ?? ""} />
+            <PageHeader title={theme?.pageHeaderText ?? ""} />
             <Table />
         </React.Fragment>
     )

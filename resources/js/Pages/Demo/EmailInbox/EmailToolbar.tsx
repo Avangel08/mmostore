@@ -19,7 +19,7 @@ import {
 import classnames from "classnames";
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { ClassicEditor } from "ckeditor5";
 import FeatherIcon from "feather-icons-react";
 import DeleteModal from "../../../Components/Common/DeleteModal";
 //SimpleBar
@@ -1710,6 +1710,9 @@ const EmailToolbar = () => {
             </div>
             <div className="ck-editor-reverse">
               <CKEditor
+                config={{
+                  licenseKey: "GPL",
+                }}
                 editor={ClassicEditor as any}
                 onReady={(editor) => {
                   // You can store the "editor" and use when it is needed.

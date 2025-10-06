@@ -20,14 +20,4 @@ class Helpers
 
         return $randomString;
     }
-
-    public static function genContentBank(int $userId, string $id, int $length = 6): string
-    {
-        $hash = hash('sha256', $id, true); // 32 bytes nhị phân, luôn ổn định theo $id
-        $code = '';
-        for ($i = 0; strlen($code) < $length && $i < strlen($hash); $i++) {
-            $code .= chr(ord('A') + (ord($hash[$i]) % 26));
-        }
-        return "QR{$userId}{$code}";
-    }
 }

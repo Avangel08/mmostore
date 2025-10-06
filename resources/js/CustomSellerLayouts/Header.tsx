@@ -1,5 +1,6 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import React, { useState } from "react";
+import moment from "moment";
 
 //import images
 import logoSm from "../../images/logo-sm.png";
@@ -8,6 +9,7 @@ import logoLight from "../../images/logo-light.png";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "@reduxjs/toolkit";
 import { Dropdown, Form } from "react-bootstrap";
+import { useTranslation } from 'react-i18next';
 import { changeSidebarVisibility } from "../slices/thunk";
 import SearchOption from "../Components/Common/SearchOption";
 import LanguageDropdown from "../Components/Common/LanguageDropdown";
@@ -19,13 +21,19 @@ import NotificationDropdown from "../Components/Common/NotificationDropdown";
 import CustomProfileDropdown from "./CustomProfileDropdown";
 
 const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
-    const dispatch : any = useDispatch();
+    const dispatch: any = useDispatch();
+    const { t } = useTranslation();
+    const user = usePage().props.auth.user as any;
 
+    const currentPlan = user?.plan || { name: "Basic Plan", expires_at: "2025-12-31" };
+    const formatExpiryDate = (dateString: string) => {
+        return moment(dateString).format('DD/MM/YYYY');
+    };
 
     const selectDashboardData = createSelector(
-        (state:any) => state.Layout,
-        (sidebarVisibilitytype:any) => sidebarVisibilitytype.sidebarVisibilitytype
-      );
+        (state: any) => state.Layout,
+        (sidebarVisibilitytype: any) => sidebarVisibilitytype.sidebarVisibilitytype
+    );
     // Inside your component
     const sidebarVisibilitytype = useSelector(selectDashboardData);
 
@@ -33,6 +41,10 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
     const [search, setSearch] = useState<boolean>(false);
     const toogleSearch = () => {
         setSearch(!search);
+    };
+
+    const handlePlanClick = () => {
+        window.open(route('seller.plan.index'), '_self');
     };
 
     const toogleMenuBtn = () => {
@@ -48,22 +60,22 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
             document.body.classList.contains("menu") ? document.body.classList.remove("menu") : document.body.classList.add("menu");
         }
 
-    //For collapse vertical and semibox menu
-    if (sidebarVisibilitytype === "show" && (document.documentElement.getAttribute('data-layout') === "vertical" || document.documentElement.getAttribute('data-layout') === "semibox")) {
-        if (windowSize < 1025 && windowSize > 767) {
-            document.body.classList.remove('vertical-sidebar-enable');
-            (document.documentElement.getAttribute('data-sidebar-size') === 'sm') ? document.documentElement.setAttribute('data-sidebar-size', '') : document.documentElement.setAttribute('data-sidebar-size', 'sm');
-        } else if (windowSize > 1025) {
-            document.body.classList.remove('vertical-sidebar-enable');
-            (document.documentElement.getAttribute('data-sidebar-size') === 'lg') ? document.documentElement.setAttribute('data-sidebar-size', 'sm') : document.documentElement.setAttribute('data-sidebar-size', 'lg');
-        } else if (windowSize <= 767) {
-            document.body.classList.add('vertical-sidebar-enable');
-            document.documentElement.setAttribute('data-sidebar-size', 'lg');
+        //For collapse vertical and semibox menu
+        if (sidebarVisibilitytype === "show" && (document.documentElement.getAttribute('data-layout') === "vertical" || document.documentElement.getAttribute('data-layout') === "semibox")) {
+            if (windowSize < 1025 && windowSize > 767) {
+                document.body.classList.remove('vertical-sidebar-enable');
+                (document.documentElement.getAttribute('data-sidebar-size') === 'sm') ? document.documentElement.setAttribute('data-sidebar-size', '') : document.documentElement.setAttribute('data-sidebar-size', 'sm');
+            } else if (windowSize > 1025) {
+                document.body.classList.remove('vertical-sidebar-enable');
+                (document.documentElement.getAttribute('data-sidebar-size') === 'lg') ? document.documentElement.setAttribute('data-sidebar-size', 'sm') : document.documentElement.setAttribute('data-sidebar-size', 'lg');
+            } else if (windowSize <= 767) {
+                document.body.classList.add('vertical-sidebar-enable');
+                document.documentElement.setAttribute('data-sidebar-size', 'lg');
+            }
         }
-    }
 
 
-    //Two column menu
+        //Two column menu
         if (document.documentElement.getAttribute('data-layout') === "twocolumn") {
             document.body.classList.contains('twocolumn-panel') ? document.body.classList.remove('twocolumn-panel') : document.body.classList.add('twocolumn-panel');
         }
@@ -106,6 +118,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                                     <span></span>
                                 </span>
                             </button>
+
                         </div>
 
                         <div className="d-flex align-items-center">
@@ -127,6 +140,30 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                                     </Form>
                                 </Dropdown.Menu>
                             </Dropdown>
+
+                            {/* Plan Display - Before Language */}
+                            {/* <div className="header-item">
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-primary btn-sm me-2"
+                                    onClick={handlePlanClick}
+                                    style={{
+                                        borderRadius: '20px',
+                                        fontSize: '0.75rem',
+                                        padding: '0.375rem 0.75rem'
+                                    }}
+                                >
+                                    <div className="d-flex align-items-center">
+                                        <i className="mdi mdi-crown text-warning me-1"></i>
+                                        <div className="d-flex flex-column text-start" onClick={handlePlanClick}>
+                                            <span className="fw-semibold">{currentPlan.name}</span>
+                                            <small className="text-muted" style={{ fontSize: '0.65rem' }}>
+                                                {t("Exp")}: {formatExpiryDate(currentPlan.expires_at)}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div> */}
 
                             {/* LanguageDropdown */}
                             <LanguageDropdown />

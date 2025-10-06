@@ -10,6 +10,8 @@ const Navdata = () => {
     const [isProduct, setIsProduct] = useState<boolean>(false);
     const [isPaymentHistory, setIsPaymentHistory] = useState<boolean>(false);
     const [iscurrentState, setIscurrentState] = useState('Dashboard');
+    const [isSettings, setIsSettings] = useState<boolean>(false)
+    const [isCustomerManager, setIsCustomerManager] = useState<boolean>(false)
 
     function updateIconSidebar(e : any) {
         if (e && e.target && e.target.getAttribute("sub-items")) {
@@ -40,6 +42,12 @@ const Navdata = () => {
         if (iscurrentState !== 'Payment History') {
             setIsPaymentHistory(false);
         }
+        if (iscurrentState !== 'Theme Settings') {
+            setIsSettings(false)
+        }
+        if (iscurrentState !== 'Customer Manager') {
+            setIsCustomerManager(false);
+        }
     }, [
         history,
         iscurrentState,
@@ -47,6 +55,8 @@ const Navdata = () => {
         isCategory,
         isProduct,
         isPaymentHistory,
+        isSettings,
+        isCustomerManager
     ]);
 
     const menuItems : any = [
@@ -64,6 +74,19 @@ const Navdata = () => {
                 e.preventDefault();
                 setIsDashboard(!isDashboard);
                 setIscurrentState('Dashboard');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "customer-manager",
+            label: "Customer Manager",
+            icon: "ri-dashboard-2-line",
+            link: route("seller.customer-manager.index"),
+            stateVariables: isDashboard,
+            click: function (e : any) {
+                e.preventDefault();
+                setIsCustomerManager(!isCustomerManager);
+                setIscurrentState('Customer Manager');
                 updateIconSidebar(e);
             },
         },
@@ -103,6 +126,19 @@ const Navdata = () => {
                 e.preventDefault();
                 setIsPaymentHistory(!isPaymentHistory);
                 setIscurrentState('Payment History');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "setting",
+            label: "Theme settings",
+            icon: "ri-settings-2-line",
+            link: route('seller.theme-settings'),
+            stateVariables: isSettings,
+            click: function (e : any) {
+                e.preventDefault();
+                setIsDashboard(!isSettings);
+                setIscurrentState('Theme Settings');
                 updateIconSidebar(e);
             },
         },

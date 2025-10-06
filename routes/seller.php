@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Controllers\Seller\Category\CategoryController;
+use App\Http\Controllers\Seller\CustomerManager\CustomerManagerController;
 use App\Http\Controllers\Seller\DashBoardController;
 use App\Http\Controllers\Seller\LoginController;
 use App\Http\Controllers\Seller\PaymentHistory\PaymentHistoryController;
+use App\Http\Controllers\Seller\Plan\PlanController;
 use App\Http\Controllers\Seller\Product\ProductController;
 use App\Http\Controllers\Seller\Product\SellerAccountController;
 use App\Http\Controllers\Seller\Product\SubProductController;
 use App\Http\Controllers\Seller\Profile\ProfileController;
+use App\Http\Controllers\Seller\Setting\ThemeSettingController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
@@ -66,6 +69,19 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                     Route::get('/edit', [PaymentHistoryController::class, 'edit'])->name('seller.payment-history.edit');
                     Route::post('/create', [PaymentHistoryController::class, 'store'])->name('seller.payment-history.store');
                     Route::post('/verify-payment', [PaymentHistoryController::class, 'verifyPayment'])->name('seller.payment-history.verify-payment');
+                });
+
+                // seller theme settings
+                Route::group(['prefix' => 'theme-settings'], function() {
+                    Route::get('/', [ThemeSettingController::class, 'index'])->name('seller.theme-settings');
+                    Route::put('/update', [ThemeSettingController::class, 'update'])->name('seller.theme-settings.update');
+                });
+
+                Route::resource('customer-manager', CustomerManagerController::class, ['as' => 'seller']);
+
+
+                Route::group(['prefix' => 'plans'], function () {
+                    Route::get("/", [PlanController::class, 'index'])->name('seller.plan.index');
                 });
             });
 

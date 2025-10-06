@@ -404,8 +404,6 @@ class VietCombank
     }
     public function doLogin(){
         $solveCaptcha = $this->solveCaptchaEcaptcha();
-        echo "solveCaptcha";
-        print_r($solveCaptcha);
         if($solveCaptcha['status'] == false){
             return $solveCaptcha;
         }
@@ -423,7 +421,6 @@ class VietCombank
             "password" => $this->password,
             "user" => $this->username
         );
-        echo 'login';
         $result = $this->curlPost($this->url['login'],$param);
         if($result->code == 00 ){
             $this->sessionId = $result->sessionId;

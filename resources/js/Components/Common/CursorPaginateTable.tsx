@@ -99,7 +99,7 @@ interface CursorPaginateTableProps {
   handleContactClick?: any;
   handleTicketClick?: any;
   onSubmit?: any;
-  onReloadTable?: (cursor: string | null, perPage: number, direction?: 'next' | 'prev') => void;
+  onReloadTable?: (cursor: string | null, perPage: number) => void;
   perPageEntries?: number[];
   onRowContextMenu?: (event: React.MouseEvent, rowData: any) => void;
   divStyle?: React.CSSProperties;
@@ -194,14 +194,14 @@ const CursorPaginateTable = ({
   }, [customPageSize, setPageSize]);
 
   const handlePreviousPage = () => {
-    if (onReloadTable && data?.prev_cursor !== null) {
-      onReloadTable(data.prev_cursor, pagination.pageSize, 'prev');
+    if (onReloadTable && data?.prev_cursor) {
+      onReloadTable(data.prev_cursor, pagination.pageSize);
     }
   };
 
   const handleNextPage = () => {
     if (onReloadTable && data?.next_cursor) {
-      onReloadTable(data.next_cursor, pagination.pageSize, 'next');
+      onReloadTable(data.next_cursor, pagination.pageSize);
     }
   };
 

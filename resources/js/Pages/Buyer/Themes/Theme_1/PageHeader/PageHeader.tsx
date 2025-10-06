@@ -15,9 +15,9 @@ const PageHeader = ({ title }: { title: string }) => {
                             </div>
                         </Col>
                         <Col lg={9}>
-                            <div>
+                            <span dangerouslySetInnerHTML={{ __html: title }} />
+                            {/* <div>
                                 <h3 className="display-8 fw-semibold text-capitalize mb-3 lh-base text-white">
-                                    {title}
                                 </h3>
                                 <p className="lh-base mb-4 text-white">
                                     <i className="ri-error-warning-line"></i> Mỗi tài khoản MAIL được bán duy nhất và một lần ( Không chia sẻ)
@@ -32,7 +32,7 @@ const PageHeader = ({ title }: { title: string }) => {
                                 <p className="lh-base mb-4 text-white">
                                     <i className="ri-error-warning-line"></i> Chúng tôi đã tích hợp đọc mail qua OAuth2 trên website và API để sử dụng khi mua mail bạn tải full định dạng bao gồm Refresh_token và client_id. Mỗi Refresh_token có thời gian tồn tại là 90 ngày, sau 90 ngày, nếu không được làm mới, Refresh_token sẽ không thể sử dụng được nữa
                                 </p>
-                            </div>
+                            </div> */}
                         </Col>
                     </Row>
                 </Container>

@@ -6,6 +6,8 @@ use App\Jobs\SellerAccount\JobDeleteUnsoldAccount;
 use App\Jobs\SellerAccount\JobImportAccount;
 use App\Models\Mongo\Accounts;
 use App\Models\Mongo\ImportAccountHistory;
+use App\Models\Mongo\Products;
+use App\Models\Mongo\SubProducts;
 use Carbon\Carbon;
 use Config;
 
@@ -34,7 +36,7 @@ class SellerAccountService
         return Accounts::select($select)->with($relation)->where('_id', $id)->first();
     }
 
-    public function processAccountFile(array $data)
+    public function processAccountFile($categoryId, $productTypeId, $data)
     {
         $file = $data['file'];
         $host = request()->getHost();
@@ -43,7 +45,7 @@ class SellerAccountService
         $filePath = $file->storeAs("{$host}/accounts", $fileName, 'public');
         $dbConfig = Config::get('database.connections.tenant_mongo');
         $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-        JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $dbConfig);
+        JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $categoryId, $productTypeId, $importAccountHistory?->id, $dbConfig);
     }
 
     public function createAccount(array $data)
@@ -151,5 +153,27 @@ class SellerAccountService
     public function startDeleteUnsoldAccount($subProductId)
     {
         JobDeleteUnsoldAccount::dispatch($subProductId, Config::get('database.connections.tenant_mongo'));
+    }
+
+    public function checkUniqueData($categoryId, $productTypeId, array $mainData)
+    {
+        if (!$categoryId || !$productTypeId) {
+            return array_fill_keys($mainData, false);
+        }
+
+        $existingMainData = Accounts::select('main_data')->where('category_id', $categoryId)
+            ->where('product_type_id', $productTypeId)
+            ->whereIn('main_data', $mainData)
+            ->pluck('main_data')
+            ->toArray();
+
+        $existingMainDataMap = array_flip($existingMainData);
+
+        $result = [];
+        foreach ($mainData as $data) {
+            $result[$data] = !isset($existingMainDataMap[$data]);
+        }
+
+        return $result;
     }
 }

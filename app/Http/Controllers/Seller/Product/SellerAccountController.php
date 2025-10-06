@@ -52,7 +52,28 @@ class SellerAccountController extends Controller
 
         try {
             $data = $request->validated();
-            $this->sellerAccountService->processAccountFile($data);
+            $subProduct = $this->subProductService->getById(
+                $data['sub_product_id'],
+                ['id', 'product_id'],
+                [
+                    'product:id,name,category_id,product_type_id',
+                    'product.productType:id,name',
+                    'product.category:id,name'
+                ]
+            );
+            if (!$subProduct) {
+                return back()->with('error', 'Sub product not exists');
+            }
+            if (!$subProduct->product) {
+                return back()->with('error', 'Product not exists');
+            }
+            if (!$subProduct?->product?->productType) {
+                return back()->with('error', 'Product type not configured for this product');
+            }
+            if (!$subProduct?->product?->category) {
+                return back()->with('error', 'Category not configured for this product');
+            }
+            $this->sellerAccountService->processAccountFile($subProduct->product->category_id, $subProduct->product->product_type_id, $data);
 
             return back()->with('success', 'File uploaded successfully and is pending processing');
         } catch (\Exception $e) {
@@ -79,14 +100,22 @@ class SellerAccountController extends Controller
         //     return abort(403);
         // }
         $subProduct = $this->subProductService->getById($subProductId);
-        if (! $subProduct) {
+        if (!$subProduct) {
             abort(404);
         }
 
         return Inertia::render('Product/Account/index', [
-            'subProduct' => fn () => $this->subProductService->getById($subProductId),
-            'importHistory' => fn () => $this->importAccountHistoryService->getForTable($subProductId, $request),
-            'accounts' => fn () => $this->sellerAccountService->getForTable($subProductId, $request),
+            'subProduct' => fn() => $this->subProductService->getById(
+                $subProductId,
+                ['id', 'product_id', 'quantity'],
+                [
+                    'product:id,name,category_id,product_type_id',
+                    'product.productType:id,name',
+                    'product.category:id,name'
+                ]
+            ),
+            'importHistory' => fn() => $this->importAccountHistoryService->getForTable($subProductId, $request),
+            'accounts' => Inertia::optional(fn() => $this->sellerAccountService->getForTable($subProductId, $request)),
         ]);
     }
 
@@ -105,7 +134,7 @@ class SellerAccountController extends Controller
     {
         try {
             $subProduct = $this->subProductService->getById($subProductId);
-            if (! $subProduct) {
+            if (!$subProduct) {
                 throw new \Exception('Sub product not found');
             }
             $this->sellerAccountService->startDeleteUnsoldAccount($subProductId);

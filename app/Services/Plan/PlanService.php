@@ -11,7 +11,7 @@ use Carbon\Carbon;
  */
 class PlanService
 {
-    public function getForTable($request)
+    public function adminGetForTable($request)
     {
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
@@ -112,5 +112,14 @@ class PlanService
         $newPlan->save();
 
         return $newPlan;
+    }
+
+    public function sellerGetAllPlans($select = ['*'], $relation = [])
+    {
+        return Plans::select($select)
+            ->where('status', Plans::STATUS['ACTIVE'])
+            ->where('show_public', Plans::SHOW_PUBLIC['true'])
+            ->with($relation)
+            ->get();
     }
 }

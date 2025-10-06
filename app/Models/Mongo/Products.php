@@ -2,6 +2,7 @@
 
 namespace App\Models\Mongo;
 
+use App\Models\MySQL\ProductType;
 use Carbon\Carbon;
 use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
@@ -24,6 +25,7 @@ class Products extends Model
         'short_description',
         'image',
         'slug',
+        'product_type_id',
     ];
 
     const STATUS = [
@@ -31,7 +33,7 @@ class Products extends Model
         'INACTIVE' => 'INACTIVE',
     ];
 
-    public function categories()
+    public function category()
     {
         return $this->belongsTo(Categories::class, 'category_id');
     }
@@ -39,6 +41,11 @@ class Products extends Model
     public function subProducts()
     {
         return $this->hasMany(SubProducts::class, 'product_id', 'id');
+    }
+
+    public function productType()
+    {
+        return $this->belongsTo(ProductType::class, 'product_type_id');
     }
 
     public function scopeFilterName($query, $request)

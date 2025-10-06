@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Buyer\Deposit;
 
-use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\Mongo\Deposits;
 use App\Services\Deposits\DepositService;
 use App\Services\CurrencyRate\CurrencyRateService;
 use App\Services\PaymentMethod\PaymentMethodService;
 use App\Services\Customer\CustomerService;
+use App\Services\CheckBank\CheckBankService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -19,16 +19,19 @@ class DepositController extends Controller
     protected $paymentMethodService;
     protected $currencyRateService;
     protected $customerService;
+    protected $checkBankService;
     public function __construct(
         DepositService $depositService,
         PaymentMethodService $paymentMethodService,
         CurrencyRateService $currencyRateService,
-        CustomerService $customerService
+        CustomerService $customerService,
+        CheckBankService $checkBankService
     ) {
         $this->depositService = $depositService;
         $this->paymentMethodService = $paymentMethodService;
         $this->currencyRateService = $currencyRateService;
         $this->customerService = $customerService;
+        $this->checkBankService = $checkBankService;
     }
     /**
      * Display a listing of the resource.
@@ -43,7 +46,7 @@ class DepositController extends Controller
     {
         try {
             $data = $request->all();
-            $ownerStoreId = session('ownerStoreId') ?? 2;
+            $ownerStoreId = session('ownerStoreId');
             $customer = Auth::guard(config('guard.buyer'))->user();
             //payment method của user setting
             $paymentMethod = $this->paymentMethodService->findByUserId($ownerStoreId);
@@ -69,7 +72,7 @@ class DepositController extends Controller
             if (!$result) {
                 $result = $this->depositService->create($dataInsert);
                 if ($result) {
-                    $contentBank = Helpers::genContentBank($ownerStoreId, $result->_id);
+                    $contentBank = $this->checkBankService->genContentBank($ownerStoreId, $result->_id);
                     $this->depositService->update($result, ['content_bank' => $contentBank]);
                 }
             }

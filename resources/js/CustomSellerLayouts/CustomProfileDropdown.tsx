@@ -1,6 +1,7 @@
 import React, { useState} from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Link, usePage, router } from '@inertiajs/react';
+import moment from "moment";
 //import images
 import avatar1 from "../../images/users/user-dummy-img.jpg";
 import { useTranslation } from 'react-i18next';
@@ -11,6 +12,11 @@ const CustomProfileDropdown = () => {
     const subdomain = usePage().props.subdomain || "";
     const storageUrl = usePage().props.storageUrl || "";
     const username = (user?.first_name || user?.last_name) ? ((user?.first_name ?? "") + ' ' + (user?.last_name ?? "")) : (user?.name ?? "");
+    
+    const currentPlan = user?.plan || { name: "Basic Plan", expires_at: "2025-12-31" };
+    const formatExpiryDate = (dateString: string) => {
+        return moment(dateString).format('DD/MM/YYYY');
+    };
     //Dropdown Toggle
     const [isProfileDropdown, setIsProfileDropdown] = useState<boolean>(false);
     const toggleProfileDropdown = () => {
@@ -42,6 +48,21 @@ const CustomProfileDropdown = () => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="dropdown-menu-end">
                     <h6 className="dropdown-header">{t("Hello")}, {username}</h6>
+                    
+                    {/* Plan Information Section */}
+                    {/* <div className="px-3 py-2 bg-light-subtle rounded mx-2 mb-2">
+                        <div className="d-flex flex-column" onClick={() => { window.open(route('seller.plan.index'), '_self'); }}>
+                            <span className="fw-semibold text-primary mb-1" style={{fontSize: '0.875rem'}}>
+                                {currentPlan.name}
+                            </span>
+                            <small className="text-muted d-flex align-items-center">
+                                <i className="mdi mdi-calendar-clock text-warning me-1"></i>
+                                {t("Expires")}: {formatExpiryDate(currentPlan.expires_at)}
+                            </small>
+                        </div>
+                    </div> */}
+                    
+                    <div className="dropdown-divider"></div>
                     <Dropdown.Item href={route("seller.profile", {sub: subdomain})} className="dropdown-item">
                        <i className="mdi mdi-account-circle text-muted fs-16 align-middle me-2"></i>
                        <span className="align-middle">{t("Edit information")}</span>
