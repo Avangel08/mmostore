@@ -159,19 +159,21 @@ const Profile = () => {
         <React.Fragment>
             <Head title={t("Personal profile")} />
             <PageHeader title={theme?.pageHeaderText ?? ""} />
-            <div className="p-5">
+            <div style={{
+                margin: '5vh 10vw',
+            }}>
                 <ToastContainer />
                 <Container fluid>
                     <Row>
                         <Col xxl={12}>
-                            <Card className="">
+                            <Card style={{ minHeight: '40vh' }}>
                                 <Tab.Container defaultActiveKey="personal-info">
                                     <Card.Body className="p-0">
                                         <Row className="g-0">
                                             <Col md={3}>
                                                 <Nav
                                                     variant="pills"
-                                                    className="flex-column nav-pills-custom p-3 border-end"
+                                                    className="flex-column nav-pills-custom p-3 border-end" style={{ height: '100%' }}
                                                     role="tablist"
                                                 >
                                                     <Nav.Item className="mb-2">
@@ -188,25 +190,30 @@ const Profile = () => {
                                                     </Nav.Item>
                                                 </Nav>
                                             </Col>
-                                            <Col md={6}>
+                                            <Col md={5}>
                                                 <Tab.Content className="p-4">
                                                     <TabPaneChangeInformation />
                                                     <TabPaneChangePassword />
                                                 </Tab.Content>
                                             </Col>
-                                            <Col md={3}>
-                                                <div className="p-4 border-start">
+                                            <Col md={4}>
+                                                <div className="p-4 border-start d-flex align-items-center justify-content-center" style={{ minHeight: '100%' }}>
                                                     <div className="text-center">
                                                         <div className="profile-user position-relative d-inline-block mx-auto mb-4">
                                                             <img
                                                                 src={previewImage || (user?.image ? `${storageUrl}/${user.image}` : avatar1)}
-                                                                className="rounded-circle avatar-xl img-thumbnail user-profile-image material-shadow"
+                                                                className="rounded-circle img-thumbnail user-profile-image material-shadow"
                                                                 alt="user-profile"
                                                                 onClick={() => {
                                                                     const imageUrl = previewImage || (user?.image ? `${storageUrl}/${user.image}` : avatar1);
                                                                     window.open(imageUrl, '_blank');
                                                                 }}
-                                                                style={{ cursor: 'pointer' }}
+                                                                style={{
+                                                                    cursor: 'pointer',
+                                                                    width: '150px',
+                                                                    height: '150px',
+                                                                    objectFit: 'cover'
+                                                                }}
                                                             />
                                                             <div className="avatar-xs p-0 rounded-circle profile-photo-edit">
                                                                 <Form.Control
@@ -245,7 +252,7 @@ const Profile = () => {
                                                                 />
                                                             </div>
                                                         )}
-                                                        <h5 className="fs-16 mb-1">{(user?.first_name || user?.last_name) ? ((user?.first_name ?? "") + ' ' + (user?.last_name ?? "")) : (user?.name ?? "")}</h5>
+                                                        <h5 className="fs-6 mb-1">{(user?.first_name || user?.last_name) ? ((user?.first_name ?? "") + ' ' + (user?.last_name ?? "")) : (user?.name ?? "")}</h5>
                                                         {errors?.image && (
                                                             <div className="text-danger small mt-1">
                                                                 {errors?.image}

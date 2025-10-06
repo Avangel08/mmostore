@@ -28,9 +28,10 @@ const SellingProduct = () => {
   );
 
   useEffect(() => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       fetchData(1, 100);
     }, 100);
+    return () => clearTimeout(timeout);
   }, []);
 
   const handleFilter = (accountPage: number, accountPerPage: number, filters: any) => {

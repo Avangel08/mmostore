@@ -26,8 +26,6 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
     const { user } = usePage().props.auth;
     const { t } = useTranslation();
 
-    console.log(user);
-
     const handleLogout = () => {
         router.post(route("buyer.logout"), {}, {
             onSuccess: () => {

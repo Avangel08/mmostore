@@ -21,8 +21,16 @@ class ProfileController extends Controller
 
     public function index()
     {
+        $user = Auth::guard(config('guard.buyer'))->user();
+        if (!$user) {
+            return abort(404);
+        }
         $theme = session('theme') ?? "Theme_1";
-        return Inertia::render("Themes/{$theme}/Profile/index", []);
+        return Inertia::render("Themes/{$theme}/Profile/index", [
+            'purchasedCount' => Inertia::optional(function () {
+                return 0;
+            }),
+        ]);
     }
 
     public function updateInfo(BuyerProfileRequest $request)

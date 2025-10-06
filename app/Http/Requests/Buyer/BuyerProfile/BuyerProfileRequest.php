@@ -28,7 +28,7 @@ class BuyerProfileRequest extends FormRequest
                 'last_name' => ['nullable', 'string', 'min:2', 'max:50'],
             ],
             'changePassword' => [
-                'current_password' => ['required', 'current_password:'.config('guard.seller')],
+                'current_password' => ['required', 'current_password:'.config('guard.buyer')],
                 'password' => ['required', 'string', 'min:8', 'confirmed'], 
             ],
             'uploadImage' => [

@@ -1,15 +1,31 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Tab, Form, Row, Col, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { router, usePage } from "@inertiajs/react";
 import { showToast } from "../../../../../utils/showToast";
+import moment from "moment";
 
 export default function TabPaneChangeInformation() {
   const { t } = useTranslation();
   const user = usePage().props.auth.user as any;
   const errors = usePage().props.errors as any;
+  const [purchasedCount, setPurchasedCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchTimeout = setTimeout(() => {
+      router.reload({
+        replace: true,
+        only: ['purchasedCount'],
+        onSuccess: (page: any) => {
+          setPurchasedCount(page?.props?.purchasedCount || 0);
+        }
+      })
+    }, 0);
+
+    return () => clearTimeout(fetchTimeout);
+  }, []);
 
   const personalInfoFormik = useFormik({
     initialValues: {
@@ -48,7 +64,7 @@ export default function TabPaneChangeInformation() {
   useEffect(() => {
     personalInfoFormik.setErrors(errors || {});
   }, [errors]);
-  
+
   return (
     <Tab.Pane eventKey="personal-info">
       <Form onSubmit={personalInfoFormik.handleSubmit} noValidate>
@@ -61,55 +77,87 @@ export default function TabPaneChangeInformation() {
               </div>
             </div>
           </Col>
-          <Col lg={6}>
+          <Col lg={12}>
             <div className="mb-3">
-              <Form.Group controlId="first_name">
-                <Form.Label>
-                  {t("First Name")} <span className="text-danger">*</span>
+              <Form.Group as={Row} controlId="first_name">
+                <Form.Label column lg={3} className="fw-semibold">
+                  {t("First Name")}<span className="text-danger">*</span> :
                 </Form.Label>
-                <Form.Control
-                  type="text"
-                  className="form-control"
-                  placeholder={t("Enter your first name")}
-                  value={personalInfoFormik.values.first_name}
-                  onChange={personalInfoFormik.handleChange}
-                  onBlur={personalInfoFormik.handleBlur}
-                  isInvalid={
-                    !!(
-                      personalInfoFormik.touched.first_name &&
-                      personalInfoFormik.errors.first_name
-                    )
-                  }
-                />
-                <Form.Control.Feedback type="invalid">
-                  {personalInfoFormik?.errors?.first_name ?? ""}
-                </Form.Control.Feedback>
+                <Col lg={9}>
+                  <Form.Control
+                    type="text"
+                    className="form-control"
+                    placeholder={t("Enter your first name")}
+                    value={personalInfoFormik.values.first_name}
+                    onChange={personalInfoFormik.handleChange}
+                    onBlur={personalInfoFormik.handleBlur}
+                    isInvalid={
+                      !!(
+                        personalInfoFormik.touched.first_name &&
+                        personalInfoFormik.errors.first_name
+                      )
+                    }
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {personalInfoFormik?.errors?.first_name ?? ""}
+                  </Form.Control.Feedback>
+                </Col>
               </Form.Group>
             </div>
           </Col>
-          <Col lg={6}>
+          <Col lg={12}>
             <div className="mb-3">
-              <Form.Group controlId="last_name">
-                <Form.Label>
-                  {t("Last Name")}
+              <Form.Group as={Row} controlId="last_name">
+                <Form.Label column lg={3} className="fw-semibold">
+                  {t("Last Name")}:
                 </Form.Label>
-                <Form.Control
-                  type="text"
-                  className="form-control"
-                  placeholder={t("Enter your last name")}
-                  value={personalInfoFormik.values.last_name}
-                  onChange={personalInfoFormik.handleChange}
-                  onBlur={personalInfoFormik.handleBlur}
-                  isInvalid={
-                    !!(
-                      personalInfoFormik.touched.last_name &&
-                      personalInfoFormik.errors.last_name
-                    )
-                  }
-                />
-                <Form.Control.Feedback type="invalid">
-                  {personalInfoFormik?.errors?.last_name ?? ""}
-                </Form.Control.Feedback>
+                <Col lg={9}>
+                  <Form.Control
+                    type="text"
+                    className="form-control"
+                    placeholder={t("Enter your last name")}
+                    value={personalInfoFormik.values.last_name}
+                    onChange={personalInfoFormik.handleChange}
+                    onBlur={personalInfoFormik.handleBlur}
+                    isInvalid={
+                      !!(
+                        personalInfoFormik.touched.last_name &&
+                        personalInfoFormik.errors.last_name
+                      )
+                    }
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {personalInfoFormik?.errors?.last_name ?? ""}
+                  </Form.Control.Feedback>
+                </Col>
+              </Form.Group>
+            </div>
+          </Col>
+          <Col lg={12}>
+            <div className="mb-3">
+              <Form.Group as={Row}>
+                <Form.Label column lg={3} className="fw-semibold">
+                  {t("Registration date")}:
+                </Form.Label>
+                <Col lg={9}>
+                  <div className="form-control-plaintext">
+                    {moment(user?.created_at).format("DD/MM/YYYY HH:mm")}
+                  </div>
+                </Col>
+              </Form.Group>
+            </div>
+          </Col>
+          <Col lg={12}>
+            <div className="mb-3">
+              <Form.Group as={Row}>
+                <Form.Label column lg={3} className="fw-semibold">
+                  {t("Purchased")}:
+                </Form.Label>
+                <Col lg={9}>
+                  <div className="form-control-plaintext">
+                    {purchasedCount == null ? t('Loading') + "..." : `${purchasedCount} ${t('products')}`}
+                  </div>
+                </Col>
               </Form.Group>
             </div>
           </Col>
