@@ -21,19 +21,19 @@ import NotificationDropdown from "../Components/Common/NotificationDropdown";
 import CustomProfileDropdown from "./CustomProfileDropdown";
 
 const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
-    const dispatch : any = useDispatch();
+    const dispatch: any = useDispatch();
     const { t } = useTranslation();
     const user = usePage().props.auth.user as any;
 
-    const currentPlan = user?.plan || { name: "Basic Plan", expires_at: "2024-12-31" };
+    const currentPlan = user?.plan || { name: "Basic Plan", expires_at: "2025-12-31" };
     const formatExpiryDate = (dateString: string) => {
         return moment(dateString).format('DD/MM/YYYY');
     };
 
     const selectDashboardData = createSelector(
-        (state:any) => state.Layout,
-        (sidebarVisibilitytype:any) => sidebarVisibilitytype.sidebarVisibilitytype
-      );
+        (state: any) => state.Layout,
+        (sidebarVisibilitytype: any) => sidebarVisibilitytype.sidebarVisibilitytype
+    );
     // Inside your component
     const sidebarVisibilitytype = useSelector(selectDashboardData);
 
@@ -44,10 +44,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
     };
 
     const handlePlanClick = () => {
-        // TODO: Navigate to plan details page or open plan modal
-        // You can replace this with your actual navigation logic
-        console.log('Navigating to plan details...');
-        // Example: router.visit(route('seller.plan-details'));
+        window.open(route('seller.plan.index'), '_self');
     };
 
     const toogleMenuBtn = () => {
@@ -63,22 +60,22 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
             document.body.classList.contains("menu") ? document.body.classList.remove("menu") : document.body.classList.add("menu");
         }
 
-    //For collapse vertical and semibox menu
-    if (sidebarVisibilitytype === "show" && (document.documentElement.getAttribute('data-layout') === "vertical" || document.documentElement.getAttribute('data-layout') === "semibox")) {
-        if (windowSize < 1025 && windowSize > 767) {
-            document.body.classList.remove('vertical-sidebar-enable');
-            (document.documentElement.getAttribute('data-sidebar-size') === 'sm') ? document.documentElement.setAttribute('data-sidebar-size', '') : document.documentElement.setAttribute('data-sidebar-size', 'sm');
-        } else if (windowSize > 1025) {
-            document.body.classList.remove('vertical-sidebar-enable');
-            (document.documentElement.getAttribute('data-sidebar-size') === 'lg') ? document.documentElement.setAttribute('data-sidebar-size', 'sm') : document.documentElement.setAttribute('data-sidebar-size', 'lg');
-        } else if (windowSize <= 767) {
-            document.body.classList.add('vertical-sidebar-enable');
-            document.documentElement.setAttribute('data-sidebar-size', 'lg');
+        //For collapse vertical and semibox menu
+        if (sidebarVisibilitytype === "show" && (document.documentElement.getAttribute('data-layout') === "vertical" || document.documentElement.getAttribute('data-layout') === "semibox")) {
+            if (windowSize < 1025 && windowSize > 767) {
+                document.body.classList.remove('vertical-sidebar-enable');
+                (document.documentElement.getAttribute('data-sidebar-size') === 'sm') ? document.documentElement.setAttribute('data-sidebar-size', '') : document.documentElement.setAttribute('data-sidebar-size', 'sm');
+            } else if (windowSize > 1025) {
+                document.body.classList.remove('vertical-sidebar-enable');
+                (document.documentElement.getAttribute('data-sidebar-size') === 'lg') ? document.documentElement.setAttribute('data-sidebar-size', 'sm') : document.documentElement.setAttribute('data-sidebar-size', 'lg');
+            } else if (windowSize <= 767) {
+                document.body.classList.add('vertical-sidebar-enable');
+                document.documentElement.setAttribute('data-sidebar-size', 'lg');
+            }
         }
-    }
 
 
-    //Two column menu
+        //Two column menu
         if (document.documentElement.getAttribute('data-layout') === "twocolumn") {
             document.body.classList.contains('twocolumn-panel') ? document.body.classList.remove('twocolumn-panel') : document.body.classList.add('twocolumn-panel');
         }
@@ -146,11 +143,11 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
 
                             {/* Plan Display - Before Language */}
                             <div className="header-item">
-                                <button 
-                                    type="button" 
+                                <button
+                                    type="button"
                                     className="btn btn-outline-primary btn-sm me-2"
                                     onClick={handlePlanClick}
-                                    style={{ 
+                                    style={{
                                         borderRadius: '20px',
                                         fontSize: '0.75rem',
                                         padding: '0.375rem 0.75rem'
@@ -158,9 +155,9 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                                 >
                                     <div className="d-flex align-items-center">
                                         <i className="mdi mdi-crown text-warning me-1"></i>
-                                        <div className="d-flex flex-column text-start">
+                                        <div className="d-flex flex-column text-start" onClick={handlePlanClick}>
                                             <span className="fw-semibold">{currentPlan.name}</span>
-                                            <small className="text-muted" style={{fontSize: '0.65rem'}}>
+                                            <small className="text-muted" style={{ fontSize: '0.65rem' }}>
                                                 {t("Exp")}: {formatExpiryDate(currentPlan.expires_at)}
                                             </small>
                                         </div>

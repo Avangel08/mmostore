@@ -13,7 +13,7 @@ const CustomProfileDropdown = () => {
     const storageUrl = usePage().props.storageUrl || "";
     const username = (user?.first_name || user?.last_name) ? ((user?.first_name ?? "") + ' ' + (user?.last_name ?? "")) : (user?.name ?? "");
     
-    const currentPlan = user?.plan || { name: "Basic Plan", expires_at: "2024-12-31" };
+    const currentPlan = user?.plan || { name: "Basic Plan", expires_at: "2025-12-31" };
     const formatExpiryDate = (dateString: string) => {
         return moment(dateString).format('DD/MM/YYYY');
     };
@@ -51,7 +51,7 @@ const CustomProfileDropdown = () => {
                     
                     {/* Plan Information Section */}
                     <div className="px-3 py-2 bg-light-subtle rounded mx-2 mb-2">
-                        <div className="d-flex flex-column">
+                        <div className="d-flex flex-column" onClick={() => { window.open(route('seller.plan.index'), '_self'); }}>
                             <span className="fw-semibold text-primary mb-1" style={{fontSize: '0.875rem'}}>
                                 {currentPlan.name}
                             </span>

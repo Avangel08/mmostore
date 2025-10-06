@@ -6,26 +6,38 @@ import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
 import { showToast } from "../../../utils/showToast";
+import { ModalPaymentPlan } from "./ModalPaymentPlan";
 
 const Plans = () => {
   const { t } = useTranslation();
   const { plans, currentUserPlan } = usePage().props as any;
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const handleSelectPlan = (planId: number) => {
     showToast(t("Plan selection functionality will be implemented"), "info");
+    // fetch data
+    router.post(route("seller.plan.select"), {
+      plan_id: planId
+    },
+      {
+        replace: true,
+
+      }
+    );
   };
 
   return (
     <React.Fragment>
       <Head title={t("Subscription Plans")} />
       <div className="page-content">
+        <ModalPaymentPlan show={showPaymentModal} onHide={() => setShowPaymentModal(false)} />
         <ToastContainer />
         <Container fluid>
           <BreadCrumb
             title={t("Subscription Plans")}
             pageTitle={t("Homepage")}
           />
-          
+
           {/* Current Plan Info */}
           {!!currentUserPlan && (
             <Row className="mb-4">

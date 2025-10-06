@@ -1,9 +1,7 @@
-import { usePage } from "@inertiajs/react";
-import React from "react";
 import { Modal, Button, Row, Col } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-export const ModalDeposit = ({
+export const ModalPaymentPlan = ({
     show,
     onHide,
     data,
@@ -14,7 +12,6 @@ export const ModalDeposit = ({
 }) => {
 
     const { t } = useTranslation();
-    console.log(data);
     const bankName = data?.bank ? String(data.bank) : "";
     const accountName = data?.account_name ? String(data.account_name) : "";
     const accountNumber = data?.account_number ? String(data.account_number) : "";
