@@ -64,6 +64,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'status' => (int) Customers::STATUS['ACTIVE'],
             'identifier' => (string) $identifier,
+            'balance' => (double) 0,
         ]);
 
         event(new Registered($user));
