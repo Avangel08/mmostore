@@ -108,7 +108,7 @@ class ProductController extends Controller
                 ], 500);
             }
 
-            JobProcessPurchase::dispatchSync(
+            JobProcessPurchase::dispatch(
                 $productId,
                 $subProductId,
                 $customer->_id,
