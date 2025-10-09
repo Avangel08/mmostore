@@ -368,7 +368,6 @@
     "View": "Xem",
     "Download": "Tải xuống",
     "View order details": "Xem chi tiết đơn hàng",
-    "Download order": "Tải xuống đơn hàng",
     "Order details": "Chi tiết đơn hàng",
     "Cannot load order details": "Không thể tải chi tiết đơn hàng",
     "Order list": "Danh sách đơn hàng",
@@ -382,5 +381,6 @@
     "Please select a valid image file": "Vui lòng chọn file hình ảnh hợp lệ",
     "Registration date": "Ngày đăng ký",
     "Purchased": "Đã mua",
-    "The email has already been taken.": "Email đã được sử dụng."
+    "The email has already been taken.": "Email đã được sử dụng.",
+    "Order history": "Lịch sử đơn hàng"
 }

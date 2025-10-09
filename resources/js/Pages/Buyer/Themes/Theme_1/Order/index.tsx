@@ -108,12 +108,8 @@ const Index: React.FC = () => {
         fetchOrdersData();
     };
 
-  // Fetch when pagination/filter changes
   useEffect(() => {
-    // Avoid duplicate fetch on initial mount if no orders yet and totalEntries is 0
-    // Still allows fetching when user changes page/perPage/category
     fetchOrdersData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, perPage, selectedCategory]);
 
     const handleViewOrder = async (orderNumber: string) => {
@@ -121,14 +117,11 @@ const Index: React.FC = () => {
         setDetailsLoading(true);
         setDetailsOrderNumber(orderNumber);
         try {
-            const response = await axios.get(`/orders/${orderNumber}`);
+            const response = await axios.get(`/order/${orderNumber}`);
             if (response.data.success) {
                 const data = response.data.data || {};
                 setDetailsTitle(data.product_title || "");
-                // items from Accounts table: { key, data }
-                const items = Array.isArray(data.items)
-                    ? data.items.map((it: any) => ({product: it.key ?? "", value: it.data ?? ""}))
-                    : [];
+                const items = Array.isArray(data.items) ? data.items.map((it: any) => ({product: it.key ?? "", value: it.data ?? ""})) : [];
                 setDetailsItems(items);
             }
         } catch (error) {
@@ -140,8 +133,7 @@ const Index: React.FC = () => {
     };
 
     const handleDownloadOrder = (orderNumber: string) => {
-        // Trigger file download
-        window.open(`/orders/${orderNumber}/download`, '_blank');
+        window.open(`/order/${orderNumber}/download`, '_blank');
     };
 
     const formatCurrency = (amount: number) => {
@@ -321,12 +313,12 @@ const Index: React.FC = () => {
             <Modal show={showDetails} onHide={() => setShowDetails(false)} size="xl" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        {t("Purchased order details")} {detailsOrderNumber && `#${detailsOrderNumber}`}
+                        {t("Order")} {detailsOrderNumber && `#${detailsOrderNumber}`}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="d-flex justify-content-between align-items-center mb-3">
-                        <div className="fw-semibold">{detailsTitle}</div>
+                        <div className="fw-semibold">{detailsOrderNumber}.txt</div>
                         <div>
                             <Button
                                 variant="primary"
@@ -334,7 +326,7 @@ const Index: React.FC = () => {
                                 onClick={() => handleDownloadOrder(detailsOrderNumber)}
                                 disabled={!detailsOrderNumber}
                             >
-                                <i className="ri-download-line"></i> {t("Download order")}
+                                <i className="ri-download-line"></i> {t("Download")}
                             </Button>
                         </div>
                     </div>
@@ -359,7 +351,7 @@ const Index: React.FC = () => {
                                 detailsItems.map((row, idx) => (
                                     <tr key={idx}>
                                         <td className="text-truncate" style={{maxWidth: 280}} title={row.product}>
-                                            {row.product}
+                                            {detailsTitle}
                                         </td>
                                         <td className="text-break" style={{wordBreak: 'break-all'}}>
                                             {row.value}

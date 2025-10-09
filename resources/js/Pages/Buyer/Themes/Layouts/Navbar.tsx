@@ -164,6 +164,13 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                                 </li>
                                 <li className="nav-item">
                                     {!!user && (
+                                        <NavLink className="fs-16" href="/order">
+                                            {t("Order history")}
+                                        </NavLink>
+                                    )}
+                                </li>
+                                <li className="nav-item">
+                                    {!!user && (
                                         <NavLink className="fs-16" href="/deposits">
                                             {t("Deposits")}
                                         </NavLink>

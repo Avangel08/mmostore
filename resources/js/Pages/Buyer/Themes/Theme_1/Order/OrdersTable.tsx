@@ -84,7 +84,7 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
                             variant="outline-success"
                             size="sm"
                             onClick={() => handleDownloadOrder(order.order_number)}
-                            title={t("Download order")}
+                            title={t("Download")}
                           >
                             <i className="ri-download-line"></i>
                           </Button>
