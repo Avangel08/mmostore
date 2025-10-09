@@ -47,7 +47,7 @@ class JobProcessPurchase implements ShouldQueue
         $this->quantity = $quantity;
         $this->storeId = $storeId;
         $this->orderId = $orderId;
-        $this->queue = 'process-purchase';
+        $this->queue = 'process_purchase';
     }
 
     public function middleware(): array

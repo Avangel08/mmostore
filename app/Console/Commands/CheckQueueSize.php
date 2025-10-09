@@ -32,7 +32,8 @@ class CheckQueueSize extends Command
             'check-bank-admin',
             'check-bank-user',
             'deposit-customer',
-            'process_seller_account'
+            'process_seller_account',
+            'process_purchase'
         ];
         foreach ($listQueue as $queue) {
             echo $queue . ' : ' . Queue::size($queue) . PHP_EOL;
