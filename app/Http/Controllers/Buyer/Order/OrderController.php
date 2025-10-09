@@ -80,6 +80,7 @@ class OrderController extends Controller
                 'total_price' => $order->total_price,
                 'status' => $order->status,
                 'payment_status' => $order->payment_status,
+                'notes' => $order->notes,
             ];
         }
 

@@ -9,6 +9,7 @@ interface OrderData {
   unit_price: number;
   total_price: number;
   status: string;
+  notes?: string;
 }
 
 interface OrdersTableProps {
@@ -38,7 +39,7 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
         <div className="table-responsive">
           <style>{`.orders-table tbody tr:last-child td { border-bottom: 0 !important; }`}</style>
           <Table className="table table-nowrap mb-0 orders-table">
-            <thead className="table-light" style={{ "--vz-table-bg": "#0d324e", color: "#ffffff" }}>
+            <thead className="table-light">
               <tr>
                 <th>{ t("Order number") }</th>
                 <th>{ t("Purchase date") }</th>
@@ -89,6 +90,10 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
                             <i className="ri-download-line"></i>
                           </Button>
                         </div>
+                      ) : order.status === "FAILED" && order.notes ? (
+                        <span className="text-danger" title={order.notes}>
+                          {order.notes}
+                        </span>
                       ) : ("")}
                     </td>
                   </tr>

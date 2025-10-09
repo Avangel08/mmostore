@@ -15,6 +15,7 @@ interface OrderData {
     unit_price: number;
     total_price: number;
     status: string;
+    notes?: string;
 }
 
 interface OrdersData {
@@ -67,7 +68,8 @@ const Index: React.FC = () => {
                     quantity: order.quantity,
                     unit_price: order.unit_price,
                     total_price: order.total_price,
-                    status: order.status
+                    status: order.status,
+                    notes: order.notes
                 }));
                 setOrdersData(transformedOrders);
                 setTotalEntries(response.data.orders.pagination?.total || 0);
@@ -90,7 +92,8 @@ const Index: React.FC = () => {
                 quantity: order.quantity,
                 unit_price: order.unit_price,
                 total_price: order.total_price,
-                status: order.status
+                status: order.status,
+                notes: order.notes
             }));
             setOrdersData(transformedOrders);
             setTotalEntries(orders.pagination?.total || 0);

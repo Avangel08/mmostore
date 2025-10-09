@@ -78,6 +78,7 @@ class JobProcessPurchase implements ShouldQueue
 
             if (empty($store)) {
                 echo "Store not found" . PHP_EOL;
+                $this->updateOrderToFailed("Store not found");
                 return;
             }
 
@@ -90,6 +91,7 @@ class JobProcessPurchase implements ShouldQueue
 
             if (!$validationResult['valid']) {
                 echo "Validation failed: " . $validationResult['message'] . PHP_EOL;
+                $this->updateOrderToFailed("Lỗi khác - E103");
                 return;
             }
 
@@ -98,10 +100,12 @@ class JobProcessPurchase implements ShouldQueue
             $availableQuantity = $this->getAvailableQuantity($subProduct);
 
             if ($availableQuantity < $this->quantity) {
+                $this->updateOrderToFailed("Số lượng hiện có không đủ");
                 return;
             }
 
             if ($subProduct->quantity < $this->quantity) {
+                $this->updateOrderToFailed("Số lượng sản phẩm không đủ");
                 return;
             }
 
@@ -109,6 +113,7 @@ class JobProcessPurchase implements ShouldQueue
 
             $deducted = $this->deductCustomerBalanceAtomic($this->customerId, $totalPrice);
             if (!$deducted) {
+                $this->updateOrderToFailed("Số dư không đủ");
                 return;
             }
 
@@ -125,6 +130,7 @@ class JobProcessPurchase implements ShouldQueue
                 ]);
             } catch (\Exception $e) {
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
+                $this->updateOrderToFailed("Lỗi khác - E101");
                 return;
             }
 
@@ -132,6 +138,7 @@ class JobProcessPurchase implements ShouldQueue
             if (count($accountsToSell) < $this->quantity) {
                 $this->rollbackReservedAccounts($accountsToSell);
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
+                $this->updateOrderToFailed("Hết tài nguyên");
                 return;
             }
 
@@ -147,16 +154,13 @@ class JobProcessPurchase implements ShouldQueue
             if (!$stockUpdated) {
                 $this->rollbackReservedAccounts($accountsToSell);
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
+                $this->updateOrderToFailed("Lỗi khác - E102");
                 return;
             }
 
             try {
-                $order = $this->updateOrderRecord($orderService, $subProduct, $totalPrice);
-                if ($order) {
-                    echo "Order updated successfully: {$order->_id}" . PHP_EOL;
-                }
+                $this->updateOrderRecord($orderService, $subProduct, $totalPrice);
             } catch (\Exception $e) {
-                echo "Error updating order: " . $e->getMessage() . PHP_EOL;
             }
 
         } catch (Exception $e) {
@@ -453,8 +457,29 @@ class JobProcessPurchase implements ShouldQueue
         }
     }
 
-    public function failed(Exception $exception): void
+    private function updateOrderToFailed($reason = 'Purchase failed')
     {
-        echo "Error: " . $exception->getMessage() . PHP_EOL;
+        if (!$this->orderId) {
+            return;
+        }
+
+        try {
+            $order = Orders::where('_id', $this->orderId)
+                ->where('status', Orders::STATUS['PENDING'])
+                ->where('payment_status', Orders::PAYMENT_STATUS['PENDING'])
+                ->first();
+
+            if (!$order) {
+                return;
+            }
+
+            $order->update([
+                'status' => Orders::STATUS['FAILED'],
+                'payment_status' => Orders::PAYMENT_STATUS['FAILED'],
+                'notes' => $reason
+            ]);
+        } catch (\Exception $e) {
+
+        }
     }
 }
