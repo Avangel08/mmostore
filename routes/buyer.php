@@ -8,7 +8,6 @@ use App\Http\Controllers\Buyer\Deposit\DepositController;
 use App\Http\Controllers\Buyer\Product\ProductController;
 use App\Http\Controllers\Buyer\Order\OrderController;
 use App\Http\Controllers\Buyer\Profile\ProfileController;
-use Illuminate\Support\Facades\Route;
 
 Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
     ->group(function () {
@@ -33,18 +32,19 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
         });
 
         Route::middleware('checkauth:buyer')->group(function () {
-            Route::get('/order', [OrderController::class, 'index'])->name('buyer.order.page');
-            Route::get('/orders/{orderNumber}', [OrderController::class, 'show'])->name('buyer.order.show');
-            Route::get('/orders/{orderNumber}/download', [OrderController::class, 'download'])->name('buyer.order.download');
-        });
+            Route::group(['prefix' => 'order'], function () {
+                Route::get('/', [OrderController::class, 'index'])->name('buyer.order.page');
+                Route::get('/{orderNumber}', [OrderController::class, 'show'])->name('buyer.order.show');
+                Route::get('/{orderNumber}/download', [OrderController::class, 'download'])->name('buyer.order.download');
+            });
 
-        Route::group(['prefix' => 'profile'], function () {
-            Route::get('/', [ProfileController::class, 'index'])->name('buyer.profile');
-            Route::put('/update-info', [ProfileController::class, 'updateInfo'])->name('buyer.profile.update-info');
-            Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('buyer.profile.change-password');
-            Route::post('/upload-image', [ProfileController::class, 'uploadImage'])->name('buyer.profile.upload-image');
+            Route::group(['prefix' => 'profile'], function () {
+                Route::get('/', [ProfileController::class, 'index'])->name('buyer.profile');
+                Route::put('/update-info', [ProfileController::class, 'updateInfo'])->name('buyer.profile.update-info');
+                Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('buyer.profile.change-password');
+                Route::post('/upload-image', [ProfileController::class, 'uploadImage'])->name('buyer.profile.upload-image');
+            });
         });
-
     });
 
 
