@@ -108,15 +108,15 @@ class ProductController extends Controller
                 ], 500);
             }
 
-//            JobProcessPurchase::dispatch(
-//                $productId,
-//                $subProductId,
-//                $customer->_id,
-//                $quantity,
-//                $store->id,
-//                $order->_id,
-//                'sub_product'
-//            );
+            JobProcessPurchase::dispatch(
+                $productId,
+                $subProductId,
+                $customer->_id,
+                $quantity,
+                $store->id,
+                $order->_id,
+                'sub_product'
+            );
 
             return response()->json([
                 'success' => true,
