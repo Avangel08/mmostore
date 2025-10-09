@@ -22,17 +22,18 @@ class ThemeSettingController extends Controller
     public function index()
     {
         $user = auth('seller')->user();
-        $userId = $user->id;
-        $store = $this->storeService->findByUserId($userId, ['*'], 'setting');
+        $store = $this->storeService->findByUserId($user->id);
         if (!$store) {
             abort(404);
         }
+        $settings = $this->settingService->getSettings(true);
+        $result = [];
+        foreach ($settings as $setting) {
+            $result[$setting->key] = $setting->value;
+        }
         return Inertia::render('Settings/index', [
-            'settings' => fn() => [
-                'domain' => $store->domain,
-                'theme' => $store->setting->theme,
-                'store_settings' => $store->setting->store_settings
-            ]
+            'settings' => fn() => $result,
+            'domains' => $store->domain,
         ]);
     }
 

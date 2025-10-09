@@ -28,18 +28,18 @@ export type Props = {
 
 const ThemeSettings = () => {
     const { t } = useTranslation()
-    const { settings } = usePage().props as any
+    const { settings, domains } = usePage().props as any
     console.log({ settings })
     const validation = useFormik({
         enableReinitialize: true,
 
         initialValues: {
             theme: settings?.theme || "theme_1",
-            storeName: settings?.store_settings?.storeName || "MMOShop",
-            storeLogo: settings?.store_settings?.storeLogo || "https://coco.mmostore.local/storage/coco.mmostore.local/logo-light.png",
-            pageHeaderImage: settings?.store_settings?.pageHeaderImage || "",
-            pageHeaderText: settings?.store_settings?.pageHeaderText || "Hello, welcome to my store",
-            domains: settings?.domain || [""],
+            storeName: settings?.storeName || "MMOShop",
+            storeLogo: settings?.storeLogo || "https://coco.mmostore.local/storage/coco.mmostore.local/logo-light.png",
+            pageHeaderImage: settings?.pageHeaderImage || "",
+            pageHeaderText: settings?.pageHeaderText || "Hello, welcome to my store",
+            domains: domains || [""],
         },
         validationSchema: Yup.object({
             storeName: Yup.string().required("Please Enter a Product Title"),

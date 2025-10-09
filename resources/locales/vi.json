@@ -375,5 +375,12 @@
     "Loading": "Đang tải...",
     "Waiting": "Đang chờ",
     "Refresh data": "Làm mới dữ liệu",
-    "No orders yet": "Chưa có đơn hàng nào"
+    "No orders yet": "Chưa có đơn hàng nào",
+    "Personal profile": "Thông tin cá nhân",
+    "Deposits": "Nạp tiền",
+    "Home": "Trang chủ",
+    "Please select a valid image file": "Vui lòng chọn file hình ảnh hợp lệ",
+    "Registration date": "Ngày đăng ký",
+    "Purchased": "Đã mua",
+    "The email has already been taken.": "Email đã được sử dụng."
 }

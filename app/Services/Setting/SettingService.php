@@ -15,9 +15,9 @@ class SettingService
         return Settings::select($select)->with($relation)->where('_id', $id)->first();
     }
 
-    public function getByUserId($id, $select = ['*'], $relation = [])
+    public function getSettings($autoLoad, $select = ['*'], $relation = [])
     {
-        return Settings::select($select)->with($relation)->where('user_id', $id)->first();
+        return Settings::select($select)->with($relation)->where('auto_load', $autoLoad)->get();
     }
 
     public function createSetting(array $data)

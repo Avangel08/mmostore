@@ -7,11 +7,13 @@ use App\Http\Controllers\Buyer\BuyerController;
 use App\Http\Controllers\Buyer\Deposit\DepositController;
 use App\Http\Controllers\Buyer\Product\ProductController;
 use App\Http\Controllers\Buyer\Order\OrderController;
+use App\Http\Controllers\Buyer\Profile\ProfileController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
     ->group(function () {
         Route::get('/', [BuyerController::class, 'home'])->name('buyer.home');
-        
+
         Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('buyer.login');
         
         Route::get('/register', [RegisteredUserController::class, 'create'])->name('buyer.register');
@@ -35,6 +37,14 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
             Route::get('/orders/{orderNumber}', [OrderController::class, 'show'])->name('buyer.order.show');
             Route::get('/orders/{orderNumber}/download', [OrderController::class, 'download'])->name('buyer.order.download');
         });
+
+        Route::group(['prefix' => 'profile'], function () {
+            Route::get('/', [ProfileController::class, 'index'])->name('buyer.profile');
+            Route::put('/update-info', [ProfileController::class, 'updateInfo'])->name('buyer.profile.update-info');
+            Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('buyer.profile.change-password');
+            Route::post('/upload-image', [ProfileController::class, 'uploadImage'])->name('buyer.profile.upload-image');
+        });
+
     });
 
 
