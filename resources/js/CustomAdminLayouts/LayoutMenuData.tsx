@@ -60,7 +60,7 @@ const Navdata = () => {
         },
         {
             id: "usermanagement",
-            label: t("User manager"),
+            label: t("User"),
             icon: "ri-user-star-fill",
             link: route("admin.user.index"),
             click: function (e : any) {
@@ -71,7 +71,7 @@ const Navdata = () => {
         },
         {
             id: "rolemanagement",
-            label: t("Role Management"),
+            label: t("Role"),
             icon: "ri-user-star-fill",
             link: route("admin.roles.index"),
             stateVariables: isRoleManagement,
@@ -84,7 +84,7 @@ const Navdata = () => {
         },
         {
             id: "permissionmanagement",
-            label: t("Permission Management"),
+            label: t("Permission"),
             icon: "ri-lock-2-fill",
             link: route("admin.permissions.index"),
             stateVariables: isPermissionManagement,
@@ -97,7 +97,7 @@ const Navdata = () => {
         },
         {
             id: "planmanagement",
-            label: t("Plan management"),
+            label: t("Plan"),
             icon: "ri-money-dollar-box-fill",
             link: route("admin.plans.index"),
             stateVariables: isRoleManagement,

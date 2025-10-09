@@ -104,4 +104,9 @@ class ProductService
     {
         return Products::whereIn('_id', $ids)->delete();
     }
+
+    public function getActive($select = ['*'], $relation = [])
+    {
+        return Products::where('status', Products::STATUS['ACTIVE'])->select($select)->with($relation)->get();
+    }
 }

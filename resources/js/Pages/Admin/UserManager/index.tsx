@@ -81,7 +81,7 @@ const UserManager = () => {
                     dataEdit={ dataEdit }
                 />
                 <Container fluid>
-                    <BreadCrumb title={ t("User manager") } pageTitle={ t("Homepage") } />
+                    <BreadCrumb title={ t("User") } pageTitle={ t("Homepage") } />
                     <Row>
                         <Col xs={12}>
                             <Card>
@@ -89,7 +89,7 @@ const UserManager = () => {
                                     <Row style={{ marginBottom: "32px" }}>
                                         <Col>
                                             <Button variant="success" onClick={ toggleOpenAddModal } className="me-2">
-                                                <i className="ri-add-line align-bottom me-1"></i>{" "} {t("Add user manager")}
+                                                <i className="ri-add-line align-bottom me-1"></i>{" "} {t("Add user")}
                                             </Button>
                                             {selectedIds.length > 0 && (
                                                 <Button variant="danger" onClick={ handleBulkDelete }>

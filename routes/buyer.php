@@ -10,10 +10,8 @@ use App\Http\Controllers\Buyer\Order\OrderController;
 
 Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
     ->group(function () {
-        // Public routes (no authentication required)
         Route::get('/', [BuyerController::class, 'home'])->name('buyer.home');
         
-        // Login/Register routes (public but with session)
         Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('buyer.login');
         
         Route::get('/register', [RegisteredUserController::class, 'create'])->name('buyer.register');
@@ -32,9 +30,10 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
             Route::get('/ping', [DepositController::class, 'pingDeposit'])->name('buyer.deposit.ping');
         });
 
-        // Protected routes (requires buyer login)
-        Route::middleware('auth:buyer')->group(function () {
-            Route::get('/orders', [OrderController::class, 'index'])->name('buyer.orders');
+        Route::middleware('checkauth:buyer')->group(function () {
+            Route::get('/order', [OrderController::class, 'index'])->name('buyer.order.page');
+            Route::get('/orders/{orderNumber}', [OrderController::class, 'show'])->name('buyer.order.show');
+            Route::get('/orders/{orderNumber}/download', [OrderController::class, 'download'])->name('buyer.order.download');
         });
     });
 

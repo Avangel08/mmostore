@@ -51,7 +51,7 @@ const PermissionManagement = () => {
   };
   return (
     <React.Fragment>
-      <Head title={t("Permission Management")} />
+      <Head title={t("Permission")} />
       <div className="page-content">
         <ToastContainer />
         <ModalAddNewGroupPermission
@@ -65,7 +65,7 @@ const PermissionManagement = () => {
         />
         <Container fluid>
           <BreadCrumb
-            title={t("Permission Management")}
+            title={t("Permission")}
             pageTitle={t("Homepage")}
           />
           <Row>

@@ -4,6 +4,7 @@ use App\Http\Controllers\Seller\Category\CategoryController;
 use App\Http\Controllers\Seller\CustomerManager\CustomerManagerController;
 use App\Http\Controllers\Seller\DashBoardController;
 use App\Http\Controllers\Seller\LoginController;
+use App\Http\Controllers\Seller\Order\OrderController;
 use App\Http\Controllers\Seller\PaymentHistory\PaymentHistoryController;
 use App\Http\Controllers\Seller\Plan\PlanController;
 use App\Http\Controllers\Seller\Product\ProductController;
@@ -42,13 +43,11 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                     Route::post('/upload-image', [ProfileController::class, 'uploadImage'])->name('seller.profile.upload-image');
                 });
 
-                // seller category
                 Route::group(['prefix' => 'category'], function () {
                     Route::delete('/delete-multiple', [CategoryController::class, 'deleteMultipleCategories'])->name('seller.category.delete-multiple');
                 });
                 Route::resource('category', CategoryController::class, ['as' => 'seller']);
 
-                // seller product
                 Route::group(['prefix' => 'product'], function () {
                     Route::delete('/delete-multiple', [ProductController::class, 'deleteMultipleProduct'])->name('seller.product.delete-multiple');
                 });
@@ -79,9 +78,12 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
 
                 Route::resource('customer-manager', CustomerManagerController::class, ['as' => 'seller']);
 
-
                 Route::group(['prefix' => 'plans'], function () {
                     Route::get("/", [PlanController::class, 'index'])->name('seller.plan.index');
+                });
+
+                Route::group(['prefix' => 'order'], function () {
+                    Route::get("/", [OrderController::class, 'index'])->name('seller.order');
                 });
             });
 

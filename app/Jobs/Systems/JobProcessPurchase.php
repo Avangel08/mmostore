@@ -6,16 +6,16 @@ use App\Models\Mongo\Customers;
 use App\Models\Mongo\SubProducts;
 use App\Models\Mongo\Accounts;
 use App\Models\Mongo\BalanceHistories;
+use App\Models\Mongo\Orders;
 use App\Services\Customer\CustomerService;
 use App\Services\Product\SubProductService;
 use App\Services\BalanceHistory\BalanceHistoryService;
+use App\Services\Order\OrderService;
 use App\Services\Tenancy\TenancyService;
 use App\Services\Home\StoreService;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Exception;
 use MongoDB\BSON\ObjectId;
 
@@ -27,25 +27,25 @@ class JobProcessPurchase implements ShouldQueue
     protected $subProductId;
     protected $customerId;
     protected $quantity;
-    protected $userId;
+    protected $storeId;
     protected $orderId;
 
-    public $uniqueFor = 300; // 5 phút unique
-    public $timeout = 120; // 2 phút timeout
+    public $uniqueFor = 300;
+    public $timeout = 120;
 
     public function __construct(
         $productId,
         $subProductId,
         $customerId,
         $quantity,
-        $userId,
+        $storeId,
         $orderId = null,
     ) {
         $this->productId = $productId;
         $this->subProductId = $subProductId;
         $this->customerId = $customerId;
         $this->quantity = $quantity;
-        $this->userId = $userId;
+        $this->storeId = $storeId;
         $this->orderId = $orderId;
         $this->queue = 'process-purchase';
     }
@@ -65,21 +65,19 @@ class JobProcessPurchase implements ShouldQueue
         return [2, 5, 10];
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(
         SubProductService $subProductService,
         CustomerService $customerService,
         BalanceHistoryService $balanceHistoryService,
+        OrderService $orderService,
         StoreService $storeService,
         TenancyService $tenancyService
     ): void {
         try {
-            $store = $storeService->findByUserId($this->userId);
+            $store = $storeService->findById($this->storeId);
+
             if (empty($store)) {
-                echo "Store not found or user not have store" . PHP_EOL;
-                echo "user_id: " . $this->userId . PHP_EOL;
+                echo "Store not found" . PHP_EOL;
                 return;
             }
 
@@ -96,9 +94,6 @@ class JobProcessPurchase implements ShouldQueue
             }
 
             $subProduct = $validationResult['sub_product'];
-            $customer = $validationResult['customer'];
-
-            // WithoutOverlapping middleware đảm nhiệm khóa theo product+sub_product
 
             $availableQuantity = $this->getAvailableQuantity($subProduct);
 
@@ -112,13 +107,11 @@ class JobProcessPurchase implements ShouldQueue
 
             $totalPrice = $subProduct->price * $this->quantity;
 
-            // Khấu trừ số dư bằng atomic operation: chỉ trừ nếu đủ tiền
             $deducted = $this->deductCustomerBalanceAtomic($this->customerId, $totalPrice);
             if (!$deducted) {
                 return;
             }
 
-            // Ghi lịch sử số dư (không critical, nếu lỗi sẽ hoàn tiền và fail)
             try {
                 $balanceHistoryService->create([
                     'customer_id' => $this->customerId,
@@ -131,21 +124,17 @@ class JobProcessPurchase implements ShouldQueue
                     'transaction' => $this->orderId ?? 'PURCHASE_' . time()
                 ]);
             } catch (\Exception $e) {
-                // Hoàn tiền nếu ghi lịch sử thất bại
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
                 return;
             }
 
-            // Reserve accounts (atomic từng bản ghi)
             $accountsToSell = $this->getAccountsToSell($subProduct, $this->quantity);
             if (count($accountsToSell) < $this->quantity) {
-                // Rollback các account đã reserve và hoàn tiền
                 $this->rollbackReservedAccounts($accountsToSell);
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
                 return;
             }
 
-            // Gán order_id cuối cùng nếu có
             if ($this->orderId) {
                 foreach ($accountsToSell as $account) {
                     $account->update([
@@ -154,7 +143,6 @@ class JobProcessPurchase implements ShouldQueue
                 }
             }
 
-            // Cập nhật stock SubProduct (atomic). Nếu thất bại: rollback & hoàn tiền
             $stockUpdated = $this->updateSubProductStock($subProduct, $this->quantity);
             if (!$stockUpdated) {
                 $this->rollbackReservedAccounts($accountsToSell);
@@ -162,16 +150,22 @@ class JobProcessPurchase implements ShouldQueue
                 return;
             }
 
+            try {
+                $order = $this->updateOrderRecord($orderService, $subProduct, $totalPrice);
+                if ($order) {
+                    echo "Order updated successfully: {$order->_id}" . PHP_EOL;
+                }
+            } catch (\Exception $e) {
+                echo "Error updating order: " . $e->getMessage() . PHP_EOL;
+            }
+
         } catch (Exception $e) {
-            // Rollback SubProduct stock nếu đã cập nhật
             if (isset($subProduct) && isset($this->quantity)) {
                 $this->rollbackSubProductStock($subProduct, $this->quantity);
             }
             
             throw $e;
         }
-
-        echo "==========================================End JobProcessPurchase==========================================" . PHP_EOL;
     }
 
     private function validatePurchaseData($subProductService, $customerService): array
@@ -215,10 +209,6 @@ class JobProcessPurchase implements ShouldQueue
         ];
     }
 
-    /**
-     * Lấy số lượng accounts có sẵn để bán (không bao gồm đã reserve)
-     * Trả về số lượng nhỏ hơn giữa accounts có sẵn và SubProduct quantity
-     */
     private function getAvailableQuantity($subProduct): int
     {
         $availableAccounts = Accounts::where('sub_product_id', $subProduct->_id)
@@ -231,9 +221,6 @@ class JobProcessPurchase implements ShouldQueue
         return min($availableAccounts, $subProduct->quantity);
     }
 
-    /**
-     * Lấy accounts để bán (quantity đầu tiên) với atomic operation để tránh race condition
-     */
     private function getAccountsToSell($subProduct, $quantity)
     {
         $accounts = [];
@@ -265,10 +252,7 @@ class JobProcessPurchase implements ShouldQueue
         
         return $accounts;
     }
-    
-    /**
-     * Reserve một account bằng atomic operation
-     */
+
     private function reserveAccount($subProductId, $customerId, $orderId)
     {
         try {
@@ -311,14 +295,10 @@ class JobProcessPurchase implements ShouldQueue
         }
     }
 
-    /**
-     * Khấu trừ số dư khách hàng theo cách atomic (chỉ trừ nếu đủ tiền)
-     */
     private function deductCustomerBalanceAtomic($customerId, $amount): bool
     {
         try {
-            // Bảo đảm _id dùng đúng kiểu ObjectId
-            $mongoId = $customerId instanceof \MongoDB\BSON\ObjectId ? $customerId : new \MongoDB\BSON\ObjectId((string) $customerId);
+            $mongoId = $customerId instanceof ObjectId ? $customerId : new ObjectId((string) $customerId);
             // Chuẩn hóa amount về số (int/float)
             $amountToDeduct = (float) $amount;
 
@@ -337,13 +317,10 @@ class JobProcessPurchase implements ShouldQueue
         }
     }
 
-    /**
-     * Hoàn tiền cho khách hàng (best-effort)
-     */
     private function refundCustomerBalance($customerId, $amount): void
     {
         try {
-            $mongoId = $customerId instanceof \MongoDB\BSON\ObjectId ? $customerId : new \MongoDB\BSON\ObjectId((string) $customerId);
+            $mongoId = $customerId instanceof ObjectId ? $customerId : new ObjectId((string) $customerId);
             $amountToAdd = (float) $amount;
 
             Customers::raw(function ($collection) use ($mongoId, $amountToAdd) {
@@ -357,10 +334,7 @@ class JobProcessPurchase implements ShouldQueue
             echo "Error refunding customer balance: " . $e->getMessage() . PHP_EOL;
         }
     }
-    
-    /**
-     * Rollback những accounts đã reserve nếu không đủ số lượng
-     */
+
     private function rollbackReservedAccounts($accounts)
     {
         foreach ($accounts as $account) {
@@ -378,9 +352,6 @@ class JobProcessPurchase implements ShouldQueue
         }
     }
 
-    /**
-     * Rollback SubProduct stock khi có lỗi
-     */
     private function rollbackSubProductStock($subProduct, $quantityToAdd)
     {
         try {
@@ -405,10 +376,7 @@ class JobProcessPurchase implements ShouldQueue
             echo "Error rolling back SubProduct stock: " . $e->getMessage() . PHP_EOL;
         }
     }
-    
-    /**
-     * Cleanup những accounts đã reserve quá lâu (stale reservations)
-     */
+
     private function cleanupStaleReservations($subProductId)
     {
         try {
@@ -440,9 +408,6 @@ class JobProcessPurchase implements ShouldQueue
         }
     }
 
-    /**
-     * Cập nhật stock SubProduct với atomic operation để tránh race condition
-     */
     private function updateSubProductStock($subProduct, $quantityToSubtract): bool
     {
         try {
@@ -462,9 +427,32 @@ class JobProcessPurchase implements ShouldQueue
         }
     }
 
-    /**
-     * Handle a job failure.
-     */
+    private function updateOrderRecord($orderService, $subProduct, $totalPrice)
+    {
+        try {
+            $order = Orders::where('_id', $this->orderId)
+                ->where('status', Orders::STATUS['PENDING'])
+                ->where('payment_status', Orders::PAYMENT_STATUS['PENDING'])
+                ->first();
+
+            if (!$order) {
+                echo "Order not found for order_number: {$this->orderId}" . PHP_EOL;
+                return null;
+            }
+
+            $order->update([
+                'status' => Orders::STATUS['COMPLETED'],
+                'payment_status' => Orders::PAYMENT_STATUS['PAID'],
+                'notes' => "Order completed via JobProcessPurchase - Payment successful"
+            ]);
+
+            return $order;
+        } catch (\Exception $e) {
+            echo "Error in updateOrderRecord: " . $e->getMessage() . PHP_EOL;
+            return null;
+        }
+    }
+
     public function failed(Exception $exception): void
     {
         echo "Error: " . $exception->getMessage() . PHP_EOL;

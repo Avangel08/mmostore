@@ -44,7 +44,7 @@ const RoleManagement = () => {
 
   return (
     <React.Fragment>
-      <Head title={t("Role Management")} />
+      <Head title={t("Role")} />
       <div className="page-content">
         <ToastContainer />
         <ModalDetailRole show={isOpenAddModal} onHide={toggleOpenAddModal} />
@@ -54,12 +54,12 @@ const RoleManagement = () => {
           dataEdit={dataEdit}
         />
         <Container fluid>
-          <BreadCrumb title={t("Role Management")} pageTitle={t("Homepage")} />
+          <BreadCrumb title={t("Role")} pageTitle={t("Homepage")} />
           <Row>
             <Col xs={12}>
               <Card>
                 <Card.Header>
-                  <h5 className="card-title mb-0">{t("Role Management")}</h5>
+                  <h5 className="card-title mb-0">{t("Role")}</h5>
                 </Card.Header>
                 <Card.Body>
                   <Row style={{ marginBottom: "32px" }}>

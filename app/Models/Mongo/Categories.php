@@ -14,8 +14,8 @@ class Categories extends Model
     protected $connection = 'tenant_mongo';
 
     const STATUS = [
-        'INACTIVE' => 0,
-        'ACTIVE' => 1,
+        'INACTIVE' => 'INACTIVE',
+        'ACTIVE' => 'ACTIVE',
     ];
 
     protected $fillable = [

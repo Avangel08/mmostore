@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import { Modal, Form, Button, Card, Row } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
 
 interface Product {
     id: number;
@@ -54,20 +55,24 @@ const ModalBuy: React.FC<ProductModalProps> = ({
                 t("Please choose your sub product")
             ),
         }),
-        onSubmit: (values) => {
-            router.post(route('buyer-product.checkout'), {
-                product_id: productId,
-                sub_product_id: values.subProduct,
-                quantity: values.quantity,
-                price: values.price
-            }, {
-                onSuccess: () => {
+        onSubmit: async (values) => {
+            try {
+                const response = await axios.post('/products/checkout', {
+                    product_id: productId,
+                    sub_product_id: values.subProduct,
+                    quantity: values.quantity,
+                    price: values.price
+                });
+
+                if (response.data.success) {
                     handleClose();
-                },
-                onError: (errors) => {
-                    console.error('Checkout errors:', errors);
+                    window.location.href = '/order';
+                } else {
+                    console.error('Checkout failed:', response.data.message);
                 }
-            });
+            } catch (error) {
+                console.error('Checkout errors:', error);
+            }
         },
     });
 

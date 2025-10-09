@@ -1,7 +1,6 @@
 import { Inertia } from "@inertiajs/inertia";
 import { usePage } from "@inertiajs/react";
 import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 
 const Navdata = () => {
     const subdomain = usePage().props.subdomain;
@@ -12,6 +11,7 @@ const Navdata = () => {
     const [iscurrentState, setIscurrentState] = useState('Dashboard');
     const [isSettings, setIsSettings] = useState<boolean>(false)
     const [isCustomerManager, setIsCustomerManager] = useState<boolean>(false)
+    const [isOrderManager, setIsOrderManager] = useState<boolean>(false)
 
     function updateIconSidebar(e : any) {
         if (e && e.target && e.target.getAttribute("sub-items")) {
@@ -30,33 +30,43 @@ const Navdata = () => {
 
     useEffect(() => {
         document.body.classList.remove('twocolumn-panel');
+
         if (iscurrentState !== 'Dashboard') {
             setIsDashboard(false);
         }
+
         if (iscurrentState !== 'Category') {
             setIsCategory(false);
         }
+
         if (iscurrentState !== 'Product') {
             setIsProduct(false);
         }
+
         if (iscurrentState !== 'Payment History') {
             setIsPaymentHistory(false);
         }
+
         if (iscurrentState !== 'Theme Settings') {
             setIsSettings(false)
         }
+
         if (iscurrentState !== 'Customer Manager') {
             setIsCustomerManager(false);
         }
+
+        if (iscurrentState !== 'Order Manager') {
+            setIsOrderManager(false);
+        }
     }, [
-        history,
         iscurrentState,
         isDashboard,
         isCategory,
         isProduct,
         isPaymentHistory,
         isSettings,
-        isCustomerManager
+        isCustomerManager,
+        isOrderManager
     ]);
 
     const menuItems : any = [
@@ -79,7 +89,7 @@ const Navdata = () => {
         },
         {
             id: "customer-manager",
-            label: "Customer Manager",
+            label: "Customer",
             icon: "ri-dashboard-2-line",
             link: route("seller.customer-manager.index"),
             stateVariables: isDashboard,
@@ -92,7 +102,7 @@ const Navdata = () => {
         },
         {
             id: "category",
-            label: "Category Management",
+            label: "Category",
             icon: "ri-file-list-fill",
             link: route('seller.category.index'),
             stateVariables: isCategory,
@@ -105,7 +115,7 @@ const Navdata = () => {
         },
         {
             id: "product",
-            label: "Product Management",
+            label: "Product",
             icon: "ri-box-3-fill",
             link: route('seller.product.index'),
             stateVariables: isProduct,
@@ -119,7 +129,7 @@ const Navdata = () => {
         {
             id: "payment-history",
             label: "Payment History",
-            icon: "ri-box-3-fill",
+            icon: "ri-money-dollar-circle-line",
             link: route('seller.payment-history'),
             stateVariables: isPaymentHistory,
             click: function (e : any) {
@@ -139,6 +149,19 @@ const Navdata = () => {
                 e.preventDefault();
                 setIsDashboard(!isSettings);
                 setIscurrentState('Theme Settings');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "order",
+            label: "Order",
+            icon: "ri-shopping-cart-line",
+            link: route('seller.order'),
+            stateVariables: isOrderManager,
+            click: function (e : any) {
+                e.preventDefault();
+                setIsOrderManager(!isOrderManager);
+                setIscurrentState('Order Manager');
                 updateIconSidebar(e);
             },
         },
