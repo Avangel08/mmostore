@@ -8,12 +8,9 @@ const DomainConfig = ({ validation }: Props) => {
     const { t } = useTranslation()
     return (
         <React.Fragment>
-            <Card>
-                <Card.Header>
-                    <h5 className="card-title">{t("Domain")}<span className="text-danger">*</span></h5>
-                    <p className="text-muted fs-14 mb-0">Để website có thể được nhận diện và hiển thị đến người dùng, website luôn phải có một tên miền chính. Chỉ có thể chọn duy nhất một tên miền làm tên miền chính</p>
-                </Card.Header>
-                <Card.Body>
+            <div className="mb-3">
+                <h5 className="mb-2">{t("Domain")}<span className="text-danger">*</span></h5>
+                <p className="text-muted fs-14 mb-3">Để website có thể được nhận diện và hiển thị đến người dùng, website luôn phải có một tên miền chính. Chỉ có thể chọn duy nhất một tên miền làm tên miền chính</p>
                     <Row>
                         <Col>
                             <FieldArray
@@ -57,8 +54,7 @@ const DomainConfig = ({ validation }: Props) => {
                             />
                         </Col>
                     </Row>
-                </Card.Body>
-            </Card>
+            </div>
         </React.Fragment >
     )
 }

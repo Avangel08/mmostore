@@ -139,9 +139,6 @@ const Product = () => {
           <Row>
             <Col xs={12}>
               <Card>
-                <Card.Header>
-                  <h5 className="card-title mb-0">{t("Products")}</h5>
-                </Card.Header>
                 <Card.Body>
                   <div className="mb-4">
                     <ProductFilter 

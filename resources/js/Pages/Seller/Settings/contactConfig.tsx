@@ -68,12 +68,9 @@ const ContactConfig = ({validation}: Props) => {
                     }
                 `}
             </style>
-            <Card>
-                <Card.Header>
-                    <h5 className="card-title">{t("Contact")}<span className="text-danger">*</span></h5>
-                    <p className="text-muted fs-14 mb-0">{t("Add your contact information for customers to reach you")}</p>
-                </Card.Header>
-                <Card.Body>
+            <div className="mb-3">
+                <h5 className="mb-2">{t("Contact")}<span className="text-danger">*</span></h5>
+                <p className="text-muted fs-14 mb-3">{t("Add your contact information for customers to reach you")}</p>
                     <div className="mb-3">
                         {validation.values.contacts.map((contact, index) => (
                             <Row key={index} className="mb-2" data-contact-index={index}>
@@ -176,8 +173,7 @@ const ContactConfig = ({validation}: Props) => {
                             <i className="ri-add-circle-line"></i>{" "}{t("Add Contact")}
                         </Button>
                     </div>
-                </Card.Body>
-            </Card>
+            </div>
         </>
     );
 };

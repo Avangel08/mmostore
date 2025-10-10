@@ -135,9 +135,6 @@ const Category = () => {
           <Row>
             <Col xs={12}>
               <Card>
-                <Card.Header>
-                  <h5 className="card-title mb-0">{t("Category")}</h5>
-                </Card.Header>
                 <Card.Body>
                   <div className="mb-4">
                     <CategoryFilter 

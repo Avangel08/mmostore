@@ -104,9 +104,6 @@ const Plan = () => {
           <Row>
             <Col xs={12}>
               <Card>
-                <Card.Header>
-                  <h5 className="card-title mb-0">{t("Plan")}</h5>
-                </Card.Header>
                 <Card.Body>
                   <PlanFilter onFilter={handleFilter} />
                   <Row style={{ marginBottom: "32px" }}>

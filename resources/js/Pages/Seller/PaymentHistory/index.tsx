@@ -85,9 +85,6 @@ const PaymentHistory = () => {
           <Row>
             <Col xs={12}>
               <Card>
-                <Card.Header>
-                  <h5 className="card-title mb-0">{t("Payment History")}</h5>
-                </Card.Header>
                 <Card.Body>
                   <Filter onFilter={handleFilter} />
                   <Row style={{ marginBottom: "32px" }}>

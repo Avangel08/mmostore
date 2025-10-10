@@ -71,11 +71,6 @@ const PermissionManagement = () => {
           <Row>
             <Col xs={12}>
               <Card>
-                <Card.Header>
-                  <h5 className="card-title mb-0">
-                    {t("List group permission")}
-                  </h5>
-                </Card.Header>
                 <Card.Body>
                   <Row style={{ marginBottom: "32px" }}>
                     <Col>

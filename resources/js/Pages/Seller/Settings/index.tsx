@@ -1,6 +1,6 @@
 import { Head, router, usePage } from "@inertiajs/react";
-import React from "react";
-import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import React, { useState } from "react";
+import { Button, Card, Col, Container, Form, Row, Nav, Tab } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
@@ -32,6 +32,7 @@ export type Props = {
 const ThemeSettings = () => {
     const { t } = useTranslation()
     const { settings, domains } = usePage().props as any
+    const [activeTab, setActiveTab] = useState("giao-dien")
     const validation = useFormik({
         enableReinitialize: true,
 
@@ -148,14 +149,48 @@ const ThemeSettings = () => {
                         <Col lg={12}>
                             <FormikProvider value={validation}>
                                 <Form noValidate onSubmit={validation.handleSubmit}>
-                                    <ThemeConfigs validation={validation}/>
-                                    <ContactConfig validation={validation}/>
-                                    <DomainConfig validation={validation}/>
-                                    <div className="text-end mb-3">
-                                        <Button type="submit" variant="success">
-                                            {t("Submit")}
-                                        </Button>
-                                    </div>
+                                    <Card>
+                                        <Card.Body>
+                                            <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k || "giao-dien")}>
+                                                <Nav variant="tabs" className="nav-tabs-custom">
+                                                    <Nav.Item>
+                                                        <Nav.Link eventKey="giao-dien">
+                                                            <i className="ri-store-2-line me-1"></i>
+                                                            {t("Giao diện")}
+                                                        </Nav.Link>
+                                                    </Nav.Item>
+                                                    <Nav.Item>
+                                                        <Nav.Link eventKey="lien-he">
+                                                            <i className="ri-phone-line me-1"></i>
+                                                            {t("Liên hệ")}
+                                                        </Nav.Link>
+                                                    </Nav.Item>
+                                                    <Nav.Item>
+                                                        <Nav.Link eventKey="domain">
+                                                            <i className="ri-global-line me-1"></i>
+                                                            {t("Domain")}
+                                                        </Nav.Link>
+                                                    </Nav.Item>
+                                                </Nav>
+                                                <Tab.Content className="mt-4">
+                                                    <Tab.Pane eventKey="giao-dien">
+                                                        <ThemeConfigs validation={validation}/>
+                                                    </Tab.Pane>
+                                                    <Tab.Pane eventKey="lien-he">
+                                                        <ContactConfig validation={validation}/>
+                                                    </Tab.Pane>
+                                                    <Tab.Pane eventKey="domain">
+                                                        <DomainConfig validation={validation}/>
+                                                    </Tab.Pane>
+                                                </Tab.Content>
+                                            </Tab.Container>
+                                            <div className="text-start mt-4">
+                                                <Button type="submit" variant="success">
+                                                    {t("Update")}
+                                                </Button>
+                                            </div>
+                                        </Card.Body>
+                                    </Card>
                                 </Form>
                             </FormikProvider>
                         </Col>

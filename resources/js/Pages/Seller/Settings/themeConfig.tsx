@@ -64,19 +64,16 @@ const ThemeConfigs = ({ validation }: Props) => {
 
     return (
         <React.Fragment>
-            <Card>
-                <Card.Header>
-                    <div className="d-flex justify-content-between align-items-center">
-                        <h5 className="card-title mb-0">{t("Store")}</h5>
-                        <div className="d-flex gap-2">
-                            <Button variant="outline-success" size="sm">
-                                <i className="ri-eye-line align-bottom me-1"></i>{" "}
-                                {t("View store")}
-                            </Button>
-                        </div>
+            <div className="mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h5 className="mb-0">{t("Store")}</h5>
+                    <div className="d-flex gap-2">
+                        <Button variant="outline-success" size="sm">
+                            <i className="ri-eye-line align-bottom me-1"></i>{" "}
+                            {t("View store")}
+                        </Button>
                     </div>
-                </Card.Header>
-                <Card.Body>
+                </div>
                     <Row>
                         <Col>
                             <div className="mb-3">
@@ -298,8 +295,7 @@ const ThemeConfigs = ({ validation }: Props) => {
                             </div>
                         </Col>
                     </Row>
-                </Card.Body>
-            </Card>
+            </div>
 
         </React.Fragment>
     )
