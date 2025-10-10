@@ -2,6 +2,7 @@
 
 namespace App\Models\Mongo;
 
+use App\Models\MySQL\PaymentMethods;
 use MongoDB\Laravel\Eloquent\Model;
 
 class BalanceHistories extends Model
@@ -30,6 +31,11 @@ class BalanceHistories extends Model
     public function customer()
     {
         return $this->belongsTo(Customers::class, 'customer_id');
+    }
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethods::class, 'payment_method_id');
     }
 
     public function scopeFilterSearch($query, $request){

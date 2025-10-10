@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Buyer\PaymentHistory\PaymentHistoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Buyer\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Buyer\Auth\RegisteredUserController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Buyer\Deposit\DepositController;
 use App\Http\Controllers\Buyer\Product\ProductController;
 use App\Http\Controllers\Buyer\Order\OrderController;
 use App\Http\Controllers\Buyer\Profile\ProfileController;
+// use App\Http\Controllers\Buyer\PaymentHistory\PaymentHistoryController;
 
 Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
     ->group(function () {
@@ -43,6 +45,10 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                 Route::put('/update-info', [ProfileController::class, 'updateInfo'])->name('buyer.profile.update-info');
                 Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('buyer.profile.change-password');
                 Route::post('/upload-image', [ProfileController::class, 'uploadImage'])->name('buyer.profile.upload-image');
+            });
+
+            Route::group(['prefix' => 'payment-history'], function () {
+                Route::get('/', [PaymentHistoryController::class, 'index'])->name('buyer.payment-history');
             });
         });
     });

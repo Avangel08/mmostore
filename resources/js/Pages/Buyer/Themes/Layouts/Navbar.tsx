@@ -176,6 +176,13 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                                         </NavLink>
                                     )}
                                 </li>
+                                <li className="nav-item">
+                                    {!!user && (
+                                        <NavLink className="fs-16" href="/payment-history">
+                                            {t("Payment History")}
+                                        </NavLink>
+                                    )}
+                                </li>
                             </Scrollspy>
 
                             <div className="d-flex align-items-center">
