@@ -13,6 +13,7 @@ import Navbar from "./Navbar";
 import { usePage } from "@inertiajs/react";
 import { LayoutProvider } from "./LayoutContext";
 import Footer from "../Theme_1/Components/Footer/Footer";
+import ContactFloatingButton from "../../../../Components/ContactFloatingButton";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     const dispatch: any = useDispatch();
@@ -59,7 +60,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     <div className="main-page">
                         {children}
                     </div>
-                    <Footer contacts={contacts} />
+                    <Footer />
+                    
+                    {/* Contact Floating Button */}
+                    <ContactFloatingButton contacts={contacts as any} position="bottom-right" />
                 </div>
             </LayoutProvider>
         </React.Fragment>

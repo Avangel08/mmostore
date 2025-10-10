@@ -145,7 +145,7 @@ const ThemeSettings = () => {
                         pageTitle={t("Homepage")}
                     />
                     <Row>
-                        <Col lg={7}>
+                        <Col lg={12}>
                             <FormikProvider value={validation}>
                                 <Form noValidate onSubmit={validation.handleSubmit}>
                                     <ThemeConfigs validation={validation}/>
@@ -158,16 +158,6 @@ const ThemeSettings = () => {
                                     </div>
                                 </Form>
                             </FormikProvider>
-                        </Col>
-                        <Col lg={5}>
-                            <Card>
-                                <Card.Header>
-                                    <h5 className="card-title mb-0">{t("Preview")}</h5>
-                                </Card.Header>
-                                <Card.Body>
-                                    Empty :)
-                                </Card.Body>
-                            </Card>
                         </Col>
                     </Row>
                 </Container>

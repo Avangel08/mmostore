@@ -87,5 +87,12 @@ class Settings extends Model
             'placeholder' => 'username',
             'url_format' => 'https://youtube.com/@',
         ],
+        'zalo' => [
+            'value' => 'zalo',
+            'label' => 'Zalo',
+            'icon' => 'ri-chat-3-line',
+            'placeholder' => 'số điện thoại hoặc ID Zalo',
+            'url_format' => 'https://zalo.me/',
+        ],
     ];
 }
