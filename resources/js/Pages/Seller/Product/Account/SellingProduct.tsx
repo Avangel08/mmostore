@@ -44,7 +44,7 @@ const SellingProduct = () => {
         header: t("Product"),
         cell: (cell: any) => {
           const data = cell.row.original;
-          return <span>{`${data?.key}|${data?.data}`}</span>;
+          return <span>{`${data?.data ?? ""}`}</span>;
         },
         accessorKey: "",
         enableColumnFilter: false,
@@ -68,6 +68,9 @@ const SellingProduct = () => {
         enableSorting: true,
         cell: (cell: any) => {
           const statusLabel = cell.getValue() || "Unknown";
+          const label = {
+            SOLD: t("Sold"),
+          } as any;
           const className = {
             LIVE: "bg-success",
             BAN: "bg-danger",
@@ -79,7 +82,7 @@ const SellingProduct = () => {
               className={`badge ${className?.[statusLabel] || "bg-dark"
                 } fs-6 fw-medium`}
             >
-              {t(statusLabel)}
+              {label?.[statusLabel] || statusLabel}
             </span>
           );
         },

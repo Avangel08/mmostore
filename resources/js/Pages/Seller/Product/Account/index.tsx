@@ -33,24 +33,24 @@ const SellerAccount = () => {
       content: "",
     },
     validationSchema: Yup.object().shape({
-      file: inputMethod === 'file' 
+      file: inputMethod === 'file'
         ? Yup.mixed()
-            .required(t("Please select a file to upload"))
-            .test('fileType', t('Only .txt files are allowed'), (value: any) => {
-              if (!value) return false;
-              return value.name.toLowerCase().endsWith('.txt');
-            })
-            .test('fileSize', t('The file must not be greater than 50MB'), (value: any) => {
-              if (!value) return false;
-              return value.size <= 50 * 1024 * 1024; // 50MB
-            })
+          .required(t("Please select a file to upload"))
+          .test('fileType', t('Only .txt files are allowed'), (value: any) => {
+            if (!value) return false;
+            return value.name.toLowerCase().endsWith('.txt');
+          })
+          .test('fileSize', t('The file must not be greater than 50MB'), (value: any) => {
+            if (!value) return false;
+            return value.size <= 50 * 1024 * 1024; // 50MB
+          })
         : Yup.mixed().nullable(),
       content: inputMethod === 'textarea'
         ? Yup.string()
-            .required(t("Please enter content"))
-            .test('contentNotEmpty', t("Please enter content"), (value) => {
-              return !!value && value.trim().length > 0;
-            })
+          .required(t("Please enter content"))
+          .test('contentNotEmpty', t("Please enter content"), (value) => {
+            return !!value && value.trim().length > 0;
+          })
         : Yup.string().nullable(),
     }),
     onSubmit: (values) => {
@@ -59,7 +59,7 @@ const SellerAccount = () => {
       formData.append("sub_product_id", subProduct?.id || "");
       formData.append("product_id", subProduct?.product_id || "");
       formData.append("input_method", inputMethod);
-      
+
       if (inputMethod === 'file' && values.file) {
         formData.append("file", values.file);
       } else if (inputMethod === 'textarea' && values.content) {
@@ -212,7 +212,7 @@ const SellerAccount = () => {
                               type="radio"
                               id="method-textarea"
                               name="inputMethod"
-                              label={t("Input text")}
+                              label={t("Input list")}
                               checked={inputMethod === 'textarea'}
                               onChange={() => {
                                 setInputMethod('textarea');
@@ -324,31 +324,59 @@ const SellerAccount = () => {
                       <Card bg="light" className="mb-3">
                         <Card.Body>
                           <h5>
-                            {t("Note: Each line will be 1 product")}
+                            {t("Instructions")}
                           </h5>
+
                           <div className="mb-3">
                             <strong>{t("Format")}:</strong>
                             <div className="ms-2">
-                              • <code>key|data1|data2|...</code><br />
-                              • <code>status:STATUS|key|data1|data2|...</code>
+                              • <code className="fs-6">data1|data2|...</code><br />
+                              <small className="text-muted">{t("or")}</small><br />
+                              • <code className="fs-6">status:STATUS|data1|data2|...</code>
                             </div>
                           </div>
+
                           <div className="mb-3">
                             <small>
+                              <strong>{t("Note")}:</strong> {t("Each line will be 1 product")}.<br />
                               {t("Define status after 'status:' keyword")}. {t("If no status specified, default status is LIVE")}.
                               <br />
                               <strong>{t("LIVE means the product is ready for sale")}</strong>.
                             </small>
                           </div>
-                          <div className="mb-1">
+
+                          <div className="mb-3">
                             <strong>{t("Examples")}:</strong>
                           </div>
-                          <div className="font-monospace small bg-white p-2 rounded">
-                            status:LIVE|gameacc01|username123|password456|2fa_code
-                            <br />
-                            email001|john@example.com|mypass123|2fa_code ({t("default status is LIVE")})
-                            <br />
-                            status:Ban|social01|@username|pass789|verified ({t("status is BAN")})
+
+                          <div className="mb-2">
+                            <div className="font-monospace small bg-white p-2 rounded border-start border-info border-3">
+                              john@example.com|mypass123|2fa_code
+                            </div>
+                            <div className="small text-info mt-1 ms-2">
+                              <i className="ri-arrow-up-line me-1"></i>
+                              {t("Account without status: prefix")} - <em>{t("default status is LIVE")}</em>
+                            </div>
+                          </div>
+
+                          <div className="mb-2">
+                            <div className="font-monospace small bg-white p-2 rounded border-start border-success border-3">
+                              status:LIVE|username123|password456|2fa_code
+                            </div>
+                            <div className="small text-success mt-1 ms-2">
+                              <i className="ri-arrow-up-line me-1"></i>
+                              {t("Account with LIVE status (ready for sale)")}
+                            </div>
+                          </div>
+
+                          <div className="mb-3">
+                            <div className="font-monospace small bg-white p-2 rounded border-start border-danger border-3">
+                              status:Ban|@username|pass789|verified
+                            </div>
+                            <div className="small text-danger mt-1 ms-2">
+                              <i className="ri-arrow-up-line me-1"></i>
+                              {t("Account with non LIVE status (non LIVE status not available for sale)")}
+                            </div>
                           </div>
                         </Card.Body>
                       </Card>
