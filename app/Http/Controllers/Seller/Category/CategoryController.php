@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\Category\CategoryRequest;
 use App\Models\Mongo\Categories;
 use App\Services\Category\CategoryService;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
@@ -25,12 +27,12 @@ class CategoryController extends Controller
         // }
 
         return Inertia::render('Category/index', [
-            'statusConst' => fn () => [
+            'statusConst' => fn() => [
                 Categories::STATUS['ACTIVE'] => 'Active',
                 Categories::STATUS['INACTIVE'] => 'Inactive',
             ],
-            'categories' => fn () => $this->categoryService->getForTable($request),
-            'detailCategory' => fn () => $this->categoryService->getById(id: $request->input('id')),
+            'categories' => fn() => $this->categoryService->getForTable($request),
+            'detailCategory' => fn() => $this->categoryService->getById(id: $request->input('id')),
         ]);
     }
 
@@ -41,9 +43,17 @@ class CategoryController extends Controller
         // }
         try {
             $data = $request->validated();
+
+            $existNameCategory = $this->categoryService->findByNameIgnoreCase($data['categoryName']);
+            if ($existNameCategory) {
+                throw ValidationException::withMessages(['categoryName' => 'The category name has already been taken.']);
+            }
+
             $this->categoryService->createCategory($data);
 
             return back()->with('success', 'Category created successfully');
+        } catch (ValidationException $ve) {
+            throw $ve;
         } catch (\Exception $e) {
             \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
 
@@ -59,14 +69,22 @@ class CategoryController extends Controller
         try {
             $category = $this->categoryService->getById($id);
 
-            if (! $category) {
+            if (!$category) {
                 return back()->with('error', 'Category not found');
             }
 
             $data = $request->validated();
+
+            $existNameCategory = $this->categoryService->findByNameIgnoreCase($data['categoryName']);
+            if ($existNameCategory && $existNameCategory?->id != (string) $category?->id) {
+                throw ValidationException::withMessages(['categoryName' => 'The category name has already been taken.']);
+            }
+
             $this->categoryService->updateCategory($category, $data);
 
             return back()->with('success', 'Category updated successfully');
+        } catch (ValidationException $ve) {
+            throw $ve;
         } catch (\Exception $e) {
             \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
 
@@ -74,7 +92,7 @@ class CategoryController extends Controller
         }
     }
 
-    
+
     public function destroy($sub, $id)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_delete')) {
@@ -82,7 +100,7 @@ class CategoryController extends Controller
         // }
         try {
             $category = $this->categoryService->getById($id);
-            if (! $category) {
+            if (!$category) {
                 return back()->with('error', 'Category not found');
             }
 

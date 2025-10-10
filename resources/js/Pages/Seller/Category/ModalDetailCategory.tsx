@@ -71,7 +71,6 @@ export const ModalDetailCategory = ({
     (option: any) => option?.value === formik.values.categoryStatus
   ) ?? null;
 
-  // Reset form when modal opens/closes or when dataEdit changes
   useEffect(() => {
     if (show) {
       formik.setValues({
@@ -82,6 +81,10 @@ export const ModalDetailCategory = ({
       formik.resetForm();
     }
   }, [show, dataEdit]);
+
+  useEffect(() => {
+    formik.setErrors(errors || {});
+  }, [errors]);
 
   return (
     <Modal
@@ -112,11 +115,11 @@ export const ModalDetailCategory = ({
               onBlur={formik.handleBlur}
               value={formik.values.categoryName}
               isInvalid={
-                !!((formik.touched.categoryName && formik.errors.categoryName) || errors?.categoryName)
+                !!((formik.touched.categoryName && formik.errors.categoryName))
               }
             />
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.categoryName || errors?.categoryName)}
+              {t(formik.errors.categoryName as string ?? "")}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -145,7 +148,7 @@ export const ModalDetailCategory = ({
               </div>
             )}
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.categoryStatus || errors?.categoryStatus)}
+              {t(formik.errors.categoryStatus as string ?? "")}
             </Form.Control.Feedback>
           </Form.Group>
         </Modal.Body>
