@@ -389,7 +389,7 @@ export default function product() {
                             <div>
                               <a
                                 target="_blank"
-                                href={`${storageUrl}/${product.image}`}
+                                href={`${storageUrl}/${product.image}?v=${Date.now()}`}
                               >
                                 <img
                                   src={`${storageUrl}/${product.image
