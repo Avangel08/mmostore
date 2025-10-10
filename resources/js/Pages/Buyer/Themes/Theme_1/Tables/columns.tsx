@@ -14,6 +14,7 @@ export function columnsApi(columns: columns[], actions: { onBuy: (row: any) => v
           accessorKey: col.key,
           header: col.name,
           enableColumnFilter: false,
+          enableSorting: false,
           cell: ({ row }: any) => {
             return (
               <span className="fw-semibold">{row.index + 1}</span>
@@ -25,6 +26,7 @@ export function columnsApi(columns: columns[], actions: { onBuy: (row: any) => v
           accessorKey: col.key,
           header: col.name,
           enableColumnFilter: false,
+          enableSorting: false,
           cell: (cell: any) => {
             return (
               <>
