@@ -141,7 +141,7 @@ const Navdata = () => {
         },
         {
             id: "setting",
-            label: "Theme settings",
+            label: "Theme setting",
             icon: "ri-settings-2-line",
             link: route('seller.theme-settings'),
             stateVariables: isSettings,

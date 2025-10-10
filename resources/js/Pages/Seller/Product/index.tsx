@@ -119,7 +119,7 @@ const Product = () => {
 
   return (
     <React.Fragment>
-      <Head title={t("Product Management")} />
+      <Head title={t("Product")} />
       <div className="page-content">
         <ToastContainer />
         <ModalStockManagement
@@ -133,7 +133,7 @@ const Product = () => {
         />
         <Container fluid>
           <BreadCrumb
-            title={t("Product Management")}
+            title={t("Product")}
             pageTitle={t("Homepage")}
           />
           <Row>

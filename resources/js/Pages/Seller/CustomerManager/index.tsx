@@ -59,19 +59,19 @@ const CustomerManager = () => {
 
   return (
     <React.Fragment>
-      <Head title={t("Customer Manager")} />
+      <Head title={t("Customer")} />
       <div className="page-content">
         <ToastContainer />
         <Container fluid>
           <BreadCrumb
-            title={t("Customer Manager")}
+            title={t("Customer")}
             pageTitle={t("Homepage")}
           />
           <Row>
             <Col xs={12}>
               <Card>
                 <Card.Header>
-                  <h5 className="card-title mb-0">{t("Customer Manager")}</h5>
+                  <h5 className="card-title mb-0">{t("Customer")}</h5>
                 </Card.Header>
                 <Card.Body>
                   <Filter onFilter={handleFilter} />

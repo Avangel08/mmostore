@@ -88,12 +88,12 @@ const ThemeSettings = () => {
 
     return (
         <React.Fragment>
-            <Head title={t("Theme Settings Management")} />
+            <Head title={t("Theme Setting")} />
             <div className="page-content">
                 <ToastContainer />
                 <Container fluid>
                     <BreadCrumb
-                        title={t("Theme Settings Management")}
+                        title={t("Theme Setting")}
                         pageTitle={t("Homepage")}
                     />
                     <Row>

@@ -116,7 +116,7 @@ const Category = () => {
 
   return (
     <React.Fragment>
-      <Head title={t("Category Management")} />
+      <Head title={t("Category")} />
       <div className="page-content">
         <ToastContainer />
         <ModalDetailCategory
@@ -129,7 +129,7 @@ const Category = () => {
         />
         <Container fluid>
           <BreadCrumb
-            title={t("Category Management")}
+            title={t("Category")}
             pageTitle={t("Homepage")}
           />
           <Row>

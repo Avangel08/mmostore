@@ -89,7 +89,6 @@
     "Old Password": "Mật Khẩu Cũ",
     "New Password": "Mật Khẩu Mới",
     "Confirm Password": "Xác Nhận Mật Khẩu",
-    "Category Management": "Quản Lý Danh Mục",
     "Hello": "Xin chào",
     "Add category": "Thêm danh mục",
     "Category name": "Tên danh mục",
@@ -130,7 +129,6 @@
     "Leave blank to keep current password": "Để trống nếu muốn giữ nguyên mật khẩu hiện tại",
     "User": "Tài khoản",
     "Add user": "Thêm tài khoản",
-    "Product Management": "Quản Lý Sản Phẩm",
     "Stock": "Tồn kho",
     "Add product": "Thêm sản phẩm",
     "Product Name": "Tên sản phẩm",
@@ -383,5 +381,7 @@
     "Purchased": "Đã mua",
     "The email has already been taken.": "Email đã được sử dụng.",
     "Order history": "Lịch sử đơn hàng",
-    "Purchased order": "Đơn hàng đã mua"
+    "Purchased order": "Đơn hàng đã mua",
+    "Customer": "Khách hàng",
+    "Theme setting": "Cấu hình trang web"
 }

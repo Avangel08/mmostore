@@ -1,80 +1,21 @@
-import React, { Fragment, useEffect, useState } from "react";
-import { Button, Card, Col, Row, Table } from "react-bootstrap";
+import React, { Fragment, useEffect } from "react";
+import { Button, Table } from "react-bootstrap";
 
 import {
     Column,
     Table as ReactTable,
-    ColumnFiltersState,
-    FilterFn,
     useReactTable,
     getCoreRowModel,
-    getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
     flexRender
 } from '@tanstack/react-table';
-
-import { rankItem } from '@tanstack/match-sorter-utils';
 import { useTranslation } from "react-i18next";
 
-// Column Filter
-const Filter = ({
-    column
-}: {
-    column: Column<any, unknown>;
-    table: ReactTable<any>;
-}) => {
-    const columnFilterValue = column.getFilterValue();
-
-    return (
-        <>
-            <DebouncedInput
-                type="text"
-                value={(columnFilterValue ?? '') as string}
-                onChange={value => column.setFilterValue(value)}
-                placeholder="Search..."
-                className="w-36 border shadow rounded"
-                list={column.id + 'list'}
-            />
-            <div className="h-1" />
-        </>
-    );
-};
-
-// Global Filter
-const DebouncedInput = ({
-    value: initialValue,
-    onChange,
-    debounce = 500,
-    ...props
-}: {
-    value: string | number;
-    onChange: (value: string | number) => void;
-    debounce?: number;
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>) => {
-    const [value, setValue] = useState(initialValue);
-
-    useEffect(() => {
-        setValue(initialValue);
-    }, [initialValue]);
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            onChange(value);
-        }, debounce);
-
-        return () => clearTimeout(timeout);
-    }, [debounce, value]);
-
-    return (
-        <input {...props} value={value} id="search-bar-0" className="form-control border-0 search" onChange={e => setValue(e.target.value)} />
-    );
-};
 
 interface TableContainerProps {
     columns?: any;
     data?: any;
-    isGlobalFilter?: any;
     handleTaskClick?: any;
     customPageSize?: any;
     borderClass?: any;
@@ -83,19 +24,16 @@ interface TableContainerProps {
     trClass?: any;
     thClass?: any;
     divClass?: any;
-    SearchPlaceholder?: any;
     handleLeadClick?: any;
     handleCompanyClick?: any;
     handleContactClick?: any;
     handleTicketClick?: any;
-    onSubmit?: any;
     onRowContextMenu?: (event: React.MouseEvent, rowData: any) => void;
 }
 
 const TableContainer = ({
     columns,
     data,
-    isGlobalFilter,
     customPageSize,
     borderClass,
     tableClass,
@@ -103,37 +41,15 @@ const TableContainer = ({
     trClass,
     thClass,
     divClass,
-    SearchPlaceholder,
-    onSubmit = (e: React.FormEvent<HTMLFormElement>) => { e.preventDefault(); },
     onRowContextMenu
 }: TableContainerProps) => {
     const { t } = useTranslation();
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [globalFilter, setGlobalFilter] = useState('');
 
-    const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-        const itemRank = rankItem(row.getValue(columnId), value);
-        addMeta({
-            itemRank
-        });
-        return itemRank.passed;
-    };
 
     const table = useReactTable({
         columns,
         data: data,
-        filterFns: {
-            fuzzy: fuzzyFilter,
-        },
-        state: {
-            columnFilters,
-            globalFilter,
-        },
-        onColumnFiltersChange: setColumnFilters,
-        onGlobalFilterChange: setGlobalFilter,
-        globalFilterFn: fuzzyFilter,
         getCoreRowModel: getCoreRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
     });
@@ -163,24 +79,6 @@ const TableContainer = ({
 
     return (
         <Fragment>
-            {isGlobalFilter && <Row className="mb-3">
-                <Card.Body className="border border-dashed border-end-0 border-start-0">
-                    <form onSubmit={onSubmit}>
-                        <Row>
-                            <Col sm={5}>
-                                <div className="search-box me-2 mb-2 d-inline-block col-12">
-                                    <DebouncedInput
-                                        value={globalFilter ?? ''}
-                                        onChange={value => setGlobalFilter(String(value))}
-                                        placeholder={SearchPlaceholder}
-                                    />
-                                    <i className="bx bx-search-alt search-icon"></i>
-                                </div>
-                            </Col>
-                        </Row>
-                    </form>
-                </Card.Body>
-            </Row>}
 
 
             <div className={divClass}>
@@ -203,11 +101,6 @@ const TableContainer = ({
                                                     desc: ' ',
                                                 }
                                                 [header.column.getIsSorted() as string] ?? null}
-                                                {header.column.getCanFilter() ? (
-                                                    <div>
-                                                        <Filter column={header.column} table={table} />
-                                                    </div>
-                                                ) : null}
                                             </React.Fragment>
                                         )}
                                     </th>

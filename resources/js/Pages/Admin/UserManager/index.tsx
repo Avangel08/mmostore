@@ -88,9 +88,9 @@ const UserManager = () => {
                                 <Card.Body>
                                     <Row style={{ marginBottom: "32px" }}>
                                         <Col>
-                                            <Button variant="success" onClick={ toggleOpenAddModal } className="me-2">
-                                                <i className="ri-add-line align-bottom me-1"></i>{" "} {t("Add user")}
-                                            </Button>
+                                            {/*<Button variant="success" onClick={ toggleOpenAddModal } className="me-2">*/}
+                                            {/*    <i className="ri-add-line align-bottom me-1"></i>{" "} {t("Add user")}*/}
+                                            {/*</Button>*/}
                                             {selectedIds.length > 0 && (
                                                 <Button variant="danger" onClick={ handleBulkDelete }>
                                                     <i className="ri-delete-bin-5-line align-bottom me-1"></i>{" "} {t("Delete")}
