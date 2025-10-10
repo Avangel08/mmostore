@@ -94,17 +94,23 @@ const ThemeConfigs = ({ validation }: Props) => {
                                                         name="theme"
                                                         value={String(sub.key)}
                                                         id={`${sub.key}`}
+										                disabled={sub.key === "theme_2" || sub.key === "theme_3"}
                                                         onChange={validation.handleChange}
                                                         onBlur={validation.handleBlur}
-                                                        checked={validation.values.theme === String(sub.key)} // ✅ chỉ chọn 1
+                                                        checked={validation.values.theme === String(sub.key)}
                                                     />
                                                     <Form.Label
                                                         htmlFor={`${sub.key}`}
-                                                        className={`text-muted mb-0 cursor-pointer`}
+										                className={`text-muted mb-0 ${sub.key === "theme_2" || sub.key === "theme_3" ? "cursor-default" : "cursor-pointer"}`}
                                                     >
                                                         {t(sub.label)}
                                                     </Form.Label>
                                                 </Form.Group>
+									{sub.key === "theme_2" || sub.key === "theme_3" ? (
+										<div style={{ fontSize: 12, fontStyle: "italic", color: "#fd7e14" }}>
+                                            { t("Coming soon") }
+										</div>
+									) : null}
                                             </div>
                                         </Col>
                                     ))}

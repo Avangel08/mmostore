@@ -37,7 +37,7 @@ class SellerAccountService
         return Accounts::select($select)->with($relation)->where('_id', $id)->first();
     }
 
-    public function processAccountFile($categoryId, $productTypeId, $data)
+    public function processAccountFile($data)
     {
         $inputMethod = $data['input_method'] ?? Accounts::INPUT_METHOD['FILE'];
         $host = request()->getHost();
@@ -48,14 +48,14 @@ class SellerAccountService
             $fileName = 'accounts_' . time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs("{$host}/accounts", $fileName, 'public');
             $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-            JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $categoryId, $productTypeId, $importAccountHistory?->id, $dbConfig, Accounts::INPUT_METHOD['FILE']);
+            JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $dbConfig, Accounts::INPUT_METHOD['FILE']);
         } elseif ($inputMethod === Accounts::INPUT_METHOD['TEXTAREA']) {
             $content = $data['content'];
             $fileName = 'input_accounts_' . time() . '.txt';
             $filePath = "{$host}/accounts/{$fileName}";
             Storage::disk('public')->put($filePath, $content);
             $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-            JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $categoryId, $productTypeId, $importAccountHistory?->id, $dbConfig, Accounts::INPUT_METHOD['TEXTAREA']);
+            JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $dbConfig, Accounts::INPUT_METHOD['TEXTAREA']);
         }
     }
 
