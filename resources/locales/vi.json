@@ -446,5 +446,6 @@
     "The uploaded item must be a file.": "Mục được tải lên phải là một file.",
     "Content must be a string.": "Nội dung phải là một chuỗi.",
     "Content must have at least 1 character.": "Nội dung phải có ít nhất 1 ký tự.",
-    "Content must not exceed 10000 characters.": "Nội dung không được vượt quá 10000 ký tự."
+    "Content must not exceed 10000 characters.": "Nội dung không được vượt quá 10000 ký tự.",
+    "Contact support": "Liên hệ"
 }

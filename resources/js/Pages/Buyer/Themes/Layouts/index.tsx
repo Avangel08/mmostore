@@ -19,8 +19,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     const dispatch: any = useDispatch();
     const { subdomain, user, isAuthenticated, theme, store_settings, contacts, contact_types } = usePage().props;
 
-    console.log({ subdomain, user, isAuthenticated, theme, store_settings })
-
     const selectLayoutState = (state: any) => state.Layout;
     const selectLayoutProperties = createSelector(
         selectLayoutState,

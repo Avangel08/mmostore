@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { usePage } from '@inertiajs/react';
+import { useTranslation } from "react-i18next";
 
 interface Contact {
     type: string;
@@ -25,6 +26,7 @@ const ContactFloatingButton: React.FC<ContactFloatingButtonProps> = ({
 }) => {
     const { contact_types } = usePage().props as any;
     const [isExpanded, setIsExpanded] = useState(false);
+    const {t} = useTranslation();
 
     // Filter contacts that have values
     const activeContacts = contacts.filter(contact => contact.value && contact.value.trim());
@@ -95,31 +97,31 @@ const ContactFloatingButton: React.FC<ContactFloatingButtonProps> = ({
             case 'bottom-right':
                 return {
                     ...baseStyles,
-                    bottom: '20px',
+                    bottom: '100px',
                     right: '20px',
                 };
             case 'bottom-left':
                 return {
                     ...baseStyles,
-                    bottom: '20px',
+                    bottom: '100px',
                     left: '20px',
                 };
             case 'top-right':
                 return {
                     ...baseStyles,
-                    top: '20px',
+                    top: '100px',
                     right: '20px',
                 };
             case 'top-left':
                 return {
                     ...baseStyles,
-                    top: '20px',
+                    top: '100px',
                     left: '20px',
                 };
             default:
                 return {
                     ...baseStyles,
-                    bottom: '20px',
+                    bottom: '100px',
                     right: '20px',
                 };
         }
@@ -149,8 +151,41 @@ const ContactFloatingButton: React.FC<ContactFloatingButtonProps> = ({
                     .contact-floating-container {
                         display: flex;
                         flex-direction: column;
-                        align-items: flex-end;
+                        align-items: center;
                         gap: 10px;
+                    }
+                    
+                    .contact-item-wrapper {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        transform: translateX(0);
+                        transition: all 0.3s ease;
+                        width: 100%;
+                        justify-content: center;
+                    }
+                    
+                    .contact-item-wrapper.expanded {
+                        transform: translateX(-40px);
+                    }
+                    
+                    .contact-item-text {
+                        background: rgba(0, 0, 0, 0.8);
+                        color: white;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        white-space: nowrap;
+                        opacity: 0;
+                        transform: translateY(-10px);
+                        transition: all 0.3s ease;
+                        z-index: 1001;
+                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                    }
+                    
+                    .contact-item-wrapper.expanded .contact-item-text {
+                        opacity: 1;
+                        transform: translateY(0);
                     }
                     
                     .contact-floating-button {
@@ -194,7 +229,17 @@ const ContactFloatingButton: React.FC<ContactFloatingButtonProps> = ({
                     .contact-main-button {
                         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                         color: white;
-                        font-size: 24px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 2px;
+                    }
+                    
+                    .contact-main-button i {
+                        font-size: 16px;
                     }
                     
                     .contact-item-button {
@@ -204,19 +249,19 @@ const ContactFloatingButton: React.FC<ContactFloatingButtonProps> = ({
                         color: #333;
                         font-size: 20px;
                         opacity: 0;
-                        transform: translateX(20px);
+                        transform: translateY(-20px);
                         transition: all 0.3s ease;
                         border: 2px solid rgba(255, 255, 255, 0.8);
                     }
                     
                     .contact-item-button.expanded {
                         opacity: 1;
-                        transform: translateX(0);
+                        transform: translateY(0);
                     }
                     
                     .contact-item-button:hover {
                         background: #f8f9fa;
-                        transform: translateX(0) scale(1.15);
+                        transform: translateY(0) scale(1.15);
                     }
                     
                     .contact-main-button {
@@ -238,22 +283,25 @@ const ContactFloatingButton: React.FC<ContactFloatingButtonProps> = ({
                     
                     .contact-label {
                         position: absolute;
-                        right: 70px;
+                        right: 60px;
                         top: 50%;
                         transform: translateY(-50%);
-                        background: rgba(0, 0, 0, 0.8);
+                        background: rgba(0, 0, 0, 0.9);
                         color: white;
-                        padding: 8px 12px;
-                        border-radius: 6px;
-                        font-size: 14px;
+                        padding: 6px 10px;
+                        border-radius: 4px;
+                        font-size: 12px;
                         white-space: nowrap;
                         opacity: 0;
                         pointer-events: none;
                         transition: opacity 0.3s ease;
+                        z-index: 1001;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
                     }
                     
-                    .contact-item-button:hover .contact-label {
-                        opacity: 1;
+                    .contact-item-button.expanded .contact-label {
+                        opacity: 1 !important;
+                        transition-delay: 0.2s;
                     }
                     
                     .contact-main-label {
@@ -297,7 +345,8 @@ const ContactFloatingButton: React.FC<ContactFloatingButtonProps> = ({
                         }
                         
                         .contact-label,
-                        .contact-main-label {
+                        .contact-main-label,
+                        .contact-item-text {
                             display: none;
                         }
                     }
@@ -305,16 +354,6 @@ const ContactFloatingButton: React.FC<ContactFloatingButtonProps> = ({
             </style>
             
             <div className="contact-floating-container" style={getPositionStyles()}>
-                {/* Main toggle button */}
-                <button
-                    className="contact-floating-button contact-main-button"
-                    onClick={() => setIsExpanded(!isExpanded)}
-                >
-                    <i className="ri-customer-service-2-line"></i>
-                    <span className="contact-main-label">Liên hệ hỗ trợ</span>
-                </button>
-
-                {/* Contact buttons */}
                 {activeContacts.map((contact, index) => {
                     const config = getContactConfig(contact.type);
                     if (!config) return null;
@@ -322,20 +361,38 @@ const ContactFloatingButton: React.FC<ContactFloatingButtonProps> = ({
                     const iconColor = getContactIconColor(contact.type);
                     
                     return (
-                        <button
-                            key={index}
-                            className={`contact-floating-button contact-item-button ${isExpanded ? 'expanded' : ''}`}
-                            onClick={() => handleContactClick(contact)}
-                            style={{
-                                transitionDelay: isExpanded ? `${index * 0.1}s` : '0s',
-                                color: iconColor,
-                            }}
-                        >
-                            <i className={config.icon}></i>
-                            <span className="contact-label">{config.label}</span>
-                        </button>
+                        <div key={index} className={`contact-item-wrapper ${isExpanded ? 'expanded' : ''}`}>
+                            <span 
+                                className="contact-item-text"
+                                style={{
+                                    transitionDelay: isExpanded ? `${index * 0.1 + 0.2}s` : '0s',
+                                }}
+                            >
+                                {config.label}
+                            </span>
+                            <button
+                                className={`contact-floating-button contact-item-button ${isExpanded ? 'expanded' : ''}`}
+                                onClick={() => handleContactClick(contact)}
+                                style={{
+                                    transitionDelay: isExpanded ? `${index * 0.1}s` : '0s',
+                                    color: iconColor,
+                                }}
+                            >
+                                <i className={config.icon}></i>
+                            </button>
+                        </div>
                     );
                 })}
+                
+                <button
+                    className="contact-floating-button contact-main-button"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    style={{ marginTop: '20px' }}
+                >
+                    <i className="ri-customer-service-2-line"></i>
+                    <span style={{ fontSize: '10px', lineHeight: '1' }}>{ t("Contact support") }</span>
+                    <span className="contact-main-label">{ t("Contact support") }</span>
+                </button>
             </div>
         </>
     );
