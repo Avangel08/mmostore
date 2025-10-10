@@ -11,6 +11,17 @@ use App\Models\Mongo\BalanceHistories;
 class BalanceHistoryService
 {
 
+    public function getForTableCustomer($request, $customerId){
+        $page = $request['page'] ?? 1;
+        $perPage = $request['perPage'] ?? 10;
+
+        return BalanceHistories::where('customer_id', $customerId)
+            ->with('paymentMethod:id,name')
+            ->filterSearch($request)
+            ->filterCreatedDate($request)   
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
     public function getForTable($request){
         $page = $request['page'] ?? 1;
         $perPage = $request['perPage'] ?? 10;

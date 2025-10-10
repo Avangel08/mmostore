@@ -108,8 +108,8 @@ const Index: React.FC<DepositProps> = () => {
 
     return (
         <React.Fragment>
-             <Head title={theme?.storeName ?? ""} />
-             <PageHeader title={theme?.pageHeaderText ?? ""} />
+            <Head title={theme?.storeName ?? ""} />
+            <PageHeader title={theme?.pageHeaderText ?? ""} />
             <ModalDeposit show={showModal} onHide={() => setShowModal(false)} data={data} />
             <ToastContainer />
             <Container className="mt-4 custom-container" fluid>
