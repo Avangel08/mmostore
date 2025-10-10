@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Head, router } from "@inertiajs/react";
 import PageHeader from "../PageHeader/PageHeader";
 import { Container, Card, Button, Form } from "react-bootstrap";
@@ -16,6 +16,7 @@ import { useContext } from "react";
 import { LayoutContext } from "../../Layouts/LayoutContext";
 import { useThemeConfig } from "../../hooks/useThemeConfig";
 import { useDispatch } from "react-redux";
+import { changeLayoutTheme } from "../../../../../slices/thunk";
 
 interface DepositProps {
     // Add any props if needed
@@ -32,6 +33,12 @@ const Index: React.FC<DepositProps> = () => {
     const intervalRefs = useRef<any[]>([])
     const theme = useThemeConfig()
     const dispatch: any = useDispatch();
+
+    useEffect(() => {
+        if (theme) {
+            dispatch(changeLayoutTheme(theme?.theme));
+        }
+    }, [theme, dispatch])
 
     const { t } = useTranslation();
 
