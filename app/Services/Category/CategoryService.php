@@ -31,22 +31,30 @@ class CategoryService
     public function createCategory(array $data)
     {
         return Categories::create([
-            'name' => $data['categoryName'],
-            'status' => (int) $data['categoryStatus'],
+            'name' =>(string) $data['categoryName'],
+            'status' => (string) $data['categoryStatus'],
         ]);
     }
 
     public function updateCategory(Categories $category, array $data)
     {
         return $category->update([
-            'name' => $data['categoryName'],
-            'status' => (int) $data['categoryStatus'],
+            'name' => (string) $data['categoryName'],
+            'status' => (string) $data['categoryStatus'],
         ]);
     }
 
     public function findByIds(array $ids, $select = ['*'], $relation = [])
     {
         return Categories::select($select)->with($relation)->whereIn('_id', $ids)->get();
+    }
+
+    public function findByNameIgnoreCase($name, $select = ['*'], $relation = [])
+    {
+        return Categories::select($select)
+            ->with($relation)
+            ->where('name', 'ILIKE', $name)
+            ->first();
     }
 
     public function delete(Categories $category)

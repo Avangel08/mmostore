@@ -88,7 +88,7 @@ const TableProduct = ({
           const imageUrl = cell?.row?.original?.image;
 
           return <div className="d-flex align-items-center gap-2">
-            <img src={`${storageUrl}/${imageUrl}`} className="object-fit-contain cursor-pointer" style={{ width: "50px", height: "50px" }} onClick={() => { window.open(`${storageUrl}/${imageUrl}`) }} /> <span className="fw-semibold">{cell.getValue()}</span>
+            <img src={`${storageUrl}/${imageUrl}?v=${Date.now()}`} className="object-fit-contain cursor-pointer" style={{ width: "50px", height: "50px" }} onClick={() => { window.open(`${storageUrl}/${imageUrl}?v=${Date.now()}`) }} /> <span className="fw-semibold">{cell.getValue()}</span>
           </div>
         },
         accessorKey: "name",

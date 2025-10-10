@@ -3,8 +3,9 @@ import { useFormik } from "formik";
 import React, { useEffect } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
+import Select from "react-select";
 
-import * as Yup from "yup" ;
+import * as Yup from "yup";
 import { showToast } from "../../../utils/showToast";
 
 export const ModalDetailCategory = ({
@@ -20,26 +21,32 @@ export const ModalDetailCategory = ({
   const { t } = useTranslation();
   const isEditMode = !!dataEdit;
   const errors = usePage().props.errors as any;
+  const statusConst = usePage().props.statusConst as any;
+
+  const statusOptions = Object.entries(statusConst || {}).map(([key, value]) => ({
+    value: (key as string ?? "")?.toString(),
+    label: t(value as string ?? ""),
+  }));
 
   const formik = useFormik({
     initialValues: {
       categoryName: dataEdit?.name || "",
-      categoryStatus: dataEdit?.status ?? 1,
+      categoryStatus: dataEdit?.status ?? "ACTIVE",
     },
     validationSchema: Yup.object({
       categoryName: Yup.string()
         .max(maxLengthName, `Must be ${maxLengthName} characters or less`)
         .required(t("Please enter this field")),
-      categoryStatus: Yup.number()
+      categoryStatus: Yup.string()
         .required(t("Please select status")),
     }),
     onSubmit: (values) => {
-      const url = isEditMode 
+      const url = isEditMode
         ? route("seller.category.update", { id: dataEdit.id })
         : route("seller.category.store");
-      
+
       const method = isEditMode ? "put" : "post";
-      
+
       router[method](url, values, {
         replace: true,
         preserveScroll: true,
@@ -59,17 +66,25 @@ export const ModalDetailCategory = ({
       });
     },
   });
-  // Reset form when modal opens/closes or when dataEdit changes
+
+  const selectedStatusOption = statusOptions?.find(
+    (option: any) => option?.value === formik.values.categoryStatus
+  ) ?? null;
+
   useEffect(() => {
     if (show) {
       formik.setValues({
         categoryName: dataEdit?.name || "",
-        categoryStatus: dataEdit?.status ?? 1,
+        categoryStatus: dataEdit?.status ?? "ACTIVE",
       });
     } else {
       formik.resetForm();
     }
   }, [show, dataEdit]);
+
+  useEffect(() => {
+    formik.setErrors(errors || {});
+  }, [errors]);
 
   return (
     <Modal
@@ -100,11 +115,11 @@ export const ModalDetailCategory = ({
               onBlur={formik.handleBlur}
               value={formik.values.categoryName}
               isInvalid={
-                !!((formik.touched.categoryName && formik.errors.categoryName) || errors?.categoryName)
+                !!((formik.touched.categoryName && formik.errors.categoryName))
               }
             />
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.categoryName || errors?.categoryName)}
+              {t(formik.errors.categoryName as string ?? "")}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -113,17 +128,27 @@ export const ModalDetailCategory = ({
             <Form.Label>
               {t("Status")} <span className="text-danger">*</span>
             </Form.Label>
-            <Form.Select
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.categoryStatus}
-              isInvalid={!!((formik.touched.categoryStatus && formik.errors.categoryStatus) || errors?.categoryStatus)}
-            >
-              <option value={1}>{t("Active")}</option>
-              <option value={0}>{t("Inactive")}</option>
-            </Form.Select>  
+            <Select
+              options={statusOptions}
+              placeholder={t("Select status")}
+              value={selectedStatusOption}
+              onChange={(selectedOption: any) => {
+                formik.setFieldValue("categoryStatus", selectedOption?.value ?? "");
+              }}
+              onBlur={() => formik.setFieldTouched("categoryStatus", true)}
+              className={
+                (formik?.touched?.categoryStatus && formik?.errors?.categoryStatus)
+                  ? "is-invalid"
+                  : ""
+              }
+            />
+            {((formik?.touched?.categoryStatus && formik?.errors?.categoryStatus)) && (
+              <div className="invalid-feedback d-block">
+                {t(formik?.errors?.categoryStatus as string ?? "")}
+              </div>
+            )}
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.categoryStatus || errors?.categoryStatus)}
+              {t(formik.errors.categoryStatus as string ?? "")}
             </Form.Control.Feedback>
           </Form.Group>
         </Modal.Body>

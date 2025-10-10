@@ -75,6 +75,9 @@ class ProductService
         }
 
         if (!empty($data['image'])) {
+            if ($product?->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
             $host = request()->getHost();
             $extension = $data['image']->getClientOriginalExtension();
             $fileName = "product_" . $product->_id . '.' . $extension;

@@ -48,8 +48,8 @@ const CategoryFilter = ({ onFilter, additionalButtons }: CategoryFilterProps) =>
 
   const statusOptions = [
     { value: "", label: t("All") },
-    { value: 1, label: t("Active") },
-    { value: 0, label: t("Inactive") },
+    { value: "ACTIVE", label: t("Active") },
+    { value: "INACTIVE", label: t("Inactive") },
   ];
 
   const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
