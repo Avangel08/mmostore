@@ -105,7 +105,7 @@ const Index: React.FC<DepositProps> = () => {
              <PageHeader title={theme?.pageHeaderText ?? ""} />
             <ModalDeposit show={showModal} onHide={() => setShowModal(false)} data={data} />
             <ToastContainer />
-            <Container className="mt-4" fluid>
+            <Container className="mt-4 custom-container" fluid>
                 <Card className="shadow-sm p-2" style={{ minHeight: "50vh" }}>
                     <Card.Body>
                         <Form onSubmit={formik.handleSubmit} noValidate>
