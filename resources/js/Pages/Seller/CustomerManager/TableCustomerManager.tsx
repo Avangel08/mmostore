@@ -10,12 +10,14 @@ import CONSTANTS from "../../../utils/constants";
 const TableCustomerManager = ({
   data,
   onReloadTable,
+  onDeposit,
   onEdit,
   onDelete,
   onSelectionChange
 }: {
   data: any;
   onReloadTable?: (page: number, perPage: number, filters?: any) => void;
+  onDeposit?: (id: number | string) => void;
   onEdit?: (id: number | string) => void;
   onDelete?: (id: number | string) => void;
   onSelectionChange?: (selectedItems: (string | number)[]) => void;
@@ -134,12 +136,12 @@ const TableCustomerManager = ({
             <div className="d-flex gap-2">
               <OverlayTrigger
                 placement="top"
-                overlay={<Tooltip>{t("Add Balance")}</Tooltip>}
+                overlay={<Tooltip>{t("Update balance")}</Tooltip>}
               >
                 <Button
                   size="sm"
                   variant="outline-info"
-                  onClick={() => onEdit && onEdit(rowData?.id)}
+                  onClick={() => onDeposit && onDeposit(rowData?.id)}
                 >
                 <i className="ri-money-dollar-circle-line" style={{ fontSize: "16px" }}></i>
                 </Button>

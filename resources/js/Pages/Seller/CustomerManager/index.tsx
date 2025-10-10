@@ -9,12 +9,15 @@ import TableCustomerManager from "./TableCustomerManager";
 import { useQueryParams } from "../../../hooks/useQueryParam";
 import Filter from "./Filter";
 import axios from "axios";
+import { ModalDeposit } from "./Modal/ModalDeposit";
 
 const CustomerManager = () => {
   const { t } = useTranslation();
-  const { customers } = usePage().props;
+  const { customers, paymentMethods } = usePage().props;
   const [showModal, setShowModal] = useState(false);
+  const [showModalDeposit, setShowModalDeposit] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
+  const [dataDeposit, setDataDeposit] = useState<any>(null);
   const params = useQueryParams();
   const buildQuery = (p: any = {}) => ({
     page: Number(p.page || 1),
@@ -47,14 +50,26 @@ const CustomerManager = () => {
     fetchData(currentPage, perPage, filters);
   };
 
-  const openModalEdit = async () => {
+  const openModalEdit = async (id: number | string) => {
     try {
-      const response = await axios.get(route("seller.customer-manager.edit"));
-      setDataEdit(response.data.customer);
+      const response = await axios.get(route("seller.customer-manager.edit", { id }));
+      setDataEdit(response.data.data);
       setShowModal(true);
     } catch (error) {
-      console.error("Error fetching payment method:", error);
+      console.error("Error fetching customer:", error);
     }
+  };
+
+  const openModalDeposit = async (id: number | string) => {
+    
+    const response = await axios.get(route("seller.customer-manager.edit", { id })).then((response) => {
+      console.log(response.data.data);
+      
+      setDataDeposit(response.data.data);
+      setShowModalDeposit(true);
+    }).catch((error) => {
+      console.error("Error fetching payment method:", error);
+    });
   };
 
   return (
@@ -80,6 +95,8 @@ const CustomerManager = () => {
                       <TableCustomerManager
                         data={customers || []}
                         onReloadTable={fetchData}
+                        onDeposit={openModalDeposit}
+                        onEdit={openModalEdit}
                       />
                     </Col>
                   </Row>
@@ -89,6 +106,14 @@ const CustomerManager = () => {
           </Row>
         </Container>
       </div>
+
+      {/* Deposit Modal */}
+      <ModalDeposit
+        show={showModalDeposit}
+        onHide={() => setShowModalDeposit(false)}
+        dataEdit={dataDeposit}
+        paymentMethods={paymentMethods}
+      />
     </React.Fragment>
   );
 };

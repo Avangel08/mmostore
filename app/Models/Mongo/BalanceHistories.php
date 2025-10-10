@@ -9,6 +9,7 @@ class BalanceHistories extends Model
     const TYPE = [
         "deposit" => 1, //user nạp tiền - deposit
         "purchase" => 2, //user mua hàng - purchase
+        "deduct_money" => 3, //user trừ tiền - deduct_money
     ];
     protected $table = 'balance_histories';
 
