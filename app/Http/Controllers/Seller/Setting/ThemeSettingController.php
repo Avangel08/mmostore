@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Seller\Setting;
 
 use App\Http\Controllers\Controller;
+use App\Models\Mongo\Settings;
 use App\Services\Home\StoreService;
 use App\Services\Setting\SettingService;
 use Illuminate\Http\Request;
@@ -28,12 +29,19 @@ class ThemeSettingController extends Controller
         }
         $settings = $this->settingService->getSettings(true);
         $result = [];
+
         foreach ($settings as $setting) {
-            $result[$setting->key] = $setting->value;
+            if ($setting->key === 'contacts') {
+                $result[$setting->key] = json_decode($setting->value, true) ?: [];
+            } else {
+                $result[$setting->key] = $setting->value;
+            }
         }
+
         return Inertia::render('Settings/index', [
             'settings' => fn() => $result,
             'domains' => $store->domain,
+            'contact_types' => fn() => Settings::CONTACT_TYPES,
         ]);
     }
 
@@ -43,10 +51,26 @@ class ThemeSettingController extends Controller
         $this->settingService->createSetting($data);
     }
 
-    public function update($sub, $id, Request $request)
+    public function update(Request $request)
     {
-        $data = $request->validated();
-        $setting = $this->settingService->getById($id);
-        $this->settingService->updateSetting($setting, $data);
+        $theme = $request->input('theme');
+        $storeSettings = json_decode($request->input('store_settings'), true);
+        
+        $this->settingService->updateOrCreateSetting('theme', $theme);
+        
+        if ($storeSettings) {
+            foreach ($storeSettings as $key => $value) {
+                if ($key === 'contacts') {
+                    $value = json_encode($value);
+                }
+                $this->settingService->updateOrCreateSetting($key, $value);
+            }
+        }
+        
+        return redirect()->back()->with([
+            'message' => [
+                'success' => 'Settings updated successfully'
+            ]
+        ]);
     }
 }

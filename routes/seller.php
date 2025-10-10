@@ -73,7 +73,7 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                 // seller theme settings
                 Route::group(['prefix' => 'theme-settings'], function() {
                     Route::get('/', [ThemeSettingController::class, 'index'])->name('seller.theme-settings');
-                    Route::put('/update', [ThemeSettingController::class, 'update'])->name('seller.theme-settings.update');
+                    Route::post('/update', [ThemeSettingController::class, 'update'])->name('seller.theme-settings.update');
                 });
 
                 Route::resource('customer-manager', CustomerManagerController::class, ['as' => 'seller']);

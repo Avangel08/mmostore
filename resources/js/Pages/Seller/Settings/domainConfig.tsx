@@ -10,8 +10,8 @@ const DomainConfig = ({ validation }: Props) => {
         <React.Fragment>
             <Card>
                 <Card.Header>
-                    <h5 className="card-title">{t("Domain Details")}</h5>
-                    <p className="text-muted fs-14">Để website có thể được nhận diện và hiển thị đến người dùng, website luôn phải có một tên miền chính. Chỉ có thể chọn duy nhất một tên miền làm tên miền chính</p>
+                    <h5 className="card-title">{t("Domain")}<span className="text-danger">*</span></h5>
+                    <p className="text-muted fs-14 mb-0">Để website có thể được nhận diện và hiển thị đến người dùng, website luôn phải có một tên miền chính. Chỉ có thể chọn duy nhất một tên miền làm tên miền chính</p>
                 </Card.Header>
                 <Card.Body>
                     <Row>
@@ -20,7 +20,6 @@ const DomainConfig = ({ validation }: Props) => {
                                 name="domains"
                                 render={(arrayHelpers) => (
                                     <div className="mb-3">
-                                        <Form.Label htmlFor="setting-domain">{t("Domain")}{" "}<span className="text-danger">*</span></Form.Label>
                                         {validation.values.domains.map((domain, index) => (
                                             <Row key={index} className="mb-2">
                                                 <Col>
@@ -33,7 +32,6 @@ const DomainConfig = ({ validation }: Props) => {
                                                         onBlur={validation.handleBlur}
                                                         name={`domains[${index}]`}
                                                         placeholder={t("Enter your domain")}
-                                                    // disabled
                                                     />
                                                 </Col>
                                                 <Col xs="auto">

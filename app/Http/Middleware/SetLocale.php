@@ -22,6 +22,8 @@ class SetLocale
             $lang = config('app.fallback_locale', 'en');
         }
 
+        $lang = 'vi';
+
         App::setLocale($lang);
 
         $response = $next($request);

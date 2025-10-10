@@ -67,7 +67,7 @@ const ThemeConfigs = ({ validation }: Props) => {
             <Card>
                 <Card.Header>
                     <div className="d-flex justify-content-between align-items-center">
-                        <h5 className="card-title mb-0">{t("Store Details")}</h5>
+                        <h5 className="card-title mb-0">{t("Store")}</h5>
                         <div className="d-flex gap-2">
                             <Button variant="outline-success" size="sm">
                                 <i className="ri-eye-line align-bottom me-1"></i>{" "}
@@ -81,7 +81,7 @@ const ThemeConfigs = ({ validation }: Props) => {
                         <Col>
                             <div className="mb-3">
                                 <div className="fs-13 mb-3 fw-medium">
-                                    <span>{t('Choose theme')}{" "}<span className="text-danger">*</span></span>
+                                    <span>{t('Theme')}{" "}<span className="text-danger">*</span></span>
                                 </div>
                                 <Row>
                                     {LIST_THEMES.map(sub => (
@@ -102,7 +102,7 @@ const ThemeConfigs = ({ validation }: Props) => {
                                                         htmlFor={`${sub.key}`}
                                                         className={`text-muted mb-0 cursor-pointer`}
                                                     >
-                                                        {sub.label}
+                                                        {t(sub.label)}
                                                     </Form.Label>
                                                 </Form.Group>
                                             </div>
@@ -142,10 +142,9 @@ const ThemeConfigs = ({ validation }: Props) => {
                                     {validation.errors.storeName}{" "}
                                 </Form.Control.Feedback>
                             </div>
-                            {/** Store Logo */}
                             <div className="mb-4">
-                                <h5 className="fs-14 mb-1">{t("Store Logo")}{" "}<span className="text-danger">*</span></h5>
-                                <p className="text-muted">{t("Add a logo for your store")}.</p>
+                                <h5 className="fs-14 mb-1">{t("Logo")}{" "}<span className="text-danger">*</span></h5>
+                                <p className="text-muted">{t("Add a logo for your store")}</p>
                                 <div className="text-center">
                                     <div className="position-relative d-inline-block">
                                         <div className="position-absolute top-100 start-100 translate-middle">
@@ -188,10 +187,6 @@ const ThemeConfigs = ({ validation }: Props) => {
                                     <div className="invalid-feedback d-block">
                                         {t(validation.errors.storeLogo || errors?.storeLogo)}
                                     </div>
-                                    // <Form.Control.Feedback type="invalid">
-                                    //     {" "}
-                                    //     {validation.errors.storeLogo}{" "}
-                                    // </Form.Control.Feedback>
                                 ) : null}
                             </div>
 

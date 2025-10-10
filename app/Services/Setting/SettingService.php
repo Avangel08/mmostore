@@ -27,6 +27,18 @@ class SettingService
 
     public function updateSetting(Settings $setting, array $data)
     {
+        return $setting->update($data);
+    }
 
+    public function updateOrCreateSetting($key, $value)
+    {
+        return Settings::updateOrCreate(
+            ['key' => $key],
+            [
+                'value' => $value,
+                'auto_load' => true,
+                'updated_at' => now()
+            ]
+        );
     }
 }
