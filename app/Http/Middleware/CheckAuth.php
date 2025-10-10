@@ -14,6 +14,8 @@ class CheckAuth
     {
         if (!Auth::guard($guard)->check()) {
             switch ($guard) {
+                case 'buyer':
+                    return redirect()->route($redirectRoute ?? 'buyer.home');
                 case 'admin':
                     return redirect()->route($redirectRoute ?? 'admin.login');
                 case 'seller':

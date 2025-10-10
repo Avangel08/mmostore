@@ -68,7 +68,7 @@ const Navbar = () => {
                 id="navbar"
             >
                 <Container fluid className="custom-container">
-                    <Link className="navbar-brand" href="/dashboard">
+                    <Link className="navbar-brand" href={route('buyer.home')}>
                         <img
                             src={LogoDark}
                             className="card-logo card-logo-dark"

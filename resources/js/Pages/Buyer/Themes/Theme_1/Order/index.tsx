@@ -1,11 +1,16 @@
-import React, {useState, useEffect} from "react";
-import {Head, router} from "@inertiajs/react";
-import {Container, Row, Col, Table, Form, Button, InputGroup, Dropdown, Badge, Modal} from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Head } from "@inertiajs/react";
+import { Container, Row, Col, Table, Form, Button, InputGroup, Dropdown, Badge, Modal } from "react-bootstrap";
 import Layout from "../../Layouts";
-import {useTranslation} from "react-i18next";
-import {usePage} from "@inertiajs/react";
+import PageHeader from "../PageHeader/PageHeader";
+import { useThemeConfig } from "../../hooks/useThemeConfig";
+
+import { useTranslation } from "react-i18next";
+import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import OrdersTable from "./OrdersTable";
+import { changeLayoutTheme } from "../../../../../slices/layouts/thunk";
+import { useDispatch } from "react-redux";
 
 interface OrderData {
     order_number: string;
@@ -30,24 +35,23 @@ interface OrdersData {
 
 const Index: React.FC = () => {
     const {t} = useTranslation();
+    const theme = useThemeConfig();
     const {user, orders} = usePage().props as { user: any; orders?: OrdersData };
 
+    const dispatch: any = useDispatch();
     const [ordersData, setOrdersData] = useState<OrderData[]>([]);
-    const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [totalEntries, setTotalEntries] = useState(0);
     const [showDetails, setShowDetails] = useState(false);
-    const [detailsLoading, setDetailsLoading] = useState(false);
     const [detailsTitle, setDetailsTitle] = useState<string>("");
     const [detailsItems, setDetailsItems] = useState<Array<{ product?: string; value?: string }>>([]);
     const [detailsOrderNumber, setDetailsOrderNumber] = useState<string>("");
 
     const fetchOrdersData = async () => {
         try {
-            setLoading(true);
             const response = await axios.get('/order', {
                 params: {
                     page: currentPage,
@@ -78,8 +82,6 @@ const Index: React.FC = () => {
             }
         } catch (error) {
             console.error("Error fetching orders:", error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -103,7 +105,11 @@ const Index: React.FC = () => {
             setOrdersData([]);
             setTotalEntries(0);
         }
-    }, [orders]);
+
+        if (theme) {
+            dispatch(changeLayoutTheme(theme?.theme));
+        }
+    }, [orders, theme, dispatch]);
 
 
     const handleSearch = () => {
@@ -111,27 +117,27 @@ const Index: React.FC = () => {
         fetchOrdersData();
     };
 
-  useEffect(() => {
-    fetchOrdersData();
-  }, [currentPage, perPage, selectedCategory]);
+    useEffect(() => {
+        fetchOrdersData();
+    }, [currentPage, perPage, selectedCategory]);
 
     const handleViewOrder = async (orderNumber: string) => {
         setShowDetails(true);
-        setDetailsLoading(true);
         setDetailsOrderNumber(orderNumber);
         try {
             const response = await axios.get(`/order/${orderNumber}`);
             if (response.data.success) {
                 const data = response.data.data || {};
                 setDetailsTitle(data.product_title || "");
-                const items = Array.isArray(data.items) ? data.items.map((it: any) => ({product: it.key ?? "", value: it.data ?? ""})) : [];
+                const items = Array.isArray(data.items) ? data.items.map((it: any) => ({
+                    product: it.key ?? "",
+                    value: it.data ?? ""
+                })) : [];
                 setDetailsItems(items);
             }
         } catch (error) {
             console.error("Error fetching order details:", error);
             setDetailsItems([]);
-        } finally {
-            setDetailsLoading(false);
         }
     };
 
@@ -146,15 +152,15 @@ const Index: React.FC = () => {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case "COMPLETED":
-                return <Badge bg="success">{ t("Completed") }</Badge>;
+                return <Badge bg="success">{t("Completed")}</Badge>;
             case "PENDING":
-                return <Badge bg="warning">{ t("Pending") }</Badge>;
+                return <Badge bg="warning">{t("Pending")}</Badge>;
             case "PROCESSING":
-                return <Badge bg="info">{ t("Processing") }</Badge>;
+                return <Badge bg="info">{t("Processing")}</Badge>;
             case "CANCELLED":
-                return <Badge bg="danger">{ t("Cancelled") }</Badge>;
+                return <Badge bg="danger">{t("Cancelled")}</Badge>;
             case "FAILED":
-                return <Badge bg="danger">{ t("Failed") }</Badge>;
+                return <Badge bg="danger">{t("Failed")}</Badge>;
             default:
                 return <Badge bg="secondary">{status}</Badge>;
         }
@@ -207,60 +213,38 @@ const Index: React.FC = () => {
         return items;
     };
 
-    if (loading) {
-        return (
-            <React.Fragment>
-                <Head title="Đơn hàng đã mua"/>
-                <Container fluid className="custom-container">
-                    <div className="d-flex justify-content-center align-items-center" style={{minHeight: "50vh"}}>
-                        <div className="spinner-border text-primary" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                </Container>
-            </React.Fragment>
-        );
-    }
 
     return (
         <React.Fragment>
+            <PageHeader title={theme?.pageHeaderText ?? ""}/>
             <Head title="Đơn hàng đã mua"/>
 
-            <div className="section job-hero-section pb-0" id="hero"
-                 style={{background: "linear-gradient(180deg, #004577 0%, #122B3D 100%)"}}>
-                <Container fluid className="custom-container">
-                    <div className="d-flex align-items-center justify-content-between py-4">
-                        <h3 className="display-8 fw-semibold text-capitalize mb-0 lh-base text-white">
-                            Đơn hàng đã mua
-                        </h3>
-                    </div>
-                </Container>
-            </div>
-
             <Container fluid className="custom-container">
-                <Row className="mb-4 mt-4">
+                <Row className="mb-4 mt-4 align-items-center">
                     <Col md={6}>
-                        <div className="rounded-3 overflow-hidden border">
-                            <InputGroup>
-                                <Form.Control
-                                    type="text"
-                                    placeholder={ t("Enter order number") }
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </InputGroup>
-                        </div>
+                        <h4 className="mb-0" style={{fontSize: '30px', fontWeight: 'bold', color: 'black'}}>{t("Purchased order")}</h4>
                     </Col>
-                    <Col md={2}>
-                        <Button variant="primary" onClick={handleSearch} className="rounded-3">
-                            { t("Filter") }
-                        </Button>
+                    <Col md={6}>
+                        <div className="d-flex justify-content-end">
+                            <div className="rounded-3 overflow-hidden border me-2" style={{width: '250px'}}>
+                                <InputGroup>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder={t("Enter order number")}
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                </InputGroup>
+                            </div>
+                            <Button variant="primary" onClick={handleSearch} className="rounded-3">
+                                {t("Filter")}
+                            </Button>
+                        </div>
                     </Col>
                 </Row>
 
                 <OrdersTable
                     ordersData={ordersData}
-                    loading={loading}
                     handleViewOrder={handleViewOrder}
                     handleDownloadOrder={handleDownloadOrder}
                     formatCurrency={formatCurrency}
@@ -269,7 +253,7 @@ const Index: React.FC = () => {
                     t={t}
                 />
 
-        <Row className="mt-3">
+                <Row className="mt-3">
                     <Col md={6}>
                         <p className="text-muted mb-0"></p>
                     </Col>
@@ -342,15 +326,7 @@ const Index: React.FC = () => {
                             </tr>
                             </thead>
                             <tbody>
-                            {detailsLoading ? (
-                                <tr>
-                                    <td colSpan={2} className="text-center py-4">
-                                        <div className="spinner-border" role="status">
-                                            <span className="visually-hidden">{t("Loading")}</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : detailsItems.length > 0 ? (
+                            {detailsItems.length > 0 ? (
                                 detailsItems.map((row, idx) => (
                                     <tr key={idx}>
                                         <td className="text-truncate" style={{maxWidth: 280}} title={row.product}>

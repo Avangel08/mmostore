@@ -15,6 +15,27 @@ export default function Register() {
     const [serverError, setServerError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+    // Function to convert store name to domain format
+    const generateDomainFromStoreName = (storeName: string): string => {
+        if (!storeName || storeName.trim() === '') return '';
+        
+        // Remove Vietnamese diacritics and convert to lowercase
+        const removeDiacritics = (str: string): string => {
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        };
+        
+        // Clean the store name: remove diacritics, spaces, special characters, convert to lowercase
+        let cleanName = removeDiacritics(storeName)
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '') // Remove all non-alphanumeric characters
+            .substring(0, 12); // Limit to 12 characters to leave room for 3 random numbers
+        
+        // Generate 3 random numbers
+        const randomNumbers = Math.floor(100 + Math.random() * 900); // 100-999
+        
+        return cleanName + randomNumbers;
+    };
+
     const validation = useFormik({
         enableReinitialize: true,
 
@@ -143,7 +164,16 @@ export default function Register() {
                                                             name="store_name"
                                                             value={validation.values.store_name}
                                                             onBlur={validation.handleBlur}
-                                                            onChange={validation.handleChange}
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                const storeName = e.target.value;
+                                                                validation.setFieldValue('store_name', storeName);
+                                                                
+                                                                // Auto-generate domain_store if store_name is not empty
+                                                                if (storeName && storeName.trim() !== '') {
+                                                                    const generatedDomain = generateDomainFromStoreName(storeName);
+                                                                    validation.setFieldValue('domain_store', `${generatedDomain}.${DOMAIN_SUFFIX}`);
+                                                                }
+                                                            }}
                                                             isInvalid={validation.errors.store_name && validation.touched.store_name ? true : false}
                                                             style={{
                                                                 borderColor: validation.errors.store_name && validation.touched.store_name ? '#ced4da' : undefined,
