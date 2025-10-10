@@ -40,7 +40,7 @@ class Categories extends Model
     public function scopeFilterStatus($query, $request)
     {
         if (isset($request['status']) && $request['status'] != '') {
-            $query->where('status', (int) $request['status']);
+            $query->where('status', $request['status']);
         }
 
         return $query;

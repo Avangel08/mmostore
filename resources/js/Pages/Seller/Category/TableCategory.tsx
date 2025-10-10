@@ -107,7 +107,6 @@ const TableCategory = ({
           const className = {
             Active: "bg-success",
             Inactive: "bg-danger",
-            Unknown: "bg-dark",
           } as any;
 
           return (

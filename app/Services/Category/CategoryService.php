@@ -32,7 +32,7 @@ class CategoryService
     {
         return Categories::create([
             'name' => $data['categoryName'],
-            'status' => (int) $data['categoryStatus'],
+            'status' => $data['categoryStatus'],
         ]);
     }
 
@@ -40,7 +40,7 @@ class CategoryService
     {
         return $category->update([
             'name' => $data['categoryName'],
-            'status' => (int) $data['categoryStatus'],
+            'status' => $data['categoryStatus'],
         ]);
     }
 
