@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Head, router } from "@inertiajs/react";
 import PageHeader from "../PageHeader/PageHeader";
 import { Container, Card, Button, Form } from "react-bootstrap";
@@ -14,6 +14,9 @@ import { ModalDeposit } from "./Modal/ModalDeposit";
 import Cleave from "cleave.js/react";
 import { useContext } from "react";
 import { LayoutContext } from "../../Layouts/LayoutContext";
+import { useThemeConfig } from "../../hooks/useThemeConfig";
+import { useDispatch } from "react-redux";
+import { changeLayoutTheme } from "../../../../../slices/thunk";
 
 interface DepositProps {
     // Add any props if needed
@@ -28,6 +31,14 @@ const Index: React.FC<DepositProps> = () => {
     const layoutCtx = useContext(LayoutContext);
     const pingDeposit = layoutCtx?.pingDeposit as (() => Promise<boolean>);
     const intervalRefs = useRef<any[]>([])
+    const theme = useThemeConfig()
+    const dispatch: any = useDispatch();
+
+    useEffect(() => {
+        if (theme) {
+            dispatch(changeLayoutTheme(theme?.theme));
+        }
+    }, [theme, dispatch])
 
     const { t } = useTranslation();
 
@@ -97,11 +108,11 @@ const Index: React.FC<DepositProps> = () => {
 
     return (
         <React.Fragment>
+             <Head title={theme?.storeName ?? ""} />
+             <PageHeader title={theme?.pageHeaderText ?? ""} />
             <ModalDeposit show={showModal} onHide={() => setShowModal(false)} data={data} />
-            <Head title="Deposit" />
             <ToastContainer />
-            <PageHeader title="Hỗ Trợ và Chính Sách Bảo Hành" />
-            <Container className="mt-4">
+            <Container className="mt-4 custom-container" fluid>
                 <Card className="shadow-sm p-2" style={{ minHeight: "50vh" }}>
                     <Card.Body>
                         <Form onSubmit={formik.handleSubmit} noValidate>

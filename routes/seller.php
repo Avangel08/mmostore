@@ -75,8 +75,11 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
                     Route::get('/', [ThemeSettingController::class, 'index'])->name('seller.theme-settings');
                     Route::post('/update', [ThemeSettingController::class, 'update'])->name('seller.theme-settings.update');
                 });
-
-                Route::resource('customer-manager', CustomerManagerController::class, ['as' => 'seller']);
+                Route::group(['prefix' => 'customer-manager'], function () {
+                    Route::get('/', [CustomerManagerController::class, 'index'])->name('seller.customer-manager.index');
+                    Route::get('/edit/{id}', [CustomerManagerController::class, 'edit'])->name('seller.customer-manager.edit');
+                    Route::post('/deposit', [CustomerManagerController::class, 'deposit'])->name('seller.customer-manager.deposit');
+                }); 
 
                 Route::group(['prefix' => 'plans'], function () {
                     Route::get("/", [PlanController::class, 'index'])->name('seller.plan.index');

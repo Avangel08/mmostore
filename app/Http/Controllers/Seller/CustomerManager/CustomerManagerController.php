@@ -3,16 +3,33 @@
 namespace App\Http\Controllers\Seller\CustomerManager;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Seller\CustomerManager\CustomerManagerRequest;
+use App\Models\Mongo\BalanceHistories;
 use App\Services\Customer\CustomerService;
+use App\Services\PaymentMethod\PaymentMethodService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Inertia\Inertia;
+use App\Services\BalanceHistory\BalanceHistoryService;
+use App\Services\CurrencyRate\CurrencyRateService;
 
 class CustomerManagerController extends Controller
 {
     protected $customerService;
-    public function __construct(CustomerService $customerService)
+    protected $paymentMethodService;
+    protected $balanceHistoryService;
+    protected $currencyRateService;
+    public function __construct(
+        CustomerService $customerService, 
+        PaymentMethodService $paymentMethodService,
+        BalanceHistoryService $balanceHistoryService,
+        CurrencyRateService $currencyRateService
+        )
     {
         $this->customerService = $customerService;
+        $this->paymentMethodService = $paymentMethodService;
+        $this->balanceHistoryService = $balanceHistoryService;
+        $this->currencyRateService = $currencyRateService;
     }
     /**
      * Display a listing of the resource.
@@ -20,8 +37,10 @@ class CustomerManagerController extends Controller
     public function index(Request $request)
     {
         $request = $request->all();
+        $paymentMethods = $this->paymentMethodService->listActive();
         return Inertia::render('CustomerManager/index', [
             'customers' => fn() => $this->customerService->getForTable($request),
+            'paymentMethods' => $paymentMethods,
         ]);
     }
 
@@ -46,15 +65,27 @@ class CustomerManagerController extends Controller
      */
     public function show(string $id)
     {
-        //
+        
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($sub, $id)
     {
-        //
+        $result = $this->customerService->findById($id);
+        if(!$result) {
+            return response()->json([
+                'status' => "error",
+                'message' => 'Customer not found',
+                'data' => null,
+            ]);
+        }
+        return response()->json([
+            'status' => "success",
+            'message' => 'Customer fetched successfully',
+            'data' => $result,
+        ]);
     }
 
     /**
@@ -71,5 +102,57 @@ class CustomerManagerController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+    
+    public function deposit(CustomerManagerRequest $request)
+    {
+        try {
+            $data = $request->validated();
+            $customer = $this->customerService->findById($data['customer_id']);
+            if(!$customer) {
+                return back()->with('error', __('Customer not found'));
+            }
+            $amount = $amount_vnd = $before = $after = 0;
+            if($data['currency'] == 'USD') {
+                $amount = $data['amount'];
+                $amount_vnd = $this->currencyRateService->convertUSDToVND($data['amount']);
+            } else {
+                $amount = $this->currencyRateService->convertVNDToUSD($data['amount']);
+                $amount_vnd = $data['amount'];
+            }
+
+            if($data['transaction_type'] == BalanceHistories::TYPE['deposit']) {
+                $before = $customer->balance;
+                $after = $before + $amount_vnd;
+            }
+            if($data['transaction_type'] == BalanceHistories::TYPE['deduct_money']) {
+                $before = $customer->balance;
+                $after = $before - $amount_vnd;
+            }
+
+            $dataInsert = [
+                'customer_id' => $customer['_id'],
+                'payment_method_id' => $data['payment_method_id'],
+                'type' => intval($data['transaction_type']),
+                'amount' => $amount,
+                'amount_vnd' => $amount_vnd,
+                'before' => $before,
+                'after' => $after,
+                'currency' => $data['currency'],
+                'transaction' => $data['transaction_code'],
+                'note' => $data['note'],
+                'date_at' => Carbon::now()->toDateTimeString(),
+            ];
+            
+            $customerUpdated = $this->customerService->update($customer, ['balance' => $after]);
+            $result = $this->balanceHistoryService->create($dataInsert);
+            if($result && $customerUpdated) {
+                return back()->with('success', __('Update successfully'));
+            }
+            return back()->with('error', __('Update failed'));
+        } catch (\Exception $e) {
+            \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
+            return back()->with('error', __('Update failed'));
+        }
     }
 }

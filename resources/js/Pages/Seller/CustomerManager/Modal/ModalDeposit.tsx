@@ -7,62 +7,76 @@ import { useTranslation } from "react-i18next";
 import * as Yup from "yup";
 import { showToast } from "../../../../utils/showToast";
 
-export const ModalSettingPayment = ({
+export const ModalDeposit = ({
   show,
   onHide,
   dataEdit,
-  listBank,
+  paymentMethods,
 }: {
   show: boolean;
   onHide: () => void;
   dataEdit?: any;
-  listBank?: any;
+  paymentMethods?: any;
 }) => {
 
-  const maxLengthName = 150;
   const { t } = useTranslation();
   const errors = usePage().props.errors as any;
 
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [showOtp, setShowOtp] = useState(false);
-  const [canSubmit, setCanSubmit] = useState(false);
+  const [transactionCode, setTransactionCode] = useState("");
+
+  // Generate transaction code
+  const generateTransactionCode = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const randomChars = Math.random().toString(36).substring(2, 8).toUpperCase();
+    return `M${year}${month}${day}${randomChars}`;
+  };
+
+  // Initialize transaction code when modal opens
+  useEffect(() => {
+    if (show) {
+      setTransactionCode(generateTransactionCode());
+    }
+  }, [show]);
 
   const validationSchema = useMemo(() => {
     return Yup.object({
-      key: Yup.string()
-        .required(t("Please select a bank")),
-      account_name: Yup.string()
-        .max(maxLengthName, `Must be ${maxLengthName} characters or less`)
-        .required(t("Please enter this field")),
-      account_number: Yup.string()
-        .required(t("Please enter this field")),
-      user_name: Yup.string()
-        .required(t("Please enter this field")),
-      password: Yup.string()
-        .required(t("Please enter this field")),
-      ...(showOtp
-        ? {
-          otp: Yup.string().required(t("Please enter this field")),
-        }
-        : {}),
+      payment_method_id: Yup.string()
+        .required(t("Please select payment method")),
+      transaction_type: Yup.string()
+        .required(t("Please select transaction type")),
+      currency: Yup.string()
+        .required(t("Please select currency")),
+      amount: Yup.number()
+        .min(1, t("Minimum amount is 1"))
+        .required(t("Please enter amount")),
+      note: Yup.string()
+        .max(500, t("Note must be less than 500 characters")),
     });
-  }, [showOtp, t]);
+  }, [t]);
 
   const formik = useFormik({
     initialValues: {
-      key: dataEdit?.key || "",
-      account_name: dataEdit?.details?.account_name || "",
-      account_number: dataEdit?.details?.account_number ?? "",
-      user_name: dataEdit?.details?.user_name ?? "",
-      password: dataEdit?.details?.password ?? "",
-      otp: "",
+      payment_method_id: "",
+      transaction_type: "",
+      currency: "VND",
+      amount: "",
+      note: "",
     },
     validationSchema,
     onSubmit: (values) => {
-      const url = route("seller.payment-history.store");
+      const url = route("seller.customer-manager.deposit");
       const method = "post";
 
-      router[method](url, values, {
+      const submitData = {
+        ...values,
+        transaction_code: transactionCode,
+        customer_id: dataEdit?.id,
+      };
+
+      router[method](url, submitData, {
         onSuccess: (success: any) => {
           if (success.props?.message?.error) {
             showToast(t(success.props.message.error), "error");
@@ -78,24 +92,20 @@ export const ModalSettingPayment = ({
     },
   });
 
-  // Reset form when modal opens/closes or when dataEdit changes
+  // Reset form when modal opens/closes
   useEffect(() => {
     if (show) {
       formik.setValues({
-        key: dataEdit?.key || "",
-        account_name: dataEdit?.details?.account_name || "",
-        account_number: dataEdit?.details?.account_number ?? "",
-        user_name: dataEdit?.details?.user_name ?? "",
-        password: dataEdit?.details?.password ?? "",
-        otp: "",
+        payment_method_id: "",
+        transaction_type: "",
+        currency: "VND",
+        amount: "",
+        note: "",
       });
-      setShowOtp(false);
-      setCanSubmit(false);
-      setIsVerifying(false);
     } else {
       formik.resetForm();
     }
-  }, [show, dataEdit]);
+  }, [show]);
 
   return (
     <Modal
@@ -110,216 +120,139 @@ export const ModalSettingPayment = ({
     >
       <Form onSubmit={formik.handleSubmit} noValidate>
         <Modal.Header closeButton>
-          <h5>{t("Setting Payment")}</h5>
+          <h5>{t("Update balance")}</h5>
         </Modal.Header>
         <Modal.Body>
-          {/* Bank key */}
-          <Form.Group className="mb-3" controlId="key">
+          {/* Payment Method */}
+          <Form.Group className="mb-3" controlId="paymentMethod">
             <Form.Label>
-              {t("Bank")} <span className="text-danger">*</span>
+              {t("Payment Method")} <span className="text-danger">*</span>
             </Form.Label>
             <Form.Select
-              name="key"
+              name="payment_method_id"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.key}
-              isInvalid={!!((formik.touched.key && formik.errors.key) || errors?.key)}
+              value={formik.values.payment_method_id}
+              isInvalid={!!((formik.touched.payment_method_id && formik.errors.payment_method_id) || errors?.payment_method_id)}
             >
-              <option value="">{t("Select bank")}</option>
-              {listBank && Object.keys(listBank).map((key: string) => (
-                <option key={key} value={key} selected={formik.values.key === key}>{t(listBank[key])}</option>
+              <option value="">{t("Select payment method")}</option>
+              {paymentMethods.map((paymentMethod: any) => (
+                <option key={paymentMethod.id} value={paymentMethod.id}>{paymentMethod.name}</option>
               ))}
             </Form.Select>
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.key || errors?.key)}
+              {t(formik.errors.payment_method_id || errors?.payment_method_id)}
             </Form.Control.Feedback>
           </Form.Group>
 
-          {/* Account name */}
-          <Form.Group className="mb-3" controlId="categoryName">
+          {/* Transaction Type */}
+          <Form.Group className="mb-3" controlId="transactionType">
             <Form.Label>
-              {t("Account name")}
-              <span className="text-danger">*</span>
+              {t("Transaction Type")} <span className="text-danger">*</span>
             </Form.Label>
-            <Form.Control
-              name="account_name"
-              type="text"
-              placeholder={t("Enter account name")}
-              maxLength={maxLengthName}
+            <Form.Select
+              name="transaction_type"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.account_name}
-              isInvalid={
-                !!((formik.touched.account_name && formik.errors.account_name) || errors?.account_name)
-              }
-            />
+              value={formik.values.transaction_type}
+              isInvalid={!!((formik.touched.transaction_type && formik.errors.transaction_type) || errors?.transaction_type)}
+            >
+              <option value="">{t("Select transaction type")}</option>
+              <option value="1">{t("Add money to account")}</option>
+              <option value="3">{t("Subtract money from account")}</option>
+            </Form.Select>
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.account_name || errors?.account_name)}
+              {t(formik.errors.transaction_type || errors?.transaction_type)}
             </Form.Control.Feedback>
           </Form.Group>
-          {/* Account number */}
-          <Form.Group className="mb-3" controlId="categoryName">
+
+          {/* Currency */}
+          <Form.Group className="mb-3" controlId="currency">
             <Form.Label>
-              {t("Account number")}
-              <span className="text-danger">*</span>
+              {t("Currency")} <span className="text-danger">*</span>
             </Form.Label>
-            <Form.Control
-              name="account_number"
-              type="text"
-              placeholder={t("Enter account number")}
-              maxLength={maxLengthName}
+            <Form.Select
+              name="currency"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.account_number}
-              isInvalid={
-                !!((formik.touched.account_number && formik.errors.account_number) || errors?.account_number)
-              }
-            />
+              value={formik.values.currency}
+              isInvalid={!!((formik.touched.currency && formik.errors.currency) || errors?.currency)}
+            >
+              <option value="VND">VND</option>
+              <option value="USD">USD</option>
+            </Form.Select>
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.account_number || errors?.account_number)}
+              {t(formik.errors.currency || errors?.currency)}
             </Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group className="mb-3" controlId="categoryName">
+          {/* Amount */}
+          <Form.Group className="mb-3" controlId="amount">
             <Form.Label>
-              {t("User name")}
-              <span className="text-danger">*</span>
+              {t("Amount")} <span className="text-danger">*</span>
             </Form.Label>
             <Form.Control
-              name="user_name"
-              type="text"
-              placeholder={t("0974 xxx xxx")}
-              maxLength={maxLengthName}
+              name="amount"
+              type="number"
+              placeholder={t("Enter amount")}
+              min="1"
+              step="1"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.user_name}
-              isInvalid={
-                !!((formik.touched.user_name && formik.errors.user_name) || errors?.user_name)
-              }
+              value={formik.values.amount}
+              isInvalid={!!((formik.touched.amount && formik.errors.amount) || errors?.amount)}
             />
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.user_name || errors?.user_name)}
+              {t(formik.errors.amount || errors?.amount)}
             </Form.Control.Feedback>
           </Form.Group>
 
-          {/* Password */}
-          <Form.Group className="mb-3" controlId="categoryName">
+          {/* Transaction Code */}
+          <Form.Group className="mb-3" controlId="transactionCode">
             <Form.Label>
-              {t("Password")}
-              <span className="text-danger">*</span>
+              {t("Transaction Code")} <span className="text-danger">*</span>
             </Form.Label>
-            <Form.Control
-              name="password"
-              type="text"
-              placeholder={t("Enter password")}
-              maxLength={maxLengthName}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.password}
-              isInvalid={
-                !!((formik.touched.password && formik.errors.password) || errors?.password)
-              }
-            />
-            <Form.Control.Feedback type="invalid">
-              {t(formik.errors.password || errors?.password)}
-            </Form.Control.Feedback>
-          </Form.Group>
-          <Button
-            variant="success"
-            type="button"
-            className="mb-3"
-            disabled={isVerifying}
-            onClick={async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsVerifying(true);
-              formik.setTouched({
-                key: true,
-                account_name: true,
-                account_number: true,
-                user_name: true,
-                password: true,
-                otp: formik.touched.otp || false,
-              });
-
-              const currentErrors = await formik.validateForm();
-              if (currentErrors.key || currentErrors.account_name || currentErrors.account_number || currentErrors.user_name || currentErrors.password) {
-                showToast(t("Please enter this field"), "error");
-                setIsVerifying(false);
-                return;
-              }
-              router.post(
-                route("seller.payment-history.verify-payment"),
-                {
-                  key: formik.values.key,
-                  account_name: formik.values.account_name,
-                  account_number: formik.values.account_number,
-                  user_name: formik.values.user_name,
-                  password: formik.values.password,
-                  otp: formik.values.otp ?? null,
-                },
-                {
-                  preserveScroll: true,
-                  preserveState: true,
-                  only: [],
-                  onSuccess: (props: any) => {
-                    if (props.props?.message?.error) {
-                      showToast(t(props.props.message.error), "error");
-                      setCanSubmit(false);
-                      setIsVerifying(false);
-                      return;
-                    }
-
-                    if (props.props?.message?.info) {
-                      showToast(t(props.props.message.info), "success");
-                      setShowOtp(true);
-                      setCanSubmit(true);
-                      setIsVerifying(true);
-                      return;
-                    }
-
-                    showToast(t(props.props?.message?.success || "Verified successfully"), "success");
-                    setCanSubmit(true);
-                    setIsVerifying(true);
-                    return;
-                  },
-                  onError: () => {
-                    showToast(t("Verification failed"), "error");
-                    setIsVerifying(false);
-                  },
-                  onFinish: () => {
-                    // setIsVerifying(false);
-                  },
-                }
-              );
-            }}
-          >
-            {t("Verify Payment")}
-          </Button>
-
-          {showOtp && (
-            <Form.Group className="mb-3" controlId="categoryName">
-              <Form.Label>
-                {t("OTP")}
-                <span className="text-danger">*</span>
-              </Form.Label>
+            <div className="d-flex gap-2">
               <Form.Control
-                name="otp"
                 type="text"
-                placeholder={t("Enter OTP")}
-                maxLength={maxLengthName}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.otp}
-                isInvalid={
-                  !!((formik.touched.otp && formik.errors.otp) || errors?.otp)
-                }
+                value={transactionCode}
+                readOnly
+                className="bg-light"
               />
-              <Form.Control.Feedback type="invalid">
-                {t(formik.errors.otp || errors?.otp)}
-              </Form.Control.Feedback>
-            </Form.Group>
-          )}
+              <Button
+                variant="outline-secondary"
+                type="button"
+                onClick={() => setTransactionCode(generateTransactionCode())}
+                title={t("Generate new transaction code")}
+              >
+                <i className="ri-refresh-line"></i>
+              </Button>
+            </div>
+          </Form.Group>
+
+          {/* Note */}
+          <Form.Group className="mb-3" controlId="note">
+            <Form.Label>
+              {t("Note")}
+            </Form.Label>
+            <Form.Control
+              name="note"
+              as="textarea"
+              rows={3}
+              placeholder={t("Enter note (optional)")}
+              maxLength={500}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.note}
+              isInvalid={!!((formik.touched.note && formik.errors.note) || errors?.note)}
+            />
+            <Form.Control.Feedback type="invalid">
+              {t(formik.errors.note || errors?.note)}
+            </Form.Control.Feedback>
+            <Form.Text className="text-muted">
+              {formik.values.note?.length || 0}/500 {t("Characters")}
+            </Form.Text>
+          </Form.Group>
 
         </Modal.Body>
         <Modal.Footer>
@@ -332,8 +265,8 @@ export const ModalSettingPayment = ({
           >
             {t("Close")}
           </Button>
-          <Button variant="primary" type="submit" disabled={!canSubmit}>
-            {t("Save changes")}
+          <Button variant="primary" type="submit">
+            {t("Submit")}
           </Button>
         </Modal.Footer>
       </Form>

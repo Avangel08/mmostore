@@ -44,4 +44,8 @@ class PaymentMethodService
         ->where('status', PaymentMethods::STATUS['ACTIVE'])
         ->first();
     }
+
+    public function listActive(){
+        return PaymentMethods::where('status', PaymentMethods::STATUS['ACTIVE'])->get();
+    }
 }
