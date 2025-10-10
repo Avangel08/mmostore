@@ -159,13 +159,11 @@ const Profile = () => {
         <React.Fragment>
             <Head title={t("Personal profile")} />
             <PageHeader title={theme?.pageHeaderText ?? ""} />
-            <div style={{
-                margin: '5vh 10vw',
-            }}>
+            <div className="mt-4">
                 <ToastContainer />
-                <Container fluid>
+                <Container fluid className="custom-container">
                     <Row>
-                        <Col xxl={12}>
+                        <Col lg={12}>
                             <Card style={{ minHeight: '40vh' }}>
                                 <Tab.Container defaultActiveKey="personal-info">
                                     <Card.Body className="p-0">
