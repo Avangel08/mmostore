@@ -23,39 +23,25 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
     use Queueable;
 
     protected $filePath;
-
     protected $productId;
-
     protected $subProductId;
-
-    protected $categoryId;
-
-    protected $productTypeId;
-
-    protected $accountService;
-
-    protected $subProductService;
-
     protected $importHistoryId;
-
     protected $dbConfig;
-
-    protected $cacheTag;
-
     protected $inputMethod;
+    protected $accountService;
+    protected $subProductService;
+    protected $cacheTag;
 
     public $uniqueFor = 3600;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($filePath, $productId, $subProductId, $categoryId, $productTypeId, $importHistoryId, $dbConfig, $inputMethod = Accounts::INPUT_METHOD['FILE'])
+    public function __construct($filePath, $productId, $subProductId, $importHistoryId, $dbConfig, $inputMethod = Accounts::INPUT_METHOD['FILE'])
     {
         $this->filePath = $filePath;
         $this->productId = $productId;
         $this->subProductId = $subProductId;
-        $this->categoryId = $categoryId;
-        $this->productTypeId = $productTypeId;
         $this->importHistoryId = $importHistoryId;
         $this->dbConfig = $dbConfig;
         $this->inputMethod = $inputMethod;
@@ -137,13 +123,13 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 }
 
                 $parts = explode('|', $line);
-                if (count($parts) < 2) {
+                if (count($parts) < 1) {
                     $errorCount++;
                     return null;
                 }
 
                 $status = Accounts::STATUS['LIVE'];
-                $dataParts = [];
+                $remainData = [];
                 $explodedFirstPart = explode(':', trim($parts[0] ?? ''));
                 $isStatusSection = $this->checkFirstPartIsStatus($explodedFirstPart);
                 if ($isStatusSection && empty(trim($explodedFirstPart[1] ?? ''))) {
@@ -151,21 +137,21 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 }
 
                 $status = strtoupper($isStatusSection ? trim($explodedFirstPart[1] ?? '') : Accounts::STATUS['LIVE']);
-                $key = strtolower(trim($parts[$isStatusSection ? 1 : 0] ?? ''));
-                $dataParts = array_slice($parts, $isStatusSection ? 2 : 1);
+                $mainData = strtolower(trim($parts[$isStatusSection ? 1 : 0] ?? ''));
+                if (empty($mainData)) {
+                    $errorCount++;
+                    return null;
+                }
+                $key = $this->subProductId . '_' . $mainData;
+                $remainData = array_slice($parts, $isStatusSection ? 2 : 1);
 
-                if (empty($key)) {
+                if (empty($remainData)) {
                     $errorCount++;
                     return null;
                 }
 
-                if (empty($dataParts)) {
-                    $errorCount++;
-                    return null;
-                }
-
-                foreach ($dataParts as $part) {
-                    if (trim($part) === '') {
+                foreach ($remainData as $remainPart) {
+                    if (trim($remainPart) == '') {
                         $errorCount++;
                         return null;
                     }
@@ -173,22 +159,19 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
 
                 unset($line);
 
-                $mainData = $dataParts[0];
-                $dataCacheKey = $this->getInsertDataCache($mainData);
-                if (!Cache::tags($this->cacheTag)->add($dataCacheKey, true, now()->endOfDay())) {
+                $keyDataCache = $this->getInsertDataCache($mainData);
+                if (Cache::tags($this->cacheTag)->has($keyDataCache)) {
                     $errorCount++;
                     return null;
                 }
-
+                Cache::tags($this->cacheTag)->add($keyDataCache, true, now()->addHour());
                 return [
                     'key' => (string) $key,
-                    'data' => (string) implode('|', array_map('trim', $dataParts)),
+                    'data' => (string) ($mainData . "|") . implode('|', array_map('trim', $remainData)),
                     'main_data' => (string) $mainData,
                     'status' => (string) $status,
                     'product_id' => (string) $this->productId,
                     'sub_product_id' => (string) $this->subProductId,
-                    'category_id' => (string) $this->categoryId,
-                    'product_type_id' => (int) $this->productTypeId,
                     'note' => null,
                     'customer_id' => null,
                     'order_id' => null,
@@ -201,28 +184,13 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             ->chunk($chunkSize)
             ->each(function (LazyCollection $data, $chunkIndex) use (&$successCount, &$errorCount, &$maxChunkIndex) {
                 $maxChunkIndex = $chunkIndex;
-                $listCheckUniqueData = $this->accountService->checkUniqueData($this->categoryId, $this->productTypeId, $data->pluck('main_data')->all());
-
-                $filteredData = $data->filter(function ($item) use ($listCheckUniqueData, &$errorCount) {
-                    $isUniqueData = $listCheckUniqueData[$item['main_data']] ?? false;
-                    if (!$isUniqueData) {
-                        $dataCacheKey = $this->getInsertDataCache($item['main_data']);
-                        Cache::tags($this->cacheTag)->add($dataCacheKey, true, now()->endOfDay());
-                    }
-                    return $isUniqueData;
-                });
 
                 $keysCache = $this->getInsertKeyCache($chunkIndex);
-                $allKey = $filteredData->pluck('key')->all();
-                Cache::tags($this->cacheTag)->put($keysCache, $allKey, now()->endOfDay());
+                $allKey = $data->pluck('key')->all();
+                Cache::tags($this->cacheTag)->put($keysCache, $allKey, now()->addHour());
 
-                $originalDataCount = $data->count();
-                $filteredDataCount = $filteredData->count();
-                $cannotInsertCount = $originalDataCount - $filteredDataCount;
-                $errorCount += $cannotInsertCount;
-
-                $isSuccess = $this->processInsert($filteredData);
-                $dataCount = $filteredDataCount;
+                $isSuccess = $this->processInsert($data);
+                $dataCount = $data->count();
                 if ($isSuccess) {
                     $successCount += $dataCount;
                 } else {
@@ -269,6 +237,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             'status' => ImportAccountHistory::STATUS['ERROR'],
             'ended_at' => now(),
         ]);
+        Cache::tags($this->cacheTag)->flush();
     }
 
     public function updateSubProductQuantity()
