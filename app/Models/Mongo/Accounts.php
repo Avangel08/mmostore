@@ -35,6 +35,11 @@ class Accounts extends Model
         'LIVE' => 'LIVE',
         'SOLD' => 'SOLD',
     ];
+    
+    const INPUT_METHOD = [
+        'FILE' => 'file',
+        'TEXTAREA' => 'textarea',
+    ];
 
     public function subProduct()
     {
