@@ -429,7 +429,7 @@
     "Coming soon": "Sắp ra mắt",
     "Input method": "Phương thức nhập",
     "Upload file": "Tải file lên",
-    "Input text": "Nhập văn bản",
+    "Input list": "Nhập danh sách",
     "Content": "Nội dung",
     "Enter content here (each line will be 1 product)": "Nhập nội dung ở đây (mỗi dòng sẽ là 1 sản phẩm)",
     "Note: Each line will be 1 product": "Ghi chú: Mỗi dòng sẽ là 1 sản phẩm",
@@ -446,5 +446,14 @@
     "The uploaded item must be a file.": "Mục được tải lên phải là một file.",
     "Content must be a string.": "Nội dung phải là một chuỗi.",
     "Content must have at least 1 character.": "Nội dung phải có ít nhất 1 ký tự.",
-    "Content must not exceed 10000 characters.": "Nội dung không được vượt quá 10000 ký tự."
+    "Content must not exceed 10000 characters.": "Nội dung không được vượt quá 10000 ký tự.",
+    "Instructions": "Hướng dẫn",
+    "Account with LIVE status (ready for sale)": "Tài khoản với trạng thái LIVE (sẵn sàng để bán)",
+    "Account without status: prefix": "Tài khoản không có tiền tố status:",
+    "Account with non LIVE status (non LIVE status not available for sale)": "Tài khoản với trạng thái không phải LIVE (trạng thái khác LIVE không có sẵn để bán)",
+    "Line 1": "Dòng 1",
+    "Line 2": "Dòng 2", 
+    "Line 3": "Dòng 3",
+    "Text input is disabled until product configuration is complete": "Nhập văn bản bị tắt cho đến khi cấu hình sản phẩm hoàn tất",
+    "Each line will be 1 product": "Mỗi dòng sẽ là 1 sản phẩm"
 }
