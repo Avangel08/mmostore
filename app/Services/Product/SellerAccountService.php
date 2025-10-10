@@ -10,6 +10,7 @@ use App\Models\Mongo\Products;
 use App\Models\Mongo\SubProducts;
 use Carbon\Carbon;
 use Config;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class SellerAccountService
@@ -38,14 +39,24 @@ class SellerAccountService
 
     public function processAccountFile($categoryId, $productTypeId, $data)
     {
-        $file = $data['file'];
+        $inputMethod = $data['input_method'] ?? Accounts::INPUT_METHOD['FILE'];
         $host = request()->getHost();
-
-        $fileName = 'accounts_' . time() . '_' . $file->getClientOriginalName();
-        $filePath = $file->storeAs("{$host}/accounts", $fileName, 'public');
         $dbConfig = Config::get('database.connections.tenant_mongo');
-        $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-        JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $categoryId, $productTypeId, $importAccountHistory?->id, $dbConfig);
+        
+        if ($inputMethod === Accounts::INPUT_METHOD['FILE']) {
+            $file = $data['file'];
+            $fileName = 'accounts_' . time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs("{$host}/accounts", $fileName, 'public');
+            $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
+            JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $categoryId, $productTypeId, $importAccountHistory?->id, $dbConfig, Accounts::INPUT_METHOD['FILE']);
+        } elseif ($inputMethod === Accounts::INPUT_METHOD['TEXTAREA']) {
+            $content = $data['content'];
+            $fileName = 'input_accounts_' . time() . '.txt';
+            $filePath = "{$host}/accounts/{$fileName}";
+            Storage::disk('public')->put($filePath, $content);
+            $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
+            JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $categoryId, $productTypeId, $importAccountHistory?->id, $dbConfig, Accounts::INPUT_METHOD['TEXTAREA']);
+        }
     }
 
     public function createAccount(array $data)

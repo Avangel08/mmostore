@@ -15,8 +15,8 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\LazyCollection;
-use Storage;
 
 class JobImportAccount implements ShouldBeUnique, ShouldQueue
 {
@@ -42,12 +42,14 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
 
     protected $cacheTag;
 
+    protected $inputMethod;
+
     public $uniqueFor = 3600;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($filePath, $productId, $subProductId, $categoryId, $productTypeId, $importHistoryId, $dbConfig)
+    public function __construct($filePath, $productId, $subProductId, $categoryId, $productTypeId, $importHistoryId, $dbConfig, $inputMethod = Accounts::INPUT_METHOD['FILE'])
     {
         $this->filePath = $filePath;
         $this->productId = $productId;
@@ -56,6 +58,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
         $this->productTypeId = $productTypeId;
         $this->importHistoryId = $importHistoryId;
         $this->dbConfig = $dbConfig;
+        $this->inputMethod = $inputMethod;
         $this->accountService = new SellerAccountService;
         $this->subProductService = new SubProductService;
         $this->cacheTag = 'import_account_' . $this->importHistoryId;

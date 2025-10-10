@@ -23,32 +23,47 @@ const SellerAccount = () => {
   const errors = usePage().props.errors as any;
   const { subProduct } = usePage().props as any;
   const [loading, setLoading] = useState(false);
+  const [inputMethod, setInputMethod] = useState<'file' | 'textarea'>('file');
 
   const canImport = subProduct?.product?.category && subProduct?.product?.product_type;
 
   const formik = useFormik({
     initialValues: {
       file: null as File | null,
+      content: "",
     },
-    validationSchema: Yup.object({
-      file: Yup.mixed()
-        .required(t("Please select a file to upload"))
-        .test('fileType', t('Only .txt files are allowed'), (value: any) => {
-          if (!value) return true;
-          return value.name.toLowerCase().endsWith('.txt');
-        })
-        .test('fileSize', t('The file must not be greater than 50MB'), (value: any) => {
-          if (!value) return true;
-          return value.size <= 50 * 1024 * 1024; // 50MB
-        }),
+    validationSchema: Yup.object().shape({
+      file: inputMethod === 'file' 
+        ? Yup.mixed()
+            .required(t("Please select a file to upload"))
+            .test('fileType', t('Only .txt files are allowed'), (value: any) => {
+              if (!value) return false;
+              return value.name.toLowerCase().endsWith('.txt');
+            })
+            .test('fileSize', t('The file must not be greater than 50MB'), (value: any) => {
+              if (!value) return false;
+              return value.size <= 50 * 1024 * 1024; // 50MB
+            })
+        : Yup.mixed().nullable(),
+      content: inputMethod === 'textarea'
+        ? Yup.string()
+            .required(t("Please enter content"))
+            .test('contentNotEmpty', t("Please enter content"), (value) => {
+              return !!value && value.trim().length > 0;
+            })
+        : Yup.string().nullable(),
     }),
     onSubmit: (values) => {
       setLoading(true);
       const formData = new FormData();
       formData.append("sub_product_id", subProduct?.id || "");
       formData.append("product_id", subProduct?.product_id || "");
-      if (values.file) {
+      formData.append("input_method", inputMethod);
+      
+      if (inputMethod === 'file' && values.file) {
         formData.append("file", values.file);
+      } else if (inputMethod === 'textarea' && values.content) {
+        formData.append("content", values.content);
       }
 
       router.post(route("seller.account.store"), formData, {
@@ -64,11 +79,13 @@ const SellerAccount = () => {
           }
 
           formik.resetForm();
-          const fileInput = document.querySelector(
-            'input[type="file"]'
-          ) as HTMLInputElement;
-          if (fileInput) {
-            fileInput.value = "";
+          if (inputMethod === 'file') {
+            const fileInput = document.querySelector(
+              'input[type="file"]'
+            ) as HTMLInputElement;
+            if (fileInput) {
+              fileInput.value = "";
+            }
           }
         },
         onError: (errors: any) => {
@@ -80,6 +97,10 @@ const SellerAccount = () => {
       });
     },
   });
+
+  useEffect(() => {
+    formik.validateForm();
+  }, [inputMethod]);
   return (
     <React.Fragment>
       <Head title={t("Account")} />
@@ -163,37 +184,119 @@ const SellerAccount = () => {
                         </Card>
                       )}
                       <Form onSubmit={formik.handleSubmit} noValidate>
-                        <Form.Group className="mb-3">
-                          <Form.Label>
-                            {t("Upload .txt file")}{" "}
+                        {/* Input Method Selection */}
+                        <Form.Group className="mb-4">
+                          <Form.Label className="fw-bold">
+                            {t("Input method")}
                             <span className="text-danger">*</span>
                           </Form.Label>
-                          <Form.Control
-                            type="file"
-                            name="file"
-                            accept=".txt"
-                            disabled={!canImport}
-                            onChange={(e: any) => {
-                              const file = e.target.files?.[0] || null;
-                              formik.setFieldValue("file", file);
-                            }}
-                            onBlur={formik.handleBlur}
-                            isInvalid={
-                              !!(
-                                (formik.touched.file && formik.errors.file) ||
-                                errors?.file
-                              )
-                            }
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {t(formik.errors.file || errors?.file)}
-                          </Form.Control.Feedback>
-                          {!canImport && (
-                            <Form.Text className="text-muted">
-                              {t("File upload is disabled until product configuration is complete")}
-                            </Form.Text>
-                          )}
+                          <div className="d-flex gap-4 mt-2">
+                            <Form.Check
+                              type="radio"
+                              id="method-file"
+                              name="inputMethod"
+                              label={t("Upload file")}
+                              checked={inputMethod === 'file'}
+                              onChange={() => {
+                                setInputMethod('file');
+                                formik.setFieldValue("content", "");
+                                formik.setFieldValue("file", null);
+                                formik.setFieldError("content", "");
+                                formik.setFieldError("file", "");
+                                formik.setFieldTouched("content", false);
+                                formik.setFieldTouched("file", false);
+                              }}
+                              disabled={!canImport}
+                            />
+                            <Form.Check
+                              type="radio"
+                              id="method-textarea"
+                              name="inputMethod"
+                              label={t("Input text")}
+                              checked={inputMethod === 'textarea'}
+                              onChange={() => {
+                                setInputMethod('textarea');
+                                formik.setFieldValue("file", null);
+                                formik.setFieldValue("content", "");
+                                formik.setFieldError("file", "");
+                                formik.setFieldError("content", "");
+                                formik.setFieldTouched("file", false);
+                                formik.setFieldTouched("content", false);
+                              }}
+                              disabled={!canImport}
+                            />
+                          </div>
                         </Form.Group>
+
+                        {/* File Upload Input */}
+                        {inputMethod === 'file' && (
+                          <Form.Group className="mb-3">
+                            <Form.Label>
+                              {t("Upload .txt file")}{" "}
+                              <span className="text-danger">*</span>
+                            </Form.Label>
+                            <Form.Control
+                              type="file"
+                              name="file"
+                              accept=".txt"
+                              disabled={!canImport}
+                              onChange={(e: any) => {
+                                const file = e.target.files?.[0] || null;
+                                formik.setFieldValue("file", file);
+                              }}
+                              onBlur={formik.handleBlur}
+                              isInvalid={
+                                !!(
+                                  (formik.touched.file && formik.errors.file) ||
+                                  errors?.file
+                                )
+                              }
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {t(formik.errors.file || errors?.file)}
+                            </Form.Control.Feedback>
+                            {!canImport && (
+                              <Form.Text className="text-muted">
+                                {t("File upload is disabled until product configuration is complete")}
+                              </Form.Text>
+                            )}
+                          </Form.Group>
+                        )}
+
+                        {/* Textarea Input */}
+                        {inputMethod === 'textarea' && (
+                          <Form.Group className="mb-3">
+                            <Form.Label>
+                              {t("Content")}{" "}
+                              <span className="text-danger">*</span>
+                            </Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={8}
+                              placeholder={t("Enter content here (each line will be 1 product)")}
+                              name="content"
+                              disabled={!canImport}
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                              value={formik.values.content}
+                              isInvalid={
+                                !!(
+                                  (formik.touched.content && formik.errors.content) ||
+                                  errors?.content
+                                )
+                              }
+                              style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                              {t(formik.errors.content || errors?.content)}
+                            </Form.Control.Feedback>
+                            {!canImport && (
+                              <Form.Text className="text-muted">
+                                {t("Text input is disabled until product configuration is complete")}
+                              </Form.Text>
+                            )}
+                          </Form.Group>
+                        )}
                         <Button
                           variant="primary"
                           type="submit"
@@ -209,10 +312,10 @@ const SellerAccount = () => {
                                 aria-hidden="true"
                                 className="me-2"
                               />
-                              {t("Uploading")}...
+                              {inputMethod === 'file' ? t("Uploading") : t("Processing")}...
                             </>
                           ) : (
-                            t("Upload")
+                            inputMethod === 'file' ? t("Upload") : t("Submit")
                           )}
                         </Button>
                       </Form>
@@ -221,7 +324,7 @@ const SellerAccount = () => {
                       <Card bg="light" className="mb-3">
                         <Card.Body>
                           <h5>
-                            {t("Note: Each line in the uploaded file will be 1 product")}
+                            {t("Note: Each line will be 1 product")}
                           </h5>
                           <div className="mb-3">
                             <strong>{t("Format")}:</strong>

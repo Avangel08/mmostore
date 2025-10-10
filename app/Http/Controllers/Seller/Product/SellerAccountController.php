@@ -75,7 +75,7 @@ class SellerAccountController extends Controller
             }
             $this->sellerAccountService->processAccountFile($subProduct->product->category_id, $subProduct->product->product_type_id, $data);
 
-            return back()->with('success', 'File uploaded successfully and is pending processing');
+            return back()->with('success', 'Uploaded successfully and is pending processing');
         } catch (\Exception $e) {
             \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
 
