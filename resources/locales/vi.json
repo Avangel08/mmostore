@@ -1,7 +1,7 @@
 {
     "pages": "trang",
-    "Role": "Quản lý Role",
-    "Permission": "Quản lý phân quyền",
+    "Role": "Vai trò",
+    "Permission": "Phân quyền",
     "Homepage": "Trang chủ",
     "Search...": "Tìm kiếm...",
     "Showing": "Hiển thị",
@@ -459,5 +459,8 @@
     "Line 3": "Dòng 3",
     "Text input is disabled until product configuration is complete": "Nhập văn bản bị tắt cho đến khi cấu hình sản phẩm hoàn tất",
     "Each line will be 1 product": "Mỗi dòng sẽ là 1 sản phẩm",
-    "Add domain": "Thêm tên miền"
+    "Add domain": "Thêm tên miền",
+    "INACTIVE": "Chưa kích hoạt",
+    "ACTIVE": "Hoạt động",
+    "BLOCK": "Chặn"
 }

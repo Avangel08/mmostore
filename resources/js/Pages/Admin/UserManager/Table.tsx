@@ -110,12 +110,12 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                     };
 
                     const text: Record<string, string> = {
-                        1: "ACTIVE",
-                        0: "INACTIVE",
-                        2: "BLOCK",
+                        1: t("ACTIVE"),
+                        0: t("INACTIVE"),
+                        2: t("BLOCK"),
                     };
 
-                    return (<span style={{ width: "100px" }} className={`badge border ${classColor[cell.getValue()] || "border-dark text-body"} fs-6 me-2`}>{text[cell.getValue()] || "Block"}</span>)
+                    return (<span style={{ width: "120px" }} className={`badge border ${classColor[cell.getValue()] || "border-dark text-body"} fs-6 me-2`}>{text[cell.getValue()] || "BLOCK"}</span>)
                 },
             },
             {

@@ -85,7 +85,7 @@ const Plan = () => {
 
   return (
     <React.Fragment>
-      <Head title={t("Plan management")} />
+      <Head title={t("Plan")  + " - Admin"} />
       <div className="page-content">
         <ToastContainer />
         <ModalPlan
@@ -98,7 +98,7 @@ const Plan = () => {
         />
         <Container fluid>
           <BreadCrumb
-            title={t("Plan management")}
+            title={t("Plan")}
             pageTitle={t("Homepage")}
           />
           <Row>

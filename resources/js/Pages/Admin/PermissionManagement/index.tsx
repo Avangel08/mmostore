@@ -51,7 +51,7 @@ const PermissionManagement = () => {
   };
   return (
     <React.Fragment>
-      <Head title={t("Permission")} />
+      <Head title={t("Permission")  + " - Admin"} />
       <div className="page-content">
         <ToastContainer />
         <ModalAddNewGroupPermission
