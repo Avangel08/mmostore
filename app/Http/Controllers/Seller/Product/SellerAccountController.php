@@ -73,7 +73,8 @@ class SellerAccountController extends Controller
             if (!$subProduct?->product?->category) {
                 return back()->with('error', 'Category not configured for this product');
             }
-            $this->sellerAccountService->processAccountFile($data);
+            $typeName = $subProduct?->product?->productType?->name ?? "";
+            $this->sellerAccountService->processAccountFile($data, $typeName);
 
             return back()->with('success', 'Uploaded successfully and is pending processing');
         } catch (\Exception $e) {

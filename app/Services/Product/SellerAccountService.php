@@ -37,52 +37,26 @@ class SellerAccountService
         return Accounts::select($select)->with($relation)->where('_id', $id)->first();
     }
 
-    public function processAccountFile($data)
+    public function processAccountFile($data, $typeName)
     {
         $inputMethod = $data['input_method'] ?? Accounts::INPUT_METHOD['FILE'];
         $host = request()->getHost();
         $dbConfig = Config::get('database.connections.tenant_mongo');
-        
+
         if ($inputMethod === Accounts::INPUT_METHOD['FILE']) {
             $file = $data['file'];
             $fileName = 'accounts_' . time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs("{$host}/accounts", $fileName, 'public');
             $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-            JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $dbConfig, Accounts::INPUT_METHOD['FILE']);
+            dispatch(new JobImportAccount($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $typeName, $dbConfig, Accounts::INPUT_METHOD['FILE']));
         } elseif ($inputMethod === Accounts::INPUT_METHOD['TEXTAREA']) {
             $content = $data['content'];
             $fileName = 'input_accounts_' . time() . '.txt';
             $filePath = "{$host}/accounts/{$fileName}";
             Storage::disk('public')->put($filePath, $content);
             $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-            JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $dbConfig, Accounts::INPUT_METHOD['TEXTAREA']);
+            dispatch(new JobImportAccount($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $typeName, $dbConfig, Accounts::INPUT_METHOD['TEXTAREA']));
         }
-    }
-
-    public function createAccount(array $data)
-    {
-        $accountData = [
-            'product_id' => $data['product_id'],
-            'sub_product_id' => $data['sub_product_id'],
-            'key' => $data['key'],
-            'data' => $data['data'],
-            'status' => $data['status'],
-            'note' => $data['note'] ?? null,
-            'customer_id' => $data['customer_id'] ?? null,
-            'order_id' => $data['order_id'] ?? null,
-        ];
-
-        return Accounts::create($accountData);
-    }
-
-    public function delete(Accounts $account)
-    {
-        return $account->delete();
-    }
-
-    public function insert($data)
-    {
-        return Accounts::insert($data);
     }
 
     public function createImportAccountHistory($subProductId, $filePath)
@@ -95,11 +69,6 @@ class SellerAccountService
             'result' => null,
             'ended_at' => null,
         ]);
-    }
-
-    public function getUnsoldAccountCountBySubProductId($subProductId)
-    {
-        return Accounts::where('sub_product_id', $subProductId)->whereNull('order_id')->count();
     }
 
     public function deleteOldAccounts(Carbon $timeStart, array $listKey, $subProductId)
@@ -125,9 +94,8 @@ class SellerAccountService
                 ->limit($batchSize)
                 ->forceDelete();
         } while ($deletedCount > 0);
-        $totalProduct = $this->getUnsoldAccountCountBySubProductId($subProductId);
         $subProductService = new SubProductService;
-        $subProductService->updateSubProductQuantity($subProductId, $totalProduct);
+        $subProductService->updateSubProductQuantityWithCount($subProductId);
         // });
     }
 
@@ -164,27 +132,5 @@ class SellerAccountService
     public function startDeleteUnsoldAccount($subProductId)
     {
         JobDeleteUnsoldAccount::dispatch($subProductId, Config::get('database.connections.tenant_mongo'));
-    }
-
-    public function checkUniqueData($categoryId, $productTypeId, array $mainData)
-    {
-        if (!$categoryId || !$productTypeId) {
-            return array_fill_keys($mainData, false);
-        }
-
-        $existingMainData = Accounts::select('main_data')->where('category_id', $categoryId)
-            ->where('product_type_id', $productTypeId)
-            ->whereIn('main_data', $mainData)
-            ->pluck('main_data')
-            ->toArray();
-
-        $existingMainDataMap = array_flip($existingMainData);
-
-        $result = [];
-        foreach ($mainData as $data) {
-            $result[$data] = !isset($existingMainDataMap[$data]);
-        }
-
-        return $result;
     }
 }
