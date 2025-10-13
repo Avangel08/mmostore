@@ -123,7 +123,7 @@ const Index: React.FC<DepositProps> = () => {
                                         <div className="payment-methods">
                                             <Card>
                                                 <Card.Body>
-                                                    <Form.Check
+                                                    {/* <Form.Check
                                                         type="radio"
                                                         id="bankTransfer"
                                                         name="paymentMethod"
@@ -141,7 +141,24 @@ const Index: React.FC<DepositProps> = () => {
                                                         checked={selectedPaymentMethod === 'bankTransfer'}
                                                         onChange={() => handlePaymentMethodChange('bankTransfer')}
                                                         className="mb-3"
-                                                    />
+                                                    /> */}
+
+                                                    <div>
+                                                        <div className="form-check mb-2">
+                                                            <Form.Check.Input className="form-check-input" type="checkbox" id="formCheck1" />
+                                                            <Form.Check.Label className="form-check-label" htmlFor="formCheck1">
+                                                                <div className="d-flex align-items-center">
+                                                                    <span className="d-block justify-content-center">{t('You cab transfer money directly via Vietcombank')}</span>
+                                                                    <img
+                                                                        src={vcb}
+                                                                        alt="Bank Transfer"
+                                                                        className="ms-3"
+                                                                        style={{ height: "20px" }}
+                                                                    />
+                                                                </div>
+                                                            </Form.Check.Label>
+                                                        </div>
+                                                    </div>
                                                 </Card.Body>
                                             </Card>
                                         </div>

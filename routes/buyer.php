@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Buyer\Auth\ForgotPasswordController;
+use App\Http\Controllers\Buyer\Auth\ResetPasswordController;
 use App\Http\Controllers\Buyer\PaymentHistory\PaymentHistoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Buyer\Auth\AuthenticatedSessionController;
@@ -14,12 +16,13 @@ use App\Http\Controllers\Buyer\Profile\ProfileController;
 Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
     ->group(function () {
         Route::get('/', [BuyerController::class, 'home'])->name('buyer.home');
-
         Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('buyer.login');
-        
         Route::get('/register', [RegisteredUserController::class, 'create'])->name('buyer.register');
         Route::post('/register', [RegisteredUserController::class, 'store']);
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('buyer.logout');
+        Route::post('forgot-password', [ForgotPasswordController::class, 'store'])->name('buyer.forgot-password.store');
+        Route::get('reset-password/{token}', [ResetPasswordController::class, 'create'])->name('buyer.password.reset');
+        Route::post('reset-password', [ResetPasswordController::class, 'store'])->name('buyer.password.store');
 
         Route::group(['prefix' => '/products'], function () {
             Route::get('/', [ProductController::class, 'show'])->name('buyer-product.show');

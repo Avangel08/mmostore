@@ -55,7 +55,7 @@ const PaymentHistory: React.FC<PaymentHistoryProps> = () => {
             <Container fluid className="custom-container mt-4">
                 <Row>
                     <Col>
-                        <Card>
+                        <Card className="shadow-sm p-2" style={{ minHeight: "50vh" }}>
                             <Card.Header>
                                 <h5 className="card-title mb-0">{t("Payment History")}</h5>
                             </Card.Header>

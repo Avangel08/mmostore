@@ -23,7 +23,7 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
     const [isOpenMenu, setisOpenMenu] = useState<boolean>(false);
     const [navClass, setnavClass] = useState<any>("");
     const [show, setShow] = useState(false);
-    const { user } = usePage().props.auth;
+    const { user } = usePage().props.auth as any;
     const { t } = useTranslation();
 
     const handleLogout = () => {
@@ -200,8 +200,10 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                                     <div className="ms-sm-2 text-white">
                                         <span className="d-flex align-items-center">
                                             <i className="ri-user-line fs-22"></i>
-                                            <span className="text-start">
-                                                <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{user?.name}</span>
+                                            <span className="d-flex flex-row align-items-center">
+                                                <span className="ms-1 fw-medium user-name-text">{user?.name}</span>
+                                                <span className="ms-1 fs-12">: {user?.balance ?? 0} VND
+                                                </span>
                                             </span>
                                         </span>
                                     </div>

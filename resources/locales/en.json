@@ -285,5 +285,6 @@
     "Balance": "Balance",
     "Search": "Search",
     "Date at": "Date at",
-    "Contact support": "Contact"
+    "Contact support": "Contact",
+    "passwords.user": "No account found with this email"
 }

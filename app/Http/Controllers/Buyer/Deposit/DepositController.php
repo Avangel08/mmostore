@@ -53,7 +53,7 @@ class DepositController extends Controller
             if (!$paymentMethod) {
                 return response()->json([
                     "status" => "error",
-                    "message" => "Payment method not found",
+                    "message" => __("The store does not support online payment yet"),
                     "data" => []
                 ]);
             }

@@ -21,7 +21,6 @@ class Accounts extends Model
         'sub_product_id',
         'key',
         'data',
-        'main_data',
         'status',
         'note',
         'customer_id',

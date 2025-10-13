@@ -54,7 +54,7 @@ i18n
   .init({
     resources,
     lng: localStorage.getItem("I18N_LANGUAGE") || "vi",
-    fallbackLng: "vi", // use en if detected lng is not available
+    fallbackLng: "en", // use en if detected lng is not available
 
     keySeparator: false, // we do not use keys in form messages.welcome
 
