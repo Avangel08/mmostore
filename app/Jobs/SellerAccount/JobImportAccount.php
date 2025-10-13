@@ -143,18 +143,14 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                     $errorCount++;
                     return null;
                 }
-                $key = $this->subProductId . '_' . $mainData;
-                $remainData = array_slice($parts, $isStatusSection ? 2 : 1);
-
-                if (empty($remainData)) {
-                    $errorCount++;
-                    return null;
-                }
 
                 if ($isNeedCheckMail && !filter_var($mainData, FILTER_VALIDATE_EMAIL)) {
                     $errorCount++;
                     return null;
                 }
+
+                $key = $this->subProductId . '_' . $mainData;
+                $remainData = array_slice($parts, $isStatusSection ? 2 : 1);
 
                 foreach ($remainData as $remainPart) {
                     if (trim($remainPart) == '') {
