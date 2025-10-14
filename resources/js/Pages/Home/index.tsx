@@ -1,5 +1,5 @@
 import React from "react";
-import { Head } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import Home from "./home";
 import Navbar from "./navbar";
 import Footer from "./footer";
@@ -7,12 +7,16 @@ import Showcase from "./Showcase";
 import Services from "./Services";
 import Features from "./Features";
 import Faqs from "./Faqs";
+import ModalRedirectStore from "./Modal/ModalRedirectStore";
 
 export default function Index() {
     const toTop = () => {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
     };
+    
+    const { message }: any = usePage().props;
+
     return (
         <React.Fragment>
             <Head title="Landing | Velzon - React Admin & Dashboard Template" />
@@ -32,6 +36,9 @@ export default function Index() {
                     <i className="ri-arrow-up-line"></i>
                 </button>
             </div>
+
+            {/* Show modal redirect store */}
+            <ModalRedirectStore message={message} />
         </React.Fragment>
     );
 }

@@ -25,7 +25,7 @@ class SellerAccountService
             ->filterProduct($request)
             ->filterStatus($request)
             ->filterCreatedDate($request)
-            ->filterOrderId($request)
+            ->filterOrderNumber($request)
             ->filterSellStatus($request)
             ->orderBy('_id', 'desc')
             ->with('order:_id,order_number')
