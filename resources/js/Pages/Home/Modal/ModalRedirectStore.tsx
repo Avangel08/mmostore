@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { router } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 
 interface ModalRedirectStoreProps {
     message?: {
@@ -11,7 +12,7 @@ interface ModalRedirectStoreProps {
 
 const ModalRedirectStore = ({ message }: ModalRedirectStoreProps) => {
     const [show, setShow] = useState(false);
-
+    const { t } = useTranslation();
     useEffect(() => {
         // Check if popup message exists in props
         if (message?.success && message?.popup) {
@@ -21,18 +22,13 @@ const ModalRedirectStore = ({ message }: ModalRedirectStoreProps) => {
 
     const handleClose = () => setShow(false);
 
-    const handleRedirectToStore = () => {
-        router.visit('/store');
-        setShow(false);
-    };
-
     return (
         <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Chuyển hướng đến cửa hàng</Modal.Title>
+                <Modal.Title>{t("Redirect to store")}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <p>Bạn có muốn chuyển sang cửa hàng của mình không?</p>
+                <p>{t("Would you like to switch to your store?")}</p>
                 <div className="text-center mt-3">
                     <Button
                         className="btn btn-primary me-2"
@@ -41,13 +37,7 @@ const ModalRedirectStore = ({ message }: ModalRedirectStoreProps) => {
                             window.open(url, "_blank");
                         }}
                     >
-                        Có, chuyển đến cửa hàng
-                    </Button>
-                    <Button
-                        className="btn btn-secondary"
-                        onClick={handleClose}
-                    >
-                        Không, ở lại trang chủ
+                        {t("Go to store")}
                     </Button>
                 </div>
             </Modal.Body>
