@@ -71,7 +71,7 @@ class CustomerManagerController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($sub, $id)
+    public function edit($id)
     {
         $result = $this->customerService->findById($id);
         if(!$result) {

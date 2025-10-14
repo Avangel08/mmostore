@@ -14,7 +14,7 @@ use App\Http\Controllers\Seller\Profile\ProfileController;
 use App\Http\Controllers\Seller\Setting\ThemeSettingController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
+Route::middleware(['validate.subdomain', 'tenant.mongo'])
     ->group(function () {
         Route::prefix('admin')->group(function () {
             // Public routes (no auth middleware needed)

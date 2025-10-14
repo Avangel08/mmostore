@@ -72,7 +72,6 @@ class Kernel extends HttpKernel
         'api.validate' => \App\Http\Middleware\ApiValidationMiddleware::class,
 
         'validate.subdomain' => \App\Http\Middleware\ValidateSubdomain::class,
-        'route.subdomain' => \App\Http\Middleware\SetRouteSubdomain::class,
 
         'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,

@@ -46,7 +46,7 @@ class SubProductController extends Controller
         }
     }
 
-    public function update($sub, $id, SubProductRequest $request)
+    public function update($id, SubProductRequest $request)
     {
         // if (auth(config('guard.seller'))->user()->cannot('subproduct_edit')) {
         //     return abort(403);
@@ -78,7 +78,7 @@ class SubProductController extends Controller
         }
     }
 
-    public function destroy($sub, $id)
+    public function destroy($id)
     {
         // if (auth(config('guard.seller'))->user()->cannot('subproduct_delete')) {
         //     return abort(403);

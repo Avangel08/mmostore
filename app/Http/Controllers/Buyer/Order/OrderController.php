@@ -112,10 +112,11 @@ class OrderController extends Controller
         ]);
     }
 
-    public function show($subDomain, $orderNumber)
+    public function show($orderNumber)
     {
         $customer = Auth::guard('buyer')->user();
         $theme = session('theme') ?? "Theme_1";
+        $store = app('store');
 
         if (!$customer) {
             return response()->json([
@@ -167,7 +168,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function download($subDomain, $orderNumber)
+    public function download($orderNumber)
     {
         $customer = Auth::guard('buyer')->user();
 

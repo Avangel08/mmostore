@@ -12,14 +12,17 @@ use Inertia\Response;
 
 class DashBoardController extends Controller
 {
-    public function index(string $sub)
+    public function index(string $sub = null)
     {
         $guard = config('guard.seller');
         $user = Auth::guard($guard)->user();
         
+        $currentStore = request()->get('current_store');
+        $subdomain = $sub ?? ($currentStore ? $currentStore->id : 'unknown');
+        
         return Inertia::render('Dashboard/index', [
             'user' => $user,
-            'subdomain' => $sub
+            'subdomain' => $subdomain
         ]);
     }
 }

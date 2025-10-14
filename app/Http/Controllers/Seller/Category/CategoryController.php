@@ -61,7 +61,7 @@ class CategoryController extends Controller
         }
     }
 
-    public function update($sub, $id, CategoryRequest $request)
+    public function update($id, CategoryRequest $request)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_create')) {
         //     return abort(403);
@@ -93,7 +93,7 @@ class CategoryController extends Controller
     }
 
 
-    public function destroy($sub, $id)
+    public function destroy($id)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_delete')) {
         //     return abort(403);

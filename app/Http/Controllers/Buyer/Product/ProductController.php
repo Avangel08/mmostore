@@ -61,7 +61,7 @@ class ProductController extends Controller
         return response()->json($result);
     }
 
-    public function detail($sub, String $productId)
+    public function detail(String $productId)
     {
         $product = $this->productService->getById($productId, ['*'], ['subProducts']);
         return response()->json($product);

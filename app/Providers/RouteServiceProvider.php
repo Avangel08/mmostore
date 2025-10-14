@@ -10,13 +10,6 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-    /**
-     * The path to your application's "home" route.
-     *
-     * Typically, users are redirected here after authentication.
-     *
-     * @var string
-     */
     public const HOME = '/dashboard';
 
     public static function getRedirectAfterAuthenticated(): string
@@ -34,9 +27,6 @@ class RouteServiceProvider extends ServiceProvider
         return '/';
     }
 
-    /**
-     * Define your route model bindings, pattern filters, and other route configuration.
-     */
     public function boot(): void
     {
         RateLimiter::for('api', function (Request $request) {
@@ -45,13 +35,12 @@ class RouteServiceProvider extends ServiceProvider
 
         $mainDomain = config('app.main_domain');
 
-        $this->routes(function () use ($mainDomain){
+        $this->routes(function () use ($mainDomain) {
             Route::middleware('api')->prefix('api')->group(base_path('routes/api.php'));
-//            Route::middleware('web')->prefix('demo')->group(base_path('routes/web.php'));
             Route::domain($mainDomain)->middleware('web')->group(base_path('routes/home.php'));
             Route::domain($mainDomain)->middleware('web')->prefix('admin')->group(base_path('routes/admin.php'));
-            Route::domain('{sub}.' . $mainDomain)->middleware('web')->group(base_path('routes/buyer.php'));
-            Route::domain('{sub}.' . $mainDomain)->middleware('web')->group(base_path('routes/seller.php'));
+            Route::middleware('web')->group(base_path('routes/buyer.php'));
+            Route::middleware('web')->group(base_path('routes/seller.php'));
         });
     }
 }

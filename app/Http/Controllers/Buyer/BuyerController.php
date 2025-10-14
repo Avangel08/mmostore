@@ -39,14 +39,15 @@ class BuyerController extends Controller
         return $contacts;
     }
 
-    public function home(string $sub): Response
+    public function home(): Response
     {
         $theme = "Theme_1"; // This could be dynamic based on tenant settings 
         $user = auth('buyer')->user();
         $contacts = $this->getContactsData();
-        
+
+        $store = app('store');
+
         return Inertia::render("Themes/{$theme}/Home/index", [
-            'subdomain' => $sub,
             'user' => $user,
             'isAuthenticated' => $user !== null,
             'contacts' => $contacts,
@@ -61,13 +62,14 @@ class BuyerController extends Controller
         ]);
     }
 
-    public function products(string $sub): Response
+    public function products(): Response
     {
         $user = auth('buyer')->user();
         $contacts = $this->getContactsData();
+
+        $store = app('store');
          
         return Inertia::render('Products/Index', [
-            'subdomain' => $sub,
             'user' => $user,
             'isAuthenticated' => $user !== null,
             'contacts' => $contacts,
@@ -75,28 +77,14 @@ class BuyerController extends Controller
         ]);
     }
 
-    public function productDetail(string $sub, string $id): Response
+    public function about(): Response
     {
         $user = auth('buyer')->user();
         $contacts = $this->getContactsData();
-        
-        return Inertia::render('Products/Detail', [
-            'subdomain' => $sub,
-            'productId' => $id,
-            'user' => $user,
-            'isAuthenticated' => $user !== null,
-            'contacts' => $contacts,
-            'contact_types' => fn() => Settings::CONTACT_TYPES
-        ]);
-    }
 
-    public function about(string $sub): Response
-    {
-        $user = auth('buyer')->user();
-        $contacts = $this->getContactsData();
+        $store = app('store');
         
         return Inertia::render('About/Index', [
-            'subdomain' => $sub,
             'user' => $user,
             'isAuthenticated' => $user !== null,
             'contacts' => $contacts,
@@ -104,13 +92,14 @@ class BuyerController extends Controller
         ]);
     }
 
-    public function contact(string $sub): Response
+    public function contact(): Response
     {
         $user = auth('buyer')->user();
         $contacts = $this->getContactsData();
+
+        $store = app('store');
         
         return Inertia::render('Contact/Index', [
-            'subdomain' => $sub,
             'user' => $user,
             'isAuthenticated' => $user !== null,
             'contacts' => $contacts,

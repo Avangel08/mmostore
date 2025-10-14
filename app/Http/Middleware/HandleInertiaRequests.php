@@ -38,11 +38,14 @@ class HandleInertiaRequests extends Middleware
         }
 
         $isSubdomain = count(explode('.', $host)) > 2;
-        if ($isSubdomain && str_starts_with($path, '/admin')) {
+        $mainDomain = config('app.main_domain');
+        $isCustomDomain = !str_ends_with($host, '.' . $mainDomain) && !in_array($host, $domain);
+        
+        if (($isSubdomain || $isCustomDomain) && str_starts_with($path, '/admin')) {
             return 'app_seller';
         }
 
-        if ($isSubdomain) {
+        if ($isSubdomain || $isCustomDomain) {
             return 'app_buyer';
         }
 
@@ -65,10 +68,20 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $this->rootView = $this->detectRootView($request);
-        
+
         $host = $request->getHost();
+        $mainDomain = config('app.main_domain');
         $parts = explode('.', $host);
         $subdomain = count($parts) > 2 ? $parts[0] : null;
+        
+        $domainType = 'main';
+        if ($host !== $mainDomain) {
+            if (str_ends_with($host, '.' . $mainDomain)) {
+                $domainType = 'subdomain';
+            } else {
+                $domainType = 'custom';
+            }
+        }
         
         return [
             ...parent::share($request),
@@ -76,7 +89,9 @@ class HandleInertiaRequests extends Middleware
                 'user' => AuthHelper::getCurrentUser(),
             ],
             'subdomain' => $subdomain,
-            'domainSuffix' => env('APP_MAIN_DOMAIN', 'mmostore.local'),
+            'domainType' => $domainType,
+            'currentDomain' => $host,
+            'mainDomain' => $mainDomain,
             'message' => [
                 'success' => fn() => $request->session()->get('success'),
                 'error' => fn() => $request->session()->get('error'),

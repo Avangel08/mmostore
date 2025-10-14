@@ -95,7 +95,7 @@ class SellerAccountController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($sub, string $subProductId, Request $request)
+    public function edit(string $subProductId, Request $request)
     {
         // if (auth(config('guard.seller'))->user()->cannot('account_edit')) {
         //     return abort(403);
@@ -131,7 +131,7 @@ class SellerAccountController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($sub, string $subProductId, Request $request)
+    public function destroy(string $subProductId, Request $request)
     {
         try {
             $subProduct = $this->subProductService->getById($subProductId);
@@ -148,7 +148,7 @@ class SellerAccountController extends Controller
         }
     }
 
-    public function downloadUnsoldAccounts($sub, $subProductId, Request $request)
+    public function downloadUnsoldAccounts($subProductId, Request $request)
     {
         try {
             return $this->sellerAccountService->streamDownloadUnsoldAccounts($subProductId);
