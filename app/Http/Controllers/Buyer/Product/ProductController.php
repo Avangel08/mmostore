@@ -76,7 +76,7 @@ class ProductController extends Controller
                 'quantity' => 'required|integer|min:1',
             ]);
 
-            $store = $request->input("current_store");
+            $store = app('store');
 
             $customer = Auth::guard('buyer')->user();
 
