@@ -40,16 +40,16 @@ const RecentUpload = () => {
     setIsRefreshing(true);
     setCanRefresh(false);
     setLastRefreshTime(now);
-    
+
     const startTime = Date.now();
-    
+
     router.reload({
       only: ["importHistory", "accounts", "subProduct"],
       replace: true,
       onFinish: () => {
         const elapsedTime = Date.now() - startTime;
         const minLoadingTime = 1000;
-        
+
         if (elapsedTime < minLoadingTime) {
           setTimeout(() => {
             setIsRefreshing(false);
@@ -57,7 +57,7 @@ const RecentUpload = () => {
         } else {
           setIsRefreshing(false);
         }
-        
+
         setTimeout(() => {
           setCanRefresh(true);
         }, 2000);
@@ -111,9 +111,8 @@ const RecentUpload = () => {
 
           return (
             <span
-              className={`badge ${
-                className?.[status] || "bg-dark"
-              } fs-6 fw-medium`}
+              className={`badge ${className?.[status] || "bg-dark"
+                } fs-6 fw-medium`}
             >
               {t(statusLabel?.[status] || "Unknown")}
             </span>
@@ -154,7 +153,7 @@ const RecentUpload = () => {
     <>
       <Col lg={12} className="mb-4 d-flex align-items-center gap-2">
         <h5>{t("Recent uploaded files")}</h5>
-        <Button 
+        <Button
           variant="outline-info"
           onClick={handleRefreshClick}
           disabled={isRefreshing || !canRefresh}
@@ -189,6 +188,7 @@ const RecentUpload = () => {
             onReloadTable={fetchData}
             keyPageParam="importPage"
             keyPerPageParam="importPerPage"
+            divStyle={{ height: "50vh" }}
           />
         </div>
       </Col>

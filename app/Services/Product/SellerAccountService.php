@@ -6,10 +6,9 @@ use App\Jobs\SellerAccount\JobDeleteUnsoldAccount;
 use App\Jobs\SellerAccount\JobImportAccount;
 use App\Models\Mongo\Accounts;
 use App\Models\Mongo\ImportAccountHistory;
-use App\Models\Mongo\Products;
-use App\Models\Mongo\SubProducts;
 use Carbon\Carbon;
 use Config;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -29,12 +28,24 @@ class SellerAccountService
             ->filterOrderId($request)
             ->filterSellStatus($request)
             ->orderBy('_id', 'desc')
-            ->cursorPaginate($perPage, ['*'], 'page', $page);
+            ->with('order:_id,order_number')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function getById($id, $select = ['*'], $relation = [])
     {
         return Accounts::select($select)->with($relation)->where('_id', $id)->first();
+    }
+
+    public function getTagAccountCache($subProductId)
+    {
+        return "seller_accounts_{$subProductId}";
+    }
+
+    public function clearSubProductAccountCache($subProductId)
+    {
+        $tagCache = $this->getTagAccountCache($subProductId);
+        Cache::tags($tagCache)->flush();
     }
 
     public function processAccountFile($data, $typeName)
@@ -131,6 +142,48 @@ class SellerAccountService
 
     public function startDeleteUnsoldAccount($subProductId)
     {
-        JobDeleteUnsoldAccount::dispatch($subProductId, Config::get('database.connections.tenant_mongo'));
+        dispatch(new JobDeleteUnsoldAccount($subProductId, Config::get('database.connections.tenant_mongo')));
+    }
+
+    public function getStatusOptions($subProductId, $searchTerm = '', int $page = 1, int $perPage = 10)
+    {
+        $tagCache = $this->getTagAccountCache($subProductId);
+        $cacheKey = 'account_status_options_' . md5("{$searchTerm}_{$page}_{$perPage}");
+
+        return Cache::tags($tagCache)->remember($cacheKey, now()->addMinutes(30), function () use ($searchTerm, $page, $perPage, $subProductId) {
+            $query = Accounts::select('status')
+                ->whereNotNull('status')
+                ->where('sub_product_id', $subProductId)
+                ->groupBy('status');
+
+            if (!empty($searchTerm)) {
+                $query->where('status', 'like', '%' . $searchTerm . '%');
+            }
+
+            $paginatedResults = $query->orderBy('status')
+                ->paginate($perPage, ['*'], 'page', $page);
+
+            $statusOptions = collect([]);
+            if ($page == 1) {
+                $statusOptions->push([
+                    'value' => '',
+                    'label' => 'All',
+                ]);
+            }
+
+            $statusData = $paginatedResults->map(
+                fn($item) => [
+                    'value' => $item->status,
+                    'label' => $item->status,
+                ]
+            );
+
+            $statusOptions = $statusOptions->merge($statusData);
+
+            return [
+                'results' => $statusOptions,
+                'has_more' => $paginatedResults->hasMorePages(),
+            ];
+        });
     }
 }

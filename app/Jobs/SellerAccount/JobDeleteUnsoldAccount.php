@@ -19,8 +19,6 @@ class JobDeleteUnsoldAccount implements ShouldBeUnique, ShouldQueue
 
     protected $dbConfig;
 
-    protected $accountService;
-
     public $uniqueFor = 3600;
 
     /**
@@ -30,13 +28,12 @@ class JobDeleteUnsoldAccount implements ShouldBeUnique, ShouldQueue
     {
         $this->dbConfig = $dbConfig;
         $this->subProductId = $subProductId;
-        $this->accountService = new SellerAccountService;
         $this->queue = 'process_seller_account';
     }
 
     public function uniqueId(): string
     {
-        return 'process_delete_unsold_account_'.$this->subProductId;
+        return 'process_delete_unsold_account_' . $this->subProductId;
     }
 
     public function uniqueVia(): Repository
@@ -47,12 +44,13 @@ class JobDeleteUnsoldAccount implements ShouldBeUnique, ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(SellerAccountService $accountService): void
     {
         try {
             Config::set('database.connections.tenant_mongo', $this->dbConfig);
             // echo "Start delete unsold account for sub_product_id {$this->subProductId}".PHP_EOL;
-            $this->accountService->deleteUnsoldAccounts($this->subProductId);
+             $accountService->clearSubProductAccountCache($this->subProductId);
+            $accountService->deleteUnsoldAccounts($this->subProductId);
             // echo "Finished delete unsold account for sub_product_id {$this->subProductId}".PHP_EOL;
         } catch (Exception $e) {
             // echo 'Error processing delete unsold account: '.$e->getMessage().PHP_EOL;
