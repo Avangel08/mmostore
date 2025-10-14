@@ -26,15 +26,7 @@ class LoginController extends Controller
         $request->authenticate(config('guard.seller'));
         $request->session()->regenerate();
 
-        $host = $request->getHost();
-        $parts = explode('.', $host);
-        $subdomain = count($parts) > 2 ? $parts[0] : null;
-
-        if ($subdomain) {
-            return redirect()->route('seller.dashboard', ['sub' => $subdomain]);
-        }
-
-        return redirect()->route('seller.dashboard');
+		return redirect()->route('seller.dashboard');
     }
 
     /**
@@ -61,7 +53,6 @@ class LoginController extends Controller
             return redirect()->route('seller.login');
         }
 
-        // Log in the user into seller guard without password
         $provider = Auth::guard(config('guard.seller'))->getProvider();
         $user = $provider ? $provider->retrieveById($userId) : null;
 
@@ -72,15 +63,7 @@ class LoginController extends Controller
         Auth::guard(config('guard.seller'))->login($user);
         $request->session()->regenerate();
 
-        $host = $request->getHost();
-        $parts = explode('.', $host);
-        $subdomain = count($parts) > 2 ? $parts[0] : null;
-
-        if ($subdomain) {
-            return redirect()->route('seller.dashboard', ['sub' => $subdomain]);
-        }
-
-        return redirect()->route('seller.dashboard');
+		return redirect()->route('seller.dashboard');
     }
 }
 

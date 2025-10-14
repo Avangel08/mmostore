@@ -71,7 +71,6 @@ class AuthenticatedSessionController extends Controller
             'seller.magic-login',
             now()->addMinutes(2),
             [
-                'sub' => $sub,
                 'user_id' => $user->id,
             ]
         );
