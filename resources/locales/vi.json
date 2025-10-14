@@ -509,5 +509,18 @@
     "Service price list": "Bảng giá dịch vụ",
     "Out of stock": "Hết hàng",
     "It is strictly prohibited to use email accounts for illegal purposes": "Nghiêm cấm sử dụng tài khoản email cho các mục đích bất hợp pháp",
-    "We are not responsible for any misuse of resources": "Chúng tôi không chịu trách nhiệm cho bất kỳ hành vi nào sử dụng tài nguyên sai mục đích."
+    "We are not responsible for any misuse of resources": "Chúng tôi không chịu trách nhiệm cho bất kỳ hành vi nào sử dụng tài nguyên sai mục đích.",
+    "Use this token to authenticate API requests. Keep it secure and don't share it with others.": "Sử dụng token này để xác thực các yêu cầu API. Giữ nó an toàn và không chia sẻ nó với người khác.",
+    "Token copied": "Token đã được sao chép",
+    "Failed to copy token. Please try copy manually": "Sao chép token thất bại. Vui lòng thử copy thủ công",
+    "Copy": "Sao chép",
+    "You don't have an API Token yet.": "Bạn chưa có API Token.",
+    "Create API Token": "Tạo API Token",
+    "Token created successfully": "Tạo token thành công",
+    "You already have a token. Please reload page to see your token": "Bạn đã có token. Vui lòng tải lại trang để xem token của bạn",
+    "Token deleted successfully": "Xoá token thành công",
+    "Delete this token?": "Xoá token này?",
+    "No token available to delete": "Không có token nào để xoá",
+    "Copied": "Đã sao chép",
+    "Last use": "Lần sử dụng cuối"
 }

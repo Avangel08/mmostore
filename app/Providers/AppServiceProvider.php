@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\MySQL\PersonalAccessToken;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Lang;
+use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+
         Inertia::share([
             'locale' => fn () => App::getLocale(),
             'translations', function () {
