@@ -24,7 +24,7 @@ interface ProductAccountFilters {
   createdDateStart: string;
   createdDateEnd: string;
   status: string;
-  orderId: string;
+  orderNumber: string;
   sellStatus: string;
 }
 
@@ -45,7 +45,7 @@ const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterPro
       createdDateStart: paramsUrl?.createdDateStart ?? "",
       createdDateEnd: paramsUrl?.createdDateEnd ?? "",
       status: paramsUrl?.status ?? "",
-      orderId: paramsUrl?.orderId ?? "",
+      orderNumber: paramsUrl?.orderNumber ?? "",
       sellStatus: paramsUrl?.sellStatus ?? "",
     };
   };
@@ -131,14 +131,14 @@ const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterPro
     const createdDateStart = paramsUrl?.createdDateStart || "";
     const createdDateEnd = paramsUrl?.createdDateEnd || "";
     const status = paramsUrl?.status || "";
-    const orderId = paramsUrl?.orderId || "";
+    const orderNumber = paramsUrl?.orderNumber || "";
     const sellStatus = paramsUrl?.sellStatus || "";
     return (
       (product !== null && product !== "") ||
       (createdDateStart !== null && createdDateStart !== "") ||
       (createdDateEnd !== null && createdDateEnd !== "") ||
       (status !== null && status !== "") ||
-      (orderId !== null && orderId !== "") ||
+      (orderNumber !== null && orderNumber !== "") ||
       (sellStatus !== null && sellStatus !== "")
     );
   };
@@ -149,7 +149,7 @@ const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterPro
       createdDateStart: "",
       createdDateEnd: "",
       status: "",
-      orderId: "",
+      orderNumber: "",
       sellStatus: "",
     };
     setFilters(resetFilters);
@@ -304,8 +304,8 @@ const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterPro
                 type="text"
                 id="filter-order"
                 placeholder={t("Enter Order ID")}
-                value={filters.orderId}
-                onChange={(e) => handleInputChange("orderId", e.target.value)}
+                value={filters.orderNumber}
+                onChange={(e) => handleInputChange("orderNumber", e.target.value)}
               />
             </Col>
 

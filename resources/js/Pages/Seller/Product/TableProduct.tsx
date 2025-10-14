@@ -213,6 +213,7 @@ const TableProduct = ({
         enableContextMenu={false}
         isPaginateTable={true}
         onReloadTable={onReloadTable}
+        divStyle={{ height: "50vh"}}
       />
     </div>
   );
