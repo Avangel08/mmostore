@@ -8,7 +8,7 @@
     .custom-table {
         background: linear-gradient(180deg, #014475 0%, #112d42 100%);
         color: #fff;
-
+        table-layout: fixed;
         thead {
             background: linear-gradient(180deg, #014475 0%, #112d42 100%);
             color: #fff;
@@ -106,5 +106,9 @@
     .badge-warning {
         background-color: #ff8500;
         color: #212529;
+    }
+
+    .input-step input {
+        width: 5rem;
     }
 }

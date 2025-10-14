@@ -22,18 +22,18 @@ interface TableContainerProps {
 }
 
 const TableContainer = ({
-                            columns,
-                            data,
-                            customPageSize,
-                            borderClass,
-                            tableClass,
-                            theadClass,
-                            trClass,
-                            thClass,
-                            divClass,
-                            onRowContextMenu
-                        }: TableContainerProps) => {
-    const {t} = useTranslation();
+    columns,
+    data,
+    customPageSize,
+    borderClass,
+    tableClass,
+    theadClass,
+    trClass,
+    thClass,
+    divClass,
+    onRowContextMenu
+}: TableContainerProps) => {
+    const { t } = useTranslation();
 
 
     const table = useReactTable({
@@ -62,57 +62,65 @@ const TableContainer = ({
 
     return (
         <Fragment>
-
-
             <div className={divClass}>
                 <Table hover className={tableClass} bordered={borderClass}>
                     <thead className={theadClass}>
-                    {getHeaderGroups().map((headerGroup: any) => (
-                        <tr className={trClass} key={headerGroup.id}>
-                            {headerGroup.headers.map((header: any) => (
-                                <th key={header.id} className={thClass}  {...{
-                                    onClick: header.column.getToggleSortingHandler(),
-                                }}>
-                                    {header.isPlaceholder ? null : (
-                                        <React.Fragment>
-                                            {flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                            )}
-                                            {{
-                                                asc: ' ',
-                                                desc: ' ',
-                                            }
+                        {getHeaderGroups().map((headerGroup: any) => (
+                            <tr className={trClass} key={headerGroup.id}>
+                                {headerGroup.headers.map((header: any) => (
+                                    <th key={header.id} className={`${thClass ?? ""} ${header.column.columnDef.meta?.headerClass ?? ""}`.trim()}  {...{
+                                        onClick: header.column.getToggleSortingHandler(),
+                                        style: {
+                                            width: header.column.getSize(),
+                                            // minWidth: header.column.columnDef.minSize,
+                                            // maxWidth: header.column.columnDef.maxSize,
+                                        }
+                                    }}>
+                                        {header.isPlaceholder ? null : (
+                                            <React.Fragment>
+                                                {flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                                {{
+                                                    asc: ' ',
+                                                    desc: ' ',
+                                                }
                                                 [header.column.getIsSorted() as string] ?? null}
-                                        </React.Fragment>
-                                    )}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
+                                            </React.Fragment>
+                                        )}
+                                    </th>
+                                ))}
+                            </tr>
+                        ))}
                     </thead>
 
                     <tbody>
-                    {getRowModel().rows.map((row: any) => {
-                        return (
-                            <tr
-                                key={row.id}
-                                onContextMenu={(e) => handleRowContextMenu(e, row.original)}
-                                style={{cursor: onRowContextMenu ? 'context-menu' : 'default'}}
-                            >
-                                {row.getVisibleCells().map((cell: any) => {
-                                    return (
-                                        <td key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </td>
-                                    );
-                                })}
-                            </tr>
-                        );
-                    })}
+                        {getRowModel().rows.map((row: any) => {
+                            return (
+                                <tr
+                                    key={row.id}
+                                    onContextMenu={(e) => handleRowContextMenu(e, row.original)}
+                                    style={{ cursor: onRowContextMenu ? 'context-menu' : 'default' }}
+                                >
+                                    {row.getVisibleCells().map((cell: any) => {
+                                        return (
+                                            <td key={cell.id}
+                                                className={cell.column.columnDef.meta?.cellClass ?? ""}
+                                                style={{
+                                                    width: cell.column.getSize()
+                                                }}
+                                            >
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </Table>
             </div>

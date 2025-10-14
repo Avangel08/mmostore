@@ -87,10 +87,12 @@ class Accounts extends Model
         return $query;
     }
 
-    public function scopeFilterOrderId($query, $request)
+    public function scopeFilterOrderNumber($query, $request)
     {
-        if (isset($request['orderId']) && $request['orderId'] != '') {
-            $query->where('order_id', 'like', '%' . $request['orderId'] . '%');
+        if (isset($request['orderNumber']) && $request['orderNumber'] != '') {
+            $query->whereHas('order', function ($q) use ($request) {
+                $q->where('order_number', 'like', '%' . $request['orderNumber'] . '%');
+            });
         }
 
         return $query;

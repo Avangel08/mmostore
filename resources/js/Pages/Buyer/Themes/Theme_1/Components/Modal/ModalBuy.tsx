@@ -5,6 +5,8 @@ import { Modal, Form, Button, Card, Row } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import { showToast } from "../../../../../../utils/showToast";
 
 interface Product {
     id: number;
@@ -12,13 +14,19 @@ interface Product {
     price: number;
     short_description: string;
     image: string;
-    sub_products: any;
+    sub_products: any[];
 }
 
 interface ProductModalProps {
     productId: number | null;
     show: boolean;
     onClose: () => void;
+}
+
+interface ProductFormValues {
+    quantity: number;
+    subProduct: string;
+    price: number;
 }
 
 // ⚡ fetch products detail (TanStack Query)
@@ -28,12 +36,9 @@ const fetchProduct = async (id: number): Promise<Product> => {
     return res.json();
 };
 
-const ModalBuy: React.FC<ProductModalProps> = ({
-    productId,
-    show,
-    onClose,
-}) => {
+const ModalBuy: React.FC<ProductModalProps> = ({ productId, show, onClose, }) => {
     const { t } = useTranslation()
+    const [itemSubProduct, setItemSubProduct] = useState<any>(null);
     const { data: product, isLoading, error } = useQuery({
         queryKey: ["product", productId],
         queryFn: () => fetchProduct(productId!),
@@ -41,13 +46,24 @@ const ModalBuy: React.FC<ProductModalProps> = ({
     });
     const { errors } = usePage().props;
     const storageUrl = usePage().props.storageUrl as string;
+    const { user } = usePage().props.auth as any;
 
-    const formik = useFormik({
+    useEffect(() => {
+        if (product && product.sub_products.length > 0) {
+            setItemSubProduct(product.sub_products[0]);
+        } else {
+            setItemSubProduct(null);
+        }
+    }, [product]);
+
+
+    const formik = useFormik<ProductFormValues>({
         initialValues: {
-            quantity: 0,
-            subProduct: "",
-            price: 0
+            quantity: 1,
+            subProduct: product?.sub_products?.[0]?.id || "",
+            price: product?.sub_products?.[0]?.price || 0,
         },
+        enableReinitialize: true,
         validateOnChange: true,
         validateOnBlur: true,
         validationSchema: Yup.object({
@@ -57,6 +73,10 @@ const ModalBuy: React.FC<ProductModalProps> = ({
         }),
         onSubmit: async (values) => {
             try {
+                if (!user?.balance || user?.balance < (values.price * values.quantity)) {
+                    showToast(t("Your balance is not enough, please recharge"), "error");
+                    return;
+                }
                 const response = await axios.post('/products/checkout', {
                     product_id: productId,
                     sub_product_id: values.subProduct,
@@ -72,6 +92,8 @@ const ModalBuy: React.FC<ProductModalProps> = ({
                 }
             } catch (error) {
                 console.error('Checkout errors:', error);
+            } finally {
+                formik.setSubmitting(false);
             }
         },
     });
@@ -82,6 +104,7 @@ const ModalBuy: React.FC<ProductModalProps> = ({
         onClose();
     };
 
+    console.log({ formQuantity: formik.values.quantity, error: formik.errors });
     return (
         <Modal show={show} onHide={handleClose} centered backdrop="static" size="lg">
             <Modal.Header
@@ -140,8 +163,9 @@ const ModalBuy: React.FC<ProductModalProps> = ({
                                                         id={`sub-${sub.id}`}
                                                         onChange={(e) => {
                                                             formik.handleChange(e);
-                                                            formik.setFieldValue("quantity", sub.quantity ?? 1);
-                                                            formik.setFieldValue("price", sub.price ?? 1);
+                                                            formik.setFieldValue("quantity", 1);
+                                                            formik.setFieldValue("price", sub.price ?? 0);
+                                                            setItemSubProduct(sub);
                                                         }}
                                                         onBlur={formik.handleBlur}
                                                         checked={formik.values.subProduct === String(sub.id)} // ✅ chỉ chọn 1
@@ -161,58 +185,78 @@ const ModalBuy: React.FC<ProductModalProps> = ({
                                         )}
                                     </Form.Group>
 
-                                    <div className="input-step mb-3">
-                                        <button
-                                            type="button"
-                                            className="minus material-shadow"
-                                            disabled={!formik.values.subProduct}
-                                            onClick={() =>
-                                                formik.setFieldValue(
-                                                    "quantity",
-                                                    Math.max(1, Number(formik.values.quantity) - 1)
-                                                )
-                                            }
-                                        >
-                                            –
-                                        </button>
-                                        <Form.Group>
-                                            <Form.Control
-                                                type="text"
-                                                className="text-center"
-                                                name="quantity"
-                                                value={formik.values.quantity}
-                                                onChange={formik.handleChange}
+                                    <div className="d-flex justify-items-center mb-3">
+                                        <div className="input-step">
+                                            <button
+                                                type="button"
+                                                className="minus material-shadow"
                                                 disabled={!formik.values.subProduct}
-                                                min={1}
-                                            />
-                                            <Form.Control.Feedback type="invalid">
-                                                {formik.errors.quantity || errors?.quantity}
-                                            </Form.Control.Feedback>
-                                        </Form.Group>
-                                        <button
-                                            type="button"
-                                            disabled={!formik.values.subProduct}
-                                            className="plus material-shadow"
-                                            onClick={() =>
-                                                formik.setFieldValue(
-                                                    "quantity",
-                                                    Number(formik.values.quantity) + 1
-                                                )
-                                            }
-                                        >
-                                            +
-                                        </button>
+                                                onClick={() =>
+                                                    formik.setFieldValue(
+                                                        "quantity",
+                                                        Math.max(1, Number(formik.values.quantity) - 1)
+                                                    )
+                                                }
+                                            >
+                                                –
+                                            </button>
+                                            <Form.Group>
+                                                <Form.Control
+                                                    type="number"
+                                                    className="text-center"
+                                                    name="quantity"
+                                                    value={formik.values.quantity}
+                                                    onChange={(e) => {
+                                                        formik.setFieldError("quantity", "Exceeded the allowed number of purchases");
+                                                        const value = Number(e.target.value);
+
+                                                        // custom logic
+                                                        if (value < 1) return; // không cho nhỏ hơn 1
+                                                        if (itemSubProduct && value > itemSubProduct.quantity) {
+                                                            formik.setFieldValue("quantity", itemSubProduct.quantity);
+                                                            return;
+                                                        } // không cho lớn hơn quantity hiện có
+
+                                                        // cập nhật formik
+                                                        formik.setFieldValue("quantity", value);
+                                                    }}
+                                                    disabled={!formik.values.subProduct || itemSubProduct?.quantity === 0}
+                                                    min={1}
+                                                />
+                                                <Form.Control.Feedback type="invalid">
+                                                    {formik.errors.quantity || errors?.quantity}
+                                                </Form.Control.Feedback>
+                                            </Form.Group>
+                                            <button
+                                                type="button"
+                                                disabled={!formik.values.subProduct || (formik.values.quantity >= (itemSubProduct?.quantity ?? 0))}
+                                                className="plus material-shadow"
+                                                onClick={() =>
+                                                    formik.setFieldValue(
+                                                        "quantity",
+                                                        Number(formik.values.quantity) + 1
+                                                    )
+                                                }
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                        {
+                                            itemSubProduct && itemSubProduct.quantity === 0 && (
+                                                <div className="text-danger align-self-center ms-2">
+                                                    {t("Out of stock")}
+                                                </div>
+                                            )
+                                        }
+                                        {formik.errors.quantity && (
+                                            <div className="text-danger small">{formik.errors.quantity}</div>
+                                        )}
                                     </div>
                                     <div className="d-flex align-items-center">
-                                        <p className="text-muted mb-0 me-2">Price:</p>
-                                        <span className="fs-18 text-danger">
-                                            $
-                                            <span id="ticket_price" className="product-price">
-                                                {formik.values.price * formik.values.quantity}
-                                            </span>
+                                        <p className="text-muted mb-0 me-2">{t("Price")}:</p>
+                                        <span id="ticket_price" className="fs-18 text-danger product-price">
+                                            {formik.values.price * formik.values.quantity}
                                         </span>
-                                    </div>
-                                    <div className="col-sm-auto">
                                     </div>
                                 </div>
                             </Row>
@@ -227,14 +271,15 @@ const ModalBuy: React.FC<ProductModalProps> = ({
                             style={{ fontWeight: "bold" }}
                             onClick={handleClose}
                         >
-                            Close
+                            {t("Close")}
                         </Button>
                         <Button
                             variant="success"
                             type="submit"
                             style={{ fontWeight: "bold" }}
+                            disabled={isLoading || !product || !formik.isValid || formik.isSubmitting || (itemSubProduct?.quantity === 0)}
                         >
-                            Buy
+                            {formik.isSubmitting ? t("Processing...") : t("Buy")}
                         </Button>
                     </div>
                 </Form>

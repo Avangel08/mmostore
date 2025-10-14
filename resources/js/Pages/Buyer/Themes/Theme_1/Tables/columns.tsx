@@ -1,23 +1,41 @@
-import {ColumnDef} from "@tanstack/react-table";
-import {Link} from "@inertiajs/react";
+import { ColumnDef } from "@tanstack/react-table";
 
 type columns = {
     key: string;
     name: string;
 }
 
+type dataType = {
+    id: number;
+    name: string;
+    short_description: string;
+    price: number;
+    quantity: number;
+    status: boolean;
+    created_at: string;
+    updated_at: string;
+    sub_products: any[];
+}
+
+
 export function columnsApi(columns: columns[], actions: {
     onBuy: (row: any) => void
-}, storageUrl: string): ColumnDef<columns>[] {
+}, storageUrl: string, translate: (key: string) => string): ColumnDef<dataType>[] {
     return columns.map((col) => {
         switch (col.key) {
             case "id":
                 return {
                     accessorKey: col.key,
-                    header: col.name,
+                    header: translate("No."),
                     enableColumnFilter: false,
                     enableSorting: false,
-                    cell: ({row}: any) => {
+                    size: 30,
+                    meta: {
+                        headerClass: "text-center",
+                        cellClass: "text-center",
+                    },
+                    enableResizing: false,
+                    cell: ({ row }: any) => {
                         return (
                             <span className="fw-semibold">{row.index + 1}</span>
                         );
@@ -27,8 +45,13 @@ export function columnsApi(columns: columns[], actions: {
                 return {
                     accessorKey: col.key,
                     header: col.name,
+                    size: 700,
+                    enableResizing: false,
                     enableColumnFilter: false,
                     enableSorting: false,
+                    meta: {
+                        headerClass: "text-center",
+                    },
                     cell: (cell: any) => {
                         return (
                             <>
@@ -43,21 +66,14 @@ export function columnsApi(columns: columns[], actions: {
                                         </div>
                                     </div>
                                     <div className="flex-grow-1">
-                                        <h5 className="fs-14 mb-1">
-                                            <Link
-                                                target="_blank"
-                                                href={`/products/detail/${cell.row.original.slug ?? ''}`}
-                                                className="text-body"
-                                            >
-                                                {" "}
-                                                {cell.getValue()}
-                                            </Link>
+                                        <h5 className="fs-14 mb-1 text-white">
+                                            {cell.getValue()}
                                         </h5>
-                                        <p className="text-muted mb-0">
-                      <span className="fw-medium">
-                        {" "}
-                          {cell.row.original.short_description}
-                      </span>
+                                        <p className="text-white mb-0">
+                                            <span className="fw-medium">
+                                                {" "}
+                                                {cell.row.original.short_description}
+                                            </span>
                                         </p>
                                     </div>
                                 </div>
@@ -71,35 +87,46 @@ export function columnsApi(columns: columns[], actions: {
                     header: () => (
                         <>
                             <i className="ri-shopping-cart-line me-1"></i>
-                            {col.name}
+                            {translate(col.name)}
                         </>
                     ),
                     enableColumnFilter: false,
                     enableSorting: false,
+                    meta: {
+                        headerClass: "text-center",
+                        cellClass: "text-center",
+                    },
                     cell: (info) => {
-                        const value = info.getValue<number>() ?? 0;
+                        const total = info.row.original?.sub_products?.
+                            reduce((sum, item) => sum + (item.quantity ?? 0), 0) ?? 0;
                         return (
-                            <span
-                                className="badge badge-warning text-white fs-14 badge-w badge-h d-flex align-items-center justify-content-center"
-                            >
-                {value}
-              </span>
+                            <div className="d-flex justify-content-center">
+                                <span
+                                    className="badge badge-warning text-white fs-14 badge-w badge-h d-flex align-items-center justify-content-center"
+                                >
+                                    {total}
+                                </span>
+                            </div>
                         );
                     },
                 };
             case "action":
                 return {
                     accessorKey: null,
-                    header: col.name,
+                    header: translate(col.name),
                     enableColumnFilter: false,
                     enableSorting: false,
+                    meta: {
+                        headerClass: "text-center",
+                        cellClass: "text-center",
+                    },
                     cell: (info) => {
                         return (
                             <button
                                 type="button"
                                 className="btn btn-sm btn-success"
                                 onClick={() => actions.onBuy(info.row.original)}
-                            >Mua</button>
+                            >{translate("Buy")}</button>
                         )
                     }
                 }
@@ -109,17 +136,21 @@ export function columnsApi(columns: columns[], actions: {
                     header: () => (
                         <>
                             <i className="ri-price-tag-3-line me-1"></i>
-                            {col.name}
+                            {translate(col.name)}
                         </>
                     ),
                     enableColumnFilter: false,
                     enableSorting: false,
+                    meta: {
+                        headerClass: "text-center",
+                        cellClass: "text-center",
+                    },
                     cell: (info) => {
                         const value = info.getValue<number>() ?? 0;
                         return (
                             <span className="text-success">
-                {value}VNĐ
-              </span>
+                                {value}
+                            </span>
                         );
                     },
                 };

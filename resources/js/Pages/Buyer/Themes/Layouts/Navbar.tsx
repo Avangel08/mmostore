@@ -17,6 +17,7 @@ import NotificationDropdown from "../../../../Components/Common/NotificationDrop
 import ModalLogin from "../../Home/ModalLogin";
 import { useTranslation } from "react-i18next";
 import ProfileDropdown from "../../../../Components/Common/ProfileDropdown";
+import LanguageDropdown from "../../../../Components/Common/LanguageDropdown";
 
 const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
     const dispatch: any = useDispatch();
@@ -186,6 +187,9 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                             </Scrollspy>
 
                             <div className="d-flex align-items-center">
+                                {/* LanguageDropdown */}
+                                <LanguageDropdown />
+
                                 {/* Dark/Light Mode set */}
                                 <LightDark
                                     layoutMode={layoutModeType}
@@ -193,20 +197,22 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                                 />
 
                                 {/* NotificationDropdown */}
-                                <NotificationDropdown />
+                                {/* <NotificationDropdown /> */}
 
                                 {/* ProfileDropdown */}
                                 {user && (
-                                    <div className="ms-sm-2 text-white">
-                                        <span className="d-flex align-items-center">
-                                            <i className="ri-user-line fs-22"></i>
-                                            <span className="d-flex flex-row align-items-center">
-                                                <span className="ms-1 fw-medium user-name-text">{user?.name}</span>
-                                                <span className="ms-1 fs-12">: {user?.balance ?? 0} VND
+                                    <Link href="/profile">
+                                        <div className="ms-sm-2 text-white">
+                                            <span className="d-flex align-items-center">
+                                                <i className="ri-user-line fs-22"></i>
+                                                <span className="d-flex flex-row align-items-center">
+                                                    <span className="ms-1 fw-medium user-name-text">{user?.name}</span>
+                                                    <span className="ms-1 fs-12">: {user?.balance ?? 0} VND
+                                                    </span>
                                                 </span>
                                             </span>
-                                        </span>
-                                    </div>
+                                        </div>
+                                    </Link>
                                 )}
 
                                 {/* User Login/Register */}
