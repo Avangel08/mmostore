@@ -20,13 +20,13 @@ type dataType = {
 
 export function columnsApi(columns: columns[], actions: {
     onBuy: (row: any) => void
-}, storageUrl: string): ColumnDef<dataType>[] {
+}, storageUrl: string, translate: (key: string) => string): ColumnDef<dataType>[] {
     return columns.map((col) => {
         switch (col.key) {
             case "id":
                 return {
                     accessorKey: col.key,
-                    header: col.name,
+                    header: translate("No."),
                     enableColumnFilter: false,
                     enableSorting: false,
                     size: 30,
@@ -66,10 +66,10 @@ export function columnsApi(columns: columns[], actions: {
                                         </div>
                                     </div>
                                     <div className="flex-grow-1">
-                                        <h5 className="fs-14 mb-1 text-body">
+                                        <h5 className="fs-14 mb-1 text-white">
                                             {cell.getValue()}
                                         </h5>
-                                        <p className="text-muted mb-0">
+                                        <p className="text-white mb-0">
                                             <span className="fw-medium">
                                                 {" "}
                                                 {cell.row.original.short_description}
@@ -87,7 +87,7 @@ export function columnsApi(columns: columns[], actions: {
                     header: () => (
                         <>
                             <i className="ri-shopping-cart-line me-1"></i>
-                            {col.name}
+                            {translate(col.name)}
                         </>
                     ),
                     enableColumnFilter: false,
@@ -113,7 +113,7 @@ export function columnsApi(columns: columns[], actions: {
             case "action":
                 return {
                     accessorKey: null,
-                    header: col.name,
+                    header: translate(col.name),
                     enableColumnFilter: false,
                     enableSorting: false,
                     meta: {
@@ -126,7 +126,7 @@ export function columnsApi(columns: columns[], actions: {
                                 type="button"
                                 className="btn btn-sm btn-success"
                                 onClick={() => actions.onBuy(info.row.original)}
-                            >Mua</button>
+                            >{translate("Buy")}</button>
                         )
                     }
                 }
@@ -136,7 +136,7 @@ export function columnsApi(columns: columns[], actions: {
                     header: () => (
                         <>
                             <i className="ri-price-tag-3-line me-1"></i>
-                            {col.name}
+                            {translate(col.name)}
                         </>
                     ),
                     enableColumnFilter: false,

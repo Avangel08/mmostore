@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import TableContainer from "./TableContainer";
 import { columnsApi } from "./columns";
 import { usePage } from "@inertiajs/react";
+import { useTranslation } from "react-i18next";
 
 function CategoryTable({ category, setShow, setSelectedProduct, setOpenLogin }: {
     category: any,
@@ -11,6 +12,8 @@ function CategoryTable({ category, setShow, setSelectedProduct, setOpenLogin }: 
 }) {
     const storageUrl = usePage().props.storageUrl as string;
     const { user } = usePage().props.auth as any;
+    const { t } = useTranslation();
+    const translate = t as (key: string) => string;
 
     const columns = useMemo(() => columnsApi(
         category.columns,
@@ -24,8 +27,9 @@ function CategoryTable({ category, setShow, setSelectedProduct, setOpenLogin }: 
                 }
             }
         },
-        storageUrl
-    ), [category.columns, storageUrl]
+        storageUrl,
+        translate // pass translate function for translations
+    ), [category.columns, storageUrl, translate]
     );
 
     return (

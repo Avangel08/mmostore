@@ -1,45 +1,53 @@
+import { usePage } from '@inertiajs/react';
 import React from 'react';
 
+import secure from '../../../../../../../images/secure.png';
+import { Col, Row } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+
 const Footer: React.FC = () => {
+    const { t } = useTranslation();
 
     return (
         <React.Fragment>
             <div className="footer-bottom" style={{
-                backgroundColor: '#0f172a',
+                backgroundColor: '#014475',
                 padding: '20px 0',
                 color: 'white',
-                width: '100vw',
+                // width: '100vw',
                 marginLeft: 'calc(-50vw + 50%)',
                 position: 'relative'
             }}>
-                <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <div style={{ flex: '1', minWidth: '300px', marginBottom: '10px' }}>
+                <div className='custom-container container-fluid' >
+                    <Row>
+                        <Col lg={6}>
                             <div style={{ fontSize: '14px', lineHeight: '1.8' }}>
                                 <p className="mb-2" style={{ margin: 0 }}>
-                                    - Nghiêm cấm sử dụng tài khoản email với mục đích trái pháp luật
+                                    - {t('It is strictly prohibited to use email accounts for illegal purposes')}
                                 </p>
                                 <p className="mb-0" style={{ margin: 0 }}>
-                                    - Chúng tôi không chịu trách nhiệm cho bất kì hành vi nào sử dụng tài nguyên sai mục đích.
+                                    - {t('We are not responsible for any misuse of resources')}
                                 </p>
                             </div>
-                        </div>
-                        
-                        <div style={{ flex: '0 0 auto', textAlign: 'right' }}>
+                        </Col>
+                        <Col lg={3}>
                             <div style={{ fontSize: '14px', lineHeight: '1.8' }}>
                                 <p className="mb-2" style={{ margin: 0 }}>
                                     <a href="#" style={{ color: 'white', textDecoration: 'none' }}>
-                                        - Điều khoản sử dụng
+                                        - {t('Terms of Service')}
                                     </a>
                                 </p>
                                 <p className="mb-0" style={{ margin: 0 }}>
                                     <a href="#" style={{ color: 'white', textDecoration: 'none' }}>
-                                        - Chính sách bảo mật
+                                        - {t('Privacy Policy')}
                                     </a>
                                 </p>
                             </div>
-                        </div>
-                    </div>
+                        </Col>
+                        <Col lg={3}>
+                            <img className="w-100" src={secure} alt="" />
+                        </Col>
+                    </Row>
                 </div>
             </div>
         </React.Fragment>

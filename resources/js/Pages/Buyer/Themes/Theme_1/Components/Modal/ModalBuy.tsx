@@ -73,10 +73,9 @@ const ModalBuy: React.FC<ProductModalProps> = ({ productId, show, onClose, }) =>
         }),
         onSubmit: async (values) => {
             try {
-                console.log({user})
-                return;
-                if (user && user?.balance < (values.price * values.quantity)) {
+                if (!user?.balance || user?.balance < (values.price * values.quantity)) {
                     showToast(t("Your balance is not enough, please recharge"), "error");
+                    return;
                 }
                 const response = await axios.post('/products/checkout', {
                     product_id: productId,
@@ -93,6 +92,8 @@ const ModalBuy: React.FC<ProductModalProps> = ({ productId, show, onClose, }) =>
                 }
             } catch (error) {
                 console.error('Checkout errors:', error);
+            } finally {
+                formik.setSubmitting(false);
             }
         },
     });
@@ -252,12 +253,9 @@ const ModalBuy: React.FC<ProductModalProps> = ({ productId, show, onClose, }) =>
                                         )}
                                     </div>
                                     <div className="d-flex align-items-center">
-                                        <p className="text-muted mb-0 me-2">Price:</p>
-                                        <span className="fs-18 text-danger">
-                                            $
-                                            <span id="ticket_price" className="product-price">
-                                                {formik.values.price * formik.values.quantity}
-                                            </span>
+                                        <p className="text-muted mb-0 me-2">{t("Price")}:</p>
+                                        <span id="ticket_price" className="fs-18 text-danger product-price">
+                                            {formik.values.price * formik.values.quantity}
                                         </span>
                                     </div>
                                 </div>
@@ -273,15 +271,15 @@ const ModalBuy: React.FC<ProductModalProps> = ({ productId, show, onClose, }) =>
                             style={{ fontWeight: "bold" }}
                             onClick={handleClose}
                         >
-                            Close
+                            {t("Close")}
                         </Button>
                         <Button
                             variant="success"
                             type="submit"
                             style={{ fontWeight: "bold" }}
-                            disabled={isLoading || !product || !formik.isValid}
+                            disabled={isLoading || !product || !formik.isValid || formik.isSubmitting || (itemSubProduct?.quantity === 0)}
                         >
-                            Buy
+                            {formik.isSubmitting ? t("Processing...") : t("Buy")}
                         </Button>
                     </div>
                 </Form>

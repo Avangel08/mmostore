@@ -1,24 +1,11 @@
-import React, {useEffect, useMemo, useState} from "react";
-import TableContainer from "./TableContainer";
-import {Container} from "react-bootstrap";
+import React, { useState } from "react";
+import { Container } from "react-bootstrap";
 
-import vn from "../../../../../../images/flags/vn.svg"
-import us from "../../../../../../images/flags/us.svg"
-import {ColumnDef} from "@tanstack/react-table";
-import {useQuery} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import CategoryTable from "./CategoryTable";
 import ModalBuy from "../Components/Modal/ModalBuy";
 import ModalLogin from "../../../Home/ModalLogin";
-
-type product = {
-    id: number;
-    name: string;
-    usePop3: boolean;
-    live: string;
-    country: string;
-    price: string;
-    quantity: string;
-}
+import { useTranslation } from "react-i18next";
 
 const fetchCategories = async () => {
     const res = await fetch("/products");
@@ -30,16 +17,17 @@ const Table = () => {
     const [show, setShow] = useState(false)
     const [openLogin, setOpenLogin] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
-    const {data: categories, isLoading, error} = useQuery({
+    const { data: categories, isLoading, error } = useQuery({
         queryKey: ["categories"],
         queryFn: fetchCategories,
     });
+    const { t } = useTranslation();
 
     return (
         <React.Fragment>
             <Container fluid className="custom-container">
                 <div className="d-sm-flex align-items-center justify-content-between mt-4 mb-4 page-title">
-                    <h4 className="mb-sm-0 text-white">Bảng giá dịch vụ</h4>
+                    <h4 className="mb-sm-0 text-white">{t("Service price list")}</h4>
                 </div>
                 {categories?.map((category: any) => (
                     <CategoryTable
@@ -64,4 +52,4 @@ const Table = () => {
     );
 }
 
-export {Table};
+export { Table };
