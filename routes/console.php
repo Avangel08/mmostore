@@ -1,6 +1,5 @@
 <?php
 
-use App\Console\Commands\Systems\CheckBank;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
@@ -18,14 +17,3 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
-
-$pathLogs = storage_path('logs' . DIRECTORY_SEPARATOR . date('Ymd'));
-if (!is_dir($pathLogs)) {
-  mkdir($pathLogs, 0777, true);
-}
-
-Schedule::command(CheckBank::class)
-  ->everyMinute()
-  ->withoutOverlapping(10)
-  ->runInBackground()
-  ->appendOutputTo($pathLogs . '/check_bank.txt');
