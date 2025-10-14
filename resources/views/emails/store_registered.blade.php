@@ -19,7 +19,6 @@
         <p><strong>Cửa hàng:</strong> {{ $store_name ?? '' }}</p>
         <p><strong>Tên miền:</strong> <a href="{{ $redirect_url ?? '' }}" target="_blank">{{ $domain ?? '' }}</a></p>
         <p><strong>Tài khoản:</strong> {{ $email ?? '' }}</p>
-        <p><strong>Mật khẩu:</strong> {{ $password ?? '' }}</p>
         <p>Bạn có thể truy cập trang quản trị bằng nút bên dưới.</p>
         <p>
             <a class="btn" href="{{ $redirect_url ?? '' }}" target="_blank">Vào trang quản trị</a>
