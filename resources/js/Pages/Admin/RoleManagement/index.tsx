@@ -44,7 +44,7 @@ const RoleManagement = () => {
 
   return (
     <React.Fragment>
-      <Head title={t("Role")} />
+      <Head title={t("Role")  + " - Admin" } />
       <div className="page-content">
         <ToastContainer />
         <ModalDetailRole show={isOpenAddModal} onHide={toggleOpenAddModal} />

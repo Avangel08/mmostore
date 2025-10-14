@@ -34,11 +34,16 @@ class Accounts extends Model
         'LIVE' => 'LIVE',
         'SOLD' => 'SOLD',
     ];
-    
+
     const INPUT_METHOD = [
         'FILE' => 'file',
         'TEXTAREA' => 'textarea',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Orders::class, 'order_id');
+    }
 
     public function subProduct()
     {
@@ -48,8 +53,8 @@ class Accounts extends Model
     public function scopeFilterProduct($query, $request)
     {
         if (isset($request['product']) && $request['product'] != '') {
-            $query->where('key', 'like', '%'.$request['product'].'%')
-                ->orWhere('data', 'like', '%'.$request['product'].'%');
+            $query->where('key', 'like', '%' . $request['product'] . '%')
+                ->orWhere('data', 'like', '%' . $request['product'] . '%');
         }
 
         return $query;
@@ -67,12 +72,12 @@ class Accounts extends Model
     public function scopeFilterCreatedDate($query, $request)
     {
         try {
-            if (! empty($request['createdDateStart'])) {
+            if (!empty($request['createdDateStart'])) {
                 $start = Carbon::parse($request['createdDateStart'])->startOfDay();
                 $query->where('created_at', '>=', $start);
             }
 
-            if (! empty($request['createdDateEnd'])) {
+            if (!empty($request['createdDateEnd'])) {
                 $end = Carbon::parse($request['createdDateEnd'])->endOfDay();
                 $query->where('created_at', '<=', $end);
             }
@@ -82,10 +87,12 @@ class Accounts extends Model
         return $query;
     }
 
-    public function scopeFilterOrderId($query, $request)
+    public function scopeFilterOrderNumber($query, $request)
     {
-        if (isset($request['orderId']) && $request['orderId'] != '') {
-            $query->where('order_id', 'like', '%'.$request['orderId'].'%');
+        if (isset($request['orderNumber']) && $request['orderNumber'] != '') {
+            $query->whereHas('order', function ($q) use ($request) {
+                $q->where('order_number', 'like', '%' . $request['orderNumber'] . '%');
+            });
         }
 
         return $query;
@@ -93,12 +100,13 @@ class Accounts extends Model
 
     public function scopeFilterSellStatus($query, $request)
     {
-        $sellStatus = $request['sellStatus'] ?? 'unsold';
-        
-        if ($sellStatus == 'sold') {
-            $query->whereNotNull('order_id');
-        } else {
-            $query->whereNull('order_id');
+        if (isset($request['sellStatus']) && $request['sellStatus'] != '') {
+            $sellStatus = $request['sellStatus'] ?? '';
+            if ($sellStatus == 'sold') {
+                $query->whereNotNull('order_id');
+            } else {
+                $query->whereNull('order_id');
+            }
         }
 
         return $query;

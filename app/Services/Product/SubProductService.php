@@ -94,7 +94,9 @@ class SubProductService
                     'whenMatched' => [
                         ['$set' => ['quantity' => '$count']]
                     ],
-                    'whenNotMatched' => 'fail'
+                    'whenNotMatched' => [
+                        ['$set' => ['quantity' => (int) 0]]
+                    ]
                 ]
             ]
         ];

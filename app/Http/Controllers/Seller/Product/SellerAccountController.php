@@ -158,4 +158,31 @@ class SellerAccountController extends Controller
             return back()->with('error', $e->getMessage());
         }
     }
+
+    public function getStatusOptions(Request $request)
+    {
+        try {
+            $searchTerm = $request->input('search', '');
+            $page = (int) $request->input('page', 1);
+            $subProductId = $request->input('sub_product_id');
+
+            if (!$subProductId) {
+                throw new \Exception('Sub product ID is required');
+            }
+
+            $options = $this->sellerAccountService->getStatusOptions($subProductId, $searchTerm, $page, 10);
+
+            return response()->json([
+                'results' => $options['results'] ?? [],
+                'has_more' => $options['has_more'] ?? false,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
+
+            return response()->json([
+                'results' => [],
+                'has_more' => false,
+            ], 500);
+        }
+    }
 }

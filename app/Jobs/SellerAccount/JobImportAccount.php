@@ -74,6 +74,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             $fullPath = Storage::disk('public')->path($this->filePath);
             $timeStart = now();
             $importAccountHistory = ImportAccountHistory::findOrFail($this->importHistoryId);
+            $accountService->clearSubProductAccountCache($this->subProductId);
             $result = $this->processChunk($chunkSize, $fullPath, $timeStart);
             $importAccountHistory->update([
                 'status' => ImportAccountHistory::STATUS['FINISH'],

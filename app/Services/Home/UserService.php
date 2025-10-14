@@ -44,9 +44,18 @@ class UserService
         return User::select($select)->with($relation)->whereIn('id', $ids)->get();
     }
 
-    public function getAll($select = ["*"], $relation = [], $isPaginate = false, $perPage = 10, $page = 1, $orderBy = ['id', 'DESC'])
+    public function getAll($select = ["*"], $relation = [], $isPaginate = false, $perPage = 10, $page = 1, $orderBy = ['id', 'DESC'], $request = null)
     {
         $query = User::select($select)->with($relation);
+
+        // Apply filters if request is provided
+        if ($request) {
+            $query->filterName($request)
+                  ->filterEmail($request)
+                  ->filterType($request)
+                  ->filterStatus($request)
+                  ->filterCreatedDate($request);
+        }
 
         if ($isPaginate) {
             return $query->orderBy(...$orderBy)->paginate($perPage, ['*'], 'page', $page);

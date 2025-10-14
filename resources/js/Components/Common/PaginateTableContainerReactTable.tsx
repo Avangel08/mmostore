@@ -96,7 +96,6 @@ interface TableContainerProps {
   onRowContextMenu?: (event: React.MouseEvent, rowData: any) => void;
   divStyle?: React.CSSProperties;
   tableStyle?: React.CSSProperties;
-  maxHeight?: string | number;
   keyPageParam?: string;
   keyPerPageParam?: string;
   showPaginationEllipsis?: boolean;
@@ -121,7 +120,6 @@ const PaginateTableContainer = ({
   onRowContextMenu,
   divStyle,
   tableStyle,
-  maxHeight = '500px',
   keyPageParam = 'page',
   keyPerPageParam = 'perPage',
   showPaginationEllipsis = false,
@@ -318,9 +316,13 @@ const PaginateTableContainer = ({
       </Row>}
 
 
-      <div className={divClass} style={{ ...divStyle, position: 'relative', maxHeight: maxHeight, overflowY: 'auto' }}>
+      <div className={divClass} style={{ ...divStyle }}>
         <Table hover className={tableClass} bordered={borderClass} style={tableStyle}>
-          <thead className={`${theadClass} sticky-top`} style={{ zIndex: 10 }}>
+          <thead className={`${theadClass} sticky-top`} style={{ 
+            zIndex: 10, 
+            backgroundColor: 'var(--bs-body-bg)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
             {getHeaderGroups().map((headerGroup: any) => (
               <tr className={trClass} key={headerGroup.id}>
                 {headerGroup.headers.map((header: any) => (

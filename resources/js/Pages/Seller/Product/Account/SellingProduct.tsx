@@ -68,9 +68,6 @@ const SellingProduct = () => {
         enableSorting: true,
         cell: (cell: any) => {
           const statusLabel = cell.getValue() || "Unknown";
-          const label = {
-            SOLD: t("Sold"),
-          } as any;
           const className = {
             LIVE: "bg-success",
             BAN: "bg-danger",
@@ -82,16 +79,20 @@ const SellingProduct = () => {
               className={`badge ${className?.[statusLabel] || "bg-dark"
                 } fs-6 fw-medium`}
             >
-              {label?.[statusLabel] || statusLabel}
+              {statusLabel}
             </span>
           );
         },
       },
       {
-        header: t("Order ID"),
-        accessorKey: "order_id",
+        header: t("Order number"),
+        accessorKey: "",
         enableColumnFilter: false,
         enableSorting: true,
+        cell: (cell: any) => {
+          const orderNumber = cell?.row?.original?.order?.order_number || "";
+          return <span>{orderNumber}</span>;
+        }
       },
     ],
     [t]
@@ -136,10 +137,10 @@ const SellingProduct = () => {
   return (
     <>
       <Col lg={12} className="px-4">
-        <SellerAccountFilter onFilter={handleFilter} />
+        <SellerAccountFilter onFilter={handleFilter} subProductId={subProduct?.id} />
       </Col>
       <Col lg={12} className="d-flex justify-content-between mb-4">
-        <h5>{t("Product list")} ({subProduct?.quantity ?? 0} {t("products")})</h5>
+        <h5>{t("Product list")} ({subProduct?.quantity ?? 0} {t("unsold products")})</h5>
         <div className="d-flex gap-2">
           <Button variant="danger" onClick={onDeleteAll}>
             {t("Delete all")}
@@ -165,13 +166,13 @@ const SellingProduct = () => {
             theadClass="table-light"
             enableContextMenu={false}
             isPaginateTable={true}
-            isCursorPaginateTable={true}
             keyPageParam="accountPage"
             keyPerPageParam="accountPerPage"
             onReloadTable={fetchData}
             showPaginationEllipsis={true}
-            maxVisiblePages={7}
+            maxVisiblePages={10}
             perPageEntries={[100, 200, 500, 1000]}
+            divStyle={{ height: "50vh" }}
           />
         </div>
       </Col>

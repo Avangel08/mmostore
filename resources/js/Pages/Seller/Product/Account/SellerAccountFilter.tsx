@@ -4,9 +4,11 @@ import { useTranslation } from "react-i18next";
 import Flatpickr from "react-flatpickr";
 import Select from "react-select";
 import moment from "moment";
+import axios from "axios";
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
 import { english } from "flatpickr/dist/l10n/default.js";
 import { useQueryParams } from "../../../../hooks/useQueryParam";
+import { AsyncPaginate } from "react-select-async-paginate";
 
 interface ProductAccountFilterProps {
   onFilter: (
@@ -14,6 +16,7 @@ interface ProductAccountFilterProps {
     accountPerPage: number,
     filters: ProductAccountFilters
   ) => void;
+  subProductId?: string;
 }
 
 interface ProductAccountFilters {
@@ -21,11 +24,11 @@ interface ProductAccountFilters {
   createdDateStart: string;
   createdDateEnd: string;
   status: string;
-  orderId: string;
+  orderNumber: string;
   sellStatus: string;
 }
 
-const SellerAccountFilter = ({ onFilter }: ProductAccountFilterProps) => {
+const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterProps) => {
   const { t, i18n } = useTranslation();
 
   const flatpickrRef = useRef<any>(null);
@@ -42,8 +45,8 @@ const SellerAccountFilter = ({ onFilter }: ProductAccountFilterProps) => {
       createdDateStart: paramsUrl?.createdDateStart ?? "",
       createdDateEnd: paramsUrl?.createdDateEnd ?? "",
       status: paramsUrl?.status ?? "",
-      orderId: paramsUrl?.orderId ?? "",
-      sellStatus: paramsUrl?.sellStatus ?? "unsold",
+      orderNumber: paramsUrl?.orderNumber ?? "",
+      sellStatus: paramsUrl?.sellStatus ?? "",
     };
   };
 
@@ -51,10 +54,10 @@ const SellerAccountFilter = ({ onFilter }: ProductAccountFilterProps) => {
 
   const statusOptions = [
     { value: "", label: t("All") },
-    { value: "LIVE", label: t("LIVE") },
   ];
 
   const sellStatusOptions = [
+    { value: "", label: t("All") },
     { value: "unsold", label: t("Unsold") },
     { value: "sold", label: t("Sold") },
   ];
@@ -74,7 +77,7 @@ const SellerAccountFilter = ({ onFilter }: ProductAccountFilterProps) => {
       }
     }
 
-    const urlSellStatus = paramsUrl?.sellStatus ?? "unsold";
+    const urlSellStatus = paramsUrl?.sellStatus ?? "";
     const matchingSellStatus = sellStatusOptions.find(
       (option) => option.value === urlSellStatus
     );
@@ -128,15 +131,15 @@ const SellerAccountFilter = ({ onFilter }: ProductAccountFilterProps) => {
     const createdDateStart = paramsUrl?.createdDateStart || "";
     const createdDateEnd = paramsUrl?.createdDateEnd || "";
     const status = paramsUrl?.status || "";
-    const orderId = paramsUrl?.orderId || "";
+    const orderNumber = paramsUrl?.orderNumber || "";
     const sellStatus = paramsUrl?.sellStatus || "";
     return (
       (product !== null && product !== "") ||
       (createdDateStart !== null && createdDateStart !== "") ||
       (createdDateEnd !== null && createdDateEnd !== "") ||
       (status !== null && status !== "") ||
-      (orderId !== null && orderId !== "") ||
-      (sellStatus !== null && sellStatus !== "" && sellStatus !== "unsold")
+      (orderNumber !== null && orderNumber !== "") ||
+      (sellStatus !== null && sellStatus !== "")
     );
   };
 
@@ -146,8 +149,8 @@ const SellerAccountFilter = ({ onFilter }: ProductAccountFilterProps) => {
       createdDateStart: "",
       createdDateEnd: "",
       status: "",
-      orderId: "",
-      sellStatus: "unsold",
+      orderNumber: "",
+      sellStatus: "",
     };
     setFilters(resetFilters);
     setSelectedStatus(statusOptions[0]);
@@ -174,16 +177,15 @@ const SellerAccountFilter = ({ onFilter }: ProductAccountFilterProps) => {
           className="d-flex align-items-center"
         >
           <i
-            className={`ri-filter-${
-              isFilterVisible ? "off" : "2"
-            }-line align-bottom me-2`}
+            className={`ri-filter-${isFilterVisible ? "off" : "2"
+              }-line align-bottom me-2`}
           ></i>
           {isFilterVisible ? t("Hide Filters") : t("Show Filters")}
         </Button>
 
         {hasActiveFilters() && (
           <Button
-            variant="outline-secondary"
+            variant="outline-danger"
             onClick={handleReset}
             className="d-flex align-items-center"
           >
@@ -242,12 +244,12 @@ const SellerAccountFilter = ({ onFilter }: ProductAccountFilterProps) => {
                 value={
                   filters.createdDateStart && filters.createdDateEnd
                     ? [
-                        new Date(filters.createdDateStart),
-                        new Date(filters.createdDateEnd),
-                      ]
+                      new Date(filters.createdDateStart),
+                      new Date(filters.createdDateEnd),
+                    ]
                     : filters.createdDateStart
-                    ? [new Date(filters.createdDateStart)]
-                    : []
+                      ? [new Date(filters.createdDateStart)]
+                      : []
                 }
                 onChange={handleDateChange}
               />
@@ -255,13 +257,39 @@ const SellerAccountFilter = ({ onFilter }: ProductAccountFilterProps) => {
 
             <Col md={4} lg={2}>
               <Form.Label htmlFor="filter-status">{t("Status")}</Form.Label>
-              <Select
+              <AsyncPaginate
                 id="filter-status"
                 value={selectedStatus}
+                loadOptions={async (search, loadedOptions, { page }) => {
+                  if (!subProductId) {
+                    return {
+                      options: [],
+                      hasMore: false,
+                    };
+                  }
+                  const response = await axios.get(route("seller.account.status-options", { sub_product_id: subProductId, search, page }));
+
+                  const options = response?.data?.results?.map((option: any) => ({
+                    value: option?.value ?? "",
+                    label: t(option.label) ?? "",
+                  })) ?? [];
+
+                  return {
+                    options,
+                    hasMore: response.data.has_more,
+                    additional: {
+                      page: page + 1,
+                    },
+                  };
+                }}
+                additional={{
+                  page: 1,
+                }}
+                clearCacheOnMenuClose
+                clearCacheOnSearchChange
                 onChange={handleStatusChange}
                 options={statusOptions}
                 classNamePrefix="select"
-                isSearchable={true}
                 placeholder={t("Select status")}
                 menuPortalTarget={document.body}
                 styles={{
@@ -276,12 +304,12 @@ const SellerAccountFilter = ({ onFilter }: ProductAccountFilterProps) => {
                 type="text"
                 id="filter-order"
                 placeholder={t("Enter Order ID")}
-                value={filters.orderId}
-                onChange={(e) => handleInputChange("orderId", e.target.value)}
+                value={filters.orderNumber}
+                onChange={(e) => handleInputChange("orderNumber", e.target.value)}
               />
             </Col>
 
-            <Col md={12} className="d-flex justify-content-end">
+            <Col md={12}>
               <Button variant="primary" onClick={handleFilter}>
                 <i className="ri-search-line align-bottom me-1"></i>
                 {t("Filter")}

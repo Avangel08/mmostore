@@ -32,11 +32,6 @@ class User extends Authenticatable
 
     protected $table = 'users';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'first_name',
@@ -49,23 +44,73 @@ class User extends Authenticatable
         'image',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    // Filter scopes
+    public function scopeFilterName($query, $request)
+    {
+        if ($request && $request->filled('name')) {
+            return $query->where('name', 'like', '%' . $request->input('name') . '%');
+        }
+        return $query;
+    }
+
+    public function scopeFilterEmail($query, $request)
+    {
+        if ($request && $request->filled('email')) {
+            return $query->where('email', 'like', '%' . $request->input('email') . '%');
+        }
+        return $query;
+    }
+
+    public function scopeFilterType($query, $request)
+    {
+        if ($request && $request->filled('type')) {
+            return $query->where('type', $request->input('type'));
+        }
+        return $query;
+    }
+
+    public function scopeFilterStatus($query, $request)
+    {
+        if ($request && $request->filled('status')) {
+            $statusValue = null;
+            switch ($request->input('status')) {
+                case 'ACTIVE':
+                    $statusValue = self::STATUS['ACTIVE'];
+                    break;
+                case 'INACTIVE':
+                    $statusValue = self::STATUS['INACTIVE'];
+                    break;
+                case 'BLOCK':
+                    $statusValue = self::STATUS['BLOCK'];
+                    break;
+            }
+            if ($statusValue !== null) {
+                return $query->where('status', $statusValue);
+            }
+        }
+        return $query;
+    }
+
+    public function scopeFilterCreatedDate($query, $request)
+    {
+        if ($request) {
+            if ($request->filled('createdDateStart')) {
+                $query->whereDate('created_at', '>=', $request->input('createdDateStart'));
+            }
+            if ($request->filled('createdDateEnd')) {
+                $query->whereDate('created_at', '<=', $request->input('createdDateEnd'));
+            }
+        }
+        return $query;
+    }
 }

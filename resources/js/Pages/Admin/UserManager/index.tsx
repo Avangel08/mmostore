@@ -5,14 +5,16 @@ import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
-import { ModalDetail } from "../UserManager/ModalDetail";
+import { ModalDetail } from "./ModalDetail";
+import UserFilter from "./Filter";
 import Table from "../UserManager/Table";
 import { showToast } from "../../../utils/showToast";
+import PlanFilter from "../Plan/PlanFilter";
 
 const UserManager = () => {
     const { t } = useTranslation();
-    const titleWeb = t("User manager") + " - Admin";
-    const { users, message } = usePage().props as any;
+    const titleWeb = t("User") + " - Admin";
+    const { users, message, status, type } = usePage().props as any;
     const [isOpenAddModal, setIsOpenAddModal] = useState(false);
     const [isOpenEditModal, setIsOpenEditModal] = useState(false);
     const [dataEdit, setDataEdit] = useState<any>(null);
@@ -30,6 +32,30 @@ const UserManager = () => {
                 onReloadTable();
             },
         });
+    };
+
+    const fetchData = (
+        currentPage: number = 1,
+        perPage: number = 10,
+        filters?: any
+    ) => {
+        router.reload({
+            only: ["users"],
+            replace: true,
+            data: {
+                page: currentPage,
+                perPage: perPage,
+                ...filters,
+            },
+        });
+    };
+
+    const handleFilter = (
+        currentPage: number = 1,
+        perPage: number = 10,
+        filters: any
+    ) => {
+        fetchData(currentPage, perPage, filters);
     };
 
     // Handle flash messages from session
@@ -86,11 +112,9 @@ const UserManager = () => {
                         <Col xs={12}>
                             <Card>
                                 <Card.Body>
+                                    <UserFilter onFilter={handleFilter} status={status} type={type} />
                                     <Row style={{ marginBottom: "32px" }}>
                                         <Col>
-                                            {/*<Button variant="success" onClick={ toggleOpenAddModal } className="me-2">*/}
-                                            {/*    <i className="ri-add-line align-bottom me-1"></i>{" "} {t("Add user")}*/}
-                                            {/*</Button>*/}
                                             {selectedIds.length > 0 && (
                                                 <Button variant="danger" onClick={ handleBulkDelete }>
                                                     <i className="ri-delete-bin-5-line align-bottom me-1"></i>{" "} {t("Delete")}
