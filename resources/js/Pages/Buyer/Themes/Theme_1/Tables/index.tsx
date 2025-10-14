@@ -8,6 +8,7 @@ import {ColumnDef} from "@tanstack/react-table";
 import {useQuery} from "@tanstack/react-query";
 import CategoryTable from "./CategoryTable";
 import ModalBuy from "../Components/Modal/ModalBuy";
+import ModalLogin from "../../../Home/ModalLogin";
 
 type product = {
     id: number;
@@ -27,6 +28,7 @@ const fetchCategories = async () => {
 
 const Table = () => {
     const [show, setShow] = useState(false)
+    const [openLogin, setOpenLogin] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
     const {data: categories, isLoading, error} = useQuery({
         queryKey: ["categories"],
@@ -45,6 +47,7 @@ const Table = () => {
                         category={category}
                         setShow={setShow}
                         setSelectedProduct={setSelectedProduct}
+                        setOpenLogin={setOpenLogin}
                     />
                 ))}
             </Container>
@@ -56,6 +59,7 @@ const Table = () => {
                     setSelectedProduct(null)
                 }}
             />
+            <ModalLogin show={openLogin} handleClose={() => { setOpenLogin(false) }} />
         </React.Fragment>
     );
 }
