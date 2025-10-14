@@ -34,7 +34,9 @@ class UserController extends Controller
         $perPage = $request->input('perPage', 10);
 
         return Inertia::render('UserManager/index', [
-            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: []),
+            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: [], request: $request),
+            'status' => fn() => User::STATUS,
+            'type' => fn() => User::TYPE,
             'detail' => fn() => $this->userService->findById(id: $request->input('id'), relation: [])
         ]);
     }
@@ -92,9 +94,6 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Generate a signed login-as URL and redirect to the seller domain.
-     */
     public function loginAs($id)
     {
         $user = $this->userService->findById($id);
@@ -103,18 +102,21 @@ class UserController extends Controller
         }
 
         $store = $this->storeService->findByUserId($user->id);
+
         if (!$store || empty($store->domain) || !is_array($store->domain)) {
             return back()->with('error', 'Store domain not found for this user');
         }
 
         $domains = is_array($store->domain) ? $store->domain : [(string)$store->domain];
         $mainDomain = (string) config('app.main_domain');
+
         $host = collect($domains)->first(function ($d) use ($mainDomain) {
             return is_string($d) && $mainDomain !== '' && str_ends_with($d, '.' . $mainDomain);
         }) ?? $domains[0];
 
         $hostParts = explode('.', (string) $host);
         $sub = $hostParts[0] ?? null;
+
         if (!$sub) {
             return back()->with('error', 'Invalid store domain');
         }

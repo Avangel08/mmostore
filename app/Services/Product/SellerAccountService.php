@@ -6,10 +6,9 @@ use App\Jobs\SellerAccount\JobDeleteUnsoldAccount;
 use App\Jobs\SellerAccount\JobImportAccount;
 use App\Models\Mongo\Accounts;
 use App\Models\Mongo\ImportAccountHistory;
-use App\Models\Mongo\Products;
-use App\Models\Mongo\SubProducts;
 use Carbon\Carbon;
 use Config;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -29,7 +28,8 @@ class SellerAccountService
             ->filterOrderId($request)
             ->filterSellStatus($request)
             ->orderBy('_id', 'desc')
-            ->cursorPaginate($perPage, ['*'], 'page', $page);
+            ->with('order:_id,order_number')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function getById($id, $select = ['*'], $relation = [])
@@ -37,52 +37,37 @@ class SellerAccountService
         return Accounts::select($select)->with($relation)->where('_id', $id)->first();
     }
 
-    public function processAccountFile($data)
+    public function getTagAccountCache($subProductId)
+    {
+        return "seller_accounts_{$subProductId}";
+    }
+
+    public function clearSubProductAccountCache($subProductId)
+    {
+        $tagCache = $this->getTagAccountCache($subProductId);
+        Cache::tags($tagCache)->flush();
+    }
+
+    public function processAccountFile($data, $typeName)
     {
         $inputMethod = $data['input_method'] ?? Accounts::INPUT_METHOD['FILE'];
         $host = request()->getHost();
         $dbConfig = Config::get('database.connections.tenant_mongo');
-        
+
         if ($inputMethod === Accounts::INPUT_METHOD['FILE']) {
             $file = $data['file'];
             $fileName = 'accounts_' . time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs("{$host}/accounts", $fileName, 'public');
             $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-            JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $dbConfig, Accounts::INPUT_METHOD['FILE']);
+            dispatch(new JobImportAccount($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $typeName, $dbConfig, Accounts::INPUT_METHOD['FILE']));
         } elseif ($inputMethod === Accounts::INPUT_METHOD['TEXTAREA']) {
             $content = $data['content'];
             $fileName = 'input_accounts_' . time() . '.txt';
             $filePath = "{$host}/accounts/{$fileName}";
             Storage::disk('public')->put($filePath, $content);
             $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-            JobImportAccount::dispatch($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $dbConfig, Accounts::INPUT_METHOD['TEXTAREA']);
+            dispatch(new JobImportAccount($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $typeName, $dbConfig, Accounts::INPUT_METHOD['TEXTAREA']));
         }
-    }
-
-    public function createAccount(array $data)
-    {
-        $accountData = [
-            'product_id' => $data['product_id'],
-            'sub_product_id' => $data['sub_product_id'],
-            'key' => $data['key'],
-            'data' => $data['data'],
-            'status' => $data['status'],
-            'note' => $data['note'] ?? null,
-            'customer_id' => $data['customer_id'] ?? null,
-            'order_id' => $data['order_id'] ?? null,
-        ];
-
-        return Accounts::create($accountData);
-    }
-
-    public function delete(Accounts $account)
-    {
-        return $account->delete();
-    }
-
-    public function insert($data)
-    {
-        return Accounts::insert($data);
     }
 
     public function createImportAccountHistory($subProductId, $filePath)
@@ -95,11 +80,6 @@ class SellerAccountService
             'result' => null,
             'ended_at' => null,
         ]);
-    }
-
-    public function getUnsoldAccountCountBySubProductId($subProductId)
-    {
-        return Accounts::where('sub_product_id', $subProductId)->whereNull('order_id')->count();
     }
 
     public function deleteOldAccounts(Carbon $timeStart, array $listKey, $subProductId)
@@ -125,9 +105,8 @@ class SellerAccountService
                 ->limit($batchSize)
                 ->forceDelete();
         } while ($deletedCount > 0);
-        $totalProduct = $this->getUnsoldAccountCountBySubProductId($subProductId);
         $subProductService = new SubProductService;
-        $subProductService->updateSubProductQuantity($subProductId, $totalProduct);
+        $subProductService->updateSubProductQuantityWithCount($subProductId);
         // });
     }
 
@@ -163,28 +142,48 @@ class SellerAccountService
 
     public function startDeleteUnsoldAccount($subProductId)
     {
-        JobDeleteUnsoldAccount::dispatch($subProductId, Config::get('database.connections.tenant_mongo'));
+        dispatch(new JobDeleteUnsoldAccount($subProductId, Config::get('database.connections.tenant_mongo')));
     }
 
-    public function checkUniqueData($categoryId, $productTypeId, array $mainData)
+    public function getStatusOptions($subProductId, $searchTerm = '', int $page = 1, int $perPage = 10)
     {
-        if (!$categoryId || !$productTypeId) {
-            return array_fill_keys($mainData, false);
-        }
+        $tagCache = $this->getTagAccountCache($subProductId);
+        $cacheKey = 'account_status_options_' . md5("{$searchTerm}_{$page}_{$perPage}");
 
-        $existingMainData = Accounts::select('main_data')->where('category_id', $categoryId)
-            ->where('product_type_id', $productTypeId)
-            ->whereIn('main_data', $mainData)
-            ->pluck('main_data')
-            ->toArray();
+        return Cache::tags($tagCache)->remember($cacheKey, now()->addMinutes(30), function () use ($searchTerm, $page, $perPage, $subProductId) {
+            $query = Accounts::select('status')
+                ->whereNotNull('status')
+                ->where('sub_product_id', $subProductId)
+                ->groupBy('status');
 
-        $existingMainDataMap = array_flip($existingMainData);
+            if (!empty($searchTerm)) {
+                $query->where('status', 'like', '%' . $searchTerm . '%');
+            }
 
-        $result = [];
-        foreach ($mainData as $data) {
-            $result[$data] = !isset($existingMainDataMap[$data]);
-        }
+            $paginatedResults = $query->orderBy('status')
+                ->paginate($perPage, ['*'], 'page', $page);
 
-        return $result;
+            $statusOptions = collect([]);
+            if ($page == 1) {
+                $statusOptions->push([
+                    'value' => '',
+                    'label' => 'All',
+                ]);
+            }
+
+            $statusData = $paginatedResults->map(
+                fn($item) => [
+                    'value' => $item->status,
+                    'label' => $item->status,
+                ]
+            );
+
+            $statusOptions = $statusOptions->merge($statusData);
+
+            return [
+                'results' => $statusOptions,
+                'has_more' => $paginatedResults->hasMorePages(),
+            ];
+        });
     }
 }

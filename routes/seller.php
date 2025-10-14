@@ -59,6 +59,7 @@ Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
 
                 // seller account
                 Route::group(['prefix' => 'account'], function () {
+                    Route::get('/status-options', [SellerAccountController::class, 'getStatusOptions'])->name('seller.account.status-options');
                     Route::get('/download-unsold-account/{subProductId}', [SellerAccountController::class, 'downloadUnsoldAccounts'])->name('seller.account.download-unsold-account');
                 });
                 Route::resource('account', SellerAccountController::class, ['as' => 'seller']);

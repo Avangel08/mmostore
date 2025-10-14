@@ -2,6 +2,7 @@
 
 namespace App\Services\Product;
 
+use App\Models\Mongo\Accounts;
 use App\Models\Mongo\SubProducts;
 
 /**
@@ -66,8 +67,47 @@ class SubProductService
         return $query->exists();
     }
 
-    public function updateSubProductQuantity($subProductId, $quantity)
+    public function setSubProductQuantity($subProductId, $quantity)
     {
         return SubProducts::where('_id', $subProductId)->update(['quantity' => (int) $quantity]);
+    }
+
+    public function updateSubProductQuantityWithCount($subProductId)
+    {
+        $pipeline = [
+            [
+                '$match' => [
+                    'sub_product_id' => $subProductId,
+                    'order_id' => null
+                ]
+            ],
+            [
+                '$group' => [
+                    '_id' => '$sub_product_id',
+                    'count' => ['$sum' => 1]
+                ]
+            ],
+            [
+                '$merge' => [
+                    'into' => 'sub_products',
+                    'on' => '_id',
+                    'whenMatched' => [
+                        ['$set' => ['quantity' => '$count']]
+                    ],
+                    'whenNotMatched' => [
+                        ['$set' => ['quantity' => (int) 0]]
+                    ]
+                ]
+            ]
+        ];
+
+        try {
+            return Accounts::raw()->aggregate($pipeline)->toArray();
+        } catch (\Exception $e) {
+            $totalProduct = Accounts::where('sub_product_id', $subProductId)
+                ->whereNull('order_id')
+                ->count();
+            return $this->setSubProductQuantity($subProductId, $totalProduct);
+        }
     }
 }

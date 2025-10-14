@@ -29,7 +29,7 @@ interface TableWithContextMenuProps {
   enableContextMenu?: boolean;
   contextMenuConfig?: ContextMenuConfig;
   isPaginateTable?: boolean;
-  onReloadTable?: (page: number, perPage: number) => void;
+  onReloadTable?: ((page: number, perPage: number) => void) | ((cursor: string | null, perPage: number) => void);
   divStyle?: React.CSSProperties;
   tableStyle?: React.CSSProperties;
   keyPageParam?: string;
@@ -70,12 +70,12 @@ const TableWithContextMenu: React.FC<TableWithContextMenuProps> = (props) => {
 
   return props?.isPaginateTable ? (
     props?.isCursorPaginateTable ? (
-      <CursorPaginateTable {...props} onRowContextMenu={handleRowContextMenu} />
+      <CursorPaginateTable {...props as any} onRowContextMenu={handleRowContextMenu} />
     ) : (
-      <PaginateTableContainer {...props} onRowContextMenu={handleRowContextMenu} />
+      <PaginateTableContainer {...props as any} onRowContextMenu={handleRowContextMenu} />
     )
   ) : (
-    <TableContainer {...props} onRowContextMenu={handleRowContextMenu} />
+    <TableContainer {...props as any} onRowContextMenu={handleRowContextMenu} />
   );
 };
 
