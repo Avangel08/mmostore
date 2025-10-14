@@ -92,7 +92,7 @@ const Navbar = () => {
                     </NavbarToggle>
 
                     <Collapse in={isOpenMenu} className="navbar-collapse">
-                        <>
+                        <div>
                             <Scrollspy
                                 offset={-18}
                                 items={[
@@ -145,7 +145,7 @@ const Navbar = () => {
                                     Sign Up
                                 </Link>
                             </div>
-                        </>
+                        </div>
                     </Collapse>
                 </Container>
             </nav>
