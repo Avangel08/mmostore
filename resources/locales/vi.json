@@ -509,5 +509,15 @@
     "Service price list": "Bảng giá dịch vụ",
     "Out of stock": "Hết hàng",
     "It is strictly prohibited to use email accounts for illegal purposes": "Nghiêm cấm sử dụng tài khoản email cho các mục đích bất hợp pháp",
-    "We are not responsible for any misuse of resources": "Chúng tôi không chịu trách nhiệm cho bất kỳ hành vi nào sử dụng tài nguyên sai mục đích."
+    "We are not responsible for any misuse of resources": "Chúng tôi không chịu trách nhiệm cho bất kỳ hành vi nào sử dụng tài nguyên sai mục đích.",
+    "Enter your phone number": "Nhập số điện thoại của bạn",
+    "Phone": "Số điện thoại",
+    "Phone must be at least 8 characters": "Số điện thoại có ít nhất 8 ký tự",
+    "Phone must be at most 15 characters": "Số điện thoại có nhiều nhất 15 ký tự",
+    "Phone is required": "Số điện thoại là bắt buộc",
+    "By registering you agree to the MMO Store": "Bằng cách đăng ký, bạn đồng ý với Cửa hàng MMO",
+    "Terms of Use": "Điều khoản sử dụng",
+    "Get your free MMO Store account now": "Nhận ngay tài khoản MMO Store miễn phí ngay bây giờ",
+    "Create New Account": "Tạo tài khoản mới",
+    "Phone number already exists": "Số điện thoại này đã tồn tại trong hệ thống"
 }

@@ -61,7 +61,6 @@ export default function Login({}: any) {
 
         post(route('seller.login.post', { sub: subdomain }), {
             onSuccess: () => {
-                // Reload page to refresh CSRF token after successful login
                 window.location.reload();
             },
             onError: (errors: any) => {
@@ -148,28 +147,19 @@ export default function Login({}: any) {
                                             </Button>
                                         </Form>
 
-                                        <div className="text-center mt-4">
-                                            <p className="text-muted mb-0">
-                                                { t("Don't have an account?") }
-                                                <Link href="#" className="text-primary text-decoration-none fw-semibold ms-1">
-                                                    { t("Sign Up") }
-                                                </Link>
-                                            </p>
-                                        </div>
+                                        {/*<div className="text-center my-4">*/}
+                                        {/*    <div className="d-flex align-items-center">*/}
+                                        {/*        <hr className="flex-grow-1" />*/}
+                                        {/*        <span className="px-3 text-muted">{ t("OR") }</span>*/}
+                                        {/*        <hr className="flex-grow-1" />*/}
+                                        {/*    </div>*/}
+                                        {/*</div>*/}
 
-                                        <div className="text-center my-4">
-                                            <div className="d-flex align-items-center">
-                                                <hr className="flex-grow-1" />
-                                                <span className="px-3 text-muted">{ t("OR") }</span>
-                                                <hr className="flex-grow-1" />
-                                            </div>
-                                        </div>
-
-                                        <div className="d-flex justify-content-center gap-3">
-                                            <Button  variant="outline-danger"  className="rounded-circle p-3" style={{ width: '60px', height: '60px' }}>
-                                                <i className="ri-google-fill fs-3"></i>
-                                            </Button>
-                                        </div>
+                                        {/*<div className="d-flex justify-content-center gap-3">*/}
+                                        {/*    <Button  variant="outline-danger"  className="rounded-circle p-3" style={{ width: '60px', height: '60px' }}>*/}
+                                        {/*        <i className="ri-google-fill fs-3"></i>*/}
+                                        {/*    </Button>*/}
+                                        {/*</div>*/}
                                     </Card.Body>
                                 </Card>
                             </div>

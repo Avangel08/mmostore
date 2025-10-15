@@ -1,11 +1,184 @@
 import React, { useState } from "react";
 import GuestLayout from "../../../Layouts/GuestLayout";
 import { Head, Link, router, usePage } from "@inertiajs/react";
-import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, Form, Row, InputGroup } from "react-bootstrap";
 import logoLight from "../../../../images/logo-light.png";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {t} from "i18next";
+
+// Component icon cờ quốc gia
+const FlagIcon = ({ countryCode }: { countryCode: string }) => {
+    const flagStyle = {
+        width: '16px',
+        height: '12px',
+        borderRadius: '2px',
+        marginRight: '6px',
+        display: 'inline-block',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        border: '1px solid #ddd',
+        verticalAlign: 'middle'
+    };
+
+    // Sử dụng flagcdn.com để hiển thị cờ quốc gia
+    const getFlagUrl = (code: string) => {
+        const countryMap: { [key: string]: string } = {
+            "+84": "vn", // Vietnam
+            "+1": "us", // United States
+            "+44": "gb", // United Kingdom
+            "+86": "cn", // China
+            "+81": "jp", // Japan
+            "+82": "kr", // South Korea
+            "+65": "sg", // Singapore
+            "+66": "th", // Thailand
+            "+60": "my", // Malaysia
+            "+63": "ph", // Philippines
+            "+62": "id", // Indonesia
+            "+91": "in", // India
+            "+61": "au", // Australia
+            "+64": "nz", // New Zealand
+            "+33": "fr", // France
+            "+49": "de", // Germany
+            "+39": "it", // Italy
+            "+34": "es", // Spain
+            "+7": "ru", // Russia
+            "+55": "br", // Brazil
+            "+52": "mx", // Mexico
+            "+54": "ar", // Argentina
+            "+27": "za", // South Africa
+            "+20": "eg", // Egypt
+            "+971": "ae", // UAE
+            "+966": "sa", // Saudi Arabia
+            "+90": "tr", // Turkey
+            "+98": "ir", // Iran
+            "+92": "pk", // Pakistan
+            "+880": "bd", // Bangladesh
+        };
+        
+        const flagCode = countryMap[code] || "un"; // default to UN flag
+        return `https://flagcdn.com/16x12/${flagCode}.png`;
+    };
+
+    return (
+        <img 
+            src={getFlagUrl(countryCode)} 
+            alt={`Flag of ${countryCode}`}
+            style={flagStyle}
+            onError={(e) => {
+                // Fallback to emoji if image fails to load
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const parent = target.parentNode as HTMLElement;
+                if (parent && !parent.querySelector('.flag-emoji')) {
+                    const emoji = document.createElement('span');
+                    emoji.className = 'flag-emoji';
+                    emoji.textContent = '🏳️';
+                    emoji.style.marginRight = '6px';
+                    emoji.style.fontSize = '14px';
+                    emoji.style.verticalAlign = 'middle';
+                    parent.insertBefore(emoji, target);
+                }
+            }}
+        />
+    );
+};
+
+// Component hiển thị cờ quốc gia thực
+const CountryFlag = ({ countryCode }: { countryCode: string }) => {
+    const getFlagUrl = (code: string) => {
+        const countryMap: { [key: string]: string } = {
+            "+84": "vn", // Vietnam
+            "+1": "us", // United States
+            "+44": "gb", // United Kingdom
+            "+86": "cn", // China
+            "+81": "jp", // Japan
+            "+82": "kr", // South Korea
+            "+65": "sg", // Singapore
+            "+66": "th", // Thailand
+            "+60": "my", // Malaysia
+            "+63": "ph", // Philippines
+            "+62": "id", // Indonesia
+            "+91": "in", // India
+            "+61": "au", // Australia
+            "+64": "nz", // New Zealand
+            "+33": "fr", // France
+            "+49": "de", // Germany
+            "+39": "it", // Italy
+            "+34": "es", // Spain
+            "+7": "ru", // Russia
+            "+55": "br", // Brazil
+            "+52": "mx", // Mexico
+            "+54": "ar", // Argentina
+            "+27": "za", // South Africa
+            "+20": "eg", // Egypt
+            "+971": "ae", // UAE
+            "+966": "sa", // Saudi Arabia
+            "+90": "tr", // Turkey
+            "+98": "ir", // Iran
+            "+92": "pk", // Pakistan
+            "+880": "bd", // Bangladesh
+        };
+        
+        const flagCode = countryMap[code] || "un";
+        return `https://flagcdn.com/20x15/${flagCode}.png`;
+    };
+
+    return (
+        <img 
+            src={getFlagUrl(countryCode)} 
+            alt={`Flag of ${countryCode}`}
+            style={{
+                width: '20px',
+                height: '15px',
+                borderRadius: '2px',
+                marginRight: '8px',
+                display: 'inline-block',
+                verticalAlign: 'middle',
+                border: '1px solid #ddd'
+            }}
+            onError={(e) => {
+                // Fallback nếu ảnh không load được
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+            }}
+        />
+    );
+};
+
+// Danh sách các quốc gia với mã số điện thoại và ISO country code
+const countryCodes = [
+    { code: "+84", country: "Vietnam", isoCode: "VN" },
+    { code: "+1", country: "United States", isoCode: "US" },
+    { code: "+44", country: "United Kingdom", isoCode: "GB" },
+    { code: "+86", country: "China", isoCode: "CN" },
+    { code: "+81", country: "Japan", isoCode: "JP" },
+    { code: "+82", country: "South Korea", isoCode: "KR" },
+    { code: "+65", country: "Singapore", isoCode: "SG" },
+    { code: "+66", country: "Thailand", isoCode: "TH" },
+    { code: "+60", country: "Malaysia", isoCode: "MY" },
+    { code: "+63", country: "Philippines", isoCode: "PH" },
+    { code: "+62", country: "Indonesia", isoCode: "ID" },
+    { code: "+91", country: "India", isoCode: "IN" },
+    { code: "+61", country: "Australia", isoCode: "AU" },
+    { code: "+64", country: "New Zealand", isoCode: "NZ" },
+    { code: "+33", country: "France", isoCode: "FR" },
+    { code: "+49", country: "Germany", isoCode: "DE" },
+    { code: "+39", country: "Italy", isoCode: "IT" },
+    { code: "+34", country: "Spain", isoCode: "ES" },
+    { code: "+7", country: "Russia", isoCode: "RU" },
+    { code: "+55", country: "Brazil", isoCode: "BR" },
+    { code: "+52", country: "Mexico", isoCode: "MX" },
+    { code: "+54", country: "Argentina", isoCode: "AR" },
+    { code: "+27", country: "South Africa", isoCode: "ZA" },
+    { code: "+20", country: "Egypt", isoCode: "EG" },
+    { code: "+971", country: "UAE", isoCode: "AE" },
+    { code: "+966", country: "Saudi Arabia", isoCode: "SA" },
+    { code: "+90", country: "Turkey", isoCode: "TR" },
+    { code: "+98", country: "Iran", isoCode: "IR" },
+    { code: "+92", country: "Pakistan", isoCode: "PK" },
+    { code: "+880", country: "Bangladesh", isoCode: "BD" },
+];
 
 export default function Register() {
     const { props } = usePage();
@@ -14,6 +187,8 @@ export default function Register() {
     const [confirmPasswordShow, setConfirmPasswordShow] = useState<boolean>(false);
     const [serverError, setServerError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [selectedCountryCode, setSelectedCountryCode] = useState<string>("+84");
+    const [agreeToTerms, setAgreeToTerms] = useState<boolean>(false);
 
     // Function to convert store name to domain format
     const generateDomainFromStoreName = (storeName: string): string => {
@@ -43,6 +218,7 @@ export default function Register() {
             email: "",
             store_name: "",
             domain_store: "",
+            phone: "",
             password: "",
             confirm_password: "",
         },
@@ -64,6 +240,11 @@ export default function Register() {
                 .min(3, t("Domain store must be at least 3 characters"))
                 .max(15, t("Domain store must be at most 15 characters"))
                 .required(t("Domain store is required")),
+            phone: Yup.string()
+                .matches(/^[0-9\s\-\+\(\)]+$/, t("Phone number contains invalid characters"))
+                .min(8, t("Phone must be at least 8 characters"))
+                .max(15, t("Phone must be at most 15 characters"))
+                .required(t("Phone is required")),
             password: Yup.string()
                 .min(8, t("Password must be at least 8 characters"))
                 .required(t("Password is required")),
@@ -72,11 +253,16 @@ export default function Register() {
                 .required(t("Password is required")),
         }),
         onSubmit: (values) => {
+            const selectedCountry = countryCodes.find(c => c.code === selectedCountryCode);
             const payload = {
                 ...values,
                 domain_store: values.domain_store
                     .replace(new RegExp(`\\.?${DOMAIN_SUFFIX.replace(/\./g, '\\.')}$`, 'i'), '')
                     .replace(/^\.+/, ''),
+                country_code: selectedCountryCode,
+                country: selectedCountry?.isoCode || 'VN',
+                phone_number: values.phone,
+                full_phone: `${selectedCountryCode}${values.phone}`,
             };
             setIsSubmitting(true);
             router.post(route('home.register.post'), payload, {
@@ -88,7 +274,6 @@ export default function Register() {
                 onError: (errors: any) => {
                     validation.setErrors(errors);
                     const topMessage = Array.isArray(errors?.register) ? errors.register[0] : errors?.register;
-                    setServerError(topMessage || t('Something went wrong. Please try again.'));
                     setIsSubmitting(false);
                 }
             });
@@ -98,6 +283,25 @@ export default function Register() {
 
     return (
         <React.Fragment>
+            <style>
+                {`
+                    .country-code-select option {
+                        font-size: 14px !important;
+                        font-weight: 500 !important;
+                        padding: 8px 12px !important;
+                    }
+                    .country-code-select {
+                        background-image: none !important;
+                    }
+                    .country-code-select:focus {
+                        border-color: #86b7fe !important;
+                        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+                    }
+                    .country-code-select option:first-child {
+                        background-color: #f8f9fa;
+                    }
+                `}
+            </style>
             <GuestLayout>
                 <Head title="Basic SignUp | Velzon - React Admin & Dashboard Template" />
                 <div className="auth-page-content mt-lg-5">
@@ -110,18 +314,17 @@ export default function Register() {
                                             <img src={logoLight} alt="" height="20"/>
                                         </Link>
                                     </div>
-                                    <p className="mt-3 fs-15 fw-medium">Premium Admin & Dashboard Template</p>
                                 </div>
                             </Col>
                         </Row>
 
                         <Row className="justify-content-center">
-                            <Col md={8} lg={6} xl={5}>
+                            <Col md={9} lg={7} xl={6}>
                                 <Card className="mt-4">
-                                    <Card.Body className="p-4">
+                                    <Card.Body>
                                         <div className="text-center mt-2">
-                                            <h5 className="text-primary">Create New Account</h5>
-                                            <p className="text-muted">Get your free mmoshop account now</p>
+                                            <h5 className="text-primary">{t('Create New Account')}</h5>
+                                            <p className="text-muted">{t('Get your free MMO Store account now')}</p>
                                         </div>
                                         <div className="p-2 mt-4">
                                             {serverError && (
@@ -154,6 +357,49 @@ export default function Register() {
                                                     </div>
                                                 </div>
                                                 <div className="mb-3">
+                                                    <Form.Label className="form-label" htmlFor="phone-number">{t("Phone")} <span className="text-danger">*</span></Form.Label>
+                                                    <InputGroup className="position-relative auth-phone-inputgroup">
+                                                        <div className="d-flex align-items-center rounded-start" style={{
+                                                            padding: '5px 5px'
+                                                        }}>
+                                                            <CountryFlag countryCode={selectedCountryCode} />
+                                                        </div>
+                                                        <Form.Select
+                                                            value={selectedCountryCode}
+                                                            onChange={(e) => setSelectedCountryCode(e.target.value)}
+                                                            className="country-code-select"
+                                                            style={{ 
+                                                                borderRadius: 'var(--vz-border-radius) 0 0 var(--vz-border-radius)',
+                                                            }}
+                                                        >
+                                                            {countryCodes.map((country) => (
+                                                                <option key={country.code} value={country.code}>
+                                                                    {country.country} ({country.code})
+                                                                </option>
+                                                            ))}
+                                                        </Form.Select>
+                                                        <Form.Control
+                                                            type="tel"
+                                                            className="form-control phone-input"
+                                                            placeholder={t("Enter your phone number")}
+                                                            id="phone-number"
+                                                            name="phone"
+                                                            value={validation.values.phone}
+                                                            onBlur={validation.handleBlur}
+                                                            onChange={validation.handleChange}
+                                                            isInvalid={validation.errors.phone && validation.touched.phone ? true : false}
+                                                            style={{
+                                                                borderColor: validation.errors.phone && validation.touched.phone ? '#ced4da' : undefined,
+                                                                backgroundImage: validation.errors.phone && validation.touched.phone ? 'none' : undefined,
+                                                                minWidth: '260px'
+                                                            }}
+                                                        />
+                                                        {validation.errors.phone && validation.touched.phone ? (
+                                                            <Form.Control.Feedback type="invalid" style={{display: 'block'}}>{validation.errors.phone}</Form.Control.Feedback>
+                                                        ) : null}
+                                                    </InputGroup>
+                                                </div>
+                                                <div className="mb-3">
                                                     <Form.Label className="form-label" htmlFor="store-name">{t("Store name")} <span className="text-danger">*</span></Form.Label>
                                                     <div className="position-relative auth-store-name-inputgroup">
                                                         <Form.Control
@@ -168,7 +414,6 @@ export default function Register() {
                                                                 const storeName = e.target.value;
                                                                 validation.setFieldValue('store_name', storeName);
                                                                 
-                                                                // Auto-generate domain_store if store_name is not empty
                                                                 if (storeName && storeName.trim() !== '') {
                                                                     const generatedDomain = generateDomainFromStoreName(storeName);
                                                                     validation.setFieldValue('domain_store', `${generatedDomain}.${DOMAIN_SUFFIX}`);
@@ -280,13 +525,33 @@ export default function Register() {
                                                 </div>
 
                                                 <div className="mb-4">
-                                                    <p className="mb-0 fs-12 text-muted fst-italic">By registering you agree to the MMO Store
-                                                        <Link href="#" className="text-primary text-decoration-underline fst-normal fw-medium ms-2">Terms of Use</Link>
-                                                    </p>
+                                                    <div className="form-check">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="agree-terms"
+                                                            checked={agreeToTerms}
+                                                            onChange={(e) => setAgreeToTerms(e.target.checked)}
+                                                            className="form-check-input"
+                                                        />
+                                                        <Form.Label htmlFor="agree-terms" className="form-check-label fs-12 text-muted fst-italic">
+                                                            {t('By registering you agree to the MMO Store')}
+                                                            <Link href="#" className="text-primary text-decoration-underline fst-normal fw-medium ms-1">{t('Terms of Use')}</Link>
+                                                        </Form.Label>
+                                                    </div>
                                                 </div>
 
                                                 <div className="mt-4">
-                                                    <button className="btn btn-success w-100" type="submit" disabled={isSubmitting}>{ t("Sign up store") }</button>
+                                                    <button 
+                                                        className="btn btn-success w-100" 
+                                                        type="submit" 
+                                                        disabled={isSubmitting || !agreeToTerms}
+                                                        style={{
+                                                            opacity: (!agreeToTerms && !isSubmitting) ? 0.6 : 1,
+                                                            cursor: (!agreeToTerms && !isSubmitting) ? 'not-allowed' : 'pointer'
+                                                        }}
+                                                    >
+                                                        { t("Sign up store") }
+                                                    </button>
                                                 </div>
 
                                                 {/*<div className="mt-4 text-center">*/}
