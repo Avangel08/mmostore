@@ -76,6 +76,7 @@ class JobProcessPurchase implements ShouldQueue
     ): void {
         try {
             $store = $storeService->findById($this->storeId);
+            $order = $orderService->findById($this->orderId);
 
             if (empty($store)) {
                 echo "Store not found" . PHP_EOL;
@@ -125,9 +126,9 @@ class JobProcessPurchase implements ShouldQueue
                     'amount' => -$totalPrice,
                     'before' => null,
                     'after' => null,
-                    'description' => "Purchase : {$subProduct->name}, Quantity: {$this->quantity}",
+                    'description' => "{$subProduct->name}, {$this->quantity}",
                     'date_at' => now(),
-                    'transaction' => $this->orderId ?? 'PURCHASE_' . time()
+                    'transaction' => $order->order_number ?? 'PURCHASE_' . time()
                 ]);
             } catch (\Exception $e) {
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
