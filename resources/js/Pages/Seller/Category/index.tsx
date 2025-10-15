@@ -54,9 +54,14 @@ const Category = () => {
     });
   };
 
-  const onDelete = async (id: number | string) => {
+  const onDelete = async (id: number | string, name: string) => {
+    if (!id) {
+      showToast(t("Invalid ID"), "error");
+      return;
+    }
+
     const confirmed = await confirmDelete({
-      title: t("Delete this item?"),
+      title: t("Delete category '{{name}}'?", { name }),
       text: t("Once deleted, you will not be able to recover it."),
       confirmButtonText: t("Delete now"),
       cancelButtonText: t("Cancel"),

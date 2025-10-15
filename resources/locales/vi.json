@@ -549,5 +549,7 @@
     "Enter content here (each line will be 1 resource)": "Nhập nội dung ở đây (mỗi dòng sẽ là 1 tài nguyên)",
     "LIVE means the resource is ready for sale": "LIVE có nghĩa là tài nguyên đã sẵn sàng để bán",
     "Note: Each line will be 1 resource": "Ghi chú: Mỗi dòng sẽ là 1 tài nguyên",
-    "Variant": "Biến thể"
+    "Variant": "Biến thể",
+    "Delete category '{{name}}'?": "Xoá danh mục '{{name}}'?",
+    "Invalid ID": "ID không hợp lệ"
 }
