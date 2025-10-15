@@ -28,14 +28,13 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
     protected $importHistoryId;
     protected $typeName;
     protected $dbConfig;
-    protected $inputMethod;
     protected $uniqueKeys;
     public $uniqueFor = 3600;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($filePath, $productId, $subProductId, $importHistoryId, $typeName, $dbConfig, $inputMethod = Accounts::INPUT_METHOD['FILE'])
+    public function __construct($filePath, $productId, $subProductId, $importHistoryId, $typeName, $dbConfig)
     {
         $this->filePath = $filePath;
         $this->productId = $productId;
@@ -43,7 +42,6 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
         $this->importHistoryId = $importHistoryId;
         $this->typeName = $typeName;
         $this->dbConfig = $dbConfig;
-        $this->inputMethod = $inputMethod;
         $this->uniqueKeys = [];
         $this->queue = 'process_seller_account';
     }
@@ -68,10 +66,10 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
         try {
             // DB::beginTransaction();
             // echo "Start processing import account for sub_product_id {$this->subProductId}".PHP_EOL;
-            $this->setMemoryLimit('1G');
+            $this->setMemoryLimit('2G');
             Config::set('database.connections.tenant_mongo', $this->dbConfig);
             $chunkSize = 1000;
-            $fullPath = Storage::disk('public')->path($this->filePath);
+            $fullPath = Storage::disk('local')->path($this->filePath);
             $timeStart = now();
             $importAccountHistory = ImportAccountHistory::findOrFail($this->importHistoryId);
             $accountService->clearSubProductAccountCache($this->subProductId);
@@ -84,11 +82,11 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             // echo "Finished processing import account for sub_product_id {$this->subProductId}: {$result['total_count']} total, {$result['success_count']} success, {$result['error_count']} errors".PHP_EOL;
             // echo 'Deleting old accounts...'.PHP_EOL;
             if ($result['success_count'] > 0) {
-                $this->deleteOldAccounts($chunkSize, $timeStart, $accountService);
+                dispatch(new JobDeleteOldAccount($this->subProductId, $this->uniqueKeys, $timeStart, $this->dbConfig));
             }
-            $subProductService->updateSubProductQuantityWithCount($this->subProductId);
             // echo 'Delete old accounts done.'.PHP_EOL;
             // DB::commit();
+            return $result;
         } catch (Exception $e) {
             // DB::rollBack();
             // echo 'Error processing import account: '.$e->getMessage().PHP_EOL;
@@ -99,6 +97,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             throw $e;
         } finally {
             unset($this->uniqueKeys);
+            unset($result);
         }
     }
 
@@ -107,6 +106,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
         $totalCount = 0;
         $successCount = 0;
         $errorCount = 0;
+        $errors = [];
         $isNeedCheckMail = str_contains(strtolower($this->typeName), 'mail');
 
         LazyCollection::make(function () use ($fullPath) {
@@ -116,17 +116,19 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             }
             fclose($handle);
         })
-            ->map(function ($line) use (&$totalCount, &$successCount, &$errorCount, $timeStart, $isNeedCheckMail) {
+            ->map(function ($line) use (&$totalCount, &$successCount, &$errorCount, $timeStart, $isNeedCheckMail, &$errors) {
                 $totalCount++;
                 $line = trim($line);
                 if (empty($line)) {
                     $errorCount++;
+                    $errors["Line {$totalCount}"] = 'Empty line';
                     return null;
                 }
 
                 $parts = explode('|', $line);
                 if (count($parts) < 1) {
                     $errorCount++;
+                    $errors["Line {$totalCount} ({$line})"] = 'Empty format';
                     return null;
                 }
 
@@ -142,11 +144,13 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 $mainData = strtolower(trim($parts[$isStatusSection ? 1 : 0] ?? ''));
                 if (empty($mainData)) {
                     $errorCount++;
+                    $errors["Line {$totalCount} ({$line})"] = 'Empty main data';
                     return null;
                 }
 
                 if ($isNeedCheckMail && !filter_var($mainData, FILTER_VALIDATE_EMAIL)) {
                     $errorCount++;
+                    $errors["Line {$totalCount} ({$line})"] = 'Invalid email format';
                     return null;
                 }
 
@@ -156,17 +160,18 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 foreach ($remainData as $remainPart) {
                     if (trim($remainPart) == '') {
                         $errorCount++;
+                        $errors["Line {$totalCount} ({$line})"] = 'Empty remain data';
                         return null;
                     }
                 }
 
-                unset($line);
-
                 if (isset($this->uniqueKeys[$key])) {
                     $errorCount++;
+                    $errors["Line {$totalCount} ({$line})"] = 'Duplicate data';
                     return null;
                 }
-
+                
+                unset($line);
                 $this->uniqueKeys[$key] = true;
                 return [
                     'key' => (string) $key,
@@ -184,13 +189,14 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             })
             ->filter()
             ->chunk($chunkSize)
-            ->each(function (LazyCollection $data) use (&$successCount, &$errorCount) {
+            ->each(function (LazyCollection $data, $index) use (&$successCount, &$errorCount, &$errors) {
                 $isSuccess = $this->processInsert($data);
                 $dataCount = $data->count();
                 if ($isSuccess) {
                     $successCount += $dataCount;
                 } else {
                     $errorCount += $dataCount;
+                    $errors["Batch of {$dataCount} accounts in chunk {$index}"] = 'Failed to insert';
                 }
                 unset($data);
             });
@@ -199,6 +205,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             'total_count' => (int) $totalCount,
             'success_count' => (int) $successCount,
             'error_count' => (int) $errorCount,
+            'errors' => $errors
         ];
     }
 
@@ -239,13 +246,5 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
     public function setMemoryLimit(string $limit)
     {
         ini_set('memory_limit', $limit);
-    }
-
-    public function deleteOldAccounts($chunkSize, $timeStart, SellerAccountService $accountService)
-    {
-        LazyCollection::make($this->uniqueKeys)->chunk($chunkSize)->each(function (LazyCollection $keys) use ($accountService, $timeStart) {
-            $accountService->deleteOldAccounts($timeStart, $keys->keys()->toArray(), $this->subProductId);
-            unset($keys);
-        });
     }
 }

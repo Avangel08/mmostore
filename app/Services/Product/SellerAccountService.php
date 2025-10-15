@@ -51,23 +51,49 @@ class SellerAccountService
     public function processAccountFile($data, $typeName)
     {
         $inputMethod = $data['input_method'] ?? Accounts::INPUT_METHOD['FILE'];
+
+        $productId = $data['product_id'];
+        $subProductId = $data['sub_product_id'];
+
+        if ($inputMethod === Accounts::INPUT_METHOD['FILE']) {
+            $this->handleFileImport($data['file'], $productId, $subProductId, $typeName);
+        } elseif ($inputMethod === Accounts::INPUT_METHOD['TEXTAREA']) {
+            $this->handleRawContentImport($data['content'], $productId, $subProductId, $typeName);
+        }
+    }
+
+    public function handleFileImport($file, $productId, $subProductId, $typeName)
+    {
         $host = request()->getHost();
         $dbConfig = Config::get('database.connections.tenant_mongo');
 
-        if ($inputMethod === Accounts::INPUT_METHOD['FILE']) {
-            $file = $data['file'];
-            $fileName = 'accounts_' . time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs("{$host}/accounts", $fileName, 'public');
-            $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-            dispatch(new JobImportAccount($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $typeName, $dbConfig, Accounts::INPUT_METHOD['FILE']));
-        } elseif ($inputMethod === Accounts::INPUT_METHOD['TEXTAREA']) {
-            $content = $data['content'];
-            $fileName = 'input_accounts_' . time() . '.txt';
-            $filePath = "{$host}/accounts/{$fileName}";
-            Storage::disk('public')->put($filePath, $content);
-            $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-            dispatch(new JobImportAccount($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $typeName, $dbConfig, Accounts::INPUT_METHOD['TEXTAREA']));
+        $fileName = 'accounts_' . time() . '_' . $file->getClientOriginalName();
+        $filePath = $file->storeAs("{$host}/accounts", $fileName, 'local');
+        $importAccountHistory = $this->createImportAccountHistory($subProductId, $filePath);
+        dispatch(new JobImportAccount($filePath, $productId, $subProductId, $importAccountHistory?->id, $typeName, $dbConfig));
+    }
+
+    public function handleRawContentImport($content, $productId, $subProductId, $typeName, bool $isSync = false)
+    {
+        $host = request()->getHost();
+        $dbConfig = Config::get('database.connections.tenant_mongo');
+
+        $fileName = 'input_accounts_' . time() . '.txt';
+        $filePath = "{$host}/accounts/{$fileName}";
+        Storage::disk('local')->put($filePath, $content);
+        $importAccountHistory = $this->createImportAccountHistory($subProductId, $filePath);
+
+        $jobImport = new JobImportAccount($filePath, $productId, $subProductId, $importAccountHistory?->id, $typeName, $dbConfig);
+        if ($isSync) {
+            $result = app()->call([$jobImport, 'handle']);
+            return $result;
         }
+        dispatch($jobImport);
+    }
+
+    public function processApiAccount($content, $productId, $subProductId, $typeName)
+    {
+        return $this->handleRawContentImport($content, $productId, $subProductId, $typeName, true);
     }
 
     public function createImportAccountHistory($subProductId, $filePath)

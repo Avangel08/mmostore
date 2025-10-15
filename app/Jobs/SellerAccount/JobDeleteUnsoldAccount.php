@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Cache;
+use Throwable;
 
 class JobDeleteUnsoldAccount implements ShouldBeUnique, ShouldQueue
 {
@@ -49,7 +50,7 @@ class JobDeleteUnsoldAccount implements ShouldBeUnique, ShouldQueue
         try {
             Config::set('database.connections.tenant_mongo', $this->dbConfig);
             // echo "Start delete unsold account for sub_product_id {$this->subProductId}".PHP_EOL;
-             $accountService->clearSubProductAccountCache($this->subProductId);
+            $accountService->clearSubProductAccountCache($this->subProductId);
             $accountService->deleteUnsoldAccounts($this->subProductId);
             // echo "Finished delete unsold account for sub_product_id {$this->subProductId}".PHP_EOL;
         } catch (Exception $e) {
@@ -58,7 +59,7 @@ class JobDeleteUnsoldAccount implements ShouldBeUnique, ShouldQueue
         }
     }
 
-    public function failed(Exception $exception): void
+    public function failed(Throwable $exception): void
     {
         // echo 'Job delete unsold account failed: '.$exception->getMessage().PHP_EOL;
     }

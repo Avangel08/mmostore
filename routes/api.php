@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\Seller\Product\ApiSellerAccountController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['validate.subdomain', 'body.token', 'auth:sanctum'])->prefix('v1')->group(function () {
-    Route::get("/", [ApiController::class, 'user']);
-});
+Route::middleware(['body.token', 'auth:sanctum', 'validate.subdomain', 'tenant.mongo'])
+    ->prefix('v1')
+    ->group(function () {
+        Route::apiResource('accounts', ApiSellerAccountController::class);
+    });

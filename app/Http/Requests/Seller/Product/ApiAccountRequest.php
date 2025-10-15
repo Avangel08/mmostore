@@ -28,6 +28,8 @@ class ApiAccountRequest extends FormRequest
         return match ($action) {
             'store' => [
                 'sub_product_id' => ['required', 'string', 'exists:tenant_mongo.sub_products,_id'],
+                'accounts' => ['required', 'array', 'min:1', 'max:100000'],
+                'accounts.*' => ['nullable', 'string'],
             ],
             default => [],
         };

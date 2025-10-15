@@ -532,5 +532,6 @@
     "Delete this token?": "Xoá token này?",
     "No token available to delete": "Không có token nào để xoá",
     "Copied": "Đã sao chép",
-    "Last use": "Lần sử dụng cuối"
+    "Last use": "Lần sử dụng cuối",
+    "Upload history": "Lịch sử tải lên"
 }
