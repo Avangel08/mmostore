@@ -108,7 +108,7 @@ class SellerAccountController extends Controller
         return Inertia::render('Product/Account/index', [
             'subProduct' => fn() => $this->subProductService->getById(
                 $subProductId,
-                ['id', 'product_id', 'quantity'],
+                ['id', 'name', 'product_id', 'quantity'],
                 [
                     'product:id,name,category_id,product_type_id',
                     'product.productType:id,name',
@@ -138,7 +138,7 @@ class SellerAccountController extends Controller
             if (!$subProduct) {
                 throw new \Exception('Sub product not found');
             }
-            $this->sellerAccountService->startDeleteUnsoldAccount($subProductId);
+            $this->sellerAccountService->startDeleteAllUnsoldAccount($subProductId);
 
             return back()->with('success', 'Success. Unsold accounts will be deleted after a few minutes');
         } catch (\Exception $e) {

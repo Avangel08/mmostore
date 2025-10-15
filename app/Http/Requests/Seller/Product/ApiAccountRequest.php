@@ -24,10 +24,16 @@ class ApiAccountRequest extends FormRequest
     public function rules(): array
     {
         $action = $this->route()->getActionMethod();
-
         return match ($action) {
             'store' => [
-                'sub_product_id' => ['required', 'string', 'exists:tenant_mongo.sub_products,_id'],
+                'sub_product_id' => ['required', 'string'],
+                'accounts' => ['required', 'array', 'min:1', 'max:100000'],
+                'accounts.*' => ['nullable', 'string'],
+            ],
+            'destroy' => [
+                'sub_product_id' => ['required', 'string'],
+                'accounts' => ['nullable', 'array', 'min:1', 'max:100000'],
+                'accounts.*' => ['nullable', 'string'],
             ],
             default => [],
         };

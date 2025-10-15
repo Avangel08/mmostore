@@ -8,6 +8,7 @@ use Auth;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Queue\Jobs\Job;
+use Illuminate\Support\Carbon;
 use MongoDB\Laravel\Auth\User as Authenticatable;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
@@ -67,9 +68,15 @@ class Customers extends Authenticatable
 
     public function scopeFilterCreatedDate($query, $request)
     {
-        if (isset($request['start_time']) && $request['start_time'] != '' && isset($request['end_time']) && $request['end_time'] != '') {
-            $query->whereBetween('created_at', [$request['start_time'], $request['end_time']]);
+        if(isset($request['start_time']) && $request['start_time']){
+            $start_time = Carbon::parse($request['start_time'])->startOfDay();
+            $query->where('created_at', '>=', $start_time);
         }
+        if (isset($request['end_time']) && $request['end_time']){
+            $end_time = Carbon::parse($request['end_time'])->endOfDay();
+            $query->where('created_at', '<=', $end_time);
+        }
+        return $query;
     }
 }
 

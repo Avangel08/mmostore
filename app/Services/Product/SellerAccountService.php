@@ -51,23 +51,49 @@ class SellerAccountService
     public function processAccountFile($data, $typeName)
     {
         $inputMethod = $data['input_method'] ?? Accounts::INPUT_METHOD['FILE'];
+
+        $productId = $data['product_id'];
+        $subProductId = $data['sub_product_id'];
+
+        if ($inputMethod === Accounts::INPUT_METHOD['FILE']) {
+            $this->handleFileImport($data['file'], $productId, $subProductId, $typeName);
+        } elseif ($inputMethod === Accounts::INPUT_METHOD['TEXTAREA']) {
+            $this->handleRawContentImport($data['content'], $productId, $subProductId, $typeName);
+        }
+    }
+
+    public function handleFileImport($file, $productId, $subProductId, $typeName)
+    {
         $host = request()->getHost();
         $dbConfig = Config::get('database.connections.tenant_mongo');
 
-        if ($inputMethod === Accounts::INPUT_METHOD['FILE']) {
-            $file = $data['file'];
-            $fileName = 'accounts_' . time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs("{$host}/accounts", $fileName, 'public');
-            $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-            dispatch(new JobImportAccount($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $typeName, $dbConfig, Accounts::INPUT_METHOD['FILE']));
-        } elseif ($inputMethod === Accounts::INPUT_METHOD['TEXTAREA']) {
-            $content = $data['content'];
-            $fileName = 'input_accounts_' . time() . '.txt';
-            $filePath = "{$host}/accounts/{$fileName}";
-            Storage::disk('public')->put($filePath, $content);
-            $importAccountHistory = $this->createImportAccountHistory($data['sub_product_id'], $filePath);
-            dispatch(new JobImportAccount($filePath, $data['product_id'], $data['sub_product_id'], $importAccountHistory?->id, $typeName, $dbConfig, Accounts::INPUT_METHOD['TEXTAREA']));
+        $fileName = 'accounts_' . time() . '_' . $file->getClientOriginalName();
+        $filePath = $file->storeAs("{$host}/accounts", $fileName, 'local');
+        $importAccountHistory = $this->createImportAccountHistory($subProductId, $filePath);
+        dispatch(new JobImportAccount($filePath, $productId, $subProductId, $importAccountHistory?->id, $typeName, $dbConfig));
+    }
+
+    public function handleRawContentImport($content, $productId, $subProductId, $typeName, bool $isSync = false)
+    {
+        $host = request()->getHost();
+        $dbConfig = Config::get('database.connections.tenant_mongo');
+
+        $fileName = 'input_accounts_' . time() . '.txt';
+        $filePath = "{$host}/accounts/{$fileName}";
+        Storage::disk('local')->put($filePath, $content);
+        $importAccountHistory = $this->createImportAccountHistory($subProductId, $filePath);
+
+        $jobImport = new JobImportAccount($filePath, $productId, $subProductId, $importAccountHistory?->id, $typeName, $dbConfig);
+        if ($isSync) {
+            $result = app()->call([$jobImport, 'handle']);
+            return $result;
         }
+        dispatch($jobImport);
+    }
+
+    public function processApiAccount($content, $productId, $subProductId, $typeName)
+    {
+        return $this->handleRawContentImport($content, $productId, $subProductId, $typeName, true);
     }
 
     public function createImportAccountHistory($subProductId, $filePath)
@@ -84,13 +110,13 @@ class SellerAccountService
 
     public function deleteOldAccounts(Carbon $timeStart, array $listKey, $subProductId)
     {
-        $batchSize = 1000;
+        $limit = 1000;
         do {
             $deletedCount = Accounts::where('sub_product_id', $subProductId)
                 ->whereNull('order_id')
                 ->whereIn('key', $listKey)
                 ->where('created_at', '<', new \MongoDB\BSON\UTCDateTime($timeStart))
-                ->limit($batchSize)
+                ->limit($limit)
                 ->forceDelete();
         } while ($deletedCount > 0);
     }
@@ -98,15 +124,14 @@ class SellerAccountService
     public function deleteUnsoldAccounts($subProductId)
     {
         // DB::transaction(function () use ($subProductId) {
-        $batchSize = 1000;
+        $limit = 1000;
         do {
             $deletedCount = Accounts::where('sub_product_id', $subProductId)
                 ->whereNull('order_id')
-                ->limit($batchSize)
+                ->limit($limit)
                 ->forceDelete();
         } while ($deletedCount > 0);
-        $subProductService = new SubProductService;
-        $subProductService->updateSubProductQuantityWithCount($subProductId);
+        app(SubProductService::class)->updateSubProductQuantityWithCount($subProductId);
         // });
     }
 
@@ -140,9 +165,35 @@ class SellerAccountService
         }, 200, $headers);
     }
 
-    public function startDeleteUnsoldAccount($subProductId)
+    public function startDeleteAllUnsoldAccount($subProductId)
     {
         dispatch(new JobDeleteUnsoldAccount($subProductId, Config::get('database.connections.tenant_mongo')));
+    }
+
+    public function deleteListAccount($subProductId, $listAccounts)
+    {
+        $limit = 1000;
+        $totalCount = count($listAccounts ?? []);
+        $successCount = 0;
+        do {
+            $deletedCount = Accounts::where('sub_product_id', $subProductId)
+                ->whereIn('data', $listAccounts)
+                ->whereNull('order_id')
+                ->limit($limit)
+                ->forceDelete();
+            $successCount += $deletedCount;
+        } while ($deletedCount > 0);
+        app(SubProductService::class)->updateSubProductQuantityWithCount($subProductId);
+        $errorCount = $totalCount - $successCount;
+        $responseData = [
+            'total_count' => $totalCount,
+            'success_count' => $successCount,
+            'error_count' => $errorCount,
+        ];
+        if ($errorCount > 0) {
+            $responseData['reason_error'] = "Could not delete not existing or sold accounts";
+        }
+        return $responseData;
     }
 
     public function getStatusOptions($subProductId, $searchTerm = '', int $page = 1, int $perPage = 10)

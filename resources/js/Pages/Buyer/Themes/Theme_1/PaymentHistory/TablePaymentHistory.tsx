@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import TableWithContextMenu from "../../../../../Components/Common/TableWithContextMenu";
 import { useMemo } from "react";
-import moment from "moment";
+import { formatDateTime } from "../../../../../utils/helpers";
 
 const TablePaymentHistory = ({
     data,
@@ -63,7 +63,7 @@ const TablePaymentHistory = ({
                 enableSorting: true,
                 cell: (cell: any) => {
                     return (
-                        <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
+                        <span>{formatDateTime(cell.getValue())}</span>
                     );
                 },
             },

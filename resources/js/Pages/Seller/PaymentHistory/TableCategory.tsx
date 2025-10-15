@@ -1,10 +1,9 @@
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
-import { Form } from "react-bootstrap";
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
-import moment from "moment";
 import { usePage } from "@inertiajs/react";
+import { formatDateTime } from "../../../utils/helpers";
 
 const TableCategory = ({
   data,
@@ -41,7 +40,7 @@ const TableCategory = ({
       .addDivider()
       .addDeleteOption(t("Delete"), "ri-delete-bin-fill", () => {
         onDelete && onDelete(rowData?.id);
-    })
+      })
       .build();
   };
 
@@ -76,16 +75,16 @@ const TableCategory = ({
         enableSorting: true,
       },
       {
-        header: t("Amount"),
+        header: t("Payment Method"),
         cell: (cell: any) => {
           return <span className="fw-semibold">{cell.getValue()}</span>;
         },
-        accessorKey: "amount",
+        accessorKey: "payment_method.name",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: t("Amount VND"),
+        header: t("Amount"),
         cell: (cell: any) => {
           return <span className="fw-semibold">{cell.getValue()}</span>;
         },
@@ -103,13 +102,13 @@ const TableCategory = ({
         enableSorting: true,
       },
       {
-        header: t("Created date"),
-        accessorKey: "created_at",
+        header: t("Date at"),
+        accessorKey: "date_at",
         enableColumnFilter: false,
         enableSorting: true,
         cell: (cell: any) => {
           return (
-            <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
+            <span>{formatDateTime(cell.getValue())}</span>
           );
         },
       },

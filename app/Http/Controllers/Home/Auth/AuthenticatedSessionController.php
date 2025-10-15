@@ -51,29 +51,42 @@ class AuthenticatedSessionController extends Controller
         }
 
         $store = $this->storeService->findByUserId($user->id);
+
         if (!$store || empty($store->domain) || !is_array($store->domain)) {
             return back()->with('error', 'Store domain not found for this user');
         }
 
-        $domains = is_array($store->domain) ? $store->domain : [(string) $store->domain];
+        $domains = is_array($store->domain) ? $store->domain : [(string)$store->domain];
         $mainDomain = (string) config('app.main_domain');
+
         $host = collect($domains)->first(function ($d) use ($mainDomain) {
             return is_string($d) && $mainDomain !== '' && str_ends_with($d, '.' . $mainDomain);
         }) ?? $domains[0];
 
         $hostParts = explode('.', (string) $host);
         $sub = $hostParts[0] ?? null;
+
         if (!$sub) {
             return back()->with('error', 'Invalid store domain');
         }
 
-        $signedUrl = URL::temporarySignedRoute(
-            'seller.magic-login',
-            now()->addMinutes(2),
-            [
-                'user_id' => $user->id,
-            ]
-        );
+        $scheme = request()->isSecure() ? 'https' : 'http';
+        $tenantRoot = $scheme . '://' . $sub . '.' . $mainDomain;
+
+        try {
+            URL::forceRootUrl($tenantRoot);
+            URL::forceScheme($scheme);
+
+            $signedUrl = URL::temporarySignedRoute(
+                'seller.magic-login',
+                now()->addMinutes(2),
+                [
+                    'user_id' => $user->id,
+                ]
+            );
+        } finally {
+            URL::forceRootUrl(null);
+        }
 
         return Redirect::away($signedUrl);
     }
