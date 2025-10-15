@@ -519,5 +519,18 @@
     "Terms of Use": "Điều khoản sử dụng",
     "Get your free MMO Store account now": "Nhận ngay tài khoản MMO Store miễn phí ngay bây giờ",
     "Create New Account": "Tạo tài khoản mới",
-    "Phone number already exists": "Số điện thoại này đã tồn tại trong hệ thống"
+    "Phone number already exists": "Số điện thoại này đã tồn tại trong hệ thống",
+    "Use this token to authenticate API requests. Keep it secure and don't share it with others.": "Sử dụng token này để xác thực các yêu cầu API. Giữ nó an toàn và không chia sẻ nó với người khác.",
+    "Token copied": "Token đã được sao chép",
+    "Failed to copy token. Please try copy manually": "Sao chép token thất bại. Vui lòng thử copy thủ công",
+    "Copy": "Sao chép",
+    "You don't have an API Token yet.": "Bạn chưa có API Token.",
+    "Create API Token": "Tạo API Token",
+    "Token created successfully": "Tạo token thành công",
+    "You already have a token. Please reload page to see your token": "Bạn đã có token. Vui lòng tải lại trang để xem token của bạn",
+    "Token deleted successfully": "Xoá token thành công",
+    "Delete this token?": "Xoá token này?",
+    "No token available to delete": "Không có token nào để xoá",
+    "Copied": "Đã sao chép",
+    "Last use": "Lần sử dụng cuối"
 }

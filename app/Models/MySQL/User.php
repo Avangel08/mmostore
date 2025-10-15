@@ -2,10 +2,12 @@
 
 namespace App\Models\MySQL;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\NewAccessToken;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -56,6 +58,27 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    // Override createToken from HasApiTokens trait
+    public function createToken(string $name, array $abilities = ['*'], ?DateTimeInterface $expiresAt = null)
+    {
+        $plainTextToken = $this->generateTokenString();
+
+        $personalAccessToken = $this->tokens()->create([
+            'name' => $name,
+            'token' => hash('sha256', $plainTextToken),
+            'abilities' => $abilities,
+            'expires_at' => $expiresAt,
+        ]);
+
+        $newAccessToken = new NewAccessToken($personalAccessToken, $personalAccessToken->getKey() . '|' . $plainTextToken);
+
+        $personalAccessToken->update([
+            'token_plain_text' => $newAccessToken->plainTextToken,
+        ]);
+
+        return $newAccessToken;
+    }
 
     // Filter scopes
     public function scopeFilterName($query, $request)

@@ -14,6 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['api.validate'])->group(function () {
-    Route::middleware('auth:sanctum')->get('/user', [ApiController::class, 'user']);
+Route::middleware(['validate.subdomain', 'body.token', 'auth:sanctum'])->prefix('v1')->group(function () {
+    Route::get("/", [ApiController::class, 'user']);
 });

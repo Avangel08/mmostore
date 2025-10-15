@@ -36,6 +36,9 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e)
     {
         if ($e instanceof NotFoundHttpException) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['message' => 'Resource not found.'], 404);
+            }
             return response()->view('errors.404', [], 404);
         }
 

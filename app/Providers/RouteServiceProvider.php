@@ -35,8 +35,9 @@ class RouteServiceProvider extends ServiceProvider
 
         $mainDomain = config('app.main_domain');
 
-        $this->routes(function () use ($mainDomain) {
-            Route::middleware('api')->prefix('api')->group(base_path('routes/api.php'));
+        $this->routes(function () use ($mainDomain){
+            Route::domain('{sub}.' . $mainDomain)->middleware('api')->prefix('api')->group(base_path('routes/api.php'));
+//            Route::middleware('web')->prefix('demo')->group(base_path('routes/web.php'));
             Route::domain($mainDomain)->middleware('web')->group(base_path('routes/home.php'));
             Route::domain($mainDomain)->middleware('web')->prefix('admin')->group(base_path('routes/admin.php'));
             Route::middleware('web')->group(base_path('routes/buyer.php'));
