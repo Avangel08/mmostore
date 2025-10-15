@@ -76,7 +76,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'api.validate' => \App\Http\Middleware\ApiValidationMiddleware::class,
         'validate.subdomain' => \App\Http\Middleware\ValidateSubdomain::class,
-
+        'validate.seller.token' => \App\Http\Middleware\ValidateSellerToken::class,
         'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,

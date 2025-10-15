@@ -18,7 +18,7 @@ Route::prefix('v1')
     ->as('api.')
     ->group(function () {
         // seller api
-        Route::middleware((['auth:sanctum', 'validate.subdomain', 'tenant.mongo']))->group(function () {
+        Route::middleware((['auth:sanctum', 'validate.subdomain', 'tenant.mongo', 'validate.seller.token']))->group(function () {
             Route::group(['prefix' => 'accounts', 'as' => 'seller.'], function () {
                 Route::post("/", [ApiSellerAccountController::class, 'store'])->name('accounts.store');
                 Route::delete("/", [ApiSellerAccountController::class, 'destroy'])->name('accounts.destroy');
