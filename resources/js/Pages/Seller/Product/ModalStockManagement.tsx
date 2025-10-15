@@ -75,7 +75,7 @@ export const ModalStockManagement = ({
     validationSchema: Yup.object({
       subProductName: Yup.string()
         .max(maxLengthName, `Must be ${maxLengthName} characters or less`)
-        .required(t("Please enter item name")),
+        .required(t("Please enter sub product name")),
       price: Yup.number()
         .positive(t("Price must be positive"))
         .max(maxPrice, `Price must be less than ${maxPrice}`)
@@ -172,7 +172,7 @@ export const ModalStockManagement = ({
   const columns = useMemo(
     () => [
       {
-        header: t("Item name"),
+        header: t("Sub product name"),
         cell: (cell: any) => {
           return <span className="fw-semibold">{cell.getValue()}</span>;
         },
@@ -240,7 +240,7 @@ export const ModalStockManagement = ({
             <div className="d-flex gap-2">
               <OverlayTrigger
                 placement="top"
-                overlay={<Tooltip>{t("Add account")}</Tooltip>}
+                overlay={<Tooltip>{t("Add resource")}</Tooltip>}
               >
                 <Button
                   size="sm"
@@ -324,12 +324,12 @@ export const ModalStockManagement = ({
               <Col md={6}>
                 <Form.Group className="mb-3" controlId="subProductName">
                   <Form.Label>
-                    {t("Item name")}{" "}
+                    {t("Sub product name")}{" "}
                     <span className="text-danger">*</span>
                   </Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder={t("Enter item name")}
+                    placeholder={t("Enter sub product name")}
                     maxLength={maxLengthName}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}

@@ -108,7 +108,7 @@ class SellerAccountController extends Controller
         return Inertia::render('Product/Account/index', [
             'subProduct' => fn() => $this->subProductService->getById(
                 $subProductId,
-                ['id', 'product_id', 'quantity'],
+                ['id', 'name', 'product_id', 'quantity'],
                 [
                     'product:id,name,category_id,product_type_id',
                     'product.productType:id,name',

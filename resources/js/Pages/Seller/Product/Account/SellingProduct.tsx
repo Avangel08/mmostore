@@ -41,7 +41,7 @@ const SellingProduct = () => {
   const columns = useMemo(
     () => [
       {
-        header: t("Product"),
+        header: t("Resource"),
         cell: (cell: any) => {
           const data = cell.row.original;
           return <span>{`${data?.data ?? ""}`}</span>;
@@ -140,7 +140,7 @@ const SellingProduct = () => {
         <SellerAccountFilter onFilter={handleFilter} subProductId={subProduct?.id} />
       </Col>
       <Col lg={12} className="d-flex justify-content-between mb-4">
-        <h5>{t("Product list")} ({subProduct?.quantity ?? 0} {t("unsold products")})</h5>
+        <h5>{t("Resource list")} ({accounts?.total ?? 0} {t("resource(s)")})</h5>
         <div className="d-flex gap-2">
           <Button variant="danger" onClick={onDeleteAll}>
             {t("Delete all")}

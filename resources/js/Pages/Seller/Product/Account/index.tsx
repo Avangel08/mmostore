@@ -103,7 +103,7 @@ const SellerAccount = () => {
   }, [inputMethod]);
   return (
     <React.Fragment>
-      <Head title={t("Account")} />
+      <Head title={t("Resource")} />
       <div className="page-content">
         <ToastContainer />
         <Container fluid>
@@ -111,7 +111,8 @@ const SellerAccount = () => {
             <Col xs={12}>
               <Card>
                 <Card.Header>
-                  <h5 className="card-title mb-0">{t("Account")}</h5>
+                  <h5 className="text-black">{t("Product")}: {t(subProduct?.product?.name || "N/A")}</h5>
+                  <h6>{t("Variant")}: {t(subProduct?.name || "N/A")}</h6>
                 </Card.Header>
                 <Card.Body>
                   {(!subProduct?.product?.category || !subProduct?.product?.product_type) && (
@@ -273,7 +274,10 @@ const SellerAccount = () => {
                             <Form.Control
                               as="textarea"
                               rows={8}
-                              placeholder={t("Enter content here (each line will be 1 product)")}
+                              placeholder={
+                                t("Enter content here (each line will be 1 resource)") + "\n\n" +
+                                t("Example") + ":\njohn1@example.com|mypass123|2fa_code\njohn2@example.com|mypass123|2fa_code\njohn3@example.com|mypass123|2fa_code"
+                              }
                               name="content"
                               disabled={!canImport}
                               onChange={formik.handleChange}
@@ -338,10 +342,10 @@ const SellerAccount = () => {
 
                           <div className="mb-3">
                             <small>
-                              <strong>{t("Note")}:</strong> {t("Each line will be 1 product")}.<br />
+                              <strong>{t("Note")}:</strong> {t("Each line will be 1 resource")}.<br />
                               {t("Define status after 'status:' keyword")}. {t("If no status specified, default status is LIVE")}.
                               <br />
-                              <strong>{t("LIVE means the product is ready for sale")}</strong>.
+                              <strong>{t("LIVE means the resource is ready for sale")}</strong>.
                             </small>
                           </div>
 
