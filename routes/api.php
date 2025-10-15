@@ -14,13 +14,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['body.token', 'auth:sanctum,seller', 'validate.subdomain', 'tenant.mongo'])
-    ->prefix('v1')
+Route::prefix('v1')
     ->as('api.')
     ->group(function () {
         // seller api
-        Route::group(['prefix' => 'accounts', 'as' => 'seller.'], function () {
-            Route::post("/", [ApiSellerAccountController::class, 'store'])->name('accounts.store');
-            Route::delete("/", [ApiSellerAccountController::class, 'destroy'])->name('accounts.destroy');
+        Route::middleware((['auth:sanctum', 'validate.subdomain', 'tenant.mongo']))->group(function () {
+            Route::group(['prefix' => 'accounts', 'as' => 'seller.'], function () {
+                Route::post("/", [ApiSellerAccountController::class, 'store'])->name('accounts.store');
+                Route::delete("/", [ApiSellerAccountController::class, 'destroy'])->name('accounts.destroy');
+            });
         });
     });
