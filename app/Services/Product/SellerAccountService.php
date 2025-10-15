@@ -110,13 +110,13 @@ class SellerAccountService
 
     public function deleteOldAccounts(Carbon $timeStart, array $listKey, $subProductId)
     {
-        $batchSize = 1000;
+        $limit = 1000;
         do {
             $deletedCount = Accounts::where('sub_product_id', $subProductId)
                 ->whereNull('order_id')
                 ->whereIn('key', $listKey)
                 ->where('created_at', '<', new \MongoDB\BSON\UTCDateTime($timeStart))
-                ->limit($batchSize)
+                ->limit($limit)
                 ->forceDelete();
         } while ($deletedCount > 0);
     }
@@ -124,15 +124,14 @@ class SellerAccountService
     public function deleteUnsoldAccounts($subProductId)
     {
         // DB::transaction(function () use ($subProductId) {
-        $batchSize = 1000;
+        $limit = 1000;
         do {
             $deletedCount = Accounts::where('sub_product_id', $subProductId)
                 ->whereNull('order_id')
-                ->limit($batchSize)
+                ->limit($limit)
                 ->forceDelete();
         } while ($deletedCount > 0);
-        $subProductService = new SubProductService;
-        $subProductService->updateSubProductQuantityWithCount($subProductId);
+        app(SubProductService::class)->updateSubProductQuantityWithCount($subProductId);
         // });
     }
 
@@ -166,9 +165,35 @@ class SellerAccountService
         }, 200, $headers);
     }
 
-    public function startDeleteUnsoldAccount($subProductId)
+    public function startDeleteAllUnsoldAccount($subProductId)
     {
         dispatch(new JobDeleteUnsoldAccount($subProductId, Config::get('database.connections.tenant_mongo')));
+    }
+
+    public function deleteListAccount($subProductId, $listAccounts)
+    {
+        $limit = 1000;
+        $totalCount = count($listAccounts ?? []);
+        $successCount = 0;
+        do {
+            $deletedCount = Accounts::where('sub_product_id', $subProductId)
+                ->whereIn('data', $listAccounts)
+                ->whereNull('order_id')
+                ->limit($limit)
+                ->forceDelete();
+            $successCount += $deletedCount;
+        } while ($deletedCount > 0);
+        app(SubProductService::class)->updateSubProductQuantityWithCount($subProductId);
+        $errorCount = $totalCount - $successCount;
+        $responseData = [
+            'total_count' => $totalCount,
+            'success_count' => $successCount,
+            'error_count' => $errorCount,
+        ];
+        if ($errorCount > 0) {
+            $responseData['reason_error'] = "Could not delete not existing or sold accounts";
+        }
+        return $responseData;
     }
 
     public function getStatusOptions($subProductId, $searchTerm = '', int $page = 1, int $perPage = 10)

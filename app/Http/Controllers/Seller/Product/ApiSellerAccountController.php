@@ -11,37 +11,25 @@ use App\Traits\ApiResourceResponse;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Log;
+use Throwable;
 
 class ApiSellerAccountController extends Controller
 {
     use ApiResourceResponse;
-
     protected $sellerAccountService;
     protected $subProductService;
     protected $importAccountHistoryService;
+
     public function __construct(SellerAccountService $sellerAccountService, SubProductService $subProductService, ImportAccountHistoryService $importAccountHistoryService)
     {
         $this->sellerAccountService = $sellerAccountService;
         $this->subProductService = $subProductService;
         $this->importAccountHistoryService = $importAccountHistoryService;
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(ApiAccountRequest $request)
     {
-        // if (auth(config('guard.seller'))->user()->cannot('subproduct_create')) {
-        //     return abort(403);
-        // }
-
         try {
             $data = $request->validated();
             $subProduct = $this->subProductService->getById(
@@ -75,35 +63,37 @@ class ApiSellerAccountController extends Controller
                 'error_count' => 0,
                 'errors' => [],
             ];
-
             return $this->success('Uploaded successfully', ['data' => $result], Response::HTTP_CREATED);
-        } catch (\Exception $e) {
-            \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.seller'))->id() ?? null]);
+        } catch (Throwable $e) {
+            Log::error($e, ['ip' => $request->ip(), 'user_id' => auth()->id() ?? null]);
             return $this->error($e->getMessage());
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function destroy(ApiAccountRequest $request)
     {
-        //
-    }
+        try {
+            $dataRequest = $request->validated();
+            $subProduct = $this->subProductService->getById($dataRequest['sub_product_id'], ['id', 'name']);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+            if (!$subProduct) {
+                throw new Exception('Sub product not found');
+            }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            $message = "Deleted unsold accounts from subProduct {$subProduct?->name} ({$dataRequest['sub_product_id']}) successfully";
+            $dataResponse = null;
+
+            if (empty($dataRequest['accounts'])) {
+                $this->sellerAccountService->startDeleteAllUnsoldAccount($dataRequest['sub_product_id']);
+                $message .= ". Unsold accounts will be deleted after a few minutes";
+            } else {
+                $dataResponse = $this->sellerAccountService->deleteListAccount($dataRequest['sub_product_id'], $dataRequest['accounts']);
+            }
+
+            return $this->success($message, $dataResponse ? ['data' => $dataResponse] : []);
+        } catch (Throwable $e) {
+            Log::error($e, ['ip' => $request->ip(), 'user_id' => auth()->id() ?? null]);
+            return $this->error($e->getMessage());
+        }
     }
 }

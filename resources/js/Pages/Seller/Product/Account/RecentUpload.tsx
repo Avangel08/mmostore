@@ -188,6 +188,8 @@ const RecentUpload = () => {
             onReloadTable={fetchData}
             keyPageParam="importPage"
             keyPerPageParam="importPerPage"
+            showPaginationEllipsis={true}
+            maxVisiblePages={10}
             divStyle={{ height: "50vh" }}
           />
         </div>

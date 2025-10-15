@@ -170,12 +170,17 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                     $errors["Line {$totalCount} ({$line})"] = 'Duplicate data';
                     return null;
                 }
-                
+
                 unset($line);
                 $this->uniqueKeys[$key] = true;
+                $dataAccount = (string) $mainData;
+
+                if (!empty($remainData)) {
+                    $dataAccount .= '|' . implode('|', array_map('trim', $remainData));
+                }
                 return [
                     'key' => (string) $key,
-                    'data' => (string) ($mainData . "|") . implode('|', array_map('trim', $remainData)),
+                    'data' => (string) $dataAccount,
                     'status' => (string) $status,
                     'product_id' => (string) $this->productId,
                     'sub_product_id' => (string) $this->subProductId,

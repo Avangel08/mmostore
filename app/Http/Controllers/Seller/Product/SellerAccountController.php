@@ -138,7 +138,7 @@ class SellerAccountController extends Controller
             if (!$subProduct) {
                 throw new \Exception('Sub product not found');
             }
-            $this->sellerAccountService->startDeleteUnsoldAccount($subProductId);
+            $this->sellerAccountService->startDeleteAllUnsoldAccount($subProductId);
 
             return back()->with('success', 'Success. Unsold accounts will be deleted after a few minutes');
         } catch (\Exception $e) {
