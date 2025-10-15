@@ -6,6 +6,7 @@ import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import moment from "moment";
 import { usePage } from "@inertiajs/react";
 import CONSTANTS from "../../../utils/constants";
+import { formatDateTime } from "../../../utils/helpers";
 
 const TableCustomerManager = ({
   data,
@@ -103,7 +104,7 @@ const TableCustomerManager = ({
         enableSorting: true,
         cell: (cell: any) => {
           return (
-            <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
+            <span>{formatDateTime(cell.getValue())}</span>
           );
         },
       },
