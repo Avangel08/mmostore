@@ -18,6 +18,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Exception;
 use MongoDB\BSON\ObjectId;
+use MongoDB\Operation\FindOneAndUpdate;
 
 class JobProcessPurchase implements ShouldQueue
 {
@@ -262,26 +263,26 @@ class JobProcessPurchase implements ShouldQueue
         try {
             $result = Accounts::raw(function ($collection) use ($subProductId, $customerId, $orderId) {
                 return $collection->findOneAndUpdate(
-                [
-                    'sub_product_id' => $subProductId,
-                    'customer_id' => null,
-                    'order_id' => null,
-                    'status' => Accounts::STATUS['LIVE']
-                ],
-                [
-                    '$set' => [
-                        'customer_id' => $customerId,
-                        'order_id' => $orderId,
-                        'status' => Accounts::STATUS['SOLD'],
-                        'reserved_at' => now()->toISOString(),
-                        'reserved_by_job' => $this->job->getJobId()
+                    [
+                        'sub_product_id' => $subProductId,
+                        'customer_id' => null,
+                        'order_id' => null,
+                        'status' => Accounts::STATUS['LIVE']
+                    ],
+                    [
+                        '$set' => [
+                            'customer_id' => $customerId,
+                            'order_id' => $orderId,
+                            'status' => Accounts::STATUS['SOLD'],
+                            'reserved_at' => now()->toISOString(),
+                            'reserved_by_job' => $this->job->getJobId()
+                        ]
+                    ],
+                    [
+                        'returnDocument' => FindOneAndUpdate::RETURN_DOCUMENT_AFTER,
+                        'sort' => ['created_at' => 1]
                     ]
-                ],
-                [
-                    'returnDocument' => \MongoDB\Operation\FindOneAndUpdate::RETURN_DOCUMENT_AFTER,
-                    'sort' => ['created_at' => 1]
-                ]
-            );
+                );
             });
             
             if ($result) {
@@ -303,14 +304,13 @@ class JobProcessPurchase implements ShouldQueue
     {
         try {
             $mongoId = $customerId instanceof ObjectId ? $customerId : new ObjectId((string) $customerId);
-            // Chuẩn hóa amount về số (int/float)
             $amountToDeduct = (float) $amount;
 
             $updated = Customers::raw(function ($collection) use ($mongoId, $amountToDeduct) {
                 return $collection->findOneAndUpdate(
                     [ '_id' => $mongoId, 'balance' => ['$gte' => $amountToDeduct] ],
                     [ '$inc' => [ 'balance' => -$amountToDeduct ] ],
-                    [ 'returnDocument' => \MongoDB\Operation\FindOneAndUpdate::RETURN_DOCUMENT_AFTER ]
+                    [ 'returnDocument' => FindOneAndUpdate::RETURN_DOCUMENT_AFTER ]
                 );
             });
 

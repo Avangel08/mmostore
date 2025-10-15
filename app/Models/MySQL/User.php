@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\NewAccessToken;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Jobs\Mail\JobMailSellerResetPassword;
 
 class User extends Authenticatable
 {

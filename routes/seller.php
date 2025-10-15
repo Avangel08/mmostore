@@ -12,19 +12,25 @@ use App\Http\Controllers\Seller\Product\SellerAccountController;
 use App\Http\Controllers\Seller\Product\SubProductController;
 use App\Http\Controllers\Seller\Profile\ProfileController;
 use App\Http\Controllers\Seller\Setting\ThemeSettingController;
+use App\Http\Controllers\Seller\Auth\ForgotPasswordController;
+use App\Http\Controllers\Seller\Auth\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['validate.subdomain', 'tenant.mongo'])
     ->group(function () {
         Route::prefix('admin')->group(function () {
-            // Public routes (no auth middleware needed)
             Route::group(['prefix' => 'login'], function () {
                 Route::get('/', [LoginController::class, 'login'])->name('seller.login');
                 Route::post('/', [LoginController::class, 'authenticate'])->name('seller.login.post');
                 Route::get('/magic', [LoginController::class, 'magicLogin'])->name('seller.magic-login')->middleware('signed');
             });
 
-            // Protected routes (need auth middleware)
+            Route::get('forgot-password', [ForgotPasswordController::class, 'create'])->name('seller.forgot-password');
+            Route::post('forgot-password', [ForgotPasswordController::class, 'store'])->name('seller.forgot-password.post');
+            Route::get('forgot-password/success', [ForgotPasswordController::class, 'success'])->name('seller.forgot-password.success');
+            Route::get('reset-password/{token}', [ResetPasswordController::class, 'create'])->name('seller.reset-password');
+            Route::post('reset-password', [ResetPasswordController::class, 'store'])->name('seller.reset-password.post');
+
             Route::middleware('checkauth:seller')->group(function () {
                 Route::post('logout', [LoginController::class, 'destroy'])->name('seller.logout');
 
@@ -56,10 +62,8 @@ Route::middleware(['validate.subdomain', 'tenant.mongo'])
 
                 Route::resource('product', ProductController::class, ['as' => 'seller']);
 
-                // seller sub-product
                 Route::resource('sub-product', SubProductController::class, ['as' => 'seller']);
 
-                // seller account
                 Route::group(['prefix' => 'account'], function () {
                     Route::get('/status-options', [SellerAccountController::class, 'getStatusOptions'])->name('seller.account.status-options');
                     Route::get('/download-unsold-account/{subProductId}', [SellerAccountController::class, 'downloadUnsoldAccounts'])->name('seller.account.download-unsold-account');
@@ -73,7 +77,6 @@ Route::middleware(['validate.subdomain', 'tenant.mongo'])
                     Route::post('/verify-payment', [PaymentHistoryController::class, 'verifyPayment'])->name('seller.payment-history.verify-payment');
                 });
 
-                // seller theme settings
                 Route::group(['prefix' => 'theme-settings'], function() {
                     Route::get('/', [ThemeSettingController::class, 'index'])->name('seller.theme-settings');
                     Route::post('/update', [ThemeSettingController::class, 'update'])->name('seller.theme-settings.update');

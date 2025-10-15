@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đặt lại mật khẩu - MMOStore</title>
+    <title>Đặt lại mật khẩu - MMOStore Seller</title>
     <style>
         * {
             margin: 0;
@@ -169,10 +169,10 @@
         </div>
 
         <div class="content">
-            <h1 class="greeting">Xin chào {{ $data['first_name'] ?? "bạn" }}! 👋</h1>
+            <h1 class="greeting">Xin chào {{ $data['name'] ?? "Seller" }}! 👋</h1>
 
             <p class="message">
-                Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản MMOStore của bạn.
+                Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản Seller MMOStore của bạn.
                 Để bảo mật tài khoản, vui lòng nhấp vào nút bên dưới để tạo mật khẩu mới.
             </p>
 
@@ -191,20 +191,20 @@
 
             <div class="divider"></div>
 
-            @if (!empty($url))
+            @if (!empty($data['url']))
                 <p class="message">
                     Nếu bạn gặp khó khăn khi nhấp vào nút trên, bạn có thể sao chép và dán link sau vào trình duyệt:
                 </p>
                 <p
                     style="word-break: break-all; color: #10B981; font-size: 14px; background: #F7FAFC; padding: 10px; border-radius: 4px;">
-                    {{ $url }}
+                    {{ $data['url'] }}
                 </p>
             @endif
         </div>
 
         <div class="footer">
             <p class="footer-text">
-                © {{ date('Y') }} <strong>MMOStore</strong>
+                © {{ date('Y') }} <strong>MMOStore Seller</strong>
             </p>
         </div>
     </div>

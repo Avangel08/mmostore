@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Http\Controllers\Seller\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Jobs\Mail\JobMailSellerResetPassword;
+use App\Rules\SellerEmailBelongsToDomain;
+use App\Models\MySQL\User;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+
+class ForgotPasswordController extends Controller
+{
+    public function __construct()
+    {
+    }
+
+    public function create()
+    {
+        return Inertia::render('Auth/ForgotPassword');
+    }
+
+    public function success()
+    {
+        return Inertia::render('Auth/ForgotPasswordSuccess');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email', new SellerEmailBelongsToDomain($request)],
+        ]);
+
+        $email = $request->input('email');
+        $user = User::where('email', $email)->where('type', User::TYPE['SELLER'])->first();
+        
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => [trans(Password::INVALID_USER)],
+            ]);
+        }
+
+        $token = Password::broker('users')->createToken($user);
+        
+        $dataSendMail = [
+            'email' => $email,
+            'name' => $user->name,
+            'url' => route('seller.reset-password', ['token' => $token]) . '?email=' . urlencode($email),
+        ];
+
+        dispatch(new JobMailSellerResetPassword($dataSendMail, app()->getLocale()));
+
+        return back()->with('status', trans(Password::RESET_LINK_SENT));
+    }
+}

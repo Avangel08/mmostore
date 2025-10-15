@@ -34,7 +34,8 @@ class CheckQueueSize extends Command
             'deposit-customer',
             'process_seller_account',
             'process_purchase',
-            'mail_buyer_reset_password'
+            'mail_buyer_reset_password',
+            'mail_seller_reset_password'
         ];
         foreach ($listQueue as $queue) {
             echo $queue . ' : ' . Queue::size($queue) . PHP_EOL;

@@ -493,7 +493,7 @@
     "Sending": "Đang gửi",
     "Enter your new password to reset your account": "Nhập mật khẩu mới của bạn để đặt lại tài khoản",
     "The email address not valid": "Địa chỉ email không hợp lệ",
-    "passwords.token": "Token không hợp lệ hoặc đã hết hạn. Vui lòng thử yêu cầu đặt lại mật khẩu mới",
+    "passwords.token": "Token không hợp lệ hoặc đã hết hạn",
     "passwords.reset": "Mật khẩu đã được đặt lại! Bạn có thể đăng nhập bằng mật khẩu mới của mình",
     "passwords.throttled": "Liên kết đã được gửi. Vui lòng kiểm tra email của bạn",
     "Create new password": "Đặt mật khẩu mới",
@@ -532,5 +532,16 @@
     "Delete this token?": "Xoá token này?",
     "No token available to delete": "Không có token nào để xoá",
     "Copied": "Đã sao chép",
-    "Last use": "Lần sử dụng cuối"
+    "Last use": "Lần sử dụng cuối",
+    "The email address is not associated with this store": "Địa chỉ email không liên kết với cửa hàng này",
+    "Email sent successfully": "Gửi email thành công",
+    "We've sent a password reset link to your email address. Please check your inbox and follow the instructions to reset your password.": "Chúng tôi đã gửi liên kết đặt lại mật khẩu đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư và làm theo hướng dẫn để đặt lại mật khẩu.",
+    "If you don't see the email in your inbox, please check your spam folder.": "Nếu bạn không thấy email trong hộp thư đến, vui lòng kiểm tra thư mục spam.",
+    "Send another email": "Gửi email khác",
+    "Password confirmation is required": "Xác nhận mật khẩu là bắt buộc",
+    "Passwords do not match": "Mật khẩu không khớp",
+    "Update Password": "Cập nhật mật khẩu",
+    "Back to login": "Quay lại đăng nhập",
+    "Invalid or expired reset link": "Liên kết đã hết hạn",
+    "Reset password for:": "Đặt lại mật khẩu cho:"
 }
