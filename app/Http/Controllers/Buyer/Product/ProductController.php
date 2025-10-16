@@ -12,6 +12,7 @@ use App\Services\Product\SubProductService;
 use App\Jobs\Systems\JobProcessPurchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Mongo\Products;
 
 class ProductController extends Controller
 {
@@ -30,7 +31,7 @@ class ProductController extends Controller
     {
         $categories = Categories::with([
             'products' => function ($query) {
-                $query->latest()->with(['subProducts']);
+                $query->where('status', Products::STATUS['ACTIVE'])->latest()->with(['subProducts']);
             }
         ])->get();
         $result = $categories->map(function ($category) {
