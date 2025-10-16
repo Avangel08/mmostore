@@ -7,7 +7,7 @@ export function useThemeConfig() {
     const [theme, setTheme] = useState<ThemeConfig | null>(null);
 
     useEffect(() => {
-        if (settings && settings?.length > 0) {
+        if (settings && typeof settings === 'object' && !Array.isArray(settings)) {
             // ✅ Nếu server trả về theme mới → update state + localStorage
             setTheme(settings as ThemeConfig);
             themeStorage.set(settings as ThemeConfig);    
