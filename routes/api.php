@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Webhook\SePay\SePayWebHookController;
 use App\Http\Controllers\Seller\Product\ApiSellerAccountController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,14 +15,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('v1')
-    ->as('api.')
-    ->group(function () {
+$mainDomain = config('app.main_domain');
+Route::group(['prefix' => 'v1','as' => 'api.'], function () use ($mainDomain) {
         // seller api
-        Route::middleware((['auth:seller_api', 'validate.subdomain', 'tenant.mongo', 'validate.seller.token']))->group(function () {
+        Route::domain('{sub}.' . $mainDomain)->middleware((['auth:seller_api', 'validate.subdomain', 'tenant.mongo', 'validate.seller.token']))->group(function () {
             Route::group(['prefix' => 'accounts', 'as' => 'seller.'], function () {
                 Route::post("/", [ApiSellerAccountController::class, 'store'])->name('accounts.store');
                 Route::delete("/", [ApiSellerAccountController::class, 'destroy'])->name('accounts.destroy');
             });
+        });
+
+        // Webhook
+        // Route::middleware((['tenant.mongo']))->group(function () {
+        //     Route::group(['prefix' => 'webhook'], function () {
+        //         Route::any("/sepay", [SePayWebHookController::class, 'callBack'])->name('webhook.sepay');
+        //     });
+        // });
+
+        Route::group(['prefix' => 'webhook'], function () {
+            Route::any("/sepay", [SePayWebHookController::class, 'callBack'])->name('webhook.sepay');
         });
     });
