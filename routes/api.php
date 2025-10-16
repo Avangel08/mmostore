@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\Seller\Product\SellerAccountApiController;
+use App\Http\Controllers\Api\Buyer\Product\ProductController;
+use App\Http\Controllers\Api\Buyer\Order\OrderController;
 use App\Http\Controllers\Api\Webhook\SePay\SePayWebHookController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,14 +27,22 @@ Route::group(['prefix' => 'v1','as' => 'api.'], function () use ($mainDomain) {
             });
         });
 
-        // Webhook
-        // Route::middleware((['tenant.mongo']))->group(function () {
-        //     Route::group(['prefix' => 'webhook'], function () {
-        //         Route::any("/sepay", [SePayWebHookController::class, 'callBack'])->name('webhook.sepay');
-        //     });
-        // });
+        // buyer api
+        Route::middleware((['validate.subdomain', 'tenant.mongo', 'auth:buyer_api', 'validate.buyer.token']))->group(function () {
+            Route::group(['prefix' => 'product', 'as' => 'buyer.'], function () {
+                Route::get('/', [ProductController::class, 'index'])->name('product.index');
+                Route::get('/{id}', [ProductController::class, 'show'])->name('product.show');
+            });
 
-        Route::group(['prefix' => 'webhook'], function () {
+            Route::group(['prefix' => 'order', 'as' => 'buyer.'], function () {
+                Route::get('/', [OrderController::class, 'index'])->name('order.index');
+                Route::get('/{orderNumber}', [OrderController::class, 'show'])->name('order.show');
+                Route::post('/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
+            });
+        });
+
+        // Webhook Seller
+        Route::group(['prefix' => 'webhook', "middleware" => ["tenant.mongo"]], function () {
             Route::any("/sepay", [SePayWebHookController::class, 'callBack'])->name('webhook.sepay');
         });
     });

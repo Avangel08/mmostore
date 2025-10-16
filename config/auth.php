@@ -56,6 +56,10 @@ return [
             'driver' => 'sanctum',
             'provider' => 'users',
         ],
+        'buyer_api' => [
+            'driver' => 'token_buyer',
+            'provider' => 'customers',
+        ],
     ],
 
     /*

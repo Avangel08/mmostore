@@ -3,6 +3,7 @@
 namespace App\Services\Category;
 
 use App\Models\Mongo\Categories;
+use App\Models\Mongo\Products;
 
 class CategoryService
 {
@@ -65,5 +66,14 @@ class CategoryService
     public function deleteMultiple(array $ids)
     {
         return Categories::whereIn('_id', $ids)->delete();
+    }
+
+    public function getWithProductsAndSubProducts()
+    {
+        return Categories::with([
+            'products' => function ($query) {
+                $query->where('status', Products::STATUS['ACTIVE'])->latest()->with(['subProducts']);
+            }
+        ])->get();
     }
 }
