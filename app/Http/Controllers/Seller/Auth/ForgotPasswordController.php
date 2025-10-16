@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Seller\Auth;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Jobs\Mail\JobMailSellerResetPassword;
 use App\Rules\SellerEmailBelongsToDomain;
@@ -39,7 +40,7 @@ class ForgotPasswordController extends Controller
         
         if (!$user) {
             throw ValidationException::withMessages([
-                'email' => [trans(Password::INVALID_USER)],
+                'email' => [trans(Helpers::getPwBrokerStatus(Password::INVALID_USER))],
             ]);
         }
 
@@ -53,6 +54,6 @@ class ForgotPasswordController extends Controller
 
         dispatch(new JobMailSellerResetPassword($dataSendMail, app()->getLocale()));
 
-        return back()->with('status', trans(Password::RESET_LINK_SENT));
+        return back()->with('status', trans(Helpers::getPwBrokerStatus(Password::RESET_LINK_SENT)));
     }
 }

@@ -481,7 +481,7 @@
     "Already have an account? Log in": "Đã có tài khoản? Đăng nhập",
     "First name": "Tên",
     "Last name": "Họ",
-    "passwords.user": "Không tìm thấy tài khoản với email này",
+    "No account found with this email": "Không tìm thấy tài khoản với email này",
     "Enter your email address and we'll send you a link to reset your password": "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn một liên kết để đặt lại mật khẩu",
     "Back to Login": "Quay lại Đăng nhập",
     "Reset password": "Đặt lại mật khẩu",
@@ -493,9 +493,9 @@
     "Sending": "Đang gửi",
     "Enter your new password to reset your account": "Nhập mật khẩu mới của bạn để đặt lại tài khoản",
     "The email address not valid": "Địa chỉ email không hợp lệ",
-    "passwords.token": "Token không hợp lệ hoặc đã hết hạn",
-    "passwords.reset": "Mật khẩu đã được đặt lại! Bạn có thể đăng nhập bằng mật khẩu mới của mình",
-    "passwords.throttled": "Liên kết đã được gửi. Vui lòng kiểm tra email của bạn",
+    "The token is invalid or has expired": "Token không hợp lệ hoặc đã hết hạn",
+    "The password has been reset! You can now log in using your new password": "Mật khẩu đã được đặt lại! Bạn có thể đăng nhập bằng mật khẩu mới của mình",
+    "The link has been sent. Please check your email": "Liên kết đã được gửi. Vui lòng kiểm tra email của bạn",
     "Create new password": "Đặt mật khẩu mới",
     "Create new password after forgot password": "Đặt mật khẩu mới sau khi quên mật khẩu",
     "Reset password link sent": "Liên kết đặt lại mật khẩu đã được gửi",
@@ -562,5 +562,6 @@
     "Note: Each line will be 1 resource": "Ghi chú: Mỗi dòng sẽ là 1 tài nguyên",
     "Variant": "Biến thể",
     "Delete category '{{name}}'?": "Xoá danh mục '{{name}}'?",
-    "Invalid ID": "ID không hợp lệ"
+    "Invalid ID": "ID không hợp lệ",
+    "An error occurred, please try again later": "Đã xảy ra lỗi, vui lòng thử lại sau"
 }

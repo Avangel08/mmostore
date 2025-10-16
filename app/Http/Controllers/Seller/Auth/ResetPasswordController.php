@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Seller\Auth;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\PasswordReset;
@@ -23,7 +24,7 @@ class ResetPasswordController extends Controller
         if (empty($plainToken)) {
             abort(404, 'Invalid reset link');
         }
-        
+
         $email = $request->query('email');
 
         return Inertia::render('Auth/ResetPassword', [
@@ -62,11 +63,11 @@ class ResetPasswordController extends Controller
         );
 
         if ($status == Password::PASSWORD_RESET) {
-            return back()->with('success', __($status));
+            return back()->with('success', __(Helpers::getPwBrokerStatus($status)));
         }
 
         throw ValidationException::withMessages([
-            'email' => __($status),
+            'email' => __(Helpers::getPwBrokerStatus($status)),
         ]);
     }
 }

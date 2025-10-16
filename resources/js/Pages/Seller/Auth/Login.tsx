@@ -106,7 +106,7 @@ export default function Login({}: any) {
                                                 borderRadius: '8px'
                                             }}>
                                                 <i className="ri-check-line me-2"></i>
-                                                {t('passwords.reset')}
+                                                {t('The password has been reset! You can now log in using your new password')}
                                             </Alert>
                                         )}
                                         

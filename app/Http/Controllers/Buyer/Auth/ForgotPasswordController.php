@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Buyer\Auth;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\Mongo\Customers;
 use Illuminate\Http\Request;
@@ -11,7 +12,6 @@ use Illuminate\Support\Facades\Password;
 
 class ForgotPasswordController extends Controller
 {
-
     /**
      * Handle an incoming password reset link request.
      *
@@ -28,11 +28,11 @@ class ForgotPasswordController extends Controller
         );
 
         if ($status == Password::RESET_LINK_SENT) {
-            return back()->with('status', __($status));
+            return back()->with('status', __(Helpers::getPwBrokerStatus($status)));
         }
 
         throw ValidationException::withMessages([
-            'email' => __($status),
+            'email' => __(Helpers::getPwBrokerStatus($status)),
         ]);
     }
 }
