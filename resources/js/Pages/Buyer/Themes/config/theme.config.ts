@@ -11,7 +11,7 @@ export interface ThemeConfig {
 const THEME_KEY = "app_theme";
 
 const defaultTheme: ThemeConfig = {
-    theme: "Theme_1",
+    theme: "theme_1",
     pageHeaderImage: "/images/default-header.png",
     pageHeaderText: "Hello, welcome to MMO Store",
     storeLogo: "/images/default-logo.png",
