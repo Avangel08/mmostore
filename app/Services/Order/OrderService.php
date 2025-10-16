@@ -53,11 +53,11 @@ class OrderService
         }
 
         if (isset($request['date_from']) && $request['date_from'] != '') {
-            $query->where('created_at', '>=', $request['date_from'] . ' 00:00:00');
+            $query->where('created_at', '>=', $request['date_from']);
         }
 
         if (isset($request['date_to']) && $request['date_to'] != '') {
-            $query->where('created_at', '<=', $request['date_to'] . ' 23:59:59');
+            $query->where('created_at', '<=', $request['date_to']);
         }
 
         if (isset($request['category_id']) && $request['category_id'] != '') {
