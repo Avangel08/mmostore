@@ -25,14 +25,8 @@ Route::group(['prefix' => 'v1','as' => 'api.'], function () use ($mainDomain) {
             });
         });
 
-        // Webhook
-        // Route::middleware((['tenant.mongo']))->group(function () {
-        //     Route::group(['prefix' => 'webhook'], function () {
-        //         Route::any("/sepay", [SePayWebHookController::class, 'callBack'])->name('webhook.sepay');
-        //     });
-        // });
-
-        Route::group(['prefix' => 'webhook'], function () {
+        // Webhook Seller
+        Route::group(['prefix' => 'webhook', "middleware" => ["tenant.mongo"]], function () {
             Route::any("/sepay", [SePayWebHookController::class, 'callBack'])->name('webhook.sepay');
         });
     });
