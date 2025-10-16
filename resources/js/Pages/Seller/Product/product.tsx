@@ -169,6 +169,7 @@ export default function product() {
                             type="text"
                             placeholder={t("Enter product name")}
                             name="productName"
+                            maxLength={255}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.productName}
@@ -327,6 +328,7 @@ export default function product() {
                             rows={3}
                             placeholder={t("Enter short description")}
                             name="shortDescription"
+                            maxLength={150}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.shortDescription}

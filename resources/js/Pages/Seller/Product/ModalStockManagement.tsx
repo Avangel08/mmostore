@@ -58,7 +58,7 @@ export const ModalStockManagement = ({
     }
   }, [show, productId]);
 
-  const maxLengthName = 50;
+  const maxLengthName = 150;
   const maxPrice = 999999999;
 
   const statusOptions = [
@@ -172,9 +172,19 @@ export const ModalStockManagement = ({
   const columns = useMemo(
     () => [
       {
+        header: t("Variant ID"),
+        accessorKey: "id",
+        enableColumnFilter: false,
+        enableSorting: true,
+      },
+      {
         header: t("Sub product name"),
         cell: (cell: any) => {
-          return <span className="fw-semibold">{cell.getValue()}</span>;
+          return (
+            <div className="fw-semibold text-break text-wrap">
+              {cell.getValue()}
+            </div>
+          );
         },
         accessorKey: "name",
         enableColumnFilter: false,
@@ -310,6 +320,10 @@ export const ModalStockManagement = ({
         <div className="mb-4">
           <Row>
             <Col>
+              <div className="d-flex items-center gap-2">
+                <span className="fw-bold">{t("Product ID")}:</span>
+                <span>{productId ?? ""}</span>
+              </div>
               <div className="d-flex items-center gap-2">
                 <span className="fw-bold">{t("Product name")}:</span>
                 <span>{productName ?? ""}</span>

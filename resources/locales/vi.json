@@ -561,7 +561,10 @@
     "LIVE means the resource is ready for sale": "LIVE có nghĩa là tài nguyên đã sẵn sàng để bán",
     "Note: Each line will be 1 resource": "Ghi chú: Mỗi dòng sẽ là 1 tài nguyên",
     "Variant": "Biến thể",
+    "Variant ID": "Mã biến thể",
+    "Product ID": "Mã sản phẩm",
     "Delete category '{{name}}'?": "Xoá danh mục '{{name}}'?",
     "Invalid ID": "ID không hợp lệ",
-    "An error occurred, please try again later": "Đã xảy ra lỗi, vui lòng thử lại sau"
+    "An error occurred, please try again later": "Đã xảy ra lỗi, vui lòng thử lại sau",
+    "Additional information": "Thông tin thêm"
 }
