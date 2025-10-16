@@ -63,7 +63,7 @@ const CustomProfileDropdown = () => {
                     </div> */}
                     
                     <div className="dropdown-divider"></div>
-                    <Dropdown.Item href={route("seller.profile", {sub: subdomain})} className="dropdown-item">
+                    <Dropdown.Item href={route("seller.profile")} className="dropdown-item">
                        <i className="mdi mdi-account-circle text-muted fs-16 align-middle me-2"></i>
                        <span className="align-middle">{t("Edit information")}</span>
                     </Dropdown.Item>

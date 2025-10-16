@@ -116,7 +116,7 @@ const EditProfile = () => {
 
   return (
     <React.Fragment>
-      <Head title="Profile Settings | Velzon - React Admin & Dashboard Template" />
+      <Head title={t("Personal profile")} />
       <div className="page-content">
         <ToastContainer />
         <Container fluid>
