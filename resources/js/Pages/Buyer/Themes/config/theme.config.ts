@@ -12,9 +12,9 @@ const THEME_KEY = "app_theme";
 
 const defaultTheme: ThemeConfig = {
     theme: "theme_1",
-    pageHeaderImage: "/images/default-header.png",
+    pageHeaderImage: "",
     pageHeaderText: "Hello, welcome to MMO Store",
-    storeLogo: "/images/default-logo.png",
+    storeLogo: "",
     storeName: "MMO Store"
 };
 
