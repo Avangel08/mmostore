@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Seller\Product;
+namespace App\Http\Controllers\Api\Seller\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\Product\ApiAccountRequest;
@@ -9,12 +9,11 @@ use App\Services\Product\SellerAccountService;
 use App\Services\Product\SubProductService;
 use App\Traits\ApiResourceResponse;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Log;
 use Throwable;
 
-class ApiSellerAccountController extends Controller
+class SellerAccountApiController extends Controller
 {
     use ApiResourceResponse;
     protected $sellerAccountService;
