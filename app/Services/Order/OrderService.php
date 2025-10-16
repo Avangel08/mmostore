@@ -5,6 +5,7 @@ namespace App\Services\Order;
 use App\Models\Mongo\Orders;
 use App\Models\Mongo\SubProducts;
 use App\Models\Mongo\Accounts;
+use Carbon\Carbon;
 use DB;
 
 class OrderService
@@ -53,11 +54,13 @@ class OrderService
         }
 
         if (isset($request['date_from']) && $request['date_from'] != '') {
-            $query->where('created_at', '>=', $request['date_from']);
+            $start = Carbon::parse($request['date_from'])->startOfDay();
+            $query->where('created_at', '>=', $start);
         }
 
         if (isset($request['date_to']) && $request['date_to'] != '') {
-            $query->where('created_at', '<=', $request['date_to']);
+            $end = Carbon::parse($request['date_to'])->endOfDay();
+            $query->where('created_at', '<=', $end);
         }
 
         if (isset($request['category_id']) && $request['category_id'] != '') {
