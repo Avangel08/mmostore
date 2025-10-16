@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
     return (
         <React.Fragment>
             <div className="footer-bottom" style={{
-                backgroundColor: '#014475',
+                background: 'linear-gradient(rgb(0, 69, 119) 0%, rgb(18, 43, 61) 100%)',
                 padding: '20px 0',
                 color: 'white',
                 // width: '100vw',

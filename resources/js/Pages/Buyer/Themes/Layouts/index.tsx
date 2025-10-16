@@ -12,7 +12,7 @@ import { createSelector } from 'reselect';
 import Navbar from "./Navbar";
 import { usePage } from "@inertiajs/react";
 import { LayoutProvider } from "./LayoutContext";
-import Footer from "../Theme_1/Components/Footer/Footer";
+import Footer from "../theme_1/Components/Footer/Footer";
 import ContactFloatingButton from "../../../../Components/ContactFloatingButton";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {

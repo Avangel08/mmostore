@@ -18,6 +18,7 @@ import ModalLogin from "../../Home/ModalLogin";
 import { useTranslation } from "react-i18next";
 import ProfileDropdown from "../../../../Components/Common/ProfileDropdown";
 import LanguageDropdown from "../../../../Components/Common/LanguageDropdown";
+import { useThemeConfig } from "../hooks/useThemeConfig";
 
 const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
     const dispatch: any = useDispatch();
@@ -26,6 +27,9 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
     const [show, setShow] = useState(false);
     const { user } = usePage().props.auth as any;
     const { t } = useTranslation();
+    const storageUrl = usePage().props.storageUrl as string;
+    const theme = useThemeConfig()
+    console.log({ theme })
 
     const handleLogout = () => {
         router.post(route("buyer.logout"), {}, {
@@ -114,13 +118,13 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                 <Container fluid className="custom-container">
                     <Link className="navbar-brand" href="/">
                         <img
-                            src={logoLight}
+                            src={theme?.storeLogo ? `${storageUrl}/${theme.storeLogo}?v=${Date.now()}` : logoLight}
                             className="card-logo card-logo-dark"
                             alt="logo dark"
                             height="17"
                         />
                         <img
-                            src={logoLight}
+                            src={theme?.storeLogo ? `${storageUrl}/${theme.storeLogo}?v=${Date.now()}` : logoLight}
                             className="card-logo card-logo-light"
                             alt="logo light"
                             height="17"

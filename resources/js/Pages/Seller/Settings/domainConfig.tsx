@@ -15,7 +15,7 @@ const domainRegex = /^(?!-)[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/; // chỉ check dom
 const DomainConfig = () => {
     const { t } = useTranslation()
     const { settings, domains, domainSuffix } = usePage().props as any
-    console.log({ domainSuffix })
+
     const formik = useFormik<initialValuesProps>({
         enableReinitialize: true,
         initialValues: {
@@ -87,17 +87,16 @@ const DomainConfig = () => {
                         </p>
                         <Row>
                             <Col>
-                                <Form.Group>
+                                {/* <Form.Group>
                                     <Form.Control
                                         type="hidden"
                                         className="form-control"
                                         disabled
-                                        name="storeName"
                                         id="setting-title-input"
                                         placeholder={t("Enter name store")}
                                         value={domains}
                                     />
-                                </Form.Group>
+                                </Form.Group> */}
                                 <FieldArray
                                     name="domains"
                                     render={(arrayHelpers) => (

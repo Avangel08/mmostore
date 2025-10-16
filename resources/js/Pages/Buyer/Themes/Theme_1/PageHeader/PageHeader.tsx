@@ -1,9 +1,12 @@
 import React from "react"
 import { Col, Container, Row } from "react-bootstrap"
+import { usePage } from "@inertiajs/react";
 
 import hero from "../../../../../../images/hero/hero.png"
 
-const PageHeader = ({ title }: { title: string }) => {
+const PageHeader = ({ theme }: any) => {
+    const storageUrl = usePage().props.storageUrl as string;
+
     return (
         <React.Fragment>
             <section className="section job-hero-section pb-0" id="hero" style={{ background: "linear-gradient(180deg, #004577 0%, #122B3D 100%)" }}>
@@ -11,11 +14,11 @@ const PageHeader = ({ title }: { title: string }) => {
                     <Row className="justify-content-between align-items-center">
                         <Col lg={2}>
                             <div>
-                                <img src={hero} alt="" style={{ width: "100%" }} />
+                                <img src={theme?.pageHeaderImage ? `${storageUrl}/${theme.pageHeaderImage}?v=${Date.now()}` : hero} alt="" style={{ width: "100%" }} />
                             </div>
                         </Col>
                         <Col lg={9}>
-                            <span dangerouslySetInnerHTML={{ __html: title }} />
+                            <div className="text-white" dangerouslySetInnerHTML={{ __html: theme?.pageHeaderText }} />
                             {/* <div>
                                 <h3 className="display-8 fw-semibold text-capitalize mb-3 lh-base text-white">
                                 </h3>

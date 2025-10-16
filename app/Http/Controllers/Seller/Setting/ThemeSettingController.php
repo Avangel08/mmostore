@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Mongo\Settings;
 use App\Services\Home\StoreService;
 use App\Services\Setting\SettingService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -56,6 +57,12 @@ class ThemeSettingController extends Controller
     {
         $theme = $request->input('theme');
         $data = $request->all();
+        $domainSettings = $request->input('domains');
+        $user = auth('seller')->user();
+        $store = $this->storeService->findByUserId($user->id);
+        if (!$store) {
+            abort(404);
+        }
         foreach ($data as $key => $value) {
             if ($request->hasFile($key)) {
                 $host = request()->getHost();
@@ -65,6 +72,14 @@ class ThemeSettingController extends Controller
                 $value = $imagePath;
             }
             $this->settingService->updateOrCreateSetting($key, $value);
+        }
+        $newDomains = json_decode($domainSettings);
+        $domains = $store->domain;
+        // tránh trùng lặp
+        if (!in_array($newDomains, $domains)) {
+            // ✅ Merge và loại bỏ trùng
+            $mergedDomains = array_values(array_unique(array_merge($domains, $newDomains)));
+            $this->storeService->update($store, ['domain' => $mergedDomains]);
         }
 
         // $storeSettings = json_decode($request->input('store_settings'), true);

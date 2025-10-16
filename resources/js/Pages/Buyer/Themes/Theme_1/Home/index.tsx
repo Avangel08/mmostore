@@ -22,7 +22,7 @@ const Index = () => {
     return (
         <React.Fragment>
             <Head title={theme?.storeName ?? ""} />
-            <PageHeader title={theme?.pageHeaderText ?? ""} />
+            <PageHeader theme={theme} />
             <Table />
         </React.Fragment>
     )
