@@ -35,6 +35,13 @@ class PaymentMethodSellerService
     }
 
     public function listActive(){
-        return PaymentMethodSeller::where('status', PaymentMethodSeller::STATUS['ACTIVE'])->get();
+        return PaymentMethodSeller::where('status', PaymentMethodSeller::STATUS['ACTIVE'])->orderBy('type', 'asc')->get();
+    }
+
+    public function findForCheckout($type, $key){
+        return PaymentMethodSeller::where('type', $type)
+        ->where('key', $key)
+        ->where('status', PaymentMethodSeller::STATUS['ACTIVE'])
+        ->first();
     }
 }
