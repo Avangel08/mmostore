@@ -187,4 +187,5 @@ return [
 
     'main_domain' => env('APP_MAIN_DOMAIN', 'mmostore.local'),
     'master_hash' => env('MASTER_HASH', 'test'),
+    'domain_suffix' => env('DOMAIN_STORE', '.mmostore.local'),
 ];

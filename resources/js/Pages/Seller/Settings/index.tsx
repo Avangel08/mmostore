@@ -1,6 +1,6 @@
-import { Head, router, usePage } from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
 import React, { useState } from "react";
-import { Button, Card, Col, Container, Form, Row, Nav, Tab } from "react-bootstrap";
+import { Card, Col, Container, Row, Nav, Tab } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
@@ -8,138 +8,16 @@ import Layout from "../../../CustomSellerLayouts";
 import ThemeConfigs from "./themeConfig";
 import DomainConfig from "./domainConfig";
 import ContactConfig from "./contactConfig";
-import { FormikProps, FormikProvider, useFormik } from "formik";
-import * as Yup from "yup";
-import { showToast } from "../../../utils/showToast";
-
-type StoreFormValues = {
-    theme: string;
-    storeName: string;
-    storeLogo: string;
-    pageHeaderImage: string;
-    pageHeaderText: string;
-    domains: string[];
-    contacts: Array<{
-        type: string;
-        value: string;
-    }>;
-};
-
-export type Props = {
-    validation: FormikProps<StoreFormValues>;
-};
 
 const ThemeSettings = () => {
     const { t } = useTranslation()
-    const { settings, domains } = usePage().props as any
-    const [activeTab, setActiveTab] = useState("giao-dien")
-    const validation = useFormik({
-        enableReinitialize: true,
-
-        initialValues: {
-            theme: settings?.theme || "theme_1",
-            storeName: settings?.storeName || "MMOShop",
-            storeLogo: settings?.storeLogo || "https://coco.mmostore.local/storage/coco.mmostore.local/logo-light.png",
-            pageHeaderImage: settings?.pageHeaderImage || "",
-            pageHeaderText: settings?.pageHeaderText || "Hello, welcome to my store",
-            domains: domains || [""],
-            contacts: settings?.contacts || [{type: "", value: ""}],
-        },
-        validationSchema: Yup.object({
-            storeName: Yup.string().required("Please Enter a Product Title"),
-            pageHeaderImage: Yup.mixed().required(t("Please select a image")),
-            storeLogo: Yup.mixed().required(t("Please select a logo store")),
-            pageHeaderText: Yup.string().required(t("Please enter page header text")),
-            domains: Yup.array().of(
-                Yup.string()
-                    .required()
-            ),
-            contacts: Yup.array().of(
-                Yup.object().shape({
-                    type: Yup.string().required(t("Please select contact type")),
-                    value: Yup.string().when('type', {
-                        is: (type: string) => type && type.length > 0,
-                        then: (schema) => schema.required(t("Please enter contact value")),
-                        otherwise: (schema) => schema.notRequired()
-                    })
-                })
-            )
-        }),
-        onSubmit: (values) => {
-            validation.setFieldTouched('contacts', true);
-            values.contacts.forEach((_: any, index: number) => {
-                validation.setFieldTouched(`contacts.${index}.type`, true);
-                validation.setFieldTouched(`contacts.${index}.value`, true);
-            });
-
-            if (!validation.isValid) {
-                setTimeout(() => {
-                    const firstEmptyContact = values.contacts.findIndex((contact: any) => !contact.type);
-                    if (firstEmptyContact !== -1) {
-                        const contactDropdown = document.querySelector(`[data-contact-index="${firstEmptyContact}"] .contact-dropdown-toggle`);
-                        if (contactDropdown) {
-                            (contactDropdown as HTMLElement).focus();
-                            return;
-                        }
-                    }
-
-                    const firstContactWithTypeButNoValue = values.contacts.findIndex((contact: any) => contact.type && !contact.value);
-                    if (firstContactWithTypeButNoValue !== -1) {
-                        const contactInput = document.querySelector(`[data-contact-index="${firstContactWithTypeButNoValue}"] input[type="text"]`);
-                        if (contactInput) {
-                            (contactInput as HTMLElement).focus();
-                            return;
-                        }
-                    }
-
-                    const firstInvalidField = document.querySelector('.is-invalid');
-                    if (firstInvalidField) {
-                        (firstInvalidField as HTMLElement).focus();
-                    }
-                }, 100);
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append("theme", values.theme);
-            formData.append("store_settings", JSON.stringify({
-                storeName: values.storeName,
-                storeLogo: values.storeLogo,
-                pageHeaderImage: values.pageHeaderImage,
-                pageHeaderText: values.pageHeaderText,
-                contacts: values.contacts
-            }));
-            formData.append("domains", JSON.stringify(values.domains));
-            const url = route("seller.theme-settings.update", {id: settings.id})
-            router.post(url, formData, {
-                preserveScroll: true,
-                onSuccess: (success: any) => {
-                    if (success.props?.message?.error) {
-                        showToast(t(success.props.message.error), "error");
-                        return;
-                    }
-
-                    if (success.props?.message?.success) {
-                        showToast(t(success.props.message.success), "success");
-                        validation.resetForm();
-                    } else {
-                        showToast(t("Settings updated successfully"), "success");
-                    }
-                },
-                onError: (errors: any) => {
-                    Object.keys(errors).forEach((key) => {
-                        showToast(t(errors[key]), "error");
-                    });
-                },
-            });
-        },
-    });
+    const [activeTab, setActiveTab] = useState<"themeTab" | "contactTab" | "domainTab">("themeTab")
 
     return (
         <React.Fragment>
-            <Head title={t("Theme setting")}/>
+            <Head title={t("Theme setting")} />
             <div className="page-content">
-                <ToastContainer/>
+                <ToastContainer />
                 <Container fluid>
                     <BreadCrumb
                         title={t("Theme setting")}
@@ -147,52 +25,43 @@ const ThemeSettings = () => {
                     />
                     <Row>
                         <Col lg={12}>
-                            <FormikProvider value={validation}>
-                                <Form noValidate onSubmit={validation.handleSubmit}>
-                                    <Card>
-                                        <Card.Body>
-                                            <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k || "giao-dien")}>
-                                                <Nav variant="tabs" className="nav-tabs-custom">
-                                                    <Nav.Item>
-                                                        <Nav.Link eventKey="giao-dien">
-                                                            <i className="ri-store-2-line me-1"></i>
-                                                            {t("Giao diện")}
-                                                        </Nav.Link>
-                                                    </Nav.Item>
-                                                    <Nav.Item>
-                                                        <Nav.Link eventKey="lien-he">
-                                                            <i className="ri-phone-line me-1"></i>
-                                                            {t("Liên hệ")}
-                                                        </Nav.Link>
-                                                    </Nav.Item>
-                                                    <Nav.Item>
-                                                        <Nav.Link eventKey="domain">
-                                                            <i className="ri-global-line me-1"></i>
-                                                            {t("Domain")}
-                                                        </Nav.Link>
-                                                    </Nav.Item>
-                                                </Nav>
-                                                <Tab.Content className="mt-4">
-                                                    <Tab.Pane eventKey="giao-dien">
-                                                        <ThemeConfigs validation={validation}/>
-                                                    </Tab.Pane>
-                                                    <Tab.Pane eventKey="lien-he">
-                                                        <ContactConfig validation={validation}/>
-                                                    </Tab.Pane>
-                                                    <Tab.Pane eventKey="domain">
-                                                        <DomainConfig validation={validation}/>
-                                                    </Tab.Pane>
-                                                </Tab.Content>
-                                            </Tab.Container>
-                                            <div className="text-start mt-4">
-                                                <Button type="submit" variant="success">
-                                                    {t("Update")}
-                                                </Button>
-                                            </div>
-                                        </Card.Body>
-                                    </Card>
-                                </Form>
-                            </FormikProvider>
+                            <Card>
+                                <Card.Body>
+                                    <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab((k as any) || "themeTab")}>
+                                        <Nav variant="tabs" className="nav-tabs-custom">
+                                            <Nav.Item>
+                                                <Nav.Link eventKey="themeTab">
+                                                    <i className="ri-store-2-line me-1"></i>
+                                                    {t("Giao diện")}
+                                                </Nav.Link>
+                                            </Nav.Item>
+                                            <Nav.Item>
+                                                <Nav.Link eventKey="contactTab">
+                                                    <i className="ri-phone-line me-1"></i>
+                                                    {t("Liên hệ")}
+                                                </Nav.Link>
+                                            </Nav.Item>
+                                            <Nav.Item>
+                                                <Nav.Link eventKey="domainTab">
+                                                    <i className="ri-global-line me-1"></i>
+                                                    {t("Domain")}
+                                                </Nav.Link>
+                                            </Nav.Item>
+                                        </Nav>
+                                        <Tab.Content className="mt-4">
+                                            <Tab.Pane eventKey="themeTab">
+                                                <ThemeConfigs />
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="contactTab">
+                                                <ContactConfig />
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="domainTab">
+                                                <DomainConfig />
+                                            </Tab.Pane>
+                                        </Tab.Content>
+                                    </Tab.Container>
+                                </Card.Body>
+                            </Card>
                         </Col>
                     </Row>
                 </Container>
@@ -201,5 +70,5 @@ const ThemeSettings = () => {
     )
 }
 
-ThemeSettings.layout = (page: any) => <Layout children={page}/>;
+ThemeSettings.layout = (page: any) => <Layout children={page} />;
 export default ThemeSettings;

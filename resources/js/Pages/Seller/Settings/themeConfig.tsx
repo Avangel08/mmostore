@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import { Button, Card, Col, Form, Row } from "react-bootstrap";
+import { Button, Col, Form, Row } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { Props } from ".";
+import { useFormik } from "formik";
+import { router, usePage } from "@inertiajs/react";
+import * as Yup from "yup";
+import CustomCKEditor from "../../../Components/CustomCKEditor";
+import { showToast } from "../../../utils/showToast";
 
 // Import React FilePond
 import { FilePond, registerPlugin } from 'react-filepond';
@@ -19,8 +23,14 @@ registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 import img1 from "../../../../images/landing/showcase/theme-store-1.png"
 import img2 from "../../../../images/landing/showcase/theme-store-2.png"
 import img3 from "../../../../images/landing/showcase/theme-store-3.png"
-import { usePage } from "@inertiajs/react";
-import CustomCKEditor from "../../../Components/CustomCKEditor";
+
+type initialValuesProps = {
+    theme: string;
+    storeName: string;
+    storeLogo: string;
+    pageHeaderImage: string;
+    pageHeaderText: string;
+};
 
 const LIST_THEMES = [
     {
@@ -42,38 +52,95 @@ const LIST_THEMES = [
 ]
 
 
-const ThemeConfigs = ({ validation }: Props) => {
+const ThemeConfigs = () => {
     const { t } = useTranslation()
-    const [selectedImage, setSelectedImage] = useState<any>(validation?.values.storeLogo ?? null);
+    const [selectedImage, setSelectedImage] = useState<any>(null);
     const [files, setFiles] = useState<any>([]);
     const errors = usePage().props.errors as any;
     const storageUrl = usePage().props.storageUrl as string;
     const { settings } = usePage().props as any
     const isEditMode = Boolean(settings);
-    
+
+    const formik = useFormik<initialValuesProps>({
+        enableReinitialize: true,
+        initialValues: {
+            theme: settings?.theme || "theme_1",
+            storeName: settings?.store_settings?.storeName || "",
+            storeLogo: settings?.store_settings?.storeLogo || "",
+            pageHeaderImage: settings?.store_settings?.pageHeaderImage || "",
+            pageHeaderText: settings?.store_settings?.pageHeaderText || "Hello, welcome to my store",
+        },
+        validationSchema: Yup.object({
+            storeName: Yup.string().required("Please enter store name"),
+            pageHeaderImage: Yup.mixed().required("Please select a image"),
+            storeLogo: Yup.mixed().required("Please select a logo store"),
+            pageHeaderText: Yup.string().required("Please enter page header text"),
+        }),
+        onSubmit: (values) => {
+            const formData = new FormData();
+            formData.append("theme", values.theme);
+            formData.append("storeName", values.storeName);
+            formData.append("storeLogo", values.storeLogo);
+            formData.append("pageHeaderImage", values.pageHeaderImage);
+            formData.append("pageHeaderText", values.pageHeaderText);
+            // formData.append("store_settings", JSON.stringify({
+            //     theme: values.theme,
+            //     storeName: values.storeName,
+            //     storeLogo: values.storeLogo,
+            //     pageHeaderImage: values.pageHeaderImage,
+            //     pageHeaderText: values.pageHeaderText,
+            // }));
+            const url = route("seller.theme-settings.update", { id: settings.id })
+            router.post(url, formData, {
+                preserveScroll: true,
+                onSuccess: (success: any) => {
+                    if (success.props?.message?.error) {
+                        showToast(t(success.props.message.error), "error");
+                        return;
+                    }
+
+                    if (success.props?.message?.success) {
+                        showToast(t(success.props.message.success), "success");
+                        formik.resetForm();
+                    } else {
+                        showToast(t("Settings updated successfully"), "success");
+                    }
+                },
+                onError: (errors: any) => {
+                    Object.keys(errors).forEach((key) => {
+                        showToast(t(errors[key]), "error");
+                    });
+                },
+            });
+        }
+    })
+
     const handleImageChange = (event: any) => {
         const file = event.target.files[0];
         const reader = new FileReader();
         reader.onload = (e: any) => {
             setSelectedImage(e.target.result);
-            validation.setFieldValue("storeLogo", e.target.result);
-            validation.setFieldTouched("storeLogo", true);
+            formik.setFieldValue("storeLogo", file);
+            formik.setFieldTouched("storeLogo", true);
         };
         reader.readAsDataURL(file);
     };
 
+    console.log({ errors, touched: formik.touched?.storeName, formik: formik.errors })
+
     return (
         <React.Fragment>
-            <div className="mb-3">
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h5 className="mb-0">{t("Store")}</h5>
-                    <div className="d-flex gap-2">
-                        <Button variant="outline-success" size="sm">
-                            <i className="ri-eye-line align-bottom me-1"></i>{" "}
-                            {t("View store")}
-                        </Button>
+            <Form noValidate onSubmit={formik.handleSubmit}>
+                <div className="mb-3">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h5 className="mb-0">{t("Store")}</h5>
+                        <div className="d-flex gap-2">
+                            <Button variant="outline-success" size="sm">
+                                <i className="ri-eye-line align-bottom me-1"></i>{" "}
+                                {t("View store")}
+                            </Button>
+                        </div>
                     </div>
-                </div>
                     <Row>
                         <Col>
                             <div className="mb-3">
@@ -91,23 +158,23 @@ const ThemeConfigs = ({ validation }: Props) => {
                                                         name="theme"
                                                         value={String(sub.key)}
                                                         id={`${sub.key}`}
-										                disabled={sub.key === "theme_2" || sub.key === "theme_3"}
-                                                        onChange={validation.handleChange}
-                                                        onBlur={validation.handleBlur}
-                                                        checked={validation.values.theme === String(sub.key)}
+                                                        disabled={sub.key === "theme_2" || sub.key === "theme_3"}
+                                                        onChange={formik.handleChange}
+                                                        onBlur={formik.handleBlur}
+                                                        checked={formik.values.theme === String(sub.key)}
                                                     />
                                                     <Form.Label
                                                         htmlFor={`${sub.key}`}
-										                className={`text-muted mb-0 ${sub.key === "theme_2" || sub.key === "theme_3" ? "cursor-default" : "cursor-pointer"}`}
+                                                        className={`text-muted mb-0 ${sub.key === "theme_2" || sub.key === "theme_3" ? "cursor-default" : "cursor-pointer"}`}
                                                     >
                                                         {t(sub.label)}
                                                     </Form.Label>
                                                 </Form.Group>
-									{sub.key === "theme_2" || sub.key === "theme_3" ? (
-										<div style={{ fontSize: 12, fontStyle: "italic", color: "#fd7e14" }}>
-                                            { t("Coming soon") }
-										</div>
-									) : null}
+                                                {sub.key === "theme_2" || sub.key === "theme_3" ? (
+                                                    <div style={{ fontSize: 12, fontStyle: "italic", color: "#fd7e14" }}>
+                                                        {t("Coming soon")}
+                                                    </div>
+                                                ) : null}
                                             </div>
                                         </Col>
                                     ))}
@@ -125,26 +192,21 @@ const ThemeConfigs = ({ validation }: Props) => {
                                     <Form.Control
                                         type="text"
                                         className="form-control"
-                                        onChange={validation.handleChange}
-                                        onBlur={validation.handleBlur}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
                                         name="storeName"
                                         id="setting-title-input"
                                         placeholder={t("Enter name store")}
-                                        value={validation.values.storeName}
-                                        isInvalid={
-                                            !!(
-                                                (validation.touched.storeName &&
-                                                    validation.errors.storeName) ||
-                                                errors?.productName
-                                            )
-                                        }
+                                        value={formik.values.storeName}
+                                        isInvalid={!!(formik.touched?.storeName && formik.errors?.storeName)}
                                     />
                                 </Form.Group>
-                                <Form.Control.Feedback type="invalid">
+                                <Form.Control.Feedback type="invalid" className="invalid-feedback d-block">
                                     {" "}
-                                    {validation.errors.storeName}{" "}
+                                    {formik.errors.storeName}{" "}
                                 </Form.Control.Feedback>
                             </div>
+                            {/** Store Logo */}
                             <div className="mb-4">
                                 <h5 className="fs-14 mb-1">{t("Logo")}{" "}<span className="text-danger">*</span></h5>
                                 <p className="text-muted">{t("Add a logo for your store")}</p>
@@ -169,6 +231,7 @@ const ThemeConfigs = ({ validation }: Props) => {
                                                     className="form-control d-none"
                                                     id="customer-image-input"
                                                     type="file"
+                                                    name="storeLogo"
                                                     accept="image/png, image/gif, image/jpeg"
                                                     onChange={handleImageChange}
                                                 />
@@ -186,9 +249,9 @@ const ThemeConfigs = ({ validation }: Props) => {
                                         </div>
                                     </div>
                                 </div>
-                                {validation.errors.storeLogo && validation.touched.storeLogo ? (
+                                {formik.errors.storeLogo && formik.touched.storeLogo ? (
                                     <div className="invalid-feedback d-block">
-                                        {t(validation.errors.storeLogo || errors?.storeLogo)}
+                                        {t(formik.errors.storeLogo || errors?.storeLogo)}
                                     </div>
                                 ) : null}
                             </div>
@@ -231,11 +294,11 @@ const ThemeConfigs = ({ validation }: Props) => {
                                         setFiles(fileItems);
                                         if (fileItems.length > 0 && fileItems[0].file) {
                                             const file = fileItems[0].file;
-                                            validation.setFieldValue("pageHeaderImage", file);
-                                            validation.setFieldTouched("pageHeaderImage", true);
+                                            formik.setFieldValue("pageHeaderImage", file);
+                                            formik.setFieldTouched("pageHeaderImage", true);
                                         } else {
-                                            validation.setFieldValue("pageHeaderImage", null);
-                                            validation.setFieldTouched("pageHeaderImage", true);
+                                            formik.setFieldValue("pageHeaderImage", null);
+                                            formik.setFieldTouched("pageHeaderImage", true);
                                         }
                                     }}
                                     allowMultiple={false}
@@ -259,16 +322,16 @@ const ThemeConfigs = ({ validation }: Props) => {
                                     instantUpload={false}
                                     credits={false}
                                     className={
-                                        (validation.touched.pageHeaderImage && validation.errors.pageHeaderImage) ||
+                                        (formik.touched.pageHeaderImage && formik.errors.pageHeaderImage) ||
                                             errors?.pageHeaderImage
                                             ? "is-invalid"
                                             : ""
                                     }
                                 />
-                                {((validation.touched.pageHeaderImage && validation.errors.pageHeaderImage) ||
+                                {((formik.touched.pageHeaderImage && formik.errors.pageHeaderImage) ||
                                     errors?.pageHeaderImage) && (
                                         <Form.Control.Feedback type="invalid" className="invalid-feedback d-block">
-                                            {t(validation.errors.pageHeaderImage || errors?.pageHeaderImage)}
+                                            {t(formik.errors.pageHeaderImage || errors?.pageHeaderImage)}
                                         </Form.Control.Feedback>
                                     )}
                             </div>
@@ -276,27 +339,32 @@ const ThemeConfigs = ({ validation }: Props) => {
                             <div className="mb-3">
                                 <Form.Label>{t("Page header text")}</Form.Label>
                                 <CustomCKEditor
-                                    data={validation.values.pageHeaderText}
+                                    data={formik.values.pageHeaderText}
                                     onChange={(data: string) => {
-                                        validation.setFieldValue("pageHeaderText", data);
+                                        formik.setFieldValue("pageHeaderText", data);
                                     }}
                                     onBlur={() =>
-                                        validation.setFieldTouched("pageHeaderText", true)
+                                        formik.setFieldTouched("pageHeaderText", true)
                                     }
                                     placeholder={t("Enter detailed description")}
                                 />
-                                {((validation.touched.pageHeaderText && validation.errors.pageHeaderText) ||
+                                {((formik.touched.pageHeaderText && formik.errors.pageHeaderText) ||
                                     errors?.pageHeaderText) && (
                                         <Form.Control.Feedback type="invalid" className="invalid-feedback d-block">
-                                            {t(validation.errors.pageHeaderText || errors?.pageHeaderText)}
+                                            {t(formik.errors.pageHeaderText || errors?.pageHeaderText)}
                                         </Form.Control.Feedback>
                                     )
                                 }
                             </div>
                         </Col>
                     </Row>
-            </div>
-
+                </div>
+                <div className="text-start">
+                    <Button type="submit" variant="success">
+                        {t("Update")}
+                    </Button>
+                </div>
+            </Form>
         </React.Fragment>
     )
 }

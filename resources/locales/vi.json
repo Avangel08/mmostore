@@ -509,5 +509,6 @@
     "Service price list": "Bảng giá dịch vụ",
     "Out of stock": "Hết hàng",
     "It is strictly prohibited to use email accounts for illegal purposes": "Nghiêm cấm sử dụng tài khoản email cho các mục đích bất hợp pháp",
-    "We are not responsible for any misuse of resources": "Chúng tôi không chịu trách nhiệm cho bất kỳ hành vi nào sử dụng tài nguyên sai mục đích."
+    "We are not responsible for any misuse of resources": "Chúng tôi không chịu trách nhiệm cho bất kỳ hành vi nào sử dụng tài nguyên sai mục đích.",
+    "To ensure that a website can be recognized and displayed to users, it must always have a primary domain name. Only one domain can be selected as the main domain": "Để website có thể được nhận diện và hiển thị đến người dùng, website luôn phải có một tên miền chính. Chỉ có thể chọn duy nhất một tên miền làm tên miền chính."
 }

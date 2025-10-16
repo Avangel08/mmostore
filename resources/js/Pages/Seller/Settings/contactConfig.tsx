@@ -1,12 +1,97 @@
 import React, { useState } from "react";
 import { Button, Card, Col, Form, Row, Dropdown } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { usePage } from "@inertiajs/react";
-import { Props } from ".";
+import { router, usePage } from "@inertiajs/react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { showToast } from "../../../utils/showToast";
 
-const ContactConfig = ({validation}: Props) => {
+type initialValuesProps = {
+    contacts: Array<{
+        type: string;
+        value: string;
+    }>;
+};
+
+const ContactConfig = () => {
     const { t } = useTranslation();
     const { contact_types } = usePage().props as any;
+    const { settings } = usePage().props as any
+
+    const formik = useFormik<initialValuesProps>({
+        enableReinitialize: true,
+        initialValues: {
+            contacts: settings?.contacts || [{ type: "", value: "" }],
+        },
+        validationSchema: Yup.object({
+            contacts: Yup.array().of(
+                Yup.object({
+                    type: Yup.string().required("Please select contact type"),
+                    value: Yup.string().required("Please enter contact value"),
+                })
+            ),
+        }),
+        onSubmit: (values) => {
+            formik.setFieldTouched('contacts', true);
+            values.contacts.forEach((_: any, index: number) => {
+                formik.setFieldTouched(`contacts.${index}.type`, true);
+                formik.setFieldTouched(`contacts.${index}.value`, true);
+            });
+
+            if (!formik.isValid) {
+                setTimeout(() => {
+                    const firstEmptyContact = values.contacts.findIndex((contact: any) => !contact.type);
+                    if (firstEmptyContact !== -1) {
+                        const contactDropdown = document.querySelector(`[data-contact-index="${firstEmptyContact}"] .contact-dropdown-toggle`);
+                        if (contactDropdown) {
+                            (contactDropdown as HTMLElement).focus();
+                            return;
+                        }
+                    }
+
+                    const firstContactWithTypeButNoValue = values.contacts.findIndex((contact: any) => contact.type && !contact.value);
+                    if (firstContactWithTypeButNoValue !== -1) {
+                        const contactInput = document.querySelector(`[data-contact-index="${firstContactWithTypeButNoValue}"] input[type="text"]`);
+                        if (contactInput) {
+                            (contactInput as HTMLElement).focus();
+                            return;
+                        }
+                    }
+
+                    const firstInvalidField = document.querySelector('.is-invalid');
+                    if (firstInvalidField) {
+                        (firstInvalidField as HTMLElement).focus();
+                    }
+                }, 100);
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("contacts", JSON.stringify(values.contacts));
+            const url = route("seller.theme-settings.update", { id: settings.id })
+            router.post(url, formData, {
+                preserveScroll: true,
+                onSuccess: (success: any) => {
+                    if (success.props?.message?.error) {
+                        showToast(t(success.props.message.error), "error");
+                        return;
+                    }
+
+                    if (success.props?.message?.success) {
+                        showToast(t(success.props.message.success), "success");
+                        formik.resetForm();
+                    } else {
+                        showToast(t("Settings updated successfully"), "success");
+                    }
+                },
+                onError: (errors: any) => {
+                    Object.keys(errors).forEach((key) => {
+                        showToast(t(errors[key]), "error");
+                    });
+                },
+            });
+        }
+    })
 
     const getContactTypesArray = () => {
         if (Array.isArray(contact_types)) {
@@ -26,20 +111,20 @@ const ContactConfig = ({validation}: Props) => {
     };
 
     const addContact = () => {
-        const newContacts = [...validation.values.contacts, {type: "", value: ""}];
-        validation.setFieldValue("contacts", newContacts);
+        const newContacts = [...formik.values.contacts, { type: "", value: "" }];
+        formik.setFieldValue("contacts", newContacts);
     };
 
     const removeContact = (index: number) => {
-        const newContacts = validation.values.contacts.filter((_, i) => i !== index);
-        validation.setFieldValue("contacts", newContacts);
+        const newContacts = formik.values.contacts.filter((_, i) => i !== index);
+        formik.setFieldValue("contacts", newContacts);
     };
 
     const updateContact = (index: number, field: 'type' | 'value', value: string) => {
-        const newContacts = [...validation.values.contacts];
-        newContacts[index] = {...newContacts[index], [field]: value};
-        validation.setFieldValue("contacts", newContacts);
-        validation.setFieldTouched(`contacts.${index}.${field}`, true);
+        const newContacts = [...formik.values.contacts];
+        newContacts[index] = { ...newContacts[index], [field]: value };
+        formik.setFieldValue("contacts", newContacts);
+        formik.setFieldTouched(`contacts.${index}.${field}`, true);
     };
 
     return (
@@ -68,18 +153,19 @@ const ContactConfig = ({validation}: Props) => {
                     }
                 `}
             </style>
-            <div className="mb-3">
-                <h5 className="mb-2">{t("Contact")}<span className="text-danger">*</span></h5>
-                <p className="text-muted fs-14 mb-3">{t("Add your contact information for customers to reach you")}</p>
+            <Form noValidate onSubmit={formik.handleSubmit}>
+                <div className="mb-3">
+                    <h5 className="mb-2">{t("Contact")}<span className="text-danger">*</span></h5>
+                    <p className="text-muted fs-14 mb-3">{t("Add your contact information for customers to reach you")}</p>
                     <div className="mb-3">
-                        {validation.values.contacts.map((contact, index) => (
+                        {formik.values.contacts.map((contact, index) => (
                             <Row key={index} className="mb-2" data-contact-index={index}>
                                 <Col md={3}>
                                     <Dropdown>
                                         <Dropdown.Toggle
                                             variant="outline-secondary"
-                                            className={`w-100 d-flex align-items-center justify-content-between contact-dropdown-toggle ${(!contact.type && validation.touched.contacts) || (validation.errors.contacts?.[index] && typeof validation.errors.contacts[index] === 'object' && (validation.errors.contacts[index] as any)?.type) ? 'is-invalid' : ''}`}
-                                            style={{height: '38px'}}
+                                            className={`w-100 d-flex align-items-center justify-content-between contact-dropdown-toggle ${(!contact.type && formik.touched.contacts) || (formik.errors.contacts?.[index] && typeof formik.errors.contacts[index] === 'object' && (formik.errors.contacts[index] as any)?.type) ? 'is-invalid' : ''}`}
+                                            style={{ height: '38px' }}
                                         >
                                             {contact.type ? (
                                                 <div className="d-flex align-items-center">
@@ -104,7 +190,7 @@ const ContactConfig = ({validation}: Props) => {
                                         </Dropdown.Menu>
                                     </Dropdown>
                                     {/* Show type error */}
-                                    {(!contact.type && validation.touched.contacts) && (
+                                    {(!contact.type && formik.touched.contacts) && (
                                         <div className="invalid-feedback d-block">
                                             {t("Please select contact type")}
                                         </div>
@@ -117,21 +203,21 @@ const ContactConfig = ({validation}: Props) => {
                                             return (
                                                 <>
                                                     <div className="input-group">
-                                                    <span className="input-group-text" style={{
-                                                        backgroundColor: '#f8f9fa',
-                                                        borderColor: '#ced4da',
-                                                        color: '#6c757d',
-                                                        fontSize: '14px',
-                                                        minWidth: '120px'
-                                                    }}>
-                                                        {config.url_format}
-                                                    </span>
+                                                        <span className="input-group-text" style={{
+                                                            backgroundColor: '#f8f9fa',
+                                                            borderColor: '#ced4da',
+                                                            color: '#6c757d',
+                                                            fontSize: '14px',
+                                                            minWidth: '120px'
+                                                        }}>
+                                                            {config.url_format}
+                                                        </span>
                                                         <Form.Control
                                                             type="text"
                                                             placeholder={config.placeholder || t("Enter contact information")}
                                                             value={contact.value}
                                                             onChange={(e) => updateContact(index, 'value', e.target.value)}
-                                                            isInvalid={!!(contact.type && validation.touched.contacts?.[index]?.value && validation.errors.contacts?.[index])}
+                                                            isInvalid={!!(contact.type && formik.touched.contacts?.[index]?.value && formik.errors.contacts?.[index])}
                                                         />
                                                     </div>
                                                 </>
@@ -143,14 +229,14 @@ const ContactConfig = ({validation}: Props) => {
                                                     placeholder={config?.placeholder || t("Enter contact information")}
                                                     value={contact.value}
                                                     onChange={(e) => updateContact(index, 'value', e.target.value)}
-                                                    isInvalid={!!(contact.type && validation.touched.contacts?.[index]?.value && validation.errors.contacts?.[index])}
+                                                    isInvalid={!!(contact.type && formik.touched.contacts?.[index]?.value && formik.errors.contacts?.[index])}
                                                 />
                                             );
                                         }
                                     })()}
-                                    {contact.type && validation.touched.contacts?.[index]?.value && validation.errors.contacts?.[index] && (
+                                    {contact.type && formik.touched.contacts?.[index]?.value && formik.errors.contacts?.[index] && (
                                         <div className="invalid-feedback d-block">
-                                            {(validation.errors.contacts[index] as any)?.value}
+                                            {(formik.errors.contacts[index] as any)?.value}
                                         </div>
                                     )}
                                 </Col>
@@ -158,7 +244,7 @@ const ContactConfig = ({validation}: Props) => {
                                     <Button
                                         variant="danger"
                                         onClick={() => removeContact(index)}
-                                        disabled={validation.values.contacts.length === 1}
+                                        disabled={formik.values.contacts.length === 1}
                                     >
                                         <i className="ri-indeterminate-circle-line"></i>
                                     </Button>
@@ -173,7 +259,13 @@ const ContactConfig = ({validation}: Props) => {
                             <i className="ri-add-circle-line"></i>{" "}{t("Add Contact")}
                         </Button>
                     </div>
-            </div>
+                </div>
+                <div className="text-start">
+                    <Button type="submit" variant="success">
+                        {t("Update")}
+                    </Button>
+                </div>
+            </Form>
         </>
     );
 };

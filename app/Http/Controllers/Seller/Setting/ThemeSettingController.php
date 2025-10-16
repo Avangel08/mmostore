@@ -31,7 +31,7 @@ class ThemeSettingController extends Controller
         $result = [];
 
         foreach ($settings as $setting) {
-            if ($setting->key === 'contacts') {
+            if ($setting->key === 'contacts' || $setting->key === 'domains') {
                 $result[$setting->key] = json_decode($setting->value, true) ?: [];
             } else {
                 $result[$setting->key] = $setting->value;
@@ -41,6 +41,7 @@ class ThemeSettingController extends Controller
         return Inertia::render('Settings/index', [
             'settings' => fn() => $result,
             'domains' => $store->domain,
+            'domainSuffix' => config('app.domain_suffix'),
             'contact_types' => fn() => Settings::CONTACT_TYPES,
         ]);
     }
@@ -54,19 +55,31 @@ class ThemeSettingController extends Controller
     public function update(Request $request)
     {
         $theme = $request->input('theme');
-        $storeSettings = json_decode($request->input('store_settings'), true);
-        
-        $this->settingService->updateOrCreateSetting('theme', $theme);
-        
-        if ($storeSettings) {
-            foreach ($storeSettings as $key => $value) {
-                if ($key === 'contacts') {
-                    $value = json_encode($value);
-                }
-                $this->settingService->updateOrCreateSetting($key, $value);
+        $data = $request->all();
+        foreach ($data as $key => $value) {
+            if ($request->hasFile($key)) {
+                $host = request()->getHost();
+                $extension = $data[$key]->getClientOriginalExtension();
+                $fileName = $key . '.' . $extension;
+                $imagePath = $data[$key]->storeAs("{$host}/settings", $fileName, 'public');
+                $value = $imagePath;
             }
+            $this->settingService->updateOrCreateSetting($key, $value);
         }
-        
+
+        // $storeSettings = json_decode($request->input('store_settings'), true);
+
+        // $this->settingService->updateOrCreateSetting('theme', $theme);
+
+        // if ($storeSettings) {
+        //     foreach ($storeSettings as $key => $value) {
+        //         if ($key === 'contacts') {
+        //             $value = json_encode($value);
+        //         }
+        //         $this->settingService->updateOrCreateSetting($key, $value);
+        //     }
+        // }
+
         return redirect()->back()->with([
             'message' => [
                 'success' => 'Settings updated successfully'
