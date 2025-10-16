@@ -28,6 +28,7 @@ import avatar1 from "../../../../../../images/users/user-dummy-img.jpg";
 // Import the tab panes
 import TabPaneChangeInformation from "./TabPaneChangeInformation";
 import TabPaneChangePassword from "./TabPaneChangePassword";
+import TabPaneToken from "./TabPaneToken";
 import { showToast } from "../../../../../utils/showToast";
 
 const Profile = () => {
@@ -192,6 +193,7 @@ const Profile = () => {
                                                 <Tab.Content className="p-4">
                                                     <TabPaneChangeInformation />
                                                     <TabPaneChangePassword />
+                                                    <TabPaneToken />
                                                 </Tab.Content>
                                             </Col>
                                             <Col md={4}>

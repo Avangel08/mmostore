@@ -48,6 +48,8 @@ Route::middleware(['validate.subdomain', 'tenant.mongo'])
                 Route::put('/update-info', [ProfileController::class, 'updateInfo'])->name('buyer.profile.update-info');
                 Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('buyer.profile.change-password');
                 Route::post('/upload-image', [ProfileController::class, 'uploadImage'])->name('buyer.profile.upload-image');
+                Route::post('/create-token', [ProfileController::class, 'createToken'])->name('buyer.profile.create-token');
+                Route::delete('/delete-token/{tokenId}', [ProfileController::class, 'deleteToken'])->name('buyer.profile.delete-token');
             });
 
             Route::group(['prefix' => 'payment-history'], function () {

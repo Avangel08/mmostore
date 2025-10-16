@@ -9,12 +9,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Support\Carbon;
+use Laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\NewAccessToken;
 use MongoDB\Laravel\Auth\User as Authenticatable;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
+use DateTimeInterface;
+use Illuminate\Support\Str;
 
 class Customers extends Authenticatable
 {
-    use HasFactory, SoftDeletes, Notifiable;
+    use HasFactory, SoftDeletes, Notifiable, HasApiTokens;
 
     protected $connection = 'tenant_mongo';
 
@@ -55,6 +59,47 @@ class Customers extends Authenticatable
             'url' => route('buyer.password.reset', ['token' => $token, 'email' => $this->email]),
         ];
         dispatch(new JobMailBuyerResetPassword($dataSendMail, app()->getLocale()));
+    }
+
+    /**
+     * Override createToken from HasApiTokens trait to use MongoDB
+     */
+    public function createToken(string $name, array $abilities = ['*'], ?DateTimeInterface $expiresAt = null)
+    {
+        $plainTextToken = $this->generateTokenString();
+
+        $personalAccessToken = $this->tokens()->create([
+            'name' => $name,
+            'token' => hash('sha256', $plainTextToken),
+            'abilities' => $abilities,
+            'expires_at' => $expiresAt,
+            'token_plain_text' => $plainTextToken, // Store plain text for display
+        ]);
+
+        $newAccessToken = new NewAccessToken($personalAccessToken, $personalAccessToken->getKey() . '|' . $plainTextToken);
+
+        return $newAccessToken;
+    }
+
+    /**
+     * Get the access tokens that belong to model.
+     */
+    public function tokens()
+    {
+        return $this->morphMany(\App\Models\Mongo\PersonalAccessToken::class, 'tokenable');
+    }
+
+    /**
+     * Generate a token string
+     */
+    protected function generateTokenString()
+    {
+        return sprintf(
+            '%s%s%s',
+            config('sanctum.token_prefix', ''),
+            $tokenEntropy = Str::random(40),
+            hash('crc32b', $tokenEntropy)
+        );
     }
 
     public function scopeFilterSearch($query, $request)
