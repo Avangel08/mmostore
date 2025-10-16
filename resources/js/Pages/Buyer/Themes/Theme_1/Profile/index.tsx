@@ -177,14 +177,20 @@ const Profile = () => {
                                                 >
                                                     <Nav.Item className="mb-2">
                                                         <Nav.Link eventKey="personal-info" className="text-start">
-                                                            <i className="fas fa-home me-2"></i>
+                                                            <i className="ri-shield-user-line me-2"></i>
                                                             {t("Personal Information")}
                                                         </Nav.Link>
                                                     </Nav.Item>
-                                                    <Nav.Item>
+                                                    <Nav.Item className="mb-2">
                                                         <Nav.Link eventKey="change-password" className="text-start">
-                                                            <i className="far fa-user me-2"></i>
+                                                            <i className="ri-lock-password-line me-2"></i>
                                                             {t("Change Password")}
+                                                        </Nav.Link>
+                                                    </Nav.Item>
+                                                    <Nav.Item>
+                                                        <Nav.Link eventKey="token" className="text-start">
+                                                            <i className="ri-key-line me-2"></i>
+                                                            {t("API Token")}
                                                         </Nav.Link>
                                                     </Nav.Item>
                                                 </Nav>

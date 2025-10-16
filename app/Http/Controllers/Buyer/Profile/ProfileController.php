@@ -5,35 +5,44 @@ namespace App\Http\Controllers\Buyer\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buyer\BuyerProfile\BuyerProfileRequest;
 use App\Services\BuyerProfile\BuyerProfileService;
-use App\Services\PersonalAccessToken\PersonalAccessTokenMongoService;
-use Auth;
+use App\Models\Mongo\CustomerAccessToken;
+use App\Services\CustomerAccessToken\CustomerAccessTokenService;
+use Illuminate\Support\Facades\Auth;
 use Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
     protected $buyerProfileService;
-    protected $personalAccessTokenService;
+    protected $customerAccessTokenService;
 
-    public function __construct(BuyerProfileService $buyerProfileService, PersonalAccessTokenMongoService $personalAccessTokenService)
-    {
+    public function __construct(
+        BuyerProfileService $buyerProfileService,
+        CustomerAccessTokenService $customerAccessTokenService,
+    ) {
         $this->buyerProfileService = $buyerProfileService;
-        $this->personalAccessTokenService = $personalAccessTokenService;
+        $this->customerAccessTokenService = $customerAccessTokenService;
     }
 
     public function index()
     {
         $user = Auth::guard(config('guard.buyer'))->user();
-        if (!$user) {
-            return abort(404);
-        }
         $theme = session('theme') ?? "theme_1";
+
+        if (!$user) {
+            return back()->with('error', 'User not found');
+        }
+
         return Inertia::render("Themes/{$theme}/Profile/index", [
             'purchasedCount' => Inertia::optional(function () {
                 return 0;
             }),
-            'token' => Inertia::optional(fn() => $this->personalAccessTokenService->userGetFirstToken($user, ['id', 'token_plain_text', 'created_at', 'last_used_at'])),
+            'token' => $this->customerAccessTokenService->userFindFirstTokenByTokenable(
+                $user,
+                ['_id as id', 'token_plain_text', 'created_at', 'last_used_at']
+            ),
         ]);
     }
 
@@ -49,8 +58,6 @@ class ProfileController extends Controller
 
             return back()->with('success', 'Update information successfully');
         } catch (\Exception $e) {
-            \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.buyer'))->id() ?? null]);
-
             return back()->with('error', $e->getMessage());
         }
     }
@@ -107,17 +114,10 @@ class ProfileController extends Controller
                 return back()->with('error', 'User not found');
             }
 
-            if ($user->tokens()->count() > 0) {
-                return back()->with('error', 'You already have a token. Please reload page to see your token');
-            }
-
-            $date = date('Ymd_His');
-            $this->personalAccessTokenService->userCreateToken($user, "token-{$date}");
+            $this->customerAccessTokenService->userCreateTokenDirect($user);
 
             return back()->with('success', 'Token created successfully');
-        } catch (\Exception $e) {
-            \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.buyer'))->id() ?? null]);
-
+        } catch (\Throwable $e) {
             return back()->with('error', $e->getMessage());
         }
     }
@@ -130,13 +130,10 @@ class ProfileController extends Controller
                 return back()->with('error', 'User not found');
             }
 
-            // current 1 user 1 token - so delete is just revoke all
-            $this->personalAccessTokenService->userRevokeAllTokens($user);
+            $this->customerAccessTokenService->userRevokeAllTokens($user);
 
             return back()->with('success', 'Token deleted successfully');
         } catch (\Exception $e) {
-            \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.buyer'))->id() ?? null]);
-
             return back()->with('error', $e->getMessage());
         }
     }
