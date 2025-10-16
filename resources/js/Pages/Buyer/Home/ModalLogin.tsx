@@ -329,14 +329,14 @@ export default function ModalLogin({
                 >
                   {t("Log in")}
                 </Button>
-                <Button
+                {/* <Button
                   variant="light"
                   size="lg"
                   className="d-flex align-items-center justify-content-center border"
                   type="button"
                 >
                   <GoogleIcon className="me-2" /> {t("Sign in with Google")}
-                </Button>
+                </Button> */}
               </div>
             </Form>
           ) : (
@@ -479,14 +479,14 @@ export default function ModalLogin({
                 >
                   {t("Register")}
                 </Button>
-                <Button
+                {/* <Button
                   variant="light"
                   size="lg"
                   className="d-flex align-items-center justify-content-center border"
                   type="button"
                 >
                   <GoogleIcon className="me-2" /> {t("Sign up with Google")}
-                </Button>
+                </Button> */}
               </div>
             </Form>
           )}
