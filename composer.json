@@ -17,6 +17,7 @@
         "mongodb/laravel-mongodb": "^5.5",
         "phpseclib/phpseclib": "2.0",
         "predis/predis": "^3.2",
+        "sepayvn/laravel-sepay": "^1.2",
         "spatie/laravel-permission": "^6.21",
         "tightenco/ziggy": "2.5.3"
     },
