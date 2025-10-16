@@ -145,7 +145,6 @@ export default function ResetPassword({ token, email, tokenExpired }: any) {
 
                                                 <Form noValidate validated={isValidated} onSubmit={submit}>
 
-                                            {/* Password Field */}
                                             <div className="mb-4">
                                                 <Form.Label className="form-label fw-semibold text-dark">{t("New Password")}</Form.Label>
                                                 <span className="text-danger ms-1">*</span>
@@ -246,7 +245,7 @@ export default function ResetPassword({ token, email, tokenExpired }: any) {
                                                     fontSize: '16px' 
                                                 }}
                                             >
-                                                {processing ? t("Updating...") : t("Update Password")}
+                                                {processing ? t("Update Password") : t("Update Password")}
                                             </Button>
                                                 </Form>
 

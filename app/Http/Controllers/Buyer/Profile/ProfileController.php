@@ -5,31 +5,44 @@ namespace App\Http\Controllers\Buyer\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buyer\BuyerProfile\BuyerProfileRequest;
 use App\Services\BuyerProfile\BuyerProfileService;
-use Auth;
+use App\Models\Mongo\CustomerAccessToken;
+use App\Services\CustomerAccessToken\CustomerAccessTokenService;
+use Illuminate\Support\Facades\Auth;
 use Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
     protected $buyerProfileService;
+    protected $customerAccessTokenService;
 
-    public function __construct(BuyerProfileService $buyerProfileService)
-    {
+    public function __construct(
+        BuyerProfileService $buyerProfileService,
+        CustomerAccessTokenService $customerAccessTokenService,
+    ) {
         $this->buyerProfileService = $buyerProfileService;
+        $this->customerAccessTokenService = $customerAccessTokenService;
     }
 
     public function index()
     {
         $user = Auth::guard(config('guard.buyer'))->user();
-        if (!$user) {
-            return abort(404);
-        }
         $theme = session('theme') ?? "theme_1";
+
+        if (!$user) {
+            return back()->with('error', 'User not found');
+        }
+
         return Inertia::render("Themes/{$theme}/Profile/index", [
             'purchasedCount' => Inertia::optional(function () {
                 return 0;
             }),
+            'token' => $this->customerAccessTokenService->userFindFirstTokenByTokenable(
+                $user,
+                ['_id as id', 'token_plain_text', 'created_at', 'last_used_at']
+            ),
         ]);
     }
 
@@ -45,8 +58,6 @@ class ProfileController extends Controller
 
             return back()->with('success', 'Update information successfully');
         } catch (\Exception $e) {
-            \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.buyer'))->id() ?? null]);
-
             return back()->with('error', $e->getMessage());
         }
     }
@@ -91,6 +102,38 @@ class ProfileController extends Controller
         } catch (\Exception $e) {
             \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.buyer'))->id() ?? null]);
 
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function createToken(BuyerProfileRequest $request)
+    {
+        try {
+            $user = Auth::guard(config('guard.buyer'))->user();
+            if (!$user) {
+                return back()->with('error', 'User not found');
+            }
+
+            $this->customerAccessTokenService->userCreateTokenDirect($user);
+
+            return back()->with('success', 'Token created successfully');
+        } catch (\Throwable $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function deleteToken(BuyerProfileRequest $request, $tokenId)
+    {
+        try {
+            $user = Auth::guard(config('guard.buyer'))->user();
+            if (!$user) {
+                return back()->with('error', 'User not found');
+            }
+
+            $this->customerAccessTokenService->userRevokeAllTokens($user);
+
+            return back()->with('success', 'Token deleted successfully');
+        } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
     }

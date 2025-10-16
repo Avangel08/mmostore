@@ -39,7 +39,7 @@ const CustomProfileDropdown = () => {
                 className="ms-sm-3 header-item topbar-user">
                 <Dropdown.Toggle as="button" type="button" className="arrow-none btn">
                     <span className="d-flex align-items-center">
-                        <img className="rounded-circle header-profile-user object-fit-contain" src={user?.image ? `${storageUrl}/${user.image}?v=${Date.now()}` : avatar1}
+                        <img className="rounded-circle header-profile-user object-fit-contain" src={user?.image ? `${storageUrl}/${user.image}` : avatar1}
                             alt="Header Avatar" />
                         <span className="text-start ms-xl-2">
                             <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{username}</span>
@@ -63,7 +63,7 @@ const CustomProfileDropdown = () => {
                     </div> */}
                     
                     <div className="dropdown-divider"></div>
-                    <Dropdown.Item href={route("seller.profile", {sub: subdomain})} className="dropdown-item">
+                    <Dropdown.Item href={route("seller.profile")} className="dropdown-item">
                        <i className="mdi mdi-account-circle text-muted fs-16 align-middle me-2"></i>
                        <span className="align-middle">{t("Edit information")}</span>
                     </Dropdown.Item>

@@ -524,7 +524,7 @@
     "Token copied": "Token đã được sao chép",
     "Failed to copy token. Please try copy manually": "Sao chép token thất bại. Vui lòng thử copy thủ công",
     "Copy": "Sao chép",
-    "You don't have an API Token yet.": "Bạn chưa có API Token.",
+    "You don't have an API Token yet.": "Bạn chưa có API Token",
     "Create API Token": "Tạo API Token",
     "Token created successfully": "Tạo token thành công",
     "You already have a token. Please reload page to see your token": "Bạn đã có token. Vui lòng tải lại trang để xem token của bạn",

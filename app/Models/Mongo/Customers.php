@@ -3,18 +3,19 @@
 namespace App\Models\Mongo;
 
 use App\Jobs\Mail\JobMailBuyerResetPassword;
-use App\Notifications\BuyerResetPasswordNotification;
 use Auth;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Queue\Jobs\Job;
 use Illuminate\Support\Carbon;
+use Laravel\Sanctum\HasApiTokens;
 use MongoDB\Laravel\Auth\User as Authenticatable;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
+use DateTimeInterface;
+use Illuminate\Support\Str;
 
 class Customers extends Authenticatable
 {
-    use HasFactory, SoftDeletes, Notifiable;
+    use HasFactory, SoftDeletes, Notifiable, HasApiTokens;
 
     protected $connection = 'tenant_mongo';
 
@@ -55,6 +56,11 @@ class Customers extends Authenticatable
             'url' => route('buyer.password.reset', ['token' => $token, 'email' => $this->email]),
         ];
         dispatch(new JobMailBuyerResetPassword($dataSendMail, app()->getLocale()));
+    }
+
+    public function tokens()
+    {
+        return $this->morphMany(CustomerAccessToken::class, 'tokenable');
     }
 
     public function scopeFilterSearch($query, $request)

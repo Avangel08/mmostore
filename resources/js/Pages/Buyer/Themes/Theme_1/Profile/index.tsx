@@ -28,6 +28,7 @@ import avatar1 from "../../../../../../images/users/user-dummy-img.jpg";
 // Import the tab panes
 import TabPaneChangeInformation from "./TabPaneChangeInformation";
 import TabPaneChangePassword from "./TabPaneChangePassword";
+import TabPaneToken from "./TabPaneToken";
 import { showToast } from "../../../../../utils/showToast";
 
 const Profile = () => {
@@ -84,8 +85,8 @@ const Profile = () => {
         document.head.appendChild(style);
 
         if (user?.image) {
-            setOriginalImage(`${storageUrl}/${user.image}?v=${Date.now()}`);
-            setPreviewImage(`${storageUrl}/${user.image}?v=${Date.now()}`);
+            setOriginalImage(`${storageUrl}/${user.image}`);
+            setPreviewImage(`${storageUrl}/${user.image}`);
         }
 
         return () => {
@@ -131,7 +132,7 @@ const Profile = () => {
             onSuccess: (page: any) => {
                 showToast(t('Profile image updated successfully'), 'success');
                 if (page.props?.auth?.user?.image) {
-                    setOriginalImage(`${storageUrl}/${page.props.auth.user.image}?v=${Date.now()}`);
+                    setOriginalImage(`${storageUrl}/${page.props.auth.user.image}`);
                 }
             },
             onError: (errors) => {
@@ -176,14 +177,20 @@ const Profile = () => {
                                                 >
                                                     <Nav.Item className="mb-2">
                                                         <Nav.Link eventKey="personal-info" className="text-start">
-                                                            <i className="fas fa-home me-2"></i>
+                                                            <i className="ri-shield-user-line me-2"></i>
                                                             {t("Personal Information")}
                                                         </Nav.Link>
                                                     </Nav.Item>
-                                                    <Nav.Item>
+                                                    <Nav.Item className="mb-2">
                                                         <Nav.Link eventKey="change-password" className="text-start">
-                                                            <i className="far fa-user me-2"></i>
+                                                            <i className="ri-lock-password-line me-2"></i>
                                                             {t("Change Password")}
+                                                        </Nav.Link>
+                                                    </Nav.Item>
+                                                    <Nav.Item>
+                                                        <Nav.Link eventKey="token" className="text-start">
+                                                            <i className="ri-key-line me-2"></i>
+                                                            {t("API Token")}
                                                         </Nav.Link>
                                                     </Nav.Item>
                                                 </Nav>
@@ -192,6 +199,7 @@ const Profile = () => {
                                                 <Tab.Content className="p-4">
                                                     <TabPaneChangeInformation />
                                                     <TabPaneChangePassword />
+                                                    <TabPaneToken />
                                                 </Tab.Content>
                                             </Col>
                                             <Col md={4}>
@@ -199,11 +207,11 @@ const Profile = () => {
                                                     <div className="text-center">
                                                         <div className="profile-user position-relative d-inline-block mx-auto mb-4">
                                                             <img
-                                                                src={previewImage || (user?.image ? `${storageUrl}/${user.image}?v=${Date.now()}` : avatar1)}
+                                                                src={previewImage || (user?.image ? `${storageUrl}/${user.image}` : avatar1)}
                                                                 className="rounded-circle img-thumbnail user-profile-image material-shadow"
                                                                 alt="user-profile"
                                                                 onClick={() => {
-                                                                    const imageUrl = previewImage || (user?.image ? `${storageUrl}/${user.image}?v=${Date.now()}` : avatar1);
+                                                                    const imageUrl = previewImage || (user?.image ? `${storageUrl}/${user.image}` : avatar1);
                                                                     window.open(imageUrl, '_blank');
                                                                 }}
                                                                 style={{
