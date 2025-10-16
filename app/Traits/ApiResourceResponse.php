@@ -11,7 +11,7 @@ trait ApiResourceResponse
         return response()->json([
             'status' => 'success',
             'message' => $message ?? 'Success',
-            ...($resourceData ?? [])
+            'data' => $resourceData
         ], $code);
     }
 

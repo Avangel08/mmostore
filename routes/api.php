@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\Seller\Product\SellerAccountApiController;
 use App\Http\Controllers\Api\Webhook\SePay\SePayWebHookController;
-use App\Http\Controllers\Seller\Product\ApiSellerAccountController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,8 +20,8 @@ Route::group(['prefix' => 'v1','as' => 'api.'], function () use ($mainDomain) {
         // seller api
         Route::domain('{sub}.' . $mainDomain)->middleware((['auth:seller_api', 'validate.subdomain', 'tenant.mongo', 'validate.seller.token']))->group(function () {
             Route::group(['prefix' => 'accounts', 'as' => 'seller.'], function () {
-                Route::post("/", [ApiSellerAccountController::class, 'store'])->name('accounts.store');
-                Route::delete("/", [ApiSellerAccountController::class, 'destroy'])->name('accounts.destroy');
+                Route::post("/", [SellerAccountApiController::class, 'store'])->name('accounts.store');
+                Route::delete("/", [SellerAccountApiController::class, 'destroy'])->name('accounts.destroy');
             });
         });
 

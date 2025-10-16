@@ -85,8 +85,8 @@ const Profile = () => {
         document.head.appendChild(style);
 
         if (user?.image) {
-            setOriginalImage(`${storageUrl}/${user.image}?v=${Date.now()}`);
-            setPreviewImage(`${storageUrl}/${user.image}?v=${Date.now()}`);
+            setOriginalImage(`${storageUrl}/${user.image}`);
+            setPreviewImage(`${storageUrl}/${user.image}`);
         }
 
         return () => {
@@ -132,7 +132,7 @@ const Profile = () => {
             onSuccess: (page: any) => {
                 showToast(t('Profile image updated successfully'), 'success');
                 if (page.props?.auth?.user?.image) {
-                    setOriginalImage(`${storageUrl}/${page.props.auth.user.image}?v=${Date.now()}`);
+                    setOriginalImage(`${storageUrl}/${page.props.auth.user.image}`);
                 }
             },
             onError: (errors) => {
@@ -207,11 +207,11 @@ const Profile = () => {
                                                     <div className="text-center">
                                                         <div className="profile-user position-relative d-inline-block mx-auto mb-4">
                                                             <img
-                                                                src={previewImage || (user?.image ? `${storageUrl}/${user.image}?v=${Date.now()}` : avatar1)}
+                                                                src={previewImage || (user?.image ? `${storageUrl}/${user.image}` : avatar1)}
                                                                 className="rounded-circle img-thumbnail user-profile-image material-shadow"
                                                                 alt="user-profile"
                                                                 onClick={() => {
-                                                                    const imageUrl = previewImage || (user?.image ? `${storageUrl}/${user.image}?v=${Date.now()}` : avatar1);
+                                                                    const imageUrl = previewImage || (user?.image ? `${storageUrl}/${user.image}` : avatar1);
                                                                     window.open(imageUrl, '_blank');
                                                                 }}
                                                                 style={{

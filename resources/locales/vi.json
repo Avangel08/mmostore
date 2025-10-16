@@ -567,5 +567,9 @@
     "Invalid ID": "ID không hợp lệ",
     "An error occurred, please try again later": "Đã xảy ra lỗi, vui lòng thử lại sau",
     "Additional information": "Thông tin thêm",
-    "To ensure that a website can be recognized and displayed to users, it must always have a primary domain name. Only one domain can be selected as the main domain": "Để website có thể được nhận diện và hiển thị đến người dùng, website luôn phải có một tên miền chính. Chỉ có thể chọn duy nhất một tên miền làm tên miền chính."
+    "To ensure that a website can be recognized and displayed to users, it must always have a primary domain name. Only one domain can be selected as the main domain": "Để website có thể được nhận diện và hiển thị đến người dùng, website luôn phải có một tên miền chính. Chỉ có thể chọn duy nhất một tên miền làm tên miền chính.",
+    "Page header image": "Ảnh tiêu đề trang",
+    "Current store logo": "Logo cửa hàng hiện tại",
+    "Current page header image": "Ảnh tiêu đề trang hiện tại",
+    "Page header text": "Văn bản tiêu đề trang"
 }
