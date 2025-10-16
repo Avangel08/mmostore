@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
-import { router, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import * as Yup from "yup";
 import CustomCKEditor from "../../../Components/CustomCKEditor";
 import { showToast } from "../../../utils/showToast";
@@ -58,17 +58,17 @@ const ThemeConfigs = () => {
     const [files, setFiles] = useState<any>([]);
     const errors = usePage().props.errors as any;
     const storageUrl = usePage().props.storageUrl as string;
-    const { settings } = usePage().props as any
+    const { settings, domains, domainSuffix } = usePage().props as any
     const isEditMode = Boolean(settings);
 
     const formik = useFormik<initialValuesProps>({
         enableReinitialize: true,
         initialValues: {
             theme: settings?.theme || "theme_1",
-            storeName: settings?.store_settings?.storeName || "",
-            storeLogo: settings?.store_settings?.storeLogo || "",
-            pageHeaderImage: settings?.store_settings?.pageHeaderImage || "",
-            pageHeaderText: settings?.store_settings?.pageHeaderText || "Hello, welcome to my store",
+            storeName: settings?.storeName || "",
+            storeLogo: settings?.storeLogo || "",
+            pageHeaderImage: settings?.pageHeaderImage || "",
+            pageHeaderText: settings?.pageHeaderText || "Hello, welcome to my store",
         },
         validationSchema: Yup.object({
             storeName: Yup.string().required("Please enter store name"),
@@ -83,13 +83,6 @@ const ThemeConfigs = () => {
             formData.append("storeLogo", values.storeLogo);
             formData.append("pageHeaderImage", values.pageHeaderImage);
             formData.append("pageHeaderText", values.pageHeaderText);
-            // formData.append("store_settings", JSON.stringify({
-            //     theme: values.theme,
-            //     storeName: values.storeName,
-            //     storeLogo: values.storeLogo,
-            //     pageHeaderImage: values.pageHeaderImage,
-            //     pageHeaderText: values.pageHeaderText,
-            // }));
             const url = route("seller.theme-settings.update", { id: settings.id })
             router.post(url, formData, {
                 preserveScroll: true,
@@ -126,8 +119,6 @@ const ThemeConfigs = () => {
         reader.readAsDataURL(file);
     };
 
-    console.log({ errors, touched: formik.touched?.storeName, formik: formik.errors })
-
     return (
         <React.Fragment>
             <Form noValidate onSubmit={formik.handleSubmit}>
@@ -135,10 +126,15 @@ const ThemeConfigs = () => {
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <h5 className="mb-0">{t("Store")}</h5>
                         <div className="d-flex gap-2">
-                            <Button variant="outline-success" size="sm">
-                                <i className="ri-eye-line align-bottom me-1"></i>{" "}
+                            <a
+                                href="/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-sm btn-outline-success"
+                            >
+                                <i className="ri-eye-line align-bottom me-1"></i>
                                 {t("View store")}
-                            </Button>
+                            </a>
                         </div>
                     </div>
                     <Row>
@@ -207,8 +203,30 @@ const ThemeConfigs = () => {
                                 </Form.Control.Feedback>
                             </div>
                             {/** Store Logo */}
+                            {isEditMode && settings?.storeLogo && (
+                                <div className="mb-3">
+                                    <div className="fs-13 mb-3 fw-medium">
+                                        <span>{t("Current store logo")}</span>
+                                    </div>
+                                    <a
+                                        target="_blank"
+                                        href={`${storageUrl}/${settings?.storeLogo}`}
+                                    >
+                                        <img
+                                            src={`${storageUrl}/${settings?.storeLogo}?v=${Date.now()}`}
+                                            style={{
+                                                maxWidth: "200px",
+                                                maxHeight: "200px",
+                                                objectFit: "contain",
+                                                border: "1px solid #dee2e6",
+                                                borderRadius: "4px",
+                                            }}
+                                        />
+                                    </a>
+                                </div>
+                            )}
                             <div className="mb-4">
-                                <h5 className="fs-14 mb-1">{t("Logo")}{" "}<span className="text-danger">*</span></h5>
+                                <h5 className="fs-14 mb-3">{t("Logo")}{" "}<span className="text-danger">*</span></h5>
                                 <p className="text-muted">{t("Add a logo for your store")}</p>
                                 <div className="text-center">
                                     <div className="position-relative d-inline-block">
@@ -256,38 +274,31 @@ const ThemeConfigs = () => {
                                 ) : null}
                             </div>
 
-                            {isEditMode && settings?.image && (
-                                <Row className="mb-4">
-                                    <Col md={12}>
-                                        <Form.Group>
-                                            <div className="mb-3">
-                                                <div className="fs-13 mb-3 fw-medium">
-                                                    <span>{t("Current product image")}</span>
-                                                </div>
-                                                <a
-                                                    target="_blank"
-                                                    href={`${storageUrl}/${settings?.store_settings?.pageHeaderImage}`}
-                                                >
-                                                    <img
-                                                        src={`${storageUrl}/${settings?.store_settings?.pageHeaderImage}?v=${Date.now()}`}
-                                                        style={{
-                                                            maxWidth: "200px",
-                                                            maxHeight: "200px",
-                                                            objectFit: "contain",
-                                                            border: "1px solid #dee2e6",
-                                                            borderRadius: "4px",
-                                                        }}
-                                                    />
-                                                </a>
-                                            </div>
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            )}
-
                             {/** Page header image */}
+                            {isEditMode && settings?.pageHeaderImage && (
+                                <div className="mb-3">
+                                    <div className="fs-13 mb-3 fw-medium">
+                                        <span>{t("Current page header image")}</span>
+                                    </div>
+                                    <a
+                                        target="_blank"
+                                        href={`${storageUrl}/${settings?.pageHeaderImage}`}
+                                    >
+                                        <img
+                                            src={`${storageUrl}/${settings?.pageHeaderImage}?v=${Date.now()}`}
+                                            style={{
+                                                maxWidth: "200px",
+                                                maxHeight: "200px",
+                                                objectFit: "contain",
+                                                border: "1px solid #dee2e6",
+                                                borderRadius: "4px",
+                                            }}
+                                        />
+                                    </a>
+                                </div>
+                            )}
                             <div className="mb-3">
-                                <Form.Label>{t("Page header image")}{" "}<span className="text-danger">*</span></Form.Label>
+                                <Form.Label>{t('Page header image')}{" "}<span className="text-danger">*</span></Form.Label>
                                 <FilePond
                                     files={files}
                                     onupdatefiles={(fileItems) => {
