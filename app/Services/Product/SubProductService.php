@@ -15,16 +15,16 @@ class SubProductService
         return SubProducts::select($select)->with($relation)->where('_id', $id)->first();
     }
 
-    public function getFromProductIdForTable($request)
+    public function getFromProductIdForTable($dataRequest, $select = ['*'], $relation = [])
     {
-        $page = $request->input('subProductPage', 1);
-        $perPage = $request->input('subProductPerPage', 10);
-        $productId = $request->input('product_id');
+        $page = $dataRequest['subProductPage'] ?? 1;
+        $perPage = $dataRequest['subProductPerPage'] ?? 10;
+        $productId = $dataRequest['productId'] ?? null;
 
         return SubProducts::where('product_id', $productId)
-            ->with('product:_id,name')
+            ->with($relation)
             ->orderBy('_id', 'desc')
-            ->paginate($perPage, ['*'], 'page', $page);
+            ->paginate($perPage, $select, 'page', $page);
     }
 
     public function createSubProduct(array $data)

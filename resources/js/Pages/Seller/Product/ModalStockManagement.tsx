@@ -47,7 +47,7 @@ export const ModalStockManagement = ({
       router.reload({
         only: ["subProduct"],
         replace: true,
-        data: { product_id: productId, subProductPage, subProductPerPage, ...filters },
+        data: { productId, subProductPage, subProductPerPage, ...filters },
       });
     }
   };

@@ -31,7 +31,7 @@ const Product = () => {
       replace: true,
       data: {
         page: currentPage,
-        perPage: perPage,
+        per_page: perPage,
         ...filters,
       },
     });
