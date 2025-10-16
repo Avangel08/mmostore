@@ -391,11 +391,10 @@ export default function product() {
                             <div>
                               <a
                                 target="_blank"
-                                href={`${storageUrl}/${product.image}?v=${Date.now()}`}
+                                href={`${storageUrl}/${product.image}`}
                               >
                                 <img
-                                  src={`${storageUrl}/${product.image
-                                    }?v=${Date.now()}`}
+                                  src={`${storageUrl}/${product.image}`}
                                   alt={product.name || t("Product image")}
                                   style={{
                                     maxWidth: "200px",

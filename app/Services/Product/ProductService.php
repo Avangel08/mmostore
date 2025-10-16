@@ -51,7 +51,7 @@ class ProductService
         if (!empty($data['image'])) {
             $host = request()->getHost();
             $extension = $data['image']->getClientOriginalExtension();
-            $fileName = "product_" . $product->_id . '.' . $extension;
+            $fileName = "product_" . $product->_id . '_' . now()->format('Ymd_His') . '_' . uniqid() . '.' . $extension;
             $imagePath = $data['image']->storeAs("{$host}/products", $fileName, 'public');
             $product->update(['image' => $imagePath]);
         }
@@ -80,7 +80,7 @@ class ProductService
             }
             $host = request()->getHost();
             $extension = $data['image']->getClientOriginalExtension();
-            $fileName = "product_" . $product->_id . '.' . $extension;
+            $fileName = "product_" . $product->_id . '_' . now()->format('Ymd_His') . '_' . uniqid() . '.' . $extension;
             $imagePath = $data['image']->storeAs("{$host}/products", $fileName, 'public');
             $dataToUpdate['image'] = $imagePath;
         }

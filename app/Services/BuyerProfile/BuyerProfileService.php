@@ -35,7 +35,7 @@ class BuyerProfileService
             Storage::disk('public')->delete($customer->image);
         }
         $host = request()->getHost();
-        $filename = 'avatar_' . $customer->id . '_' . Carbon::now()->format("Ymd_His") . '.' . $image->getClientOriginalExtension();
+        $filename = 'avatar_' . $customer->id . '_' . now()->format("Ymd_His") . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
 
         $path = $image->storeAs("{$host}/avatar/" . config('guard.buyer'), $filename, 'public');
 

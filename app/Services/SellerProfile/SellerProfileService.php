@@ -34,7 +34,7 @@ class SellerProfileService
             Storage::disk('public')->delete($user->image);
         }
         $host = request()->getHost();
-        $filename = 'avatar_' . $user->id . '_' . Carbon::now()->format("Ymd_His") . '.' . $image->getClientOriginalExtension();
+        $filename = 'avatar_' . $user->id . '_' . now()->format('Ymd_His') . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
 
         $path = $image->storeAs("{$host}/avatar/" . config('guard.seller'), $filename, 'public');
 

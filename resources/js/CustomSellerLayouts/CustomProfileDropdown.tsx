@@ -39,7 +39,7 @@ const CustomProfileDropdown = () => {
                 className="ms-sm-3 header-item topbar-user">
                 <Dropdown.Toggle as="button" type="button" className="arrow-none btn">
                     <span className="d-flex align-items-center">
-                        <img className="rounded-circle header-profile-user object-fit-contain" src={user?.image ? `${storageUrl}/${user.image}?v=${Date.now()}` : avatar1}
+                        <img className="rounded-circle header-profile-user object-fit-contain" src={user?.image ? `${storageUrl}/${user.image}` : avatar1}
                             alt="Header Avatar" />
                         <span className="text-start ms-xl-2">
                             <span className="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{username}</span>
