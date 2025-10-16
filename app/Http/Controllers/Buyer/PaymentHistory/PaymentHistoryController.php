@@ -21,7 +21,7 @@ class PaymentHistoryController extends Controller
      */
     public function index(Request $request)
     {
-        $theme = session('theme') ?? "Theme_1";
+        $theme = session('theme') ?? "theme_1";
         $request = $request->all();
         $customerId = Auth::guard('buyer')->user()->id;
         $listBalanceHistory = $this->balanceHistoryService->getForTableCustomer($request, $customerId);

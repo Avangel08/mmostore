@@ -38,7 +38,7 @@ class DepositController extends Controller
      */
     public function index()
     {
-        $theme = session('theme') ?? "Theme_1";
+        $theme = session('theme') ?? "theme_1";
         return Inertia::render("Themes/{$theme}/Deposit/index", []);
     }
 
