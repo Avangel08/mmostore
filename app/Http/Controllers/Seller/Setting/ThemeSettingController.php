@@ -39,11 +39,19 @@ class ThemeSettingController extends Controller
             }
         }
 
+        $currencyOptions = [];
+        foreach (Settings::CURRENCY_TYPES as $key => $value) {
+            $currencyOptions[] = [
+                'label' => $key,
+                'value' => $key
+            ];
+        }
         return Inertia::render('Settings/index', [
             'settings' => fn() => $result,
             'domains' => $store->domain,
             'domainSuffix' => config('app.domain_suffix'),
             'contact_types' => fn() => Settings::CONTACT_TYPES,
+            'currency_options' => fn() => $currencyOptions
         ]);
     }
 

@@ -100,4 +100,9 @@ class Settings extends Model
             'url_format' => 'https://zalo.me/',
         ],
     ];
+
+    const CURRENCY_TYPES = [
+        'VND' => 'VND',
+        'USD' => 'USD'
+    ];
 }

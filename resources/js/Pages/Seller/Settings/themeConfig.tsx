@@ -6,6 +6,7 @@ import { Link, router, usePage } from "@inertiajs/react";
 import * as Yup from "yup";
 import CustomCKEditor from "../../../Components/CustomCKEditor";
 import { showToast } from "../../../utils/showToast";
+import Select from "react-select";
 
 // Import React FilePond
 import { FilePond, registerPlugin } from 'react-filepond';
@@ -30,6 +31,7 @@ type initialValuesProps = {
     storeLogo: string;
     pageHeaderImage: string;
     pageHeaderText: string;
+    currency: string
 };
 
 const LIST_THEMES = [
@@ -58,7 +60,7 @@ const ThemeConfigs = () => {
     const [files, setFiles] = useState<any>([]);
     const errors = usePage().props.errors as any;
     const storageUrl = usePage().props.storageUrl as string;
-    const { settings, domains, domainSuffix } = usePage().props as any
+    const { settings, currency_options } = usePage().props as any
     const isEditMode = Boolean(settings);
 
     const formik = useFormik<initialValuesProps>({
@@ -69,12 +71,14 @@ const ThemeConfigs = () => {
             storeLogo: settings?.storeLogo || "",
             pageHeaderImage: settings?.pageHeaderImage || "",
             pageHeaderText: settings?.pageHeaderText || "Hello, welcome to my store",
+            currency: settings?.currency || "VND"
         },
         validationSchema: Yup.object({
             storeName: Yup.string().required("Please enter store name"),
             pageHeaderImage: Yup.mixed().required("Please select a image"),
             storeLogo: Yup.mixed().required("Please select a logo store"),
             pageHeaderText: Yup.string().required("Please enter page header text"),
+            currency: Yup.string().required(t("Please choose currency")),
         }),
         onSubmit: (values) => {
             const formData = new FormData();
@@ -83,6 +87,7 @@ const ThemeConfigs = () => {
             formData.append("storeLogo", values.storeLogo);
             formData.append("pageHeaderImage", values.pageHeaderImage);
             formData.append("pageHeaderText", values.pageHeaderText);
+            formData.append("currency", values.currency);
             const url = route("seller.theme-settings.update", { id: settings.id })
             router.post(url, formData, {
                 preserveScroll: true,
@@ -175,6 +180,41 @@ const ThemeConfigs = () => {
                                         </Col>
                                     ))}
                                 </Row>
+                            </div>
+                            {/** Currency */}
+                            <div className="mb-3">
+                                <Form.Group controlId="currency">
+                                    <Form.Label>
+                                        {t("Currency")}{" "}
+                                        <span className="text-danger">*</span>
+                                    </Form.Label>
+                                    <Select
+                                        options={currency_options}
+                                        placeholder={t("Select currency")}
+                                        name="currency"
+                                        value={currency_options.find(
+                                            (option: any) => option.value === formik.values.currency
+                                        )}
+                                        onChange={(selectedOption: any) => {
+                                            formik.setFieldValue(
+                                                "currency",
+                                                selectedOption?.value || ""
+                                            );
+                                        }}
+                                        onBlur={() =>
+                                            formik.setFieldTouched("currency", true)
+                                        }
+                                    />
+                                    {((formik.touched.currency &&
+                                        formik.errors.currency) ||
+                                        errors?.currency) && (
+                                            <div className="invalid-feedback d-block">
+                                                {t(
+                                                    formik.errors.currency || errors?.currency
+                                                )}
+                                            </div>
+                                        )}
+                                </Form.Group>
                             </div>
                             {/** Store Name */}
                             <div className="mb-3">
