@@ -125,13 +125,16 @@ class SellerAccountService
     {
         // DB::transaction(function () use ($subProductId) {
         $limit = 1000;
+        $totalDeleted = 0;
         do {
             $deletedCount = Accounts::where('sub_product_id', $subProductId)
                 ->whereNull('order_id')
                 ->limit($limit)
                 ->forceDelete();
+            $totalDeleted += $deletedCount;
         } while ($deletedCount > 0);
         app(SubProductService::class)->updateSubProductQuantityWithCount($subProductId);
+        return $totalDeleted;
         // });
     }
 
@@ -165,9 +168,14 @@ class SellerAccountService
         }, 200, $headers);
     }
 
-    public function startDeleteAllUnsoldAccount($subProductId)
+    public function startDeleteAllUnsoldAccount($subProductId, $isSync = false)
     {
-        dispatch(new JobDeleteUnsoldAccount($subProductId, Config::get('database.connections.tenant_mongo')));
+        $dbConfig = Config::get('database.connections.tenant_mongo');
+        $jobDeleteUnsoldAccount = new JobDeleteUnsoldAccount($subProductId, $dbConfig);
+        if ($isSync) {
+            return app()->call([$jobDeleteUnsoldAccount, 'handle']) ?? 0;
+        }
+        dispatch($jobDeleteUnsoldAccount);
     }
 
     public function deleteListAccount($subProductId, $listAccounts)

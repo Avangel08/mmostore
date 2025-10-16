@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Seller\Product;
+namespace App\Http\Controllers\Api\Seller\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\Product\ApiAccountRequest;
@@ -9,12 +9,11 @@ use App\Services\Product\SellerAccountService;
 use App\Services\Product\SubProductService;
 use App\Traits\ApiResourceResponse;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Log;
 use Throwable;
 
-class ApiSellerAccountController extends Controller
+class SellerAccountApiController extends Controller
 {
     use ApiResourceResponse;
     protected $sellerAccountService;
@@ -63,7 +62,7 @@ class ApiSellerAccountController extends Controller
                 'error_count' => 0,
                 'errors' => [],
             ];
-            return $this->success('Uploaded successfully', ['data' => $result], Response::HTTP_CREATED);
+            return $this->success('Uploaded successfully', $result, Response::HTTP_CREATED);
         } catch (Throwable $e) {
             Log::error($e, ['ip' => $request->ip(), 'user_id' => auth()->id() ?? null]);
             return $this->error($e->getMessage());
@@ -80,17 +79,21 @@ class ApiSellerAccountController extends Controller
                 throw new Exception('Sub product not found');
             }
 
-            $message = "Deleted unsold accounts from subProduct {$subProduct?->name} ({$dataRequest['sub_product_id']}) successfully";
             $dataResponse = null;
+            $successCount = 0;
 
             if (empty($dataRequest['accounts'])) {
-                $this->sellerAccountService->startDeleteAllUnsoldAccount($dataRequest['sub_product_id']);
-                $message .= ". Unsold accounts will be deleted after a few minutes";
+                $successCount = $this->sellerAccountService->startDeleteAllUnsoldAccount($dataRequest['sub_product_id'], true) ?? 0;
+                $dataResponse = [
+                    'success_count' => $successCount
+                ];
             } else {
                 $dataResponse = $this->sellerAccountService->deleteListAccount($dataRequest['sub_product_id'], $dataRequest['accounts']);
+                $successCount = $dataResponse['success_count'] ?? 0;
             }
 
-            return $this->success($message, $dataResponse ? ['data' => $dataResponse] : []);
+            $message = "Deleted {$successCount} unsold accounts from subProduct {$subProduct?->name} ({$dataRequest['sub_product_id']})";
+            return $this->success($message, $dataResponse);
         } catch (Throwable $e) {
             Log::error($e, ['ip' => $request->ip(), 'user_id' => auth()->id() ?? null]);
             return $this->error($e->getMessage());

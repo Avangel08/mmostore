@@ -45,14 +45,15 @@ class JobDeleteUnsoldAccount implements ShouldBeUnique, ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(SellerAccountService $accountService): void
+    public function handle(SellerAccountService $accountService)
     {
         try {
             Config::set('database.connections.tenant_mongo', $this->dbConfig);
             // echo "Start delete unsold account for sub_product_id {$this->subProductId}".PHP_EOL;
             $accountService->clearSubProductAccountCache($this->subProductId);
-            $accountService->deleteUnsoldAccounts($this->subProductId);
+            $totalDeleted = $accountService->deleteUnsoldAccounts($this->subProductId);
             // echo "Finished delete unsold account for sub_product_id {$this->subProductId}".PHP_EOL;
+            return $totalDeleted;
         } catch (Exception $e) {
             // echo 'Error processing delete unsold account: '.$e->getMessage().PHP_EOL;
             throw $e;

@@ -5,7 +5,6 @@ namespace App\Jobs\SellerAccount;
 use App\Models\Mongo\Accounts;
 use App\Models\Mongo\ImportAccountHistory;
 use App\Services\Product\SellerAccountService;
-use App\Services\Product\SubProductService;
 use Carbon\Carbon;
 use Config;
 use Exception;
@@ -60,8 +59,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
      * Execute the job.
      */
     public function handle(
-        SellerAccountService $accountService,
-        SubProductService $subProductService
+        SellerAccountService $accountService
     ) {
         try {
             // DB::beginTransaction();
