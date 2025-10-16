@@ -29,7 +29,6 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
     const { t } = useTranslation();
     const storageUrl = usePage().props.storageUrl as string;
     const theme = useThemeConfig()
-    console.log({ theme })
 
     const handleLogout = () => {
         router.post(route("buyer.logout"), {}, {

@@ -73,13 +73,15 @@ class ThemeSettingController extends Controller
             }
             $this->settingService->updateOrCreateSetting($key, $value);
         }
-        $newDomains = json_decode($domainSettings);
-        $domains = $store->domain;
-        // tránh trùng lặp
-        if (!in_array($newDomains, $domains)) {
-            // ✅ Merge và loại bỏ trùng
-            $mergedDomains = array_values(array_unique(array_merge($domains, $newDomains)));
-            $this->storeService->update($store, ['domain' => $mergedDomains]);
+        if ($domainSettings) {
+            $newDomains = json_decode($domainSettings);
+            $domains = $store->domain;
+            // tránh trùng lặp
+            if (!in_array($newDomains, $domains)) {
+                // ✅ Merge và loại bỏ trùng
+                $mergedDomains = array_values(array_unique(array_merge($domains, $newDomains)));
+                $this->storeService->update($store, ['domain' => $mergedDomains]);
+            }
         }
 
         // $storeSettings = json_decode($request->input('store_settings'), true);
