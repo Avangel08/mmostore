@@ -76,10 +76,12 @@ class ThemeSettingController extends Controller
         if ($domainSettings) {
             $newDomains = json_decode($domainSettings);
             $domains = $store->domain;
+            $domainDefault = collect($domains)->first(fn($d) => str_contains($d, config('app.domain_suffix')));
+            $mergedDomains[] = $domainDefault;
             // tránh trùng lặp
             if (!in_array($newDomains, $domains)) {
                 // ✅ Merge và loại bỏ trùng
-                $mergedDomains = array_values(array_unique(array_merge($domains, $newDomains)));
+                $mergedDomains = array_values(array_unique(array_merge($mergedDomains, $newDomains)));
                 $this->storeService->update($store, ['domain' => $mergedDomains]);
             }
         }

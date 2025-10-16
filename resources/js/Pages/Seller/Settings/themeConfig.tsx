@@ -226,8 +226,8 @@ const ThemeConfigs = () => {
                                 </div>
                             )}
                             <div className="mb-4">
-                                <h5 className="fs-14 mb-3">{t("Logo")}{" "}<span className="text-danger">*</span></h5>
-                                <p className="text-muted">{t("Add a logo for your store")}</p>
+                                <h5 className="fs-14 mb-2">{t("Logo")}{" "}<span className="text-danger">*</span></h5>
+                                <p className="text-muted fst-italic">Kích thước tối thiểu: 124 × 17 px</p>
                                 <div className="text-center">
                                     <div className="position-relative d-inline-block">
                                         <div className="position-absolute top-100 start-100 translate-middle">
@@ -299,6 +299,7 @@ const ThemeConfigs = () => {
                             )}
                             <div className="mb-3">
                                 <Form.Label>{t('Page header image')}{" "}<span className="text-danger">*</span></Form.Label>
+                                <p className="text-muted fst-italic">Kích thước yêu cầu: 262 × 195 px</p>
                                 <FilePond
                                     files={files}
                                     onupdatefiles={(fileItems) => {

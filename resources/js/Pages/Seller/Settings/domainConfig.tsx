@@ -83,7 +83,7 @@ const DomainConfig = () => {
                         <h5 className="mb-2">{t("Domain")}<span className="text-danger">*</span></h5>
                         <p className="text-muted fs-14 mb-1">{t("To ensure that a website can be recognized and displayed to users, it must always have a primary domain name. Only one domain can be selected as the main domain")}</p>
                         <p className="text-muted fs-14 mb-3">
-                            Tên miền mặc định:{" "}<span className="fst-italic">{domains}</span>
+                            {t("Current domain")}:{" "}<span className="fst-italic">{domains.find((d: any) => d.includes(domainSuffix))}</span>
                         </p>
                         <Row>
                             <Col>
