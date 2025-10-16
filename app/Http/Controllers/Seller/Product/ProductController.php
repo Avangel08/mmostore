@@ -57,7 +57,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function edit($sub, string $id)
+    public function edit(string $id)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_view')) {
         //     return abort(403);
@@ -92,7 +92,7 @@ class ProductController extends Controller
         }
     }
 
-    public function update($sub, $id, ProductRequest $request)
+    public function update($id, ProductRequest $request)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_create')) {
         //     return abort(403);
@@ -115,7 +115,7 @@ class ProductController extends Controller
         }
     }
 
-    public function destroy($sub, $id)
+    public function destroy($id)
     {
         // if (auth(config('guard.seller'))->user()->cannot('category_delete')) {
         //     return abort(403);

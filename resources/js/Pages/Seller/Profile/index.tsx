@@ -15,9 +15,10 @@ import avatar1 from "../../../../images/users/user-dummy-img.jpg";
 import { Head, usePage, router, useForm } from "@inertiajs/react";
 import Layout from "../../../CustomSellerLayouts";
 import { useTranslation } from "react-i18next";
-import { Slide, toast, ToastContainer } from "react-toastify";
-import TabPaneChangeInformation from "./TabPaneChangeInformation";
-import TabPaneChangePassword from "./TabPaneChangePassword";
+import { ToastContainer } from "react-toastify";
+import TabChangeInformation from "./TabChangeInformation";
+import TabChangePassword from "./TabChangePassword";
+import TabToken from "./TabToken";
 import { showToast } from "../../../utils/showToast";
 
 const EditProfile = () => {
@@ -40,12 +41,12 @@ const EditProfile = () => {
       }
     `;
     document.head.appendChild(style);
-    
+
     if (user?.image) {
       setOriginalImage(`${storageUrl}/${user.image}?v=${Date.now()}`);
       setPreviewImage(`${storageUrl}/${user.image}?v=${Date.now()}`);
     }
-    
+
     return () => {
       document.head.removeChild(style);
     };
@@ -98,14 +99,14 @@ const EditProfile = () => {
         } else {
           setPreviewImage(null);
         }
-        
+
         setData('image', null);
-        
+
         const fileInput = document.getElementById('profile-img-file-input') as HTMLInputElement;
         if (fileInput) {
           fileInput.value = '';
         }
-        
+
         Object.keys(errors).forEach((key) => {
           showToast(t(errors[key]), "error");
         });
@@ -184,34 +185,45 @@ const EditProfile = () => {
             </Col>
 
             <Col xxl={9}>
-              <Card className="">
-                <Tab.Container defaultActiveKey="personal-info">
-                  <Card.Header>
+              <Card>
+                <Card.Body>
+                  <Tab.Container defaultActiveKey="personal-info">
                     <Nav
-                      className="nav-tabs-custom rounded card-header-tabs border-bottom-0"
-                      role="tablist"
+                      className="nav-tabs-custom"
+                      variant="tabs"
                     >
                       <Nav.Item>
                         <Nav.Link eventKey="personal-info">
-                          <i className="fas fa-home"></i>
+                          <i className="ri-user-3-line me-1"></i>
                           {t("Personal Information")}
                         </Nav.Link>
                       </Nav.Item>
                       <Nav.Item>
                         <Nav.Link eventKey="change-password">
-                          <i className="far fa-user"></i>
+                          <i className="ri-lock-line me-1"></i>
                           {t("Change Password")}
                         </Nav.Link>
                       </Nav.Item>
+                      <Nav.Item>
+                        <Nav.Link eventKey="token">
+                          <i className="ri-key-line me-1"></i>
+                          {t("Token")}
+                        </Nav.Link>
+                      </Nav.Item>
                     </Nav>
-                  </Card.Header>
-                  <Card.Body className="p-4">
-                    <Tab.Content>
-                      <TabPaneChangeInformation />
-                      <TabPaneChangePassword />
+                    <Tab.Content className="mt-4">
+                      <Tab.Pane eventKey="personal-info">
+                        <TabChangeInformation />
+                      </Tab.Pane>
+                      <Tab.Pane eventKey="change-password">
+                        <TabChangePassword />
+                      </Tab.Pane>
+                      <Tab.Pane eventKey="token">
+                        <TabToken />
+                      </Tab.Pane>
                     </Tab.Content>
-                  </Card.Body>
-                </Tab.Container>
+                  </Tab.Container>
+                </Card.Body>
               </Card>
             </Col>
           </Row>

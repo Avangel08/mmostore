@@ -152,7 +152,7 @@ const RecentUpload = () => {
   return (
     <>
       <Col lg={12} className="mb-4 d-flex align-items-center gap-2">
-        <h5>{t("Recent uploaded files")}</h5>
+        <h5>{t("Upload history")}</h5>
         <Button
           variant="outline-info"
           onClick={handleRefreshClick}
@@ -188,6 +188,8 @@ const RecentUpload = () => {
             onReloadTable={fetchData}
             keyPageParam="importPage"
             keyPerPageParam="importPerPage"
+            showPaginationEllipsis={true}
+            maxVisiblePages={10}
             divStyle={{ height: "50vh" }}
           />
         </div>

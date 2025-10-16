@@ -202,7 +202,6 @@
             @endif
         </div>
 
-        <!-- Footer -->
         <div class="footer">
             <p class="footer-text">
                 © {{ date('Y') }} <strong>MMOStore</strong>

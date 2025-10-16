@@ -121,14 +121,23 @@ class UserController extends Controller
             return back()->with('error', 'Invalid store domain');
         }
 
-        $signedUrl = URL::temporarySignedRoute(
-            'seller.magic-login',
-            now()->addMinutes(2),
-            [
-                'sub' => $sub,
-                'user_id' => $user->id,
-            ]
-        );
+        $scheme = request()->isSecure() ? 'https' : 'http';
+        $tenantRoot = $scheme . '://' . $sub . '.' . $mainDomain;
+
+        try {
+            URL::forceRootUrl($tenantRoot);
+            URL::forceScheme($scheme);
+
+            $signedUrl = URL::temporarySignedRoute(
+                'seller.magic-login',
+                now()->addMinutes(2),
+                [
+                    'user_id' => $user->id,
+                ]
+            );
+        } finally {
+            URL::forceRootUrl(null);
+        }
 
         return Redirect::away($signedUrl);
     }

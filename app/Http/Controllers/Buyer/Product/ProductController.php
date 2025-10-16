@@ -61,7 +61,7 @@ class ProductController extends Controller
         return response()->json($result);
     }
 
-    public function detail($sub, String $productId)
+    public function detail(String $productId)
     {
         $product = $this->productService->getById($productId, ['*'], ['subProducts']);
         return response()->json($product);
@@ -76,7 +76,7 @@ class ProductController extends Controller
                 'quantity' => 'required|integer|min:1',
             ]);
 
-            $store = $request->input("current_store");
+            $store = app('store');
 
             $customer = Auth::guard('buyer')->user();
 

@@ -13,7 +13,7 @@ use App\Http\Controllers\Buyer\Order\OrderController;
 use App\Http\Controllers\Buyer\Profile\ProfileController;
 // use App\Http\Controllers\Buyer\PaymentHistory\PaymentHistoryController;
 
-Route::middleware(['route.subdomain', 'validate.subdomain', 'tenant.mongo'])
+Route::middleware(['validate.subdomain', 'tenant.mongo'])
     ->group(function () {
         Route::get('/', [BuyerController::class, 'home'])->name('buyer.home');
         Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('buyer.login');

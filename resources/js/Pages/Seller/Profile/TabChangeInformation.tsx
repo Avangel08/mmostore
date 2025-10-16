@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import { router, usePage } from "@inertiajs/react";
 import { showToast } from "../../../utils/showToast";
 
-export default function TabPaneChangeInformation() {
+export default function TabChangeInformation() {
   const { t } = useTranslation();
   const user = usePage().props.auth.user as any;
   const errors = usePage().props.errors as any;
@@ -49,7 +49,6 @@ export default function TabPaneChangeInformation() {
     personalInfoFormik.setErrors(errors || {});
   }, [errors]);
   return (
-    <Tab.Pane eventKey="personal-info">
       <Form onSubmit={personalInfoFormik.handleSubmit} noValidate>
         <Row>
           <Col lg={12} className="mb-3">
@@ -81,7 +80,7 @@ export default function TabPaneChangeInformation() {
                   }
                 />
                 <Form.Control.Feedback type="invalid">
-                  {personalInfoFormik?.errors?.first_name ?? ""}
+                  {personalInfoFormik?.errors?.first_name as string ?? ""}
                 </Form.Control.Feedback>
               </Form.Group>
             </div>
@@ -107,7 +106,7 @@ export default function TabPaneChangeInformation() {
                   }
                 />
                 <Form.Control.Feedback type="invalid">
-                  {personalInfoFormik?.errors?.last_name ?? ""}
+                  {personalInfoFormik?.errors?.last_name as string ?? ""}
                 </Form.Control.Feedback>
               </Form.Group>
             </div>
@@ -129,6 +128,5 @@ export default function TabPaneChangeInformation() {
           </Col>
         </Row>
       </Form>
-    </Tab.Pane>
   );
 }

@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\Seller\Product\ApiSellerAccountController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['api.validate'])->group(function () {
-    Route::middleware('auth:sanctum')->get('/user', [ApiController::class, 'user']);
-});
+Route::prefix('v1')
+    ->as('api.')
+    ->group(function () {
+        // seller api
+        Route::middleware((['auth:seller_api', 'validate.subdomain', 'tenant.mongo', 'validate.seller.token']))->group(function () {
+            Route::group(['prefix' => 'accounts', 'as' => 'seller.'], function () {
+                Route::post("/", [ApiSellerAccountController::class, 'store'])->name('accounts.store');
+                Route::delete("/", [ApiSellerAccountController::class, 'destroy'])->name('accounts.destroy');
+            });
+        });
+    });

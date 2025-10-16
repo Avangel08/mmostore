@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Buyer\Auth;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use Hash;
 use Illuminate\Auth\Events\PasswordReset;
@@ -57,11 +58,11 @@ class ResetPasswordController extends Controller
         );
 
         if ($status == Password::PASSWORD_RESET) {
-            return back()->with('success', __($status));
+            return back()->with('success', __(Helpers::getPwBrokerStatus($status)));
         }
 
         throw ValidationException::withMessages([
-            'email' => __($status),
+            'email' => __(Helpers::getPwBrokerStatus($status)),
         ]);
     }
 }

@@ -3,7 +3,8 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\AuthenticationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
@@ -35,10 +36,40 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $e)
     {
-        if ($e instanceof NotFoundHttpException) {
-            return response()->view('errors.404', [], 404);
-        }
+        $this->shouldRenderJsonWhen(function () use ($request, $e) {
+            if ($request->is('api/*')) {
+                return true;
+            }
+            return $request->expectsJson();
+        });
 
         return parent::render($request, $e);
+    }
+
+    protected function convertExceptionToArray(Throwable $e)
+    {
+        return [
+            'status' => 'error',
+            ...parent::convertExceptionToArray($e)
+        ];
+    }
+
+    protected function invalidJson($request, ValidationException $exception)
+    {
+        return response()->json([
+            'status' => 'error',
+            'message' => $exception->getMessage(),
+            'errors' => $exception->errors(),
+        ], $exception->status);
+    }
+
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        return $this->shouldReturnJson($request, $exception)
+            ? response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ], 401)
+            : redirect()->guest($exception->redirectTo($request) ?? route('login'));
     }
 }

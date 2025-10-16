@@ -95,7 +95,7 @@ class SellerAccountController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($sub, string $subProductId, Request $request)
+    public function edit(string $subProductId, Request $request)
     {
         // if (auth(config('guard.seller'))->user()->cannot('account_edit')) {
         //     return abort(403);
@@ -108,7 +108,7 @@ class SellerAccountController extends Controller
         return Inertia::render('Product/Account/index', [
             'subProduct' => fn() => $this->subProductService->getById(
                 $subProductId,
-                ['id', 'product_id', 'quantity'],
+                ['id', 'name', 'product_id', 'quantity'],
                 [
                     'product:id,name,category_id,product_type_id',
                     'product.productType:id,name',
@@ -131,14 +131,14 @@ class SellerAccountController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($sub, string $subProductId, Request $request)
+    public function destroy(string $subProductId, Request $request)
     {
         try {
             $subProduct = $this->subProductService->getById($subProductId);
             if (!$subProduct) {
                 throw new \Exception('Sub product not found');
             }
-            $this->sellerAccountService->startDeleteUnsoldAccount($subProductId);
+            $this->sellerAccountService->startDeleteAllUnsoldAccount($subProductId);
 
             return back()->with('success', 'Success. Unsold accounts will be deleted after a few minutes');
         } catch (\Exception $e) {
@@ -148,7 +148,7 @@ class SellerAccountController extends Controller
         }
     }
 
-    public function downloadUnsoldAccounts($sub, $subProductId, Request $request)
+    public function downloadUnsoldAccounts($subProductId, Request $request)
     {
         try {
             return $this->sellerAccountService->streamDownloadUnsoldAccounts($subProductId);

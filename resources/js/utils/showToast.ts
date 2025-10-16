@@ -1,6 +1,6 @@
-import { Slide, toast } from "react-toastify";
+import { Slide, toast, ToastOptions } from "react-toastify";
 
-export const showToast = (message: string, type: "success" | "error" | "info") => {
+export const showToast = (message: string, type: "success" | "error" | "info", options?: ToastOptions) => {
   toast[type](message, {
     position: "top-center",
     autoClose: 2500,
@@ -11,5 +11,6 @@ export const showToast = (message: string, type: "success" | "error" | "info") =
     progress: undefined,
     theme: "colored",
     transition: Slide,
+    ...options
   });
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import authLoginIllustration from "../../../../images/seller/auth-login-illustration-light.png";
-import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useTranslation } from "react-i18next";
 
 export default function Login({}: any) {
@@ -9,6 +9,7 @@ export default function Login({}: any) {
     const { props } = usePage();
     const subdomain = (props as any).subdomain;
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
+    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
     const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm({
         email: '',
         password: ''
@@ -24,9 +25,21 @@ export default function Login({}: any) {
         return 'Merdify';
     };
 
-    const titleWeb = t("Sign in") + " - " +  getSubdomain();
-
     useEffect(() => {
+        // Check if there's a reset=success parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('reset') === 'success') {
+            setShowSuccessMessage(true);
+            // Remove the parameter from URL without page reload
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+            
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                setShowSuccessMessage(false);
+            }, 5000);
+        }
+        
         return () => {
             reset('password');
         };
@@ -61,7 +74,6 @@ export default function Login({}: any) {
 
         post(route('seller.login.post', { sub: subdomain }), {
             onSuccess: () => {
-                // Reload page to refresh CSRF token after successful login
                 window.location.reload();
             },
             onError: (errors: any) => {
@@ -72,7 +84,7 @@ export default function Login({}: any) {
 
     return (
         <React.Fragment>
-            <Head title={ titleWeb } />
+            <Head title={ t("Sign in") } />
 
             <div className="min-vh-100 d-flex align-items-center" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
                 <Container fluid>
@@ -85,6 +97,18 @@ export default function Login({}: any) {
                                             <h2 className="fw-bold text-dark mb-2" style={{ fontSize: '25px' }}>{ t('Welcome to {{name}} 👋', { name: getSubdomain() }) }</h2>
                                             <div>{ t("Please sign-in to your account and start the adventure") }</div>
                                         </div>
+                                        
+                                        {showSuccessMessage && (
+                                            <Alert variant="success" className="mb-4 border-0" style={{ 
+                                                backgroundColor: '#d1edff', 
+                                                color: '#0c5460',
+                                                fontSize: '14px',
+                                                borderRadius: '8px'
+                                            }}>
+                                                <i className="ri-check-line me-2"></i>
+                                                {t('The password has been reset! You can now log in using your new password')}
+                                            </Alert>
+                                        )}
                                         
                                         <Form onSubmit={submit} noValidate>
                                             <div className="mb-4">
@@ -137,7 +161,7 @@ export default function Login({}: any) {
                                                 <Form.Control.Feedback type="invalid" className="d-block mt-2">{errors.password ? t(String(errors.password)) : null}</Form.Control.Feedback>
                                                 
                                                 <div className="d-flex justify-content-end mt-2">
-                                                    <Link href="#" className="text-decoration-none fw-semibold" style={{ transition: 'color 0.3s ease', cursor: 'pointer' }} onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = 'blue'; }} onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = '#808283'; }}>
+                                                    <Link href={route('seller.forgot-password')} className="text-decoration-none fw-semibold" style={{ transition: 'color 0.3s ease', cursor: 'pointer' }} onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = '#808283'; }} onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = '#808283'; }}>
                                                         { t("Forgot password") }
                                                     </Link>
                                                 </div>
@@ -148,28 +172,19 @@ export default function Login({}: any) {
                                             </Button>
                                         </Form>
 
-                                        <div className="text-center mt-4">
-                                            <p className="text-muted mb-0">
-                                                { t("Don't have an account?") }
-                                                <Link href="#" className="text-primary text-decoration-none fw-semibold ms-1">
-                                                    { t("Sign Up") }
-                                                </Link>
-                                            </p>
-                                        </div>
+                                        {/*<div className="text-center my-4">*/}
+                                        {/*    <div className="d-flex align-items-center">*/}
+                                        {/*        <hr className="flex-grow-1" />*/}
+                                        {/*        <span className="px-3 text-muted">{ t("OR") }</span>*/}
+                                        {/*        <hr className="flex-grow-1" />*/}
+                                        {/*    </div>*/}
+                                        {/*</div>*/}
 
-                                        <div className="text-center my-4">
-                                            <div className="d-flex align-items-center">
-                                                <hr className="flex-grow-1" />
-                                                <span className="px-3 text-muted">{ t("OR") }</span>
-                                                <hr className="flex-grow-1" />
-                                            </div>
-                                        </div>
-
-                                        <div className="d-flex justify-content-center gap-3">
-                                            <Button  variant="outline-danger"  className="rounded-circle p-3" style={{ width: '60px', height: '60px' }}>
-                                                <i className="ri-google-fill fs-3"></i>
-                                            </Button>
-                                        </div>
+                                        {/*<div className="d-flex justify-content-center gap-3">*/}
+                                        {/*    <Button  variant="outline-danger"  className="rounded-circle p-3" style={{ width: '60px', height: '60px' }}>*/}
+                                        {/*        <i className="ri-google-fill fs-3"></i>*/}
+                                        {/*    </Button>*/}
+                                        {/*</div>*/}
                                     </Card.Body>
                                 </Card>
                             </div>

@@ -15,7 +15,7 @@ const TableCategory = ({
   data: any;
   onReloadTable?: (page: number, perPage: number, filters?: any) => void;
   onEdit?: (id: number | string) => void;
-  onDelete?: (id: number | string) => void;
+  onDelete?: (id: number | string, name: string) => void;
   onSelectionChange?: (selectedItems: (string | number)[]) => void;
 }) => {
   const { t } = useTranslation();
@@ -142,7 +142,7 @@ const TableCategory = ({
                 <Button
                   variant="outline-danger"
                   size="sm"
-                  onClick={() => onDelete && onDelete(rowData?.id)}
+                  onClick={() => onDelete && onDelete(rowData?.id, rowData?.name)}
                 >
                   <i className="ri-delete-bin-fill"></i>
                 </Button>

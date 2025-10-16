@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Home\RegisterStore;
 
 use App\Models\MySQL\Stores;
+use App\Models\MySQL\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterStoreRequest extends FormRequest
@@ -36,14 +37,22 @@ class RegisterStoreRequest extends FormRequest
                         $fail(__('Domain already exists'));
                     }
                 }],
+                'phone' => ['required', 'string', 'min:8', 'max:15', 'regex:/^[0-9\s\-\+\(\)]+$/',function ($attribute, $value, $fail) {
+                    $phoneExists = User::where('phone', $value)
+                        ->where('country', request()->input('country'))
+                        ->exists();
+
+                    if ($phoneExists) {
+                        $fail(__('Phone number already exists'));
+                    }
+                }],
+                'country_code' => ['required', 'string', 'regex:/^\+\d{1,4}$/'],
+                'country' => ['required', 'string', 'size:2', 'regex:/^[A-Z]{2}$/'],
             ],
             default => [],
         };
     }
 
-    /**
-     * Get custom validation messages.
-     */
     public function messages(): array
     {
         return [
@@ -59,6 +68,15 @@ class RegisterStoreRequest extends FormRequest
             'domain_store.required' => __('Domain store is required'),
             'domain_store.min' => __('Domain store must be at least 3 characters'),
             'domain_store.max' => __('Domain store must be at most 15 characters'),
+            'phone.required' => __('Phone is required'),
+            'phone.min' => __('Phone must be at least 8 characters'),
+            'phone.max' => __('Phone must be at most 15 characters'),
+            'phone.regex' => __('Phone contains invalid characters'),
+            'country_code.required' => __('Country code is required'),
+            'country_code.regex' => __('Invalid country code format'),
+            'country.required' => __('Country is required'),
+            'country.size' => __('Country must be exactly 2 characters'),
+            'country.regex' => __('Country must be valid ISO country code (e.g., VN, US, GB)'),
         ];
     }
 }

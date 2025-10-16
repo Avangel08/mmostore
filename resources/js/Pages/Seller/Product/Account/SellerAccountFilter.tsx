@@ -46,7 +46,7 @@ const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterPro
       createdDateEnd: paramsUrl?.createdDateEnd ?? "",
       status: paramsUrl?.status ?? "",
       orderNumber: paramsUrl?.orderNumber ?? "",
-      sellStatus: paramsUrl?.sellStatus ?? "",
+      sellStatus: paramsUrl?.sellStatus ?? "unsold",
     };
   };
 
@@ -77,7 +77,7 @@ const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterPro
       }
     }
 
-    const urlSellStatus = paramsUrl?.sellStatus ?? "";
+    const urlSellStatus = paramsUrl?.sellStatus ?? "unsold";
     const matchingSellStatus = sellStatusOptions.find(
       (option) => option.value === urlSellStatus
     );
@@ -127,19 +127,19 @@ const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterPro
   };
 
   const hasActiveFilters = () => {
-    const product = paramsUrl?.product || "";
-    const createdDateStart = paramsUrl?.createdDateStart || "";
-    const createdDateEnd = paramsUrl?.createdDateEnd || "";
-    const status = paramsUrl?.status || "";
-    const orderNumber = paramsUrl?.orderNumber || "";
-    const sellStatus = paramsUrl?.sellStatus || "";
+    const product = paramsUrl?.product;
+    const createdDateStart = paramsUrl?.createdDateStart;
+    const createdDateEnd = paramsUrl?.createdDateEnd;
+    const status = paramsUrl?.status;
+    const orderNumber = paramsUrl?.orderNumber;
+    const sellStatus = paramsUrl?.sellStatus;
     return (
       (product !== null && product !== "") ||
       (createdDateStart !== null && createdDateStart !== "") ||
       (createdDateEnd !== null && createdDateEnd !== "") ||
       (status !== null && status !== "") ||
       (orderNumber !== null && orderNumber !== "") ||
-      (sellStatus !== null && sellStatus !== "")
+      (sellStatus !== null && sellStatus !== "unsold")
     );
   };
 
@@ -150,11 +150,11 @@ const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterPro
       createdDateEnd: "",
       status: "",
       orderNumber: "",
-      sellStatus: "",
+      sellStatus: "unsold",
     };
     setFilters(resetFilters);
     setSelectedStatus(statusOptions[0]);
-    setSelectedSellStatus(sellStatusOptions[0]);
+    setSelectedSellStatus(sellStatusOptions[1]);
 
     if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
       flatpickrRef.current.flatpickr.clear();

@@ -3,6 +3,8 @@
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
+use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 
 class Kernel extends HttpKernel
 {
@@ -44,8 +46,9 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
+            \App\Http\Middleware\ForceJsonResponse::class,
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -58,6 +61,8 @@ class Kernel extends HttpKernel
      * @var array<string, class-string|string>
      */
     protected $middlewareAliases = [
+        'abilities' => CheckAbilities::class,
+        'ability' => CheckForAnyAbility::class,
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
@@ -70,16 +75,18 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'api.validate' => \App\Http\Middleware\ApiValidationMiddleware::class,
-
         'validate.subdomain' => \App\Http\Middleware\ValidateSubdomain::class,
-        'route.subdomain' => \App\Http\Middleware\SetRouteSubdomain::class,
-
+        'validate.seller.token' => \App\Http\Middleware\ValidateSellerToken::class,
         'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         'tenant.mongo' => \App\Http\Middleware\ResolveTenantMongo::class,
-
         'checkauth' => \App\Http\Middleware\CheckAuth::class,
         'admin.user.type' => \App\Http\Middleware\AdminUserTypeMiddleware::class,
+    ];
+
+    // Override \Illuminate\Foundation\Http\Kernel::$middlewarePriority priority, keep this to force run correct order route middleware
+    protected $middlewarePriority = [
+        
     ];
 }

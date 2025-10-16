@@ -57,6 +57,9 @@ class RegisteredStoreController extends Controller
                 'status' => User::STATUS['ACTIVE'],
                 'password' => Hash::make($data['password']),
                 'type' => User::TYPE['SELLER'],
+                'country' => $data['country'],
+                'phone' => $data['phone'],
+                'phone_code' => $data['country_code'],
             ];
 
             $user = $this->userService->create($dataUser);
@@ -92,7 +95,6 @@ class RegisteredStoreController extends Controller
                 ]
             ]);
 
-            // Create default theme
             $defaultSettings = [
                 'theme' => "theme_1",
                 "storeName" => "",
