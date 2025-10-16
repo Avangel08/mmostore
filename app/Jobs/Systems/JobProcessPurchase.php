@@ -8,11 +8,15 @@ use App\Models\Mongo\Accounts;
 use App\Models\Mongo\BalanceHistories;
 use App\Models\Mongo\Orders;
 use App\Services\Customer\CustomerService;
+use App\Services\PaymentMethodSeller\PaymentMethodSellerService;
 use App\Services\Product\SubProductService;
 use App\Services\BalanceHistory\BalanceHistoryService;
 use App\Services\Order\OrderService;
+use App\Services\Setting\SettingService;
 use App\Services\Tenancy\TenancyService;
 use App\Services\Home\StoreService;
+use App\Services\CurrencyRateSeller\CurrencyRateSellerService;
+use App\Models\Mongo\Settings;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -30,6 +34,7 @@ class JobProcessPurchase implements ShouldQueue
     protected $quantity;
     protected $storeId;
     protected $orderId;
+    protected $sourceKey;
 
     public $uniqueFor = 300;
     public $timeout = 120;
@@ -41,6 +46,7 @@ class JobProcessPurchase implements ShouldQueue
         $quantity,
         $storeId,
         $orderId = null,
+        $sourceKey = null,
     ) {
         $this->productId = $productId;
         $this->subProductId = $subProductId;
@@ -48,6 +54,7 @@ class JobProcessPurchase implements ShouldQueue
         $this->quantity = $quantity;
         $this->storeId = $storeId;
         $this->orderId = $orderId;
+        $this->sourceKey = $sourceKey;
         $this->queue = 'process_purchase';
     }
 
@@ -72,7 +79,10 @@ class JobProcessPurchase implements ShouldQueue
         BalanceHistoryService $balanceHistoryService,
         OrderService $orderService,
         StoreService $storeService,
-        TenancyService $tenancyService
+        TenancyService $tenancyService,
+        CurrencyRateSellerService $currencyRateSellerService,
+        PaymentMethodSellerService $paymentMethodSellerService,
+        SettingService $settingService
     ): void {
         try {
             $store = $storeService->findById($this->storeId);
@@ -113,19 +123,40 @@ class JobProcessPurchase implements ShouldQueue
 
             $totalPrice = $subProduct->price * $this->quantity;
 
-            $deducted = $this->deductCustomerBalanceAtomic($this->customerId, $totalPrice);
-            if (!$deducted) {
+            $deductResult = $this->deductCustomerBalanceAtomic($this->customerId, $totalPrice);
+            if (!$deductResult['success']) {
                 $this->updateOrderToFailed("Số dư không đủ");
                 return;
             }
 
             try {
+                $paymentMethodId = null;
+                if (!empty($this->sourceKey)) {
+                    $method = $paymentMethodSellerService->findByKey($this->sourceKey);
+                    if ($method) {
+                        $paymentMethodId = $method->_id;
+                    }
+                }
+
+                $currencySetting = $settingService->findByKey('currency');
+                $storeCurrency = $currencySetting->value ?? Settings::CURRENCY['VND'];
+
+                if ($storeCurrency === Settings::CURRENCY['USD']) {
+                    $amountUsd = (float) $totalPrice;
+                    $amountVnd = $currencyRateSellerService->convertUSDToVND($amountUsd);
+                } else {
+                    $amountVnd = (float) $totalPrice;
+                    $amountUsd = $currencyRateSellerService->convertVNDToUSD($amountVnd);
+                }
+
                 $balanceHistoryService->create([
                     'customer_id' => $this->customerId,
+                    'payment_method_id' => $paymentMethodId,
                     'type' => BalanceHistories::TYPE['purchase'],
-                    'amount' => -$totalPrice,
-                    'before' => null,
-                    'after' => null,
+                    'amount' => $amountUsd,
+                    'amount_vnd' => $amountVnd,
+                    'before' => $deductResult['before'] ?? null,
+                    'after' => $deductResult['after'] ?? null,
                     'description' => "{$subProduct->name}, {$this->quantity}",
                     'date_at' => now(),
                     'transaction' => $order->order_number ?? 'PURCHASE_' . time()
@@ -301,7 +332,7 @@ class JobProcessPurchase implements ShouldQueue
         }
     }
 
-    private function deductCustomerBalanceAtomic($customerId, $amount): bool
+    private function deductCustomerBalanceAtomic($customerId, $amount): array
     {
         try {
             $mongoId = $customerId instanceof ObjectId ? $customerId : new ObjectId((string) $customerId);
@@ -315,10 +346,21 @@ class JobProcessPurchase implements ShouldQueue
                 );
             });
 
-            return (bool) $updated;
+            if (!$updated || !isset($updated['balance'])) {
+                return ['success' => false];
+            }
+
+            $after = (float) $updated['balance'];
+            $before = $after + $amountToDeduct;
+
+            return [
+                'success' => true,
+                'before' => $before,
+                'after' => $after,
+            ];
         } catch (\Exception $e) {
             echo "Error deducting customer balance: " . $e->getMessage() . PHP_EOL;
-            return false;
+            return ['success' => false];
         }
     }
 

@@ -9,16 +9,20 @@ class PaymentMethodSeller extends Model
     const KEY = [
         'VCB' => 'VCB',
         'MB' => 'MB',
+        'BALANCE' => 'BALANCE',
+        'API' => 'API',
     ];
     const TYPE = [
         'BANK' => 0,
         'CRYPTO' => 1,
-        'THIRD_PARTY' => 2,
+        'SEPAY' => 2,
+        'BALANCE' => 3,
+        'API' => 4,
     ];
 
     const LIST_BANK = [
         'VCB' => 'Vietcombank',
-        // 'MB' => 'MB Bank',
+        'MB' => 'MB Bank',   
     ];
 
     const STATUS = [
@@ -36,9 +40,5 @@ class PaymentMethodSeller extends Model
         "status",
         "icon",
         "is_verify_otp"  //check xem đã xác thực OTP chưa (true/false)
-    ];
-
-    protected $casts = [
-        'details' => 'array',
     ];
 }

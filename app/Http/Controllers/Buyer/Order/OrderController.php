@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Buyer\Order;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mongo\Orders;
-use App\Models\Mongo\SubProducts;
 use App\Models\Mongo\Accounts;
 use App\Services\Order\OrderService;
 use Inertia\Inertia;
@@ -43,80 +42,30 @@ class OrderController extends Controller
             ], 401);
         }
 
-        $perPage = (int)($request->input('per_page', 10));
-        $page = (int)($request->input('page', 1));
-        $search = $request->input('search', '');
-        $category = $request->input('category', 'all');
-
         $requestData = [
-            'page' => $page,
-            'perPage' => $perPage,
-            'search' => $search,
-            'category' => $category
+            'page' => (int)($request->input('page', 1)),
+            'perPage' => (int)($request->input('per_page', 10)),
+            'search' => $request->input('search', ''),
+            'category' => $request->input('category', 'all')
         ];
 
-        $paginator = $this->orderService->getByCustomerId($customer->_id, $requestData);
-        
-        $rows = [];
-        foreach ($paginator->items() as $order) {
-            $subProduct = SubProducts::where('_id', $order->sub_product_id)->first();
-            
-            if ($category !== 'all') {
-                $productName = $subProduct->name ?? '';
-                if ($category === 'hotmail' && !str_contains(strtolower($productName), 'hotmail')) {
-                    continue;
-                }
-                if ($category === 'tiktok' && !str_contains(strtolower($productName), 'tiktok')) {
-                    continue;
-                }
-            }
-            
-            $rows[] = [
-                'order_number' => $order->order_number,
-                'purchased_at' => optional($order->created_at)->toISOString(),
-                'product_title' => $subProduct->name ?? 'N/A',
-                'quantity' => $order->quantity,
-                'unit_price' => $order->unit_price,
-                'total_price' => $order->total_price,
-                'status' => $order->status,
-                'payment_status' => $order->payment_status,
-                'notes' => $order->notes,
-            ];
-        }
+        $ordersData = $this->orderService->getFormattedOrdersForCustomer($customer->_id, $requestData);
 
         if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json([
                 'success' => true,
-                'orders' => [
-                    'rows' => array_values($rows),
-                    'pagination' => [
-                        'current_page' => $paginator->currentPage(),
-                        'per_page' => $paginator->perPage(),
-                        'total' => $paginator->total(),
-                        'last_page' => $paginator->lastPage(),
-                    ]
-                ]
+                'orders' => $ordersData
             ]);
         }
 
         return Inertia::render("Themes/{$theme}/Order/index", [
-            'orders' => [
-                'rows' => array_values($rows),
-                'pagination' => [
-                    'current_page' => $paginator->currentPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                    'last_page' => $paginator->lastPage(),
-                ]
-            ]
+            'orders' => $ordersData
         ]);
     }
 
     public function show($orderNumber)
     {
         $customer = Auth::guard('buyer')->user();
-        $theme = session('theme') ?? "theme_1";
-        $store = app('store');
 
         if (!$customer) {
             return response()->json([
@@ -125,42 +74,14 @@ class OrderController extends Controller
             ], 401);
         }
 
-        $order = Orders::where('order_number', $orderNumber)
-            ->where('customer_id', $customer->_id)
-            ->first();
+        $orderData = $this->orderService->getFormattedOrderDetailsForCustomer($customer->_id, $orderNumber);
 
-        if (!$order) {
+        if (!$orderData) {
             return response()->json([
                 'success' => false,
                 'message' => 'Order not found'
             ], 404);
         }
-
-        $subProduct = SubProducts::where('_id', $order->sub_product_id)->first();
-
-        $accounts = Accounts::select(['key', 'data'])
-            ->where('order_id', $order->_id)
-            ->get();
-
-        $items = $accounts->map(function ($acc) {
-            return [
-                'key' => $acc->key,
-                'data' => $acc->data,
-            ];
-        })->values()->toArray();
-
-        $orderData = [
-            'order_number' => $order->order_number,
-            'purchased_at' => optional($order->created_at)->toISOString(),
-            'product_title' => $subProduct->name ?? 'N/A',
-            'quantity' => $order->quantity,
-            'unit_price' => $order->unit_price,
-            'total_price' => $order->total_price,
-            'status' => $order->status,
-            'payment_status' => $order->payment_status,
-            'notes' => $order->notes,
-            'items' => $items,
-        ];
 
         return response()->json([
             'success' => true,

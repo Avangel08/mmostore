@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Home\Register;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Home\RegisterStore\RegisterStoreRequest;
+use App\Models\Mongo\PaymentMethodSeller;
+use App\Models\Mongo\Settings;
 use App\Models\MySQL\Stores;
 use App\Models\MySQL\User;
 use App\Services\Home\ServerService;
 use App\Services\Home\StoreService;
 use App\Services\Home\UserService;
+use App\Services\PaymentMethodSeller\PaymentMethodSellerService;
 use App\Services\Setting\SettingService;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
@@ -26,13 +29,15 @@ class RegisteredStoreController extends Controller
     protected $serverService;
     protected $settingService;
     protected $tenancyService;
+    protected $paymentMethodSellerService;
 
     public function __construct(
         UserService $userService,
         StoreService $storeService,
         ServerService $serverService,
         SettingService $settingService,
-        TenancyService $tenancyService
+        TenancyService $tenancyService,
+        PaymentMethodSellerService $paymentMethodSellerService
     )
     {
         $this->userService = $userService;
@@ -40,6 +45,7 @@ class RegisteredStoreController extends Controller
         $this->serverService = $serverService;
         $this->settingService = $settingService;
         $this->tenancyService = $tenancyService;
+        $this->paymentMethodSellerService = $paymentMethodSellerService;
     }
 
     public function register(): Response
@@ -96,11 +102,12 @@ class RegisteredStoreController extends Controller
             ]);
 
             $defaultSettings = [
-                'theme' => "theme_1",
+                "theme" => "theme_1",
                 "storeName" => "",
                 "storeLogo" => "",
                 "pageHeaderImage" => "",
                 "pageHeaderText" => "",
+                "currency" => Settings::CURRENCY['VND'],
             ];
 
             $connection = $this->tenancyService->buildConnectionFromStore($store);
@@ -111,6 +118,29 @@ class RegisteredStoreController extends Controller
                 $dataSetting['value'] = $value;
                 $dataSetting['auto_load'] = true;
                 $this->settingService->createSetting($dataSetting);
+            }
+
+            $defaultPaymentMethod = [
+                [
+                    "type" => PaymentMethodSeller::TYPE['API'],
+                    "key" => PaymentMethodSeller::KEY['API'],
+                    "name" => "Balance (API)",
+                    "details" => "",
+                    "icon" => "",
+                    "status" => PaymentMethodSeller::STATUS['ACTIVE'],
+                ],
+                [
+                    "type" => PaymentMethodSeller::TYPE['BALANCE'],
+                    "key" => PaymentMethodSeller::KEY['BALANCE'],
+                    "name" => "Balance",
+                    "details" => "",
+                    "icon" => "",
+                    "status" => PaymentMethodSeller::STATUS['ACTIVE'],
+                ]
+            ];
+
+            foreach ($defaultPaymentMethod as $value) {
+                $this->paymentMethodSellerService->updateOrCreate($value);
             }
 
             $scheme = request()->isSecure() ? 'https://' : 'http://';

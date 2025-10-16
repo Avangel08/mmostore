@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Buyer\Deposit;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mongo\Deposits;
+use App\Models\Mongo\PaymentMethodSeller;
 use App\Services\Deposits\DepositService;
-use App\Services\CurrencyRate\CurrencyRateService;
-use App\Services\PaymentMethod\PaymentMethodService;
+use App\Services\CurrencyRateSeller\CurrencyRateSellerService;
 use App\Services\Customer\CustomerService;
 use App\Services\CheckBank\CheckBankService;
+use App\Services\PaymentMethodSeller\PaymentMethodSellerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -16,20 +17,20 @@ use Inertia\Inertia;
 class DepositController extends Controller
 {
     protected $depositService;
-    protected $paymentMethodService;
-    protected $currencyRateService;
+    protected $paymentMethodSellerService;
+    protected $currencyRateSellerService;
     protected $customerService;
     protected $checkBankService;
     public function __construct(
         DepositService $depositService,
-        PaymentMethodService $paymentMethodService,
-        CurrencyRateService $currencyRateService,
+        PaymentMethodSellerService $paymentMethodSellerService,
+        CurrencyRateSellerService $currencyRateSellerService,
         CustomerService $customerService,
         CheckBankService $checkBankService
     ) {
         $this->depositService = $depositService;
-        $this->paymentMethodService = $paymentMethodService;
-        $this->currencyRateService = $currencyRateService;
+        $this->paymentMethodSellerService = $paymentMethodSellerService;
+        $this->currencyRateSellerService = $currencyRateSellerService;
         $this->customerService = $customerService;
         $this->checkBankService = $checkBankService;
     }
@@ -39,7 +40,13 @@ class DepositController extends Controller
     public function index()
     {
         $theme = session('theme') ?? "theme_1";
-        return Inertia::render("Themes/{$theme}/Deposit/index", []);
+        if(!$theme) {
+            abort(404);
+        }
+        $listPaymentMethod = $this->paymentMethodSellerService->listActive();
+        return Inertia::render("Themes/{$theme}/Deposit/index", [
+            'listPaymentMethod' => $listPaymentMethod,
+        ]);
     }
 
     public function checkout(Request $request)
@@ -49,7 +56,7 @@ class DepositController extends Controller
             $ownerStoreId = session('ownerStoreId');
             $customer = Auth::guard(config('guard.buyer'))->user();
             //payment method của user setting
-            $paymentMethod = $this->paymentMethodService->findByUserId($ownerStoreId);
+            $paymentMethod = $this->paymentMethodSellerService->findForCheckout($data['type'], $data['key']);
             if (!$paymentMethod) {
                 return response()->json([
                     "status" => "error",
@@ -62,9 +69,9 @@ class DepositController extends Controller
                 'customer_id' => $customer->_id,
                 'email' => $customer->email,
                 'payment_method_id' => $paymentMethod->id,
-                'amount' => $this->currencyRateService->convertVNDToUSD($data['amount']),
+                'amount' => $this->currencyRateSellerService->convertVNDToUSD($data['amount']),
                 'amount_vnd' => $data['amount'],
-                'currency' => 'USD',
+                'currency' => 'VND',
                 'status' => Deposits::STATUS['PENDING']
             ];
 
@@ -86,7 +93,7 @@ class DepositController extends Controller
                         "bank_code" => $paymentMethod->key,
                         "account_name" => $paymentMethod->details['account_name'],
                         "account_number" => $paymentMethod->details['account_number'],
-                        "amount" => $this->currencyRateService->convertVNDToUSD($data['amount']),
+                        "amount" => $this->currencyRateSellerService->convertVNDToUSD($data['amount']),
                         "amount_vnd" => $data['amount'],
                         "content_bank" => $result->content_bank ?? '',
                     ]

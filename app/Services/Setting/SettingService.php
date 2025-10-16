@@ -25,6 +25,11 @@ class SettingService
         return Settings::create($data);
     }
 
+    public function findByKey($key)
+    {
+        return Settings::where('key', $key)->first();
+    }
+
     public function updateSetting(Settings $setting, array $data)
     {
         return $setting->update($data);

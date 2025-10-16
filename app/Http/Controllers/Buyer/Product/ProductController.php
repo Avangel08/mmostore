@@ -3,16 +3,13 @@
 namespace App\Http\Controllers\Buyer\Product;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Buyer\Product\CheckoutProductRequest;
-use App\Models\Mongo\Categories;
-use App\Models\Mongo\Orders;
-use App\Models\Mongo\SubProducts;
+use App\Models\Mongo\PaymentMethodSeller;
+use App\Services\Order\CheckoutService;
+use App\Services\Category\CategoryService;
 use App\Services\Product\ProductService;
 use App\Services\Product\SubProductService;
-use App\Jobs\Systems\JobProcessPurchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Mongo\Products;
 
 class ProductController extends Controller
 {
@@ -20,20 +17,25 @@ class ProductController extends Controller
     protected $productService;
     protected $categoryService;
     protected $subProductService;
+    protected $checkoutService;
 
-    public function __construct(ProductService $productService, SubProductService $subProductService)
+    public function __construct(
+        ProductService $productService,
+        SubProductService $subProductService,
+        CategoryService $categoryService,
+        CheckoutService $checkoutService,
+    )
     {
         $this->productService = $productService;
         $this->subProductService = $subProductService;
+        $this->categoryService = $categoryService;
+        $this->checkoutService = $checkoutService;
     }
 
     public function show(Request $request)
     {
-        $categories = Categories::with([
-            'products' => function ($query) {
-                $query->where('status', Products::STATUS['ACTIVE'])->latest()->with(['subProducts']);
-            }
-        ])->get();
+        $categories = $this->categoryService->getWithProductsAndSubProducts();
+
         $result = $categories->map(function ($category) {
             return [
                 'id' => $category->_id,
@@ -92,91 +94,25 @@ class ProductController extends Controller
             $subProductId = $request->input('sub_product_id');
             $quantity = $request->input('quantity');
 
-            $orderId = $this->generateOrderNumber();
+            $result = $this->checkoutService->checkout($productId, $subProductId, $customer->_id, (int) $quantity, $store->id, PaymentMethodSeller::KEY['BALANCE']);
 
-            $order = $this->createPendingOrder(
-                $productId,
-                $subProductId,
-                $customer->_id,
-                $quantity,
-                $orderId
-            );
-
-            if (!$order) {
+            if (!$result['success']) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to create order'
+                    'message' => $result['message'] ?? 'Checkout failed'
                 ], 500);
             }
-
-            JobProcessPurchase::dispatch(
-                $productId,
-                $subProductId,
-                $customer->_id,
-                $quantity,
-                $store->id,
-                $order->_id,
-                'sub_product'
-            );
 
             return response()->json([
                 'success' => true,
                 'message' => 'Order created and payment processing started',
+                'order_number' => $result['order_number'] ?? null,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Error processing purchase request: ' . $e->getMessage()
             ], 500);
-        }
-    }
-
-    public function generateOrderNumber()
-    {
-        $letters = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 3));
-        $timestamp = time();
-        $randomNumbers = str_pad(mt_rand(0, 99999), 5, '0', STR_PAD_LEFT);
-        return $letters . $timestamp . $randomNumbers;
-    }
-
-    private function createPendingOrder($productId, $subProductId, $customerId, $quantity, $orderNumber)
-    {
-        try {
-            $subProduct = $this->subProductService->getById($subProductId);
-            
-            if (!$subProduct) {
-                return null;
-            }
-
-            if ($subProduct->quantity < $quantity) {
-                return null;
-            }
-
-            $product = $this->productService->getById($productId);
-            if (!$product) {
-                return null;
-            }
-
-            $unitPrice = $subProduct->price;
-            $totalPrice = $unitPrice * $quantity;
-
-            $order = Orders::create([
-                'customer_id' => $customerId,
-                'product_id' => $productId,
-                'sub_product_id' => $subProductId,
-                'category_id' => $product->category_id,
-                'quantity' => $quantity,
-                'unit_price' => $unitPrice,
-                'total_price' => $totalPrice,
-                'order_number' => $orderNumber,
-                'status' => Orders::STATUS['PENDING'],
-                'payment_status' => Orders::PAYMENT_STATUS['PENDING'],
-                'notes' => 'Order created - pending payment'
-            ]);
-
-            return $order;
-        } catch (\Exception $e) {
-            return null;
         }
     }
 

@@ -20,6 +20,7 @@ class ResolveTenantMongo
             $store = Stores::query()->whereJsonContains('domain', $host)->first();
 
             if ($store) {
+                app()->instance('store', $store);
                 session(['ownerStoreId' => $store->user_id]);
                 $connection = $tenantService->buildConnectionFromStore($store);
                 $tenantService->applyConnection($connection, true);

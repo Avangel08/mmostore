@@ -16,6 +16,11 @@ class Settings extends Model
         'auto_load',
     ];
 
+    const CURRENCY = [
+        'VND' => 'VND',
+        'USD' => 'USD',
+    ];
+
     const CONTACT_TYPES = [
         'telegram' => [
             'value' => 'telegram',
