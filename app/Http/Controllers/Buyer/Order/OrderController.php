@@ -34,7 +34,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $customer = Auth::guard('buyer')->user();
-        $theme = session('theme') ?? "Theme_1";
+        $theme = session('theme') ?? "theme_1";
 
         if (!$customer) {
             return response()->json([
@@ -115,7 +115,7 @@ class OrderController extends Controller
     public function show($orderNumber)
     {
         $customer = Auth::guard('buyer')->user();
-        $theme = session('theme') ?? "Theme_1";
+        $theme = session('theme') ?? "theme_1";
         $store = app('store');
 
         if (!$customer) {

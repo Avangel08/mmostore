@@ -25,7 +25,7 @@ class ProfileController extends Controller
         if (!$user) {
             return abort(404);
         }
-        $theme = session('theme') ?? "Theme_1";
+        $theme = session('theme') ?? "theme_1";
         return Inertia::render("Themes/{$theme}/Profile/index", [
             'purchasedCount' => Inertia::optional(function () {
                 return 0;
