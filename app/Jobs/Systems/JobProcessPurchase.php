@@ -93,6 +93,15 @@ class JobProcessPurchase implements ShouldQueue
     ): void {
         try {
             $store = $storeService->findById($this->storeId);
+
+            try {
+                $connection = $tenancyService->buildConnectionFromStore($store);
+                $tenancyService->applyConnection($connection, true);
+            } catch (\Throwable $th) {
+                echo 'Lỗi jobDepositCustomer set store database config: ' . $th->getMessage().PHP_EOL;
+                throw $th;
+            }
+
             $order = $orderService->findById($this->orderId);
 
             if (empty($store)) {
@@ -100,9 +109,6 @@ class JobProcessPurchase implements ShouldQueue
                 $this->updateOrderToFailed("Store not found");
                 return;
             }
-
-            $connection = $tenancyService->buildConnectionFromStore($store);
-            $tenancyService->applyConnection($connection, true);
             
             $this->cleanupStaleReservations($this->subProductId);
             
