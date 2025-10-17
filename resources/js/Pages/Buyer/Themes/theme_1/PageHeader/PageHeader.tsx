@@ -9,9 +9,9 @@ const PageHeader = ({ theme }: any) => {
 
     return (
         <React.Fragment>
-            <section className="section job-hero-section pb-0" id="hero" style={{ background: "linear-gradient(180deg, #004577 0%, #122B3D 100%)" }}>
+            <section className="section job-hero-section pb-3" id="hero" style={{ background: "linear-gradient(180deg, #004577 0%, #122B3D 100%)" }}>
                 <Container fluid className="custom-container">
-                    <Row className="justify-content-between align-items-center">
+                    <Row className="justify-content-between">
                         <Col lg={2}>
                             <div>
                                 <img src={theme?.pageHeaderImage ? `${storageUrl}/${theme.pageHeaderImage}?v=${Date.now()}` : hero} alt="" style={{ width: "100%" }} />

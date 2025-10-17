@@ -216,8 +216,8 @@ const Index: React.FC = () => {
 
     return (
         <React.Fragment>
-            <PageHeader title={theme?.pageHeaderText ?? ""}/>
-            <Head title="Đơn hàng đã mua"/>
+            <PageHeader theme={theme}/>
+            <Head title={`${t("Order history")} - ${theme?.storeName ?? ""}`} />
 
             <Container fluid className="custom-container">
                 <Row className="mb-4 mt-4 align-items-center">

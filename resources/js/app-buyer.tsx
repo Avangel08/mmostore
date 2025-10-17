@@ -16,7 +16,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const store = configureStore({ reducer: rootReducer, devTools: true });
 
 createInertiaApp({
-    title: (title) => `${title} - Buyer - ${appName}`,
+    title: (title) => `${title}`,
     resolve: (name) => resolvePageComponent(`./Pages/Buyer/${name}.tsx`, import.meta.glob('./Pages/Buyer/**/*.tsx')),
     setup({ el, App, props }) {
         const root = createRoot(el);

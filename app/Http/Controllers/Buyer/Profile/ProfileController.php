@@ -34,7 +34,7 @@ class ProfileController extends Controller
         if (!$user) {
             return back()->with('error', 'User not found');
         }
-
+        $store = app('store');
         return Inertia::render("Themes/{$theme}/Profile/index", [
             'purchasedCount' => Inertia::optional(function () {
                 return 0;
@@ -43,6 +43,9 @@ class ProfileController extends Controller
                 $user,
                 ['_id as id', 'token_plain_text', 'created_at', 'last_used_at']
             ),
+            'store' =>  fn() => $store,
+            'domainSuffix' => config('app.domain_suffix'),
+
         ]);
     }
 

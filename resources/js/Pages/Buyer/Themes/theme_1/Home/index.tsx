@@ -8,10 +8,12 @@ import { useThemeConfig } from "../../hooks/useThemeConfig";
 //redux
 import { useDispatch } from "react-redux";
 import { changeLayoutTheme } from "../../../../../slices/thunk";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
     const theme = useThemeConfig()
     const dispatch: any = useDispatch();
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (theme) {
@@ -21,7 +23,9 @@ const Index = () => {
 
     return (
         <React.Fragment>
-            <Head title={theme?.storeName ?? ""} />
+            <Head>
+                <title>{`${t("Home")} - ${theme?.storeName ?? ""}`}</title>
+            </Head>
             <PageHeader theme={theme} />
             <Table />
         </React.Fragment>

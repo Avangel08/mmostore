@@ -49,7 +49,7 @@ const Profile = () => {
             dispatch(changeLayoutTheme(theme?.theme));
         }
     }, [theme, dispatch]);
-
+    console.log({theme})
     React.useEffect(() => {
         const style = document.createElement('style');
         style.textContent = `
@@ -158,8 +158,8 @@ const Profile = () => {
 
     return (
         <React.Fragment>
-            <Head title={t("Personal profile")} />
-            <PageHeader title={theme?.pageHeaderText ?? ""} />
+            <Head title={`${t("Personal profile")} - ${theme?.storeName ?? ""}`} />
+            <PageHeader theme={theme} />
             <div className="mt-4">
                 <ToastContainer />
                 <Container fluid className="custom-container">

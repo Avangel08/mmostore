@@ -112,7 +112,7 @@ const ContactConfig = () => {
 
     const addContact = () => {
         const newContacts = [...formik.values.contacts, { type: "", value: "" }];
-        formik.setFieldValue("contacts", newContacts);
+        formik.setFieldValue("contacts", newContacts, false);
     };
 
     const removeContact = (index: number) => {
@@ -124,7 +124,7 @@ const ContactConfig = () => {
         const newContacts = [...formik.values.contacts];
         newContacts[index] = { ...newContacts[index], [field]: value };
         formik.setFieldValue("contacts", newContacts);
-        formik.setFieldTouched(`contacts.${index}.${field}`, true);
+        formik.setFieldTouched(`contacts.${index}.${field}`, false);
     };
 
     return (
@@ -182,6 +182,7 @@ const ContactConfig = () => {
                                                     key={type.value}
                                                     onClick={() => updateContact(index, 'type', type.value)}
                                                     className="d-flex align-items-center"
+                                                    disabled={!!formik.values.contacts.find(contact => contact.type === type.value)}
                                                 >
                                                     <i className={`${type.icon} me-2`}></i>
                                                     {type.label}

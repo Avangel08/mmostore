@@ -57,9 +57,11 @@ class OrderController extends Controller
                 'orders' => $ordersData
             ]);
         }
-
+        $store = app('store');
         return Inertia::render("Themes/{$theme}/Order/index", [
-            'orders' => $ordersData
+            'orders' => $ordersData,
+            'store' =>  fn() => $store,
+            'domainSuffix' => config('app.domain_suffix'),
         ]);
     }
 
