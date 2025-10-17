@@ -40,8 +40,8 @@ class ProductController extends Controller
                 Products::STATUS['ACTIVE'] => 'Active',
                 Products::STATUS['INACTIVE'] => 'Inactive',
             ],
-            'products' => fn() => $this->productService->getForTable($request),
-            'subProduct' => fn() => $this->subProductService->getFromProductIdForTable($request),
+            'products' => fn() => $this->productService->getForTable($request, ['*'], ['category:_id,name', 'productType:id,name']),
+            'subProduct' => fn() => $this->subProductService->getFromProductIdForTable($request, ['*'], ['product:_id,name']),
         ]);
     }
 

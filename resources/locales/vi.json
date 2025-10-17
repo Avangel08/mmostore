@@ -572,5 +572,18 @@
     "Current store logo": "Logo cửa hàng hiện tại",
     "Current page header image": "Ảnh tiêu đề trang hiện tại",
     "Page header text": "Văn bản tiêu đề trang",
-    "Current domain": "Tên miền mặc định"
+    "Current domain": "Tên miền mặc định",
+    "Edit product type": "Chỉnh sửa loại sản phẩm",
+    "Add product type": "Thêm loại sản phẩm",
+    "Product type:": "Loại sản phẩm:",
+    "Product type name": "Tên loại sản phẩm",
+    "Enter product type name": "Nhập tên loại sản phẩm",
+    "Product type created successfully": "Tạo loại sản phẩm thành công",
+    "Product type not found": "Không tìm thấy loại sản phẩm",
+    "Product type updated successfully": "Cập nhật loại sản phẩm thành công",
+    "Product types deleted successfully": "Xoá loại sản phẩm thành công",
+    "Delete product type '{{name}}'?": "Xoá loại sản phẩm '{{name}}'?",
+    "You are about to delete {{count}} product types. Once deleted, you will not be able to recover them.": "Bạn sắp xóa {{count}} loại sản phẩm. Khi đã xóa, bạn sẽ không thể khôi phục lại.",
+    "The product type name has already been taken.": "Tên loại sản phẩm đã được sử dụng.",
+    "Enter product type description": "Nhập mô tả loại sản phẩm"
 }

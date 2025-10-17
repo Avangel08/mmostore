@@ -2,23 +2,24 @@
 
 namespace App\Services\Product;
 
+use App\Helpers\Helpers;
 use App\Models\Mongo\Products;
 use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
-    public function getForTable($request)
+    public function getForTable($dataRequest, $select = ['*'], $relation = [])
     {
-        $page = $request->input('page', 1);
-        $perPage = $request->input('perPage', 10);
+        $page = $dataRequest['page'] ?? 1;
+        $perPage = $dataRequest['perPage'] ?? 10;
 
-        return Products::filterName($request)
-            ->filterCategory($request)
-            ->filterStatus($request)
-            ->filterCreatedDate($request)
+        return Products::filterName($dataRequest)
+            ->filterCategory($dataRequest)
+            ->filterStatus($dataRequest)
+            ->filterCreatedDate($dataRequest)
             ->orderBy('_id', 'desc')
-            ->with('category:_id,name')
-            ->paginate($perPage, ['*'], 'page', $page);
+            ->with($relation)
+            ->paginate($perPage, $select, 'page', $page);
     }
 
     public function getById($id, $select = ['*'], $relation = [])

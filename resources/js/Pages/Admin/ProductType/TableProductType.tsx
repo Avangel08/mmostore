@@ -4,8 +4,9 @@ import TableWithContextMenu from "../../../Components/Common/TableWithContextMen
 import { Form, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import moment from "moment";
 import { usePage } from "@inertiajs/react";
+import DOMPurify from 'dompurify';
 
-const TableCategory = ({
+const TableProductType = ({
   data,
   onReloadTable,
   onEdit,
@@ -69,7 +70,7 @@ const TableCategory = ({
           return (
             <Form.Check.Input
               type="checkbox"
-              className="categoryCheckbox form-check-input"
+              className="productTypeCheckbox form-check-input"
               checked={isChecked}
               onChange={(e) => handleItemSelect(rowData.id, e.target.checked)}
             />
@@ -78,7 +79,7 @@ const TableCategory = ({
         id: "#",
       },
       {
-        header: t("Category name"),
+        header: t("Product type name"),
         cell: (cell: any) => {
           return <span className="fw-semibold text-break text-wrap">{cell.getValue()}</span>;
         },
@@ -87,15 +88,15 @@ const TableCategory = ({
         enableSorting: true,
       },
       {
-        header: t("Created date"),
-        accessorKey: "created_at",
+        header: t("Description"),
+        cell: (cell: any) => {
+          const html = cell.getValue() ?? "";
+          const safe = DOMPurify.sanitize(html);
+          return <span dangerouslySetInnerHTML={{ __html: safe }} className="text-break text-wrap" />;
+        },
+        accessorKey: "description",
         enableColumnFilter: false,
         enableSorting: true,
-        cell: (cell: any) => {
-          return (
-            <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
-          );
-        },
       },
       {
         header: t("Status"),
@@ -113,6 +114,17 @@ const TableCategory = ({
             <span className={`badge ${className?.[statusLabel] || "bg-dark"} fs-6 fw-medium`}>
               {t(statusLabel)}
             </span>
+          );
+        },
+      },
+      {
+        header: t("Created date"),
+        accessorKey: "created_at",
+        enableColumnFilter: false,
+        enableSorting: true,
+        cell: (cell: any) => {
+          return (
+            <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
           );
         },
       },
@@ -173,4 +185,4 @@ const TableCategory = ({
     </div>
   );
 };
-export default TableCategory;
+export default TableProductType;

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Dashboard\DashboardController;
 use App\Http\Controllers\Admin\PermissionManagement\PermissionManagementController;
 use App\Http\Controllers\Admin\Plan\PlanController;
+use App\Http\Controllers\Admin\ProductType\ProductTypeController;
 use App\Http\Controllers\Admin\RoleManagement\RoleManagementController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\UserManager\UserController;
@@ -45,6 +46,11 @@ Route::domain($mainDomain)->group(function () {
             Route::post('/duplicate-plan/{id}', [PlanController::class, 'duplicatePlan'])->name('admin.plans.duplicate-plan');
         });
         Route::resource('plans', PlanController::class, ['as' => 'admin']);
+
+        Route::group(['prefix' => 'product-type'], function () {
+            Route::delete('/delete-multiple', [ProductTypeController::class, 'deleteMultipleProductTypes'])->name('admin.product-types.delete-multiple');
+        });
+        Route::resource('product-types', ProductTypeController::class, ['as' => 'admin']);
     });
 
 });

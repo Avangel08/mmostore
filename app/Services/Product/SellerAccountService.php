@@ -196,7 +196,7 @@ class SellerAccountService
         $responseData = [
             'total_count' => $totalCount,
             'success_count' => $successCount,
-            'error_count' => $errorCount,
+            'error_count' => $errorCount < 0 ? 0 : $errorCount,
         ];
         if ($errorCount > 0) {
             $responseData['reason_error'] = "Could not delete not existing or sold accounts";

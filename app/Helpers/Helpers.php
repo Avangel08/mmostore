@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Models\Mongo\Customers;
 use Illuminate\Contracts\Auth\PasswordBroker;
+use Str;
 
 class Helpers
 {
@@ -31,5 +32,32 @@ class Helpers
             PasswordBroker::RESET_THROTTLED => "The link has been sent. Please check your email",
         ];
         return $rawBrokerStatus[$key] ?? $default;
+    }
+
+    public static function transformArrayKeys(array $array, string $toCase = ''): array
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            if (is_string($key)) {
+                $key = match ($toCase) {
+                    'snake' => Str::snake($key),
+                    'camel' => Str::camel($key),
+                    'studly' => Str::studly($key),
+                    'kebab' => Str::kebab($key),
+                    default => $key,
+                };
+            }
+
+            if (is_array($value)) {
+                $value = self::transformArrayKeys($value, $toCase);
+            } elseif (is_object($value)) {
+                $value = self::transformArrayKeys((array) $value, $toCase);
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
     }
 }

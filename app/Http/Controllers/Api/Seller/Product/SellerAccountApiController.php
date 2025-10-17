@@ -62,7 +62,7 @@ class SellerAccountApiController extends Controller
                 'error_count' => 0,
                 'errors' => [],
             ];
-            return $this->success('Uploaded successfully', $result, Response::HTTP_CREATED);
+            return $this->success('Uploaded successfully', ['data' => $result], Response::HTTP_CREATED);
         } catch (Throwable $e) {
             Log::error($e, ['ip' => $request->ip(), 'user_id' => auth()->id() ?? null]);
             return $this->error($e->getMessage());
@@ -93,7 +93,7 @@ class SellerAccountApiController extends Controller
             }
 
             $message = "Deleted {$successCount} unsold accounts from subProduct {$subProduct?->name} ({$dataRequest['sub_product_id']})";
-            return $this->success($message, $dataResponse);
+            return $this->success($message, $dataResponse ? ['data' => $dataResponse] : []);
         } catch (Throwable $e) {
             Log::error($e, ['ip' => $request->ip(), 'user_id' => auth()->id() ?? null]);
             return $this->error($e->getMessage());

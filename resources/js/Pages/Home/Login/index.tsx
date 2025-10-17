@@ -96,9 +96,9 @@ const Index = () => {
                                                 </div>
 
                                                 <div className="mb-3">
-                                                    <div className="float-end">
+                                                    {/* <div className="float-end">
                                                         <Link href="/forgot-password" className="text-muted">Forgot password?</Link>
-                                                    </div>
+                                                    </div> */}
                                                     <Form.Label htmlFor="password">Password</Form.Label>
                                                     <div className="position-relative auth-pass-inputgroup mb-3">
                                                         <Form.Control
