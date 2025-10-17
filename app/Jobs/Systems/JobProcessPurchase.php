@@ -17,10 +17,12 @@ use App\Services\Tenancy\TenancyService;
 use App\Services\Home\StoreService;
 use App\Services\CurrencyRateSeller\CurrencyRateSellerService;
 use App\Models\Mongo\Settings;
+use Illuminate\Cache\Repository;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Operation\FindOneAndUpdate;
 
@@ -68,6 +70,11 @@ class JobProcessPurchase implements ShouldQueue
         ];
     }
 
+    public function uniqueVia(): Repository
+    {
+        return Cache::driver('redis');
+    }
+
     public function backoff(): array|int
     {
         return [2, 5, 10];
@@ -86,6 +93,15 @@ class JobProcessPurchase implements ShouldQueue
     ): void {
         try {
             $store = $storeService->findById($this->storeId);
+
+            try {
+                $connection = $tenancyService->buildConnectionFromStore($store);
+                $tenancyService->applyConnection($connection, true);
+            } catch (\Throwable $th) {
+                echo 'Lỗi jobDepositCustomer set store database config: ' . $th->getMessage().PHP_EOL;
+                throw $th;
+            }
+
             $order = $orderService->findById($this->orderId);
 
             if (empty($store)) {
@@ -93,9 +109,6 @@ class JobProcessPurchase implements ShouldQueue
                 $this->updateOrderToFailed("Store not found");
                 return;
             }
-
-            $connection = $tenancyService->buildConnectionFromStore($store);
-            $tenancyService->applyConnection($connection, true);
             
             $this->cleanupStaleReservations($this->subProductId);
             

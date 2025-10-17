@@ -24,7 +24,7 @@ const TablePlan = ({
       {
         header: t("Plan name"),
         cell: (cell: any) => {
-          return <span className="fw-semibold">{cell.getValue() ?? ""}</span>;
+          return <span className="fw-semibold text-break text-wrap">{cell.getValue() ?? ""}</span>;
         },
         accessorKey: "name",
         enableColumnFilter: false,

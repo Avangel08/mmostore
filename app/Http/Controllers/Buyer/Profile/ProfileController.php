@@ -7,6 +7,7 @@ use App\Http\Requests\Buyer\BuyerProfile\BuyerProfileRequest;
 use App\Services\BuyerProfile\BuyerProfileService;
 use App\Models\Mongo\CustomerAccessToken;
 use App\Services\CustomerAccessToken\CustomerAccessTokenService;
+use App\Services\Order\OrderService;
 use Illuminate\Support\Facades\Auth;
 use Hash;
 use Illuminate\Validation\ValidationException;
@@ -21,9 +22,11 @@ class ProfileController extends Controller
     public function __construct(
         BuyerProfileService $buyerProfileService,
         CustomerAccessTokenService $customerAccessTokenService,
+        OrderService $orderService
     ) {
         $this->buyerProfileService = $buyerProfileService;
         $this->customerAccessTokenService = $customerAccessTokenService;
+        $this->orderService = $orderService;
     }
 
     public function index()
@@ -36,9 +39,7 @@ class ProfileController extends Controller
         }
         $store = app('store');
         return Inertia::render("Themes/{$theme}/Profile/index", [
-            'purchasedCount' => Inertia::optional(function () {
-                return 0;
-            }),
+            'purchasedCount' => Inertia::optional(fn() => $this->orderService->countQuantityPurchasedByOrder($user->_id)),
             'token' => $this->customerAccessTokenService->userFindFirstTokenByTokenable(
                 $user,
                 ['_id as id', 'token_plain_text', 'created_at', 'last_used_at']

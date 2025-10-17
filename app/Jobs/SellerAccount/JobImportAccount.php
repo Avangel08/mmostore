@@ -148,7 +148,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
 
                 if ($isNeedCheckMail && !filter_var($mainData, FILTER_VALIDATE_EMAIL)) {
                     $errorCount++;
-                    $errors["Line {$totalCount} ({$line})"] = 'Invalid email format';
+                    $errors["Line {$totalCount} ({$line})"] = 'Invalid email';
                     return null;
                 }
 

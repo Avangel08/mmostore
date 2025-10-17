@@ -225,6 +225,10 @@ export default function Register() {
         validationSchema: Yup.object({
             email: Yup.string()
                 .email(t("Invalid email"))
+                .matches(
+                    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    t("Invalid email")
+                )
                 .required(t("Email is required")),
             store_name: Yup.string()
                 .min(3, t("Store name must be at least 3 characters"))

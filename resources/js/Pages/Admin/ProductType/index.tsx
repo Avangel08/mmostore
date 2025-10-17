@@ -1,25 +1,22 @@
 import { Head, router, usePage } from "@inertiajs/react";
 import React, { useEffect, useState } from "react";
-import Layout from "../../../CustomSellerLayouts";
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import Layout from "../../../CustomAdminLayouts";
+import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
-import TableProduct from "./TableProduct";
-import { ModalStockManagement } from "./ModalStockManagement";
-import ProductFilter from "./ProductFilter";
+import TableProductType from "./TableProductType";
+import { ModelProductType } from "./ModalProductType";
+import ProductTypeFilter from "./ProductTypeFilter";
 import { confirmDelete } from "../../../utils/sweetAlert";
 import { showToast } from "../../../utils/showToast";
 
-const Product = () => {
+const ProductType = () => {
   const { t } = useTranslation();
-  const { products } = usePage().props;
-  const [showStockModal, setShowStockModal] = useState(false);
+  const { productTypes } = usePage().props;
+  const [showModal, setShowModal] = useState(false);
+  const [dataEdit, setDataEdit] = useState<any>(null);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
-  const [selectedProductId, setSelectedProductId] = useState<
-    number | string | null
-  >(null);
-  const [selectedProductName, setSelectedProductName] = useState<string>("");
 
   const fetchData = (
     currentPage: number = 1,
@@ -27,11 +24,11 @@ const Product = () => {
     filters?: any
   ) => {
     router.reload({
-      only: ["products"],
+      only: ["productTypes"],
       replace: true,
       data: {
         page: currentPage,
-        per_page: perPage,
+        perPage: perPage,
         ...filters,
       },
     });
@@ -45,30 +42,36 @@ const Product = () => {
     fetchData(currentPage, perPage, filters);
   };
 
-  const openEditPage = (id: number | string) => {
-    router.get(route("seller.product.edit", { id }));
-  };
-
-  const openAddPage = () => {
-    router.get(route("seller.product.create"));
-  };
-
-  const openModalStock = (id: number | string, name: string) => {
-    setSelectedProductId(id);
-    setSelectedProductName(name);
-    setShowStockModal(true);
+  const openModalEdit = (id: number | string) => {
+    router.reload({
+      only: ["detailProductType"],
+      data: { id },
+      replace: true,
+      onSuccess: (page) => {
+        setDataEdit(page.props.detailProductType);
+        setShowModal(true);
+      },
+    });
   };
 
   const onDelete = async (id: number | string, name: string) => {
+    if (!id) {
+      showToast(t("Invalid ID"), "error");
+      return;
+    }
+
     const confirmed = await confirmDelete({
-      title: t("Delete product {{name}}?", { name }),
+      title: t("Delete product type '{{name}}'?", { name }),
       text: t("Once deleted, you will not be able to recover it."),
       confirmButtonText: t("Delete now"),
       cancelButtonText: t("Cancel"),
     });
 
     if (confirmed) {
-      router.delete(route("seller.product.destroy", { id }), {
+      router.delete(route("admin.product-types.destroy", { id }), {
+        replace: true,
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: (page: any) => {
           if (page.props?.message?.error) {
             showToast(t(page.props.message.error), "error");
@@ -88,15 +91,14 @@ const Product = () => {
     const confirmed = await confirmDelete({
       title: t("Delete selected items?"),
       text: t(
-        `You are about to delete {{count}} products. Once deleted, you will not be able to recover them.`,
-        { count: selectedIds.length }
+        `You are about to delete {{count}} product types. Once deleted, you will not be able to recover them.`, { count: selectedIds.length }
       ),
       confirmButtonText: t("Delete now"),
       cancelButtonText: t("Cancel"),
     });
 
     if (confirmed) {
-      router.delete(route("seller.product.delete-multiple"), {
+      router.delete(route("admin.product-types.delete-multiple"), {
         data: { ids: selectedIds },
         onSuccess: (page: any) => {
           if (page.props?.message?.error) {
@@ -119,21 +121,20 @@ const Product = () => {
 
   return (
     <React.Fragment>
-      <Head title={t("Product")} />
+      <Head title={t("Product type")} />
       <div className="page-content">
         <ToastContainer />
-        <ModalStockManagement
-          show={showStockModal}
+        <ModelProductType
+          show={showModal}
           onHide={() => {
-            setShowStockModal(false);
-            setSelectedProductId(null);
+            setShowModal(false);
+            setDataEdit(null);
           }}
-          productId={selectedProductId}
-          productName={selectedProductName}
+          dataEdit={dataEdit}
         />
         <Container fluid>
           <BreadCrumb
-            title={t("Product")}
+            title={t("Product type")}
             pageTitle={t("Homepage")}
           />
           <Row>
@@ -141,13 +142,19 @@ const Product = () => {
               <Card>
                 <Card.Body>
                   <div className="mb-4">
-                    <ProductFilter 
+                    <ProductTypeFilter 
                       onFilter={handleFilter}
                       additionalButtons={
                         <>
-                          <Button variant="success" onClick={openAddPage}>
+                          <Button
+                            variant="success"
+                            onClick={() => {
+                              setDataEdit(null);
+                              setShowModal(true);
+                            }}
+                          >
                             <i className="ri-add-line align-bottom me-1"></i>{" "}
-                            {t("Add product")}
+                            {t("Add product type")}
                           </Button>
                           {selectedIds.length > 0 && (
                             <Button variant="danger" onClick={onDeleteMultiple}>
@@ -161,11 +168,10 @@ const Product = () => {
                   </div>
                   <Row>
                     <Col>
-                      <TableProduct
-                        data={products || []}
+                      <TableProductType
+                        data={productTypes || []}
                         onReloadTable={fetchData}
-                        onEdit={openEditPage}
-                        onManageStock={openModalStock}
+                        onEdit={openModalEdit}
                         onDelete={onDelete}
                         onSelectionChange={handleSelectionChange}
                       />
@@ -181,5 +187,5 @@ const Product = () => {
   );
 };
 
-Product.layout = (page: any) => <Layout children={page} />;
-export default Product;
+ProductType.layout = (page: any) => <Layout children={page} />;
+export default ProductType;

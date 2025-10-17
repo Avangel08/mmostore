@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\Api\Seller\Product\ProductApiController;
 use App\Http\Controllers\Api\Seller\Product\SellerAccountApiController;
 use App\Http\Controllers\Api\Buyer\Product\ProductController;
 use App\Http\Controllers\Api\Buyer\Order\OrderController;
@@ -20,11 +20,13 @@ use Illuminate\Support\Facades\Route;
 $mainDomain = config('app.main_domain');
 Route::group(['prefix' => 'v1','as' => 'api.'], function () use ($mainDomain) {
         // seller api
-        Route::domain('{sub}.' . $mainDomain)->middleware((['auth:seller_api', 'validate.subdomain', 'tenant.mongo', 'validate.seller.token']))->group(function () {
-            Route::group(['prefix' => 'accounts', 'as' => 'seller.'], function () {
-                Route::post("/", [SellerAccountApiController::class, 'store'])->name('accounts.store');
-                Route::delete("/", [SellerAccountApiController::class, 'destroy'])->name('accounts.destroy');
+        Route::middleware((['auth:seller_api', 'validate.subdomain', 'tenant.mongo', 'validate.seller.token']))->group(function () {
+            Route::group(['prefix' => 'accounts'], function () {
+                Route::post("/", [SellerAccountApiController::class, 'store'])->name('seller.accounts.store');
+                Route::delete("/", [SellerAccountApiController::class, 'destroy'])->name('seller.accounts.destroy');
             });
+
+            Route::apiResource('products', ProductApiController::class, ['as' => 'seller'])->only(['index', 'show']);
         });
 
         // buyer api

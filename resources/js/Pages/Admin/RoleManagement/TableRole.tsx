@@ -76,6 +76,9 @@ const TableRole = ({
         header: t("Role name"),
         accessorKey: "name",
         enableColumnFilter: false,
+        cell: (cell: any) => {
+          return <span className="text-break text-wrap">{cell.getValue()}</span>;
+        }
       },
       {
         header: t("Group permission"),

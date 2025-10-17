@@ -4,21 +4,22 @@ import { useTranslation } from "react-i18next";
 
 const Navdata = () => {
     //state data
+    const [isProductType, setIsProductType] = useState<boolean>(false);
     const [isRoleManagement, setIsRoleManagement] = useState<boolean>(false);
     const [isPermissionManagement, setIsPermissionManagement] = useState<boolean>(false);
     const [isPlanManagement, setIsPlanManagement] = useState<boolean>(false);
     const [iscurrentState, setIscurrentState] = useState('Role Management');
     const { t } = useTranslation();
 
-    function updateIconSidebar(e : any) {
+    function updateIconSidebar(e: any) {
         if (e && e.target && e.target.getAttribute("sub-items")) {
-            const ul : any = document.getElementById("two-column-menu");
-            const iconItems : any = ul.querySelectorAll(".nav-icon.active");
+            const ul: any = document.getElementById("two-column-menu");
+            const iconItems: any = ul.querySelectorAll(".nav-icon.active");
             let activeIconItems = [...iconItems];
             activeIconItems.forEach((item) => {
                 item.classList.remove("active");
                 var id = item.getAttribute("sub-items");
-                const getID : any = document.getElementById(id) as HTMLElement;
+                const getID: any = document.getElementById(id) as HTMLElement;
                 if (getID)
                     getID?.parentElement.classList.remove("show");
             });
@@ -27,6 +28,9 @@ const Navdata = () => {
 
     useEffect(() => {
         document.body.classList.remove('twocolumn-panel');
+        if (iscurrentState !== 'Product Type') {
+            setIsProductType(false);
+        }
         if (iscurrentState !== 'Role Management') {
             setIsRoleManagement(false);
         }
@@ -43,7 +47,7 @@ const Navdata = () => {
         isPermissionManagement,
     ]);
 
-    const menuItems : any = [
+    const menuItems: any = [
         {
             label: "Menu",
             isHeader: true,
@@ -53,7 +57,7 @@ const Navdata = () => {
             label: "Dashboard",
             icon: "ri-user-star-fill",
             link: route("admin.dashboard"),
-            click: function (e : any) {
+            click: function (e: any) {
                 e.preventDefault();
                 updateIconSidebar(e);
             },
@@ -63,9 +67,22 @@ const Navdata = () => {
             label: t("User"),
             icon: "ri-user-star-fill",
             link: route("admin.user.index"),
-            click: function (e : any) {
+            click: function (e: any) {
                 e.preventDefault();
                 setIscurrentState('User');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "productType",
+            label: t("Product type"),
+            icon: "ri-file-list-fill",
+            link: route("admin.product-types.index"),
+            stateVariables: isProductType,
+            click: function (e: any) {
+                e.preventDefault();
+                setIsProductType(!isProductType);
+                setIscurrentState('Product Type');
                 updateIconSidebar(e);
             },
         },
@@ -75,7 +92,7 @@ const Navdata = () => {
             icon: "ri-user-star-fill",
             link: route("admin.roles.index"),
             stateVariables: isRoleManagement,
-            click: function (e : any) {
+            click: function (e: any) {
                 e.preventDefault();
                 setIsRoleManagement(!isRoleManagement);
                 setIscurrentState('Role Management');
@@ -88,7 +105,7 @@ const Navdata = () => {
             icon: "ri-lock-2-fill",
             link: route("admin.permissions.index"),
             stateVariables: isPermissionManagement,
-            click: function (e : any) {
+            click: function (e: any) {
                 e.preventDefault();
                 setIsPermissionManagement(!isPermissionManagement);
                 setIscurrentState('Permission Management');
@@ -101,7 +118,7 @@ const Navdata = () => {
             icon: "ri-money-dollar-box-fill",
             link: route("admin.plans.index"),
             stateVariables: isRoleManagement,
-            click: function (e : any) {
+            click: function (e: any) {
                 e.preventDefault();
                 setIsPlanManagement(!isPlanManagement);
                 setIscurrentState('Plan Management');
