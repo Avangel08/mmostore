@@ -22,7 +22,7 @@ export default function TabPaneChangeInformation() {
           setPurchasedCount(page?.props?.purchasedCount || 0);
         }
       })
-    }, 0);
+    }, 500);
 
     return () => clearTimeout(fetchTimeout);
   }, []);
