@@ -5,6 +5,7 @@ namespace App\Services\Order;
 use App\Models\Mongo\Orders;
 use App\Models\Mongo\SubProducts;
 use App\Models\Mongo\Accounts;
+use Cache;
 use Carbon\Carbon;
 use DB;
 
@@ -197,5 +198,13 @@ class OrderService
             'notes' => $order->notes,
             'items' => $items,
         ];
+    }
+
+    public function countQuantityPurchasedByOrder($customerId)
+    {
+        return Orders::where('customer_id', $customerId)
+            ->where('status', Orders::STATUS['COMPLETED'])
+            ->where('payment_status', Orders::PAYMENT_STATUS['PAID'])
+            ->sum('quantity');
     }
 }
