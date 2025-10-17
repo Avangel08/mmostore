@@ -27,7 +27,7 @@ class RegisterStoreRequest extends FormRequest
 
         return match ($action) {
             'createStore' => [
-                'email' => ['required', 'string', 'email', 'unique:users,email'],
+                'email' => ['required', 'string', 'email', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', 'unique:users,email'],
                 'password' => ['required', 'string'],
                 "confirm_password" => ['required', 'string', 'same:password'],
                 "store_name" => ['required', 'string', 'min:3', 'max:20'],
@@ -58,6 +58,7 @@ class RegisterStoreRequest extends FormRequest
         return [
             'email.required' => __('Email is required'),
             'email.email' => __('Invalid email'),
+            'email.regex' => __('Invalid email'),
             'email.unique' => __('Email already exists'),
             'password.required' => __('Password is required'),
             'confirm_password.required' => __('Confirm password is required'),

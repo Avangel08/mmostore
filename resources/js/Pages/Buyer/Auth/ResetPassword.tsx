@@ -37,7 +37,7 @@ export default function ResetPassword() {
     validationSchema: Yup.object({
       token: Yup.string().required(t("Token is required")),
       email: Yup.string()
-        .email(t("Invalid email format"))
+        .email(t("Invalid email"))
         .required(t("Email is required")),
       password: Yup.string()
         .min(8, t("Password must be at least 8 characters"))

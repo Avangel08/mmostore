@@ -30,6 +30,7 @@ class PaymentMethodSeller extends Model
         'INACTIVE' => 0,
     ];
 
+    protected $connection = 'tenant_mongo';
     protected $table = 'payment_methods';
 
     protected $fillable = [
