@@ -17,8 +17,8 @@ class SubProductService
 
     public function getFromProductIdForTable($dataRequest, $select = ['*'], $relation = [])
     {
-        $page = $dataRequest['subProductPage'] ?? 1;
-        $perPage = $dataRequest['subProductPerPage'] ?? 10;
+        $page = $dataRequest['subProductPage'] ?? ($dataRequest['subPage'] ?? 1);
+        $perPage = $dataRequest['subProductPerPage'] ?? ($dataRequest['subPerPage'] ?? 10);
         $productId = $dataRequest['productId'] ?? null;
 
         return SubProducts::where('product_id', $productId)
