@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Buyer\Product;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mongo\PaymentMethodSeller;
+use App\Models\Mongo\SubProducts;
 use App\Services\Order\CheckoutService;
 use App\Services\Category\CategoryService;
 use App\Services\Product\ProductService;
@@ -66,7 +67,9 @@ class ProductController extends Controller
 
     public function detail(String $productId)
     {
-        $product = $this->productService->getById($productId, ['*'], ['subProducts']);
+        $product = $this->productService->getById($productId, ['*'], ['subProducts' => function ($query) {
+            $query->where('status', SubProducts::STATUS['ACTIVE']);
+        }]);
         return response()->json($product);
     }
 
