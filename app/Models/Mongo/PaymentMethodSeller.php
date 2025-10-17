@@ -36,6 +36,7 @@ class PaymentMethodSeller extends Model
         "type",
         "key", // giống bank_code
         "name",
+        "description",
         "details", //{account_name, password, account_number}
         "status",
         "icon",

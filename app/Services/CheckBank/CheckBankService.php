@@ -12,6 +12,8 @@ use Illuminate\Support\Carbon;
  */
 class CheckBankService
 {
+    const CONTENT_VIETTIN_BANK_SEPAY = 'SEVQR';
+
     public function getHistoryBankInfo($bank)
     {
         try {
@@ -231,25 +233,40 @@ class CheckBankService
         ];
     }
 
-    public static function genContentBank(int $userId, string $id, int $length = 6): string
+    public static function genContentBank(int $userId, string $id, $bankCode = null, int $length = 6): string
     {
         $hash = hash('sha256', $id, true); // 32 bytes nhị phân, luôn ổn định theo $id
         $code = '';
+        $contentBank = '';
         for ($i = 0; strlen($code) < $length && $i < strlen($hash); $i++) {
             $code .= chr(ord('A') + (ord($hash[$i]) % 26));
         }
-        return "QR{$userId}{$code}";
+        //Nếu là ngân hàng viettinbank sử dụng REGEX_VIETTIN_BANK_SEPAY
+        if(!empty($bankCode) && $bankCode == "ICB") {
+            $contentBank = self::CONTENT_VIETTIN_BANK_SEPAY.$userId.$code;
+        }else{
+            $contentBank = "QR{$userId}{$code}";
+        }
+        return $contentBank;
     }
 
-    public static function parseDescription(string $description)
+    public static function parseDescription(string $description, $bankCode = null)
     {   
         $userId = $contentBank = null;
+        $regexContentBank = '/\b(QR[0-9A-Z]+)\b/i';
+        $regexUserId = '/\bQR(\d+)/i';
+        //regex với ngân hàng viettinbank
+        if(!empty($bankCode) && $bankCode == "ICB") {
+            $regexContentBank = '/\b(SEVQR[0-9A-Z]+)\b/i';
+            $regexUserId = '/\bSEVQR(\d+)/i';
+        }
+
         // Lấy contentBank theo mẫu bắt đầu bằng 'QR' + chuỗi chữ/số liền kề, ví dụ: 'QR2SMTISH'
-        if (preg_match('/\b(QR[0-9A-Z]+)\b/i', $description, $output_array)) {
+        if (preg_match($regexContentBank, $description, $output_array)) {
             $contentBank = $output_array[1];
         }
 
-        if (preg_match('/\bQR(\d+)/i', $description, $output_array)) {
+        if (preg_match($regexUserId, $description, $output_array)) {
             $userId = $output_array[1];
         }
 

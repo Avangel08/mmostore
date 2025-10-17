@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Head, router } from "@inertiajs/react";
+import React, { useEffect, useMemo, useRef, useState, useContext } from "react";
+import { Head, usePage } from "@inertiajs/react";
 import PageHeader from "../PageHeader/PageHeader";
 import { Container, Card, Button, Form } from "react-bootstrap";
 import Layout from "../../Layouts";
@@ -11,8 +11,6 @@ import { showToast } from "../../../../../utils/showToast";
 import { ToastContainer } from "react-toastify";
 import axios from "axios";
 import { ModalDeposit } from "./Modal/ModalDeposit";
-import Cleave from "cleave.js/react";
-import { useContext } from "react";
 import { LayoutContext } from "../../Layouts/LayoutContext";
 import { useThemeConfig } from "../../hooks/useThemeConfig";
 import { useDispatch } from "react-redux";
@@ -22,8 +20,9 @@ interface DepositProps {
     // Add any props if needed
 }
 
-const Index: React.FC<DepositProps> = () => {
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('bankTransfer');
+type PageWithLayout = React.FC<DepositProps> & { layout?: (page: React.ReactNode) => React.ReactNode };
+
+const Index: PageWithLayout = () => {
     const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
     const [customAmount, setCustomAmount] = useState<number | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -34,11 +33,21 @@ const Index: React.FC<DepositProps> = () => {
     const theme = useThemeConfig()
     const dispatch: any = useDispatch();
 
+    const { listPaymentMethod } : any = usePage().props ;
+
     useEffect(() => {
         if (theme) {
             dispatch(changeLayoutTheme(theme?.theme));
         }
     }, [theme, dispatch])
+
+    // Auto-select first payment method on mount
+    useEffect(() => {
+        if (listPaymentMethod && listPaymentMethod.length > 0 && !formik.values.payment_method_id) {
+            const firstPaymentMethod = listPaymentMethod[0];
+            handlePaymentMethodChange(firstPaymentMethod);
+        }
+    }, [listPaymentMethod])
 
     const { t } = useTranslation();
 
@@ -58,9 +67,15 @@ const Index: React.FC<DepositProps> = () => {
         intervalRefs.current = []
     }
 
-    const handlePaymentMethodChange = (method: string) => {
-        setSelectedPaymentMethod(method);
-        formik.setFieldValue('paymentMethod', method);
+    const handlePaymentMethodChange = (paymentMethod: any) => {
+        const methodId = paymentMethod?.id !== undefined && paymentMethod?.id !== null ? String(paymentMethod.id) : '';
+        formik.setFieldValue('payment_method_id', methodId);
+
+        if (paymentMethod?.amount !== undefined && paymentMethod?.amount !== null) {
+            setSelectedAmount(paymentMethod.amount);
+            setCustomAmount(paymentMethod.amount);
+            formik.setFieldValue('amount', paymentMethod.amount);
+        }
     };
 
     const handleAmountSelect = (amount: number) => {
@@ -77,7 +92,7 @@ const Index: React.FC<DepositProps> = () => {
 
     const validationSchema = useMemo(() => {
         return Yup.object({
-            paymentMethod: Yup.string()
+            payment_method_id: Yup.string()
                 .required(t("Please select payment method")),
             amount: Yup.number()
                 .min(10000, t("Amount must be at least 10000"))
@@ -87,7 +102,7 @@ const Index: React.FC<DepositProps> = () => {
 
     const formik = useFormik({
         initialValues: {
-            paymentMethod: "bankTransfer",
+            payment_method_id: '',
             amount: 0,
         },
         validationSchema,
@@ -97,6 +112,7 @@ const Index: React.FC<DepositProps> = () => {
                 if (response.data.status === "success") {
                     setShowModal(true);
                     setData(response.data.data);
+                    handlePayNow();
                 } else {
                     showToast(t(response.data.message), "error");
                 }
@@ -121,46 +137,36 @@ const Index: React.FC<DepositProps> = () => {
                                     <div className="col-md-6">
                                         <h6>1. {t('Select your subscription method')}</h6>
                                         <div className="payment-methods">
-                                            <Card>
-                                                <Card.Body>
-                                                    {/* <Form.Check
-                                                        type="radio"
-                                                        id="bankTransfer"
-                                                        name="paymentMethod"
-                                                        label={
-                                                            <div className="d-flex align-items-center">
-                                                                <span className="d-block justify-content-center">{t('You cab transfer money directly via Vietcombank')}</span>
-                                                                <img
-                                                                    src={vcb}
-                                                                    alt="Bank Transfer"
-                                                                    className="ms-3"
-                                                                    style={{ height: "30px" }}
+                                            {listPaymentMethod?.map((paymentMethod: any , index: number) => (
+                                                <Card key={index}>
+                                                    <Card.Body>
+                                                        <div>
+                                                            <div className="form-check mb-2">
+                                                                <Form.Check.Input 
+                                                                    className="form-check-input" 
+                                                                    type="radio" 
+                                                                    id={paymentMethod.id}
+                                                                    name="payment_method_id"
+                                                                    value={paymentMethod.id}
+                                                                    checked={formik.values.payment_method_id === paymentMethod.id}
+                                                                    onChange={() => handlePaymentMethodChange(paymentMethod)}
                                                                 />
+                                                                <Form.Check.Label className="form-check-label" htmlFor={paymentMethod.id}>
+                                                                    <div className="d-flex align-items-center">
+                                                                        <span className="d-block justify-content-center">{paymentMethod.description} ( {paymentMethod.name} )</span>
+                                                                        <img
+                                                                            src={vcb}
+                                                                            alt="Bank Transfer"
+                                                                            className="ms-3"
+                                                                            style={{ height: "20px" }}
+                                                                        />
+                                                                    </div>
+                                                                </Form.Check.Label>
                                                             </div>
-                                                        }
-                                                        checked={selectedPaymentMethod === 'bankTransfer'}
-                                                        onChange={() => handlePaymentMethodChange('bankTransfer')}
-                                                        className="mb-3"
-                                                    /> */}
-
-                                                    <div>
-                                                        <div className="form-check mb-2">
-                                                            <Form.Check.Input className="form-check-input" type="checkbox" id="formCheck1" />
-                                                            <Form.Check.Label className="form-check-label" htmlFor="formCheck1">
-                                                                <div className="d-flex align-items-center">
-                                                                    <span className="d-block justify-content-center">{t('You cab transfer money directly via Vietcombank')}</span>
-                                                                    <img
-                                                                        src={vcb}
-                                                                        alt="Bank Transfer"
-                                                                        className="ms-3"
-                                                                        style={{ height: "20px" }}
-                                                                    />
-                                                                </div>
-                                                            </Form.Check.Label>
                                                         </div>
-                                                    </div>
-                                                </Card.Body>
-                                            </Card>
+                                                    </Card.Body>
+                                                </Card>
+                                            ))}
                                         </div>
                                     </div>
 
@@ -206,7 +212,6 @@ const Index: React.FC<DepositProps> = () => {
                                             className="w-100"
                                             type="submit"
                                             disabled={formik.isSubmitting}
-                                            onClick={handlePayNow}
                                         >
                                             {formik.isSubmitting ? t('Processing...') : t('Pay now')}
                                         </Button>
