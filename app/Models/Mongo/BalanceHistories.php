@@ -30,7 +30,8 @@ class BalanceHistories extends Model
         "transaction",
         "description",
         "date_at",
-        "sale_channel_id" //Thông t
+        "sale_channel_id", //Thông t
+        "gate_way" //Thông t
     ];
 
     public function customer()
