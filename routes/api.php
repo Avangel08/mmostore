@@ -44,7 +44,7 @@ Route::group(['prefix' => 'v1','as' => 'api.'], function () use ($mainDomain) {
         });
 
         // Webhook Seller
-        Route::group(['prefix' => 'webhook', "middleware" => ["tenant.mongo"]], function () {
+        Route::group(['prefix' => 'webhook', "middleware" => ["validate.subdomain","tenant.mongo"]], function () {
             Route::any("/sepay", [SePayWebHookController::class, 'callBack'])->name('webhook.sepay');
         });
     });

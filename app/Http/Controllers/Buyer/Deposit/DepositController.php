@@ -59,7 +59,7 @@ class DepositController extends Controller
             $ownerStoreId = session('ownerStoreId');
             $customer = Auth::guard(config('guard.buyer'))->user();
             //payment method của user setting
-            $paymentMethod = $this->paymentMethodSellerService->findForCheckout($data['type'], $data['key']);
+            $paymentMethod = $this->paymentMethodSellerService->findById($data['payment_method_id']);
             if (!$paymentMethod) {
                 return response()->json([
                     "status" => "error",
@@ -82,7 +82,7 @@ class DepositController extends Controller
             if (!$result) {
                 $result = $this->depositService->create($dataInsert);
                 if ($result) {
-                    $contentBank = $this->checkBankService->genContentBank($ownerStoreId, $result->_id);
+                    $contentBank = $this->checkBankService->genContentBank($ownerStoreId, $result->_id, $paymentMethod->key);
                     $this->depositService->update($result, ['content_bank' => $contentBank]);
                 }
             }

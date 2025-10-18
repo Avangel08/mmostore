@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Seller\PaymentHistory;
 
+use App\Models\Mongo\PaymentMethodSeller;
 use App\Models\MySQL\PaymentMethods;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -26,12 +27,14 @@ class PaymentHistoryRequest extends FormRequest
         $action = $this->route()->getActionMethod();
         return match ($action) {
             'store' => [
-                'key' => ['required', 'string', 'max:255', Rule::in(array_values(PaymentMethods::KEY))],
+                'type' => ['required', 'string', 'max:255'],
+                'key' => ['required', 'string', 'max:255'],
                 'account_name' => ['required', 'string', 'max:255'],
                 'account_number' => ['required', 'string'],
-                'user_name' => ['required', 'numeric'],
-                'password' => ['required', 'string'],
-                'otp' => ['nullable', 'numeric']
+                'user_name' => [Rule::requiredIf($this->type == PaymentMethodSeller::TYPE['BANK']), 'nullable'],
+                'password' => [Rule::requiredIf($this->type == PaymentMethodSeller::TYPE['BANK']), 'nullable'],
+                'otp' => ['nullable'],
+                'api_key' => [Rule::requiredIf($this->type == PaymentMethodSeller::TYPE['SEPAY']), 'nullable'],
             ],
             'verifyPayment' => [
                 'account_name' => ['required', 'string', 'max:255'],
@@ -39,6 +42,11 @@ class PaymentHistoryRequest extends FormRequest
                 'user_name' => ['required', 'numeric'],
                 'password' => ['required', 'string'],
                 'otp' => ['nullable', 'numeric']
+            ],
+            'verifySePay' => [
+                'account_name' => ['required', 'string', 'max:255'],
+                'account_number' => ['required', 'string'],
+                'api_key' => ['required', 'string'],
             ],
             default => [],
         };
