@@ -4,12 +4,14 @@ namespace App\Services\Order;
 
 use App\Jobs\Systems\JobProcessPurchase;
 use App\Models\Mongo\Categories;
+use App\Models\Mongo\Customers;
 use App\Models\Mongo\Orders;
 use App\Models\Mongo\Products;
 use App\Models\Mongo\SubProducts;
 use App\Services\Product\ProductService;
 use App\Services\Product\SubProductService;
 use App\Services\Category\CategoryService;
+use App\Services\Customer\CustomerService;
 use Illuminate\Http\Response;
 
 class CheckoutService
@@ -17,18 +19,20 @@ class CheckoutService
     protected $productService;
     protected $subProductService;
     protected $categoryService;
+    protected $customerService;
 
-    public function __construct(ProductService $productService, SubProductService $subProductService, CategoryService $categoryService)
+    public function __construct(ProductService $productService, SubProductService $subProductService, CategoryService $categoryService, CustomerService $customerService)
     {
         $this->productService = $productService;
         $this->subProductService = $subProductService;
         $this->categoryService = $categoryService;
+        $this->customerService = $customerService;
     }
 
     public function checkout(string $productId, string $subProductId, string $customerId, int $quantity, string $storeId, string $sourceKey): array
     {
         try {
-            $validationResult = $this->validateEntitiesAreActive($productId, $subProductId);
+            $validationResult = $this->validateEntitiesAreActive($productId, $subProductId, $customerId, $quantity);
             if (!$validationResult['success']) {
                 return [
                     'status' => 'error',
@@ -76,8 +80,9 @@ class CheckoutService
         }
     }
 
-    protected function validateEntitiesAreActive(string $productId, string $subProductId): array
+    protected function validateEntitiesAreActive(string $productId, string $subProductId, string $customerId, int $quantity): array
     {
+        // Validate sub product
         $subProduct = $this->subProductService->getById($subProductId);
         if (!$subProduct) {
             return [
@@ -93,6 +98,15 @@ class CheckoutService
             ];
         }
 
+        // Validate stock quantity
+        if ($subProduct->quantity < $quantity) {
+            return [
+                'success' => false,
+                'message' => 'Số lượng sản phẩm không đủ',
+            ];
+        }
+
+        // Validate product
         $product = $this->productService->getById($productId);
         if (!$product) {
             return [
@@ -108,6 +122,7 @@ class CheckoutService
             ];
         }
 
+        // Validate category
         $category = $this->categoryService->getById($product->category_id);
         if (!$category) {
             return [
@@ -120,6 +135,31 @@ class CheckoutService
             return [
                 'success' => false,
                 'message' => 'Category is inactive',
+            ];
+        }
+
+        // Validate customer
+        $customer = $this->customerService->findById($customerId);
+        if (!$customer) {
+            return [
+                'success' => false,
+                'message' => 'Customer not found',
+            ];
+        }
+
+        if ($customer->status !== Customers::STATUS['ACTIVE']) {
+            return [
+                'success' => false,
+                'message' => 'Customer is inactive',
+            ];
+        }
+
+        // Validate customer balance
+        $totalPrice = $subProduct->price * $quantity;
+        if ($customer->balance < $totalPrice) {
+            return [
+                'success' => false,
+                'message' => 'Số dư không đủ',
             ];
         }
 
@@ -141,10 +181,6 @@ class CheckoutService
         try {
             $subProduct = $this->subProductService->getById($subProductId);
             if (!$subProduct) {
-                return null;
-            }
-
-            if ($subProduct->quantity < $quantity) {
                 return null;
             }
 
