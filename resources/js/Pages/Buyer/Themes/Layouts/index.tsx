@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 //import actions
 import {
     changeLayoutMode,
-    changeLayoutTheme
 } from "../../../../slices/thunk";
 
 //redux
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from 'reselect';
 import Navbar from "./Navbar";
-import { usePage } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import { LayoutProvider } from "./LayoutContext";
 import Footer from "../theme_1/Components/Footer/Footer";
 import ContactFloatingButton from "../../../../Components/ContactFloatingButton";
+import { useThemeConfig } from "../hooks/useThemeConfig";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     const dispatch: any = useDispatch();
-    const { subdomain, user, isAuthenticated, theme, store_settings, contacts, contact_types } = usePage().props;
-
+    const { contacts, store, domainSuffix } = usePage().props as any;
+    const theme = useThemeConfig()
     const selectLayoutState = (state: any) => state.Layout;
     const selectLayoutProperties = createSelector(
         selectLayoutState,
@@ -51,6 +51,29 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
         <React.Fragment>
             <LayoutProvider>
+                <Head>
+                    <meta
+                        name="description"
+                        content={theme?.metaDescription || ""}
+                    />
+                    <meta name="author" content={theme?.storeName || ""} />
+
+                    {/* Open Graph meta tags */}
+                    <meta property="og:title" content={theme?.storeName || ""} />
+                    <meta property="og:description" content={theme?.metaDescription || ""} />
+                    <meta property="og:image" content={theme?.pageHeaderImage || ""} />
+                    <meta property="og:url" content={`https://${store?.domain.find((d: any) => d.includes(domainSuffix))}`} />
+                    <meta property="og:type" content="product" />
+                    <meta property="og:site_name" content={theme?.storeName || ""} />
+
+                    {/* Twitter card tags (tùy chọn) */}
+                    <meta name="twitter:card" content="summary_large_image" />
+                    <meta name="twitter:title" content={theme?.storeName || ""} />
+                    <meta name="twitter:description" content={theme?.metaDescription || ""} />
+                    <meta name="twitter:image" content={theme?.pageHeaderImage || ""} />
+
+                    <meta name="robots" content="index, follow" />
+                </Head>
                 <div id="layout-wrapper">
                     <Navbar
                         layoutModeType={layoutModeType}
@@ -59,7 +82,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                         {children}
                     </div>
                     <Footer />
-                    
+
                     {/* Contact Floating Button */}
                     <ContactFloatingButton contacts={contacts as any} position="bottom-right" />
                 </div>

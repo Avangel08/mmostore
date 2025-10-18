@@ -242,9 +242,13 @@ const ModalBuy: React.FC<ProductModalProps> = ({ productId, show, onClose, }) =>
                                             </button>
                                         </div>
                                         {
-                                            itemSubProduct && itemSubProduct.quantity === 0 && (
+                                            itemSubProduct && itemSubProduct.quantity === 0 ? (
                                                 <div className="text-danger align-self-center ms-2">
                                                     {t("Out of stock")}
+                                                </div>
+                                            ) : (
+                                                <div className="text-danger align-self-center ms-2">
+                                                    {t('Stock')}:{" "}{itemSubProduct?.quantity}
                                                 </div>
                                             )
                                         }

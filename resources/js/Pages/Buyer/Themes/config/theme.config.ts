@@ -6,6 +6,7 @@ export interface ThemeConfig {
     pageHeaderText: string;
     storeLogo: string;
     storeName: string;
+    metaDescription: string;
 }
 
 const THEME_KEY = "app_theme";
@@ -15,7 +16,8 @@ const defaultTheme: ThemeConfig = {
     pageHeaderImage: "",
     pageHeaderText: "Hello, welcome to MMO Store",
     storeLogo: "",
-    storeName: "MMO Store"
+    storeName: "MMO Store",
+    metaDescription: ""
 };
 
 export const themeStorage = {

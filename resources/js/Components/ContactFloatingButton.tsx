@@ -97,7 +97,7 @@ const ContactFloatingButton: React.FC<ContactFloatingButtonProps> = ({
             case 'bottom-right':
                 return {
                     ...baseStyles,
-                    bottom: '100px',
+                    bottom: '40px',
                     right: '20px',
                 };
             case 'bottom-left':

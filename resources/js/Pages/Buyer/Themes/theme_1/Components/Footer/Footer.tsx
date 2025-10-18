@@ -30,8 +30,8 @@ const Footer: React.FC = () => {
                                 </p>
                             </div>
                         </Col>
-                        <Col lg={3}>
-                            <div style={{ fontSize: '14px', lineHeight: '1.8' }}>
+                        <Col lg={6}>
+                            <div className='text-end' style={{ fontSize: '14px', lineHeight: '1.8' }}>
                                 <p className="mb-2" style={{ margin: 0 }}>
                                     <a href="#" style={{ color: 'white', textDecoration: 'none' }}>
                                         - {t('Terms of Service')}
@@ -44,9 +44,9 @@ const Footer: React.FC = () => {
                                 </p>
                             </div>
                         </Col>
-                        <Col lg={3}>
+                        {/* <Col lg={3}>
                             <img className="w-100" src={secure} alt="" />
-                        </Col>
+                        </Col> */}
                     </Row>
                 </div>
             </div>

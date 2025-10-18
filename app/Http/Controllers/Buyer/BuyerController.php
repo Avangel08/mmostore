@@ -63,6 +63,8 @@ class BuyerController extends Controller
             'contacts' => $contacts,
             'contact_types' => fn() => Settings::CONTACT_TYPES,
             'settings' => fn() => $result,
+            'store' =>  fn() => $store,
+            'domainSuffix' => config('app.domain_suffix'),
         ]);
     }
 

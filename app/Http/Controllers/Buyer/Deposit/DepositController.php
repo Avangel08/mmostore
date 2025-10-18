@@ -44,8 +44,11 @@ class DepositController extends Controller
             abort(404);
         }
         $listPaymentMethod = $this->paymentMethodSellerService->listActive();
+        $store = app('store');
         return Inertia::render("Themes/{$theme}/Deposit/index", [
             'listPaymentMethod' => $listPaymentMethod,
+            'store' =>  fn() => $store,
+            'domainSuffix' => config('app.domain_suffix'),
         ]);
     }
 

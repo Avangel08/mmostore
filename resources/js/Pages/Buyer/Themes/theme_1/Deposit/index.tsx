@@ -22,7 +22,7 @@ interface DepositProps {
     // Add any props if needed
 }
 
-const Index: React.FC<DepositProps> = () => {
+const Index = () => {
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('bankTransfer');
     const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
     const [customAmount, setCustomAmount] = useState<number | null>(null);
@@ -108,8 +108,8 @@ const Index: React.FC<DepositProps> = () => {
 
     return (
         <React.Fragment>
-            <Head title={theme?.storeName ?? ""} />
-            <PageHeader title={theme?.pageHeaderText ?? ""} />
+            <Head title={`${t("Deposit")} - ${theme?.storeName ?? ""}`} />
+            <PageHeader theme={theme} />
             <ModalDeposit show={showModal} onHide={() => setShowModal(false)} data={data} />
             <ToastContainer />
             <Container className="mt-4 custom-container" fluid>

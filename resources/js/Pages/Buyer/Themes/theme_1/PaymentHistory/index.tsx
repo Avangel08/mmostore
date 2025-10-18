@@ -13,7 +13,7 @@ interface PaymentHistoryProps {
     // Add any props if needed
 }
 
-const PaymentHistory: React.FC<PaymentHistoryProps> = () => {
+const PaymentHistory = () => {
     const { listBalanceHistory } = usePage().props;
     const theme = useThemeConfig()
     const dispatch: any = useDispatch();
@@ -49,8 +49,8 @@ const PaymentHistory: React.FC<PaymentHistoryProps> = () => {
     };
     return (
         <React.Fragment>
-            <Head title={theme?.storeName ?? ""} />
-            <PageHeader title={theme?.pageHeaderText ?? ""} />
+            <Head title={`${t("Payment History")} - ${theme?.storeName ?? ""}`} />
+            <PageHeader theme={theme} />
             <ToastContainer />
             <Container fluid className="custom-container mt-4">
                 <Row>

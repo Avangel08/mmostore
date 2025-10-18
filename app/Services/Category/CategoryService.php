@@ -4,6 +4,7 @@ namespace App\Services\Category;
 
 use App\Models\Mongo\Categories;
 use App\Models\Mongo\Products;
+use App\Models\Mongo\SubProducts;
 
 class CategoryService
 {
@@ -70,10 +71,19 @@ class CategoryService
 
     public function getWithProductsAndSubProducts()
     {
-        return Categories::with([
-            'products' => function ($query) {
-                $query->where('status', Products::STATUS['ACTIVE'])->latest()->with(['subProducts', 'productType']);
-            }
-        ])->get();
+        return Categories::where('status', Categories::STATUS['ACTIVE'])
+            ->with([
+                'products' => function ($query) {
+                    $query->where('status', Products::STATUS['ACTIVE'])
+                        ->latest()
+                        ->with([
+                            'subProducts' => function ($q) {
+                                $q->where('status', SubProducts::STATUS['ACTIVE']);
+                            },
+                            'productType'
+                        ]);
+                }
+            ])
+            ->get();
     }
 }

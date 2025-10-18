@@ -24,9 +24,12 @@ class PaymentHistoryController extends Controller
         $theme = session('theme') ?? "theme_1";
         $request = $request->all();
         $customerId = Auth::guard('buyer')->user()->id;
+        $store = app('store');
         $listBalanceHistory = $this->balanceHistoryService->getForTableCustomer($request, $customerId);
         return Inertia::render("Themes/{$theme}/PaymentHistory/index", [
             'listBalanceHistory' => $listBalanceHistory,
+            'store' =>  fn() => $store,
+            'domainSuffix' => config('app.domain_suffix'),
         ]);
     }
 
