@@ -42,10 +42,19 @@ class PaymentMethodSellerService
         return PaymentMethodSeller::where('status', PaymentMethodSeller::STATUS['ACTIVE'])->orderBy('type', 'asc')->get();
     }
 
-    public function findForCheckout($type, $key){
-        return PaymentMethodSeller::where('type', $type)
-        ->where('key', $key)
-        ->where('status', PaymentMethodSeller::STATUS['ACTIVE'])
-        ->first();
+    public function getForTable($request){
+        $page = $request['page'] ?? 1;
+        $perPage = $request['perPage'] ?? 10;
+
+        return PaymentMethodSeller::filterSearch($request)
+        ->filterCreatedDate($request)
+        ->orderBy('created_at', 'desc')
+        ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function renderLinkWebhook($host)
+    {
+        $endPoint = "api/v1/webhook/sepay";
+        return $host . "/" . $endPoint;
     }
 }

@@ -12,6 +12,7 @@ class PaymentMethodSeller extends Model
         'BALANCE' => 'BALANCE',
         'API' => 'API',
     ];
+
     const TYPE = [
         'BANK' => 0,
         'CRYPTO' => 1,
@@ -19,10 +20,13 @@ class PaymentMethodSeller extends Model
         'BALANCE' => 3,
         'API' => 4,
     ];
-
+    // danh sách bank hỗ trợ trên mmo
     const LIST_BANK = [
-        'VCB' => 'Vietcombank',
-        'MB' => 'MB Bank',   
+        'VCB' => 'Vietcombank',  
+    ];
+
+    const LIST_SEPAY = [
+        'SEPAY' => 'SEPAY',
     ];
 
     const STATUS = [
@@ -36,10 +40,29 @@ class PaymentMethodSeller extends Model
         "type",
         "key", // giống bank_code
         "name",
+        "title",
         "description",
         "details", //{account_name, password, account_number}
         "status",
         "icon",
         "is_verify_otp"  //check xem đã xác thực OTP chưa (true/false)
     ];
+
+    public function scopeFilterSearch($query, $request){
+        if(isset($request['search']) && $request['search'] != ''){
+            $query->where('name', 'like', '%'.$request['search'].'%');
+            $query->orWhere('title', 'like', '%'.$request['search'].'%');
+        }
+        return $query;
+    }
+
+    public function scopeFilterCreatedDate($query, $request){
+        if(isset($request['start_time']) && $request['start_time'] != ''){
+            $query->where('created_at', '>=', $request['start_time']);
+        }
+        if(isset($request['end_time']) && $request['end_time'] != ''){
+            $query->where('created_at', '<=', $request['end_time']);
+        }
+        return $query;
+    }
 }

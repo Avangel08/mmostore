@@ -20,7 +20,7 @@ class BankService
         return Banks::where('code', $code)->first();
     }
 
-    public function getListSupported()
+    public function getListForSePay()
     {
         return Banks::where('supported', true)->get();
     }
