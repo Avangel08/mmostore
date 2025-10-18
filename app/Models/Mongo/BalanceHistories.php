@@ -11,6 +11,12 @@ class BalanceHistories extends Model
         "purchase" => 2, //user mua hàng - purchase
         "deduct_money" => 3, //user trừ tiền - deduct_money
     ];
+
+    const GATEWAY = [
+      'SYSTEM' => "SYSTEM",
+      'API' => "API",
+    ];
+
     protected $table = 'balance_histories';
 
     protected $fillable = [

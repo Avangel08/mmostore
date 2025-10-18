@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Buyer\Order;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mongo\Accounts;
+use App\Models\Mongo\BalanceHistories;
 use App\Models\Mongo\Orders;
 use App\Models\Mongo\PaymentMethodSeller;
 use App\Models\Mongo\SubProducts;
@@ -30,7 +31,7 @@ class OrderController extends Controller
     {
         $customer = Auth::guard('buyer_api')->user();
         if (!$customer) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
         $requestData = [
@@ -38,13 +39,16 @@ class OrderController extends Controller
             'perPage' => (int)($request->input('per_page', 10)),
             'search' => $request->input('search', ''),
             'category' => $request->input('category', 'all'),
+            'from' => $request->input('from', ''),
+            'to' => $request->input('to', ''),
         ];
 
         $ordersData = $this->orderService->getFormattedOrdersForCustomer($customer->_id, $requestData);
 
         return response()->json([
-            'success' => true,
-            'orders' => $ordersData
+            'status' => 'success',
+            'message' => 'Orders retrieved successfully',
+            'data' => $ordersData
         ]);
     }
 
@@ -52,18 +56,19 @@ class OrderController extends Controller
     {
         $customer = Auth::guard('buyer_api')->user();
         if (!$customer) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
         $orderData = $this->orderService->getFormattedOrderDetailsForCustomer($customer->_id, $orderNumber);
 
         if (!$orderData) {
-            return response()->json(['success' => false, 'message' => 'Order not found'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
         }
 
         return response()->json([
-            'success' => true,
-            'order' => $orderData,
+            'status' => 'success',
+            'message' => 'Order retrieved successfully',
+            'data' => $orderData
         ]);
     }
 
@@ -81,7 +86,7 @@ class OrderController extends Controller
             $customer = Auth::guard('buyer_api')->user();
             if (!$customer) {
                 return response()->json([
-                    'success' => false,
+                    'status' => 'error',
                     'message' => 'Unauthorized'
                 ], 401);
             }
@@ -90,23 +95,16 @@ class OrderController extends Controller
             $subProductId = $request->input('sub_product_id');
             $quantity = (int) $request->input('quantity');
 
-            $result = $this->checkoutService->checkout($productId, $subProductId, $customer->_id, $quantity, $store->id, PaymentMethodSeller::KEY['API']);
-
-            if (!$result['success']) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $result['message'] ?? 'Checkout failed',
-                ], 500);
-            }
+            $result = $this->checkoutService->checkout($productId, $subProductId, $customer->_id, $quantity, $store->id, BalanceHistories::GATEWAY['API']);
 
             return response()->json([
-                'success' => true,
-                'message' => 'Order created and payment processing started',
-                'order_number' => $result['order_number'] ?? null,
-            ]);
+                'status' => $result['status'],
+                'message' => $result['message'],
+                'data' => $result['data'] ?? null,
+            ], $result['code']);
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Error processing purchase request: ' . $e->getMessage()
             ], 500);
         }

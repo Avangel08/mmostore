@@ -72,7 +72,7 @@ class CategoryService
     {
         return Categories::with([
             'products' => function ($query) {
-                $query->where('status', Products::STATUS['ACTIVE'])->latest()->with(['subProducts']);
+                $query->where('status', Products::STATUS['ACTIVE'])->latest()->with(['subProducts', 'productType']);
             }
         ])->get();
     }

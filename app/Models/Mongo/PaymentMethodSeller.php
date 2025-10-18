@@ -10,14 +10,12 @@ class PaymentMethodSeller extends Model
         'VCB' => 'VCB',
         'MB' => 'MB',
         'BALANCE' => 'BALANCE',
-        'API' => 'API',
     ];
     const TYPE = [
         'BANK' => 0,
         'CRYPTO' => 1,
         'SEPAY' => 2,
         'BALANCE' => 3,
-        'API' => 4,
     ];
 
     const LIST_BANK = [

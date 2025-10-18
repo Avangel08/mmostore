@@ -122,14 +122,6 @@ class RegisteredStoreController extends Controller
 
             $defaultPaymentMethod = [
                 [
-                    "type" => PaymentMethodSeller::TYPE['API'],
-                    "key" => PaymentMethodSeller::KEY['API'],
-                    "name" => "Balance (API)",
-                    "details" => "",
-                    "icon" => "",
-                    "status" => PaymentMethodSeller::STATUS['ACTIVE'],
-                ],
-                [
                     "type" => PaymentMethodSeller::TYPE['BALANCE'],
                     "key" => PaymentMethodSeller::KEY['BALANCE'],
                     "name" => "Balance",

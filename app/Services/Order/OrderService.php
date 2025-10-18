@@ -112,6 +112,8 @@ class OrderService
         $perPage = $requestData['perPage'] ?? 10;
         $search = $requestData['search'] ?? '';
         $category = $requestData['category'] ?? 'all';
+        $from = $requestData['from'] ?? '';
+        $to = $requestData['to'] ?? '';
 
         $query = Orders::where('customer_id', $customerId);
 
@@ -120,6 +122,16 @@ class OrderService
                 $q->where('order_number', 'like', '%' . $search . '%')
                   ->orWhere('notes', 'like', '%' . $search . '%');
             });
+        }
+
+        if ($from !== '') {
+            $start = Carbon::parse($from)->startOfDay();
+            $query->where('created_at', '>=', $start);
+        }
+
+        if ($to !== '') {
+            $end = Carbon::parse($to)->endOfDay();
+            $query->where('created_at', '<=', $end);
         }
 
         $paginator = $query->orderBy('created_at', 'desc')
@@ -141,7 +153,7 @@ class OrderService
 
             $rows[] = [
                 'order_number' => $order->order_number,
-                'purchased_at' => optional($order->created_at)->toISOString(),
+                'purchased_at' => optional($order->created_at)->format('Y-m-d H:i:s'),
                 'product_title' => $subProduct->name ?? 'N/A',
                 'quantity' => $order->quantity,
                 'unit_price' => $order->unit_price,
@@ -159,6 +171,8 @@ class OrderService
                 'per_page' => $paginator->perPage(),
                 'total' => $paginator->total(),
                 'last_page' => $paginator->lastPage(),
+                'from' => $paginator->firstItem(),
+                'to' => $paginator->lastItem(),
             ]
         ];
     }
@@ -188,7 +202,7 @@ class OrderService
 
         return [
             'order_number' => $order->order_number,
-            'purchased_at' => optional($order->created_at)->toISOString(),
+            'purchased_at' => optional($order->created_at)->format('Y-m-d H:i:s'),
             'product_title' => $subProduct->name ?? 'N/A',
             'quantity' => $order->quantity,
             'unit_price' => $order->unit_price,

@@ -3,36 +3,48 @@
 namespace App\Services\Order;
 
 use App\Jobs\Systems\JobProcessPurchase;
+use App\Models\Mongo\Categories;
 use App\Models\Mongo\Orders;
+use App\Models\Mongo\Products;
+use App\Models\Mongo\SubProducts;
 use App\Services\Product\ProductService;
 use App\Services\Product\SubProductService;
+use App\Services\Category\CategoryService;
+use Illuminate\Http\Response;
 
 class CheckoutService
 {
     protected $productService;
     protected $subProductService;
+    protected $categoryService;
 
-    public function __construct(ProductService $productService, SubProductService $subProductService)
+    public function __construct(ProductService $productService, SubProductService $subProductService, CategoryService $categoryService)
     {
         $this->productService = $productService;
         $this->subProductService = $subProductService;
+        $this->categoryService = $categoryService;
     }
 
-    /**
-     * Perform checkout: validate, create pending order, dispatch processing job.
-     *
-     * @return array{success:bool,message?:string,order?:Orders,order_number?:string}
-     */
     public function checkout(string $productId, string $subProductId, string $customerId, int $quantity, string $storeId, string $sourceKey): array
     {
         try {
+            $validationResult = $this->validateEntitiesAreActive($productId, $subProductId);
+            if (!$validationResult['success']) {
+                return [
+                    'status' => 'error',
+                    'message' => $validationResult['message'],
+                    'code' => Response::HTTP_BAD_REQUEST
+                ];
+            }
+
             $orderNumber = $this->generateOrderNumber();
 
             $order = $this->createPendingOrder($productId, $subProductId, $customerId, $quantity, $orderNumber);
             if (!$order) {
                 return [
-                    'success' => false,
+                    'status' => 'error',
                     'message' => 'Failed to create order',
+                    'code' => Response::HTTP_INTERNAL_SERVER_ERROR
                 ];
             }
 
@@ -47,16 +59,73 @@ class CheckoutService
             );
 
             return [
-                'success' => true,
-                'order' => $order,
-                'order_number' => $orderNumber,
+                'status' => 'success',
+                'message' => 'Order created successfully',
+                'data' => [
+                    'order' => $order,
+                    'order_number' => $orderNumber,
+                ],
+                'code' => Response::HTTP_CREATED
             ];
         } catch (\Exception $e) {
             return [
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Error processing purchase request: ' . $e->getMessage(),
+                'code' => Response::HTTP_INTERNAL_SERVER_ERROR
             ];
         }
+    }
+
+    protected function validateEntitiesAreActive(string $productId, string $subProductId): array
+    {
+        $subProduct = $this->subProductService->getById($subProductId);
+        if (!$subProduct) {
+            return [
+                'success' => false,
+                'message' => 'Sub product not found',
+            ];
+        }
+
+        if ($subProduct->status !== SubProducts::STATUS['ACTIVE']) {
+            return [
+                'success' => false,
+                'message' => 'Sub product is inactive',
+            ];
+        }
+
+        $product = $this->productService->getById($productId);
+        if (!$product) {
+            return [
+                'success' => false,
+                'message' => 'Product not found',
+            ];
+        }
+
+        if ($product->status !== Products::STATUS['ACTIVE']) {
+            return [
+                'success' => false,
+                'message' => 'Product is inactive',
+            ];
+        }
+
+        $category = $this->categoryService->getById($product->category_id);
+        if (!$category) {
+            return [
+                'success' => false,
+                'message' => 'Category not found',
+            ];
+        }
+
+        if ($category->status !== Categories::STATUS['ACTIVE']) {
+            return [
+                'success' => false,
+                'message' => 'Category is inactive',
+            ];
+        }
+
+        return [
+            'success' => true,
+        ];
     }
 
     protected function generateOrderNumber(): string

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Buyer\Product;
 
 use App\Http\Controllers\Controller;
+use App\Models\Mongo\BalanceHistories;
 use App\Models\Mongo\PaymentMethodSeller;
 use App\Services\Order\CheckoutService;
 use App\Services\Category\CategoryService;
@@ -85,7 +86,7 @@ class ProductController extends Controller
 
             if (!$customer) {
                 return response()->json([
-                    'success' => false,
+                    'status' => 'error',
                     'message' => 'Customer not authenticated'
                 ], 401);
             }
@@ -94,23 +95,16 @@ class ProductController extends Controller
             $subProductId = $request->input('sub_product_id');
             $quantity = $request->input('quantity');
 
-            $result = $this->checkoutService->checkout($productId, $subProductId, $customer->_id, (int) $quantity, $store->id, PaymentMethodSeller::KEY['BALANCE']);
-
-            if (!$result['success']) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $result['message'] ?? 'Checkout failed'
-                ], 500);
-            }
+            $result = $this->checkoutService->checkout($productId, $subProductId, $customer->_id, (int) $quantity, $store->id, BalanceHistories::GATEWAY['SYSTEM']);
 
             return response()->json([
-                'success' => true,
-                'message' => 'Order created and payment processing started',
-                'order_number' => $result['order_number'] ?? null,
-            ]);
+                'status' => $result['status'],
+                'message' => $result['message'],
+                'data' => $result['data'] ?? null,
+            ], $result['code']);
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Error processing purchase request: ' . $e->getMessage()
             ], 500);
         }

@@ -3,6 +3,7 @@
 namespace App\Jobs\Systems;
 
 use App\Models\Mongo\Customers;
+use App\Models\Mongo\PaymentMethodSeller;
 use App\Models\Mongo\SubProducts;
 use App\Models\Mongo\Accounts;
 use App\Models\Mongo\BalanceHistories;
@@ -144,13 +145,13 @@ class JobProcessPurchase implements ShouldQueue
 
             try {
                 $paymentMethodId = null;
-                if (!empty($this->sourceKey)) {
-                    $method = $paymentMethodSellerService->findByKey($this->sourceKey);
-                    if ($method) {
-                        $paymentMethodId = $method->_id;
-                    }
+                $method = $paymentMethodSellerService->findByKey(PaymentMethodSeller::KEY['BALANCE']);
+
+                if ($method) {
+                    $paymentMethodId = $method->_id;
                 }
 
+                $gateWay = BalanceHistories::GATEWAY[$this->sourceKey];
                 $currencySetting = $settingService->findByKey('currency');
                 $storeCurrency = $currencySetting->value ?? Settings::CURRENCY['VND'];
 
@@ -172,7 +173,8 @@ class JobProcessPurchase implements ShouldQueue
                     'after' => $deductResult['after'] ?? null,
                     'description' => "{$subProduct->name}, {$this->quantity}",
                     'date_at' => now(),
-                    'transaction' => $order->order_number ?? 'PURCHASE_' . time()
+                    'transaction' => $order->order_number ?? 'PURCHASE_' . time(),
+                    'gate_way' => $gateWay,
                 ]);
             } catch (\Exception $e) {
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
