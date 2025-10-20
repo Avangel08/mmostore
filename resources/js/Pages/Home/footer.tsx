@@ -42,7 +42,7 @@ const Footer = () => {
                                     <div className="text-muted mt-3">
                                         <ul className="list-unstyled ff-secondary footer-list">
                                             <li>
-                                                <Link href="/pages-profile">
+                                                <Link href="/">
                                                     Về chúng tôi
                                                 </Link>
                                             </li>
