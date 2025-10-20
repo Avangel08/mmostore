@@ -125,6 +125,17 @@ const Navdata = () => {
                 updateIconSidebar(e);
             },
         },
+        {
+            id: "postmanagement",
+            label: t("Posts"),
+            icon: "ri-file-list-3-fill",
+            link: route("admin.posts.index"),
+            click: function (e: any) {
+                e.preventDefault();
+                Inertia.visit(route("admin.posts.index"));
+                updateIconSidebar(e);
+            },
+        },
     ];
     return <React.Fragment>{menuItems}</React.Fragment>;
 };
