@@ -1,0 +1,1 @@
+import{u as f,c as i}from"./ThemeProvider-CYM_k5Zw.js";import{d as n,j as x}from"./ContextMenuProvider-Bgjy8Wg_.js";const c=n.forwardRef(({bsPrefix:r,bg:s="primary",pill:e=!1,text:a,className:o,as:t="span",...p},m)=>{const d=f(r,"badge");return x.jsx(t,{ref:m,...p,className:i(o,d,e&&"rounded-pill",a&&`text-${a}`,s&&`bg-${s}`)})});c.displayName="Badge";export{c as B};
