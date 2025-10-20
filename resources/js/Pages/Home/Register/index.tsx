@@ -307,7 +307,7 @@ export default function Register() {
                 `}
             </style>
             <GuestLayout>
-                <Head title="Basic SignUp | Velzon - React Admin & Dashboard Template" />
+                <Head title={t("Register")} />
                 <div className="auth-page-content mt-lg-5">
                     <Container>
                         <Row>
