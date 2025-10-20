@@ -33,7 +33,7 @@ class PaymentMethodSeller extends Model
     ];
 
     protected $connection = 'tenant_mongo';
-    protected $table = 'payment_methods';
+    protected $table = 'payment_method_sellers';
 
     protected $fillable = [
         "type",

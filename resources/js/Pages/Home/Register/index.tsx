@@ -182,7 +182,7 @@ const countryCodes = [
 
 export default function Register() {
     const { props } = usePage();
-    const DOMAIN_SUFFIX = (props as any)?.domainSuffix || "mmostore.local";
+    const DOMAIN_SUFFIX = (props as any)?.domainSuffix;
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
     const [confirmPasswordShow, setConfirmPasswordShow] = useState<boolean>(false);
     const [serverError, setServerError] = useState<string | null>(null);

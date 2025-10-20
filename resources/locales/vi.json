@@ -585,5 +585,7 @@
     "Delete product type '{{name}}'?": "Xoá loại sản phẩm '{{name}}'?",
     "You are about to delete {{count}} product types. Once deleted, you will not be able to recover them.": "Bạn sắp xóa {{count}} loại sản phẩm. Khi đã xóa, bạn sẽ không thể khôi phục lại.",
     "The product type name has already been taken.": "Tên loại sản phẩm đã được sử dụng.",
-    "Enter product type description": "Nhập mô tả loại sản phẩm"
+    "Enter product type description": "Nhập mô tả loại sản phẩm",
+    "Gate Way" : "Cổng thanh toán",
+    "Add Payment Method" : "Thêm phương thức thanh toán"
 }

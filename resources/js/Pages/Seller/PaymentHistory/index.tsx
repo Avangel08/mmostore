@@ -69,14 +69,6 @@ const PaymentHistory = () => {
       <Head title={t("Payment History")} />
       <div className="page-content">
         <ToastContainer />
-        <ModalSettingPayment
-          show={showModal}
-          onHide={() => {
-            setShowModal(false);
-          }}
-          dataEdit={dataEdit}
-          listBank={listBank}
-        />
         <Container fluid>
           <BreadCrumb
             title={t("Payment History")}
@@ -87,16 +79,10 @@ const PaymentHistory = () => {
               <Card>
                 <Card.Body>
                   <Filter onFilter={handleFilter} />
-                  <Row style={{ marginBottom: "32px" }}>
+                  <Row style={{ marginBottom: "15px" }}>
                     <Col>
                       <div className="d-flex gap-2">
-                        <Button
-                          variant="success"
-                          onClick={openModalEdit}
-                        >
-                          <i className="ri-add-line align-bottom me-1"></i>{" "}
-                          {t("Setting Payment")}
-                        </Button>
+                       {/* Button */}
                       </div>
                     </Col>
                   </Row>

@@ -18,6 +18,11 @@ class PaymentMethodSellerService
         ],$data);
     }
 
+    public function create($data)
+    {
+        return PaymentMethodSeller::create($data);
+    }
+
     public function update($item, $data)
     {
         return $item->update($data);

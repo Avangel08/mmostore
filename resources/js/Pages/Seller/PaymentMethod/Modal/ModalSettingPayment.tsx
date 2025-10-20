@@ -18,7 +18,7 @@ export const ModalSettingPayment = ({
   dataEdit?: any;
   dataOptions?: any;
 }) => {
-
+  console.log(dataEdit);
   const maxLengthName = 150;
   const { t } = useTranslation();
   const errors = usePage().props.errors as any;
@@ -28,6 +28,7 @@ export const ModalSettingPayment = ({
   const [showOtp, setShowOtp] = useState(false);
   const [canSubmit, setCanSubmit] = useState(false);
   const [showWebhook, setShowWebhook] = useState(false);
+  const isEditMode = !!dataEdit;
 
   const validationSchema: any = useMemo(() => {
     return Yup.object({
@@ -67,6 +68,7 @@ export const ModalSettingPayment = ({
   }, [showOtp, t, dataOptions]);
 
   const formik = useFormik<{
+    id: string;
     type: string;
     key: string;
     account_name: string;
@@ -77,6 +79,7 @@ export const ModalSettingPayment = ({
     api_key: string;
   }>({
     initialValues: {
+      id: dataEdit?.id || "",
       type: dataEdit?.type || "BANK",
       key: dataEdit?.key || "",
       account_name: dataEdit?.details?.account_name || "",
@@ -88,8 +91,10 @@ export const ModalSettingPayment = ({
     },
     validationSchema,
     onSubmit: (values) => {
-      const url = route("seller.payment-method.store");
-      const method = "post";
+      const url = isEditMode
+        ? route("seller.payment-method.update", { id: dataEdit.id })
+        : route("seller.payment-method.store");
+      const method = isEditMode ? "put" : "post";
 
       router[method](url, values, {
         onSuccess: (success: any) => {
@@ -111,6 +116,7 @@ export const ModalSettingPayment = ({
   useEffect(() => {
     if (show) {
       formik.setValues({
+        id: dataEdit?.id || "",
         type: dataEdit?.type ? String(dataEdit?.type) : "0",
         key: dataEdit?.key || "",
         account_name: dataEdit?.details?.account_name || "",

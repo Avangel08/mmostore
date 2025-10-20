@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Seller\PaymentHistory;
+namespace App\Http\Requests\Seller\PaymentMethod;
 
 use App\Models\Mongo\PaymentMethodSeller;
 use App\Rules\UniquePaymentMethodSellerRule;
@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 
-class PaymentHistoryRequest extends FormRequest
+class PaymentMethodRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
