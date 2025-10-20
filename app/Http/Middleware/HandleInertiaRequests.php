@@ -20,6 +20,7 @@ class HandleInertiaRequests extends Middleware
         $domain = [
             'mmostore.local',
             'mmostores.shop',
+            'mmoshop.io',
         ];
 
         $host = $request->getHost();
