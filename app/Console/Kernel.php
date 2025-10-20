@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\Systems\CheckBank;
+use App\Console\Commands\Systems\CheckBankSeller;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -13,11 +14,11 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
-    
+
     /**
      * Define the application's command schedule.
      */
@@ -28,10 +29,16 @@ class Kernel extends ConsoleKernel
             mkdir($pathLogs, 0777, true);
         }
 
-        $schedule->command(CheckBank::class)
+        // $schedule->command(CheckBank::class)
+        //     ->everyMinute()
+        //     ->withoutOverlapping(10)
+        //     ->runInBackground()
+        //     ->appendOutputTo($pathLogs . '/check_bank.txt');
+
+        $schedule->command(CheckBankSeller::class)
             ->everyMinute()
             ->withoutOverlapping(10)
             ->runInBackground()
-            ->appendOutputTo($pathLogs . '/check_bank.txt');
+            ->appendOutputTo($pathLogs . '/check_bank_seller.txt');
     }
 }

@@ -5,7 +5,10 @@ namespace App\Jobs\Systems;
 use App\Jobs\Systems\JobDepositCustomer;
 use App\Models\Mongo\BankHistoryLogs;
 use App\Services\CheckBank\CheckBankService;
+use App\Services\Home\StoreService;
 use App\Services\PaymentMethod\PaymentMethodService;
+use App\Services\PaymentMethodSeller\PaymentMethodSellerService;
+use App\Services\Tenancy\TenancyService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -17,15 +20,17 @@ class JobCheckBankUser implements ShouldQueue, ShouldBeUnique
     use Queueable;
 
     protected $bankId;
+    protected $storeId;
     protected $formatTime = 'd/m/Y H:i:s'; // d/m/Y or d-m-Y
 
     public $uniqueFor = 3600;
     /**
      * Create a new job instance.
      */
-    public function __construct($bankId)
+    public function __construct($bankId, $storeId)
     {
         $this->bankId = $bankId;
+        $this->storeId = $storeId;
         $this->queue = 'check-bank-user';
     }
 
@@ -43,10 +48,27 @@ class JobCheckBankUser implements ShouldQueue, ShouldBeUnique
     /**
      * Execute the job.
      */
-    public function handle(PaymentMethodService $paymentMethodService, CheckBankService $checkBankService): void
-    {
+    public function handle(
+        PaymentMethodSellerService $paymentMethodSellerService,
+        CheckBankService $checkBankService,
+        StoreService $storeService,
+        TenancyService $tenancyService
+    ): void {
+        $store = $storeService->findById($this->storeId);
+        if (empty($store)) {
+            echo "Store not found or user not have store" . PHP_EOL;
+            return;
+        }
+        try {
+            $connection = $tenancyService->buildConnectionFromStore($store);
+            $tenancyService->applyConnection($connection, true);
+        } catch (\Throwable $th) {
+            echo 'Lỗi jobDepositCustomer set store database config: ' . $th->getMessage() . PHP_EOL;
+            throw $th;
+        }
+
         echo "Start checking bank user" . PHP_EOL;
-        $bank = $paymentMethodService->findById($this->bankId);
+        $bank = $paymentMethodSellerService->findById($this->bankId);
         if (empty($bank)) {
             echo "Ngân hàng không hợp lệ";
             return;
@@ -74,7 +96,7 @@ class JobCheckBankUser implements ShouldQueue, ShouldBeUnique
         if (count($history['data']) > 0) {
             foreach ($history['data'] as $transaction) {
                 $dataLog = $checkBankService->bankClassification($bankCode, (array) $transaction);
-  
+
                 if (empty($dataLog)) {
                     echo "Giao dịch không hợp lệ" . PHP_EOL;
                     continue;

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Seller\PaymentMethod;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\PaymentHistory\PaymentHistoryRequest;
+use App\Http\Requests\Seller\PaymentMethod\PaymentMethodRequest;
 use App\Models\Mongo\PaymentMethodSeller;
 use App\Models\MySQL\PaymentMethods;
 use App\Services\BalanceHistory\BalanceHistoryService;
@@ -69,7 +70,7 @@ class PaymentMethodController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(PaymentHistoryRequest $request)
+    public function store(PaymentMethodRequest $request)
     {
         try {
             $data = $request->validated();
@@ -116,9 +117,19 @@ class PaymentMethodController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(PaymentMethodRequest $request, string $id)
     {
-        //
+        try {
+            $data = $request->validated();
+            switch ($data['type']) {
+                case PaymentMethodSeller::TYPE['BANK']:
+                    return $this->saveBank($data, $id);
+                case PaymentMethodSeller::TYPE['SEPAY']:
+                    return $this->saveSePay($data, $id);
+            }
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
+        }
     }
 
     /**
@@ -134,7 +145,7 @@ class PaymentMethodController extends Controller
         return back()->with('success', 'Payment method deleted successfully');
     }
 
-    public function verifyPayment(PaymentHistoryRequest $request)
+    public function verifyPayment(PaymentMethodRequest $request)
     {
         $data = $request->validated();
         $vietcombankService = new VietCombank(trim($data['user_name']), trim($data['password']), trim($data['account_number']));
@@ -172,7 +183,7 @@ class PaymentMethodController extends Controller
         return back()->with('error', 'Verified failed');
     }
 
-    public function verifySePay(PaymentHistoryRequest $request)
+    public function verifySePay(PaymentMethodRequest $request)
     {
         $data = $request->validated();
         $sepayService = new SePayService();
@@ -183,9 +194,16 @@ class PaymentMethodController extends Controller
         return back()->with('error', 'Verified failed');
     }
 
-    public function saveBank($data)
+    public function saveBank($data, $id = null)
     {
         $vietcombankService = new VietCombank(trim($data['user_name']), trim($data['password']), trim($data['account_number']));
+        if ($id) {
+            $paymentMethod = $this->paymentMethodSellerService->findById($id);
+            if (!$paymentMethod) {
+                return back()->with('error', 'Payment method not found');
+            }
+        }
+
         //Send OTP
         if (isset($data['otp']) && !empty($data['otp'])) {
             $otpResult = $vietcombankService->submitOtpLogin($data['otp']);
@@ -218,22 +236,42 @@ class PaymentMethodController extends Controller
             if (!$bank) {
                 return back()->with('error', 'Bank not found');
             }
-            $result = $this->paymentMethodSellerService->updateOrCreate([
-                "type" => PaymentMethodSeller::TYPE['BANK'],
-                "key" => $bank['code'],
-                "name" => $bank['short_name'],
-                "title" => $bank['name'],
-                "description" => null,
-                "details" => [
-                    "account_name" => trim($data['account_name']),
-                    "account_number" => trim($data['account_number']),
-                    "user_name" => trim($data['user_name']),
-                    "password" => trim($data['password']),
-                ],
-                "status" => PaymentMethodSeller::STATUS['ACTIVE'],
-                "icon" => null,
-                "is_verify_otp" => true,
-            ]);
+
+            if ($id && isset($paymentMethod) && $paymentMethod) {
+                $result = $this->paymentMethodSellerService->update($paymentMethod, [
+                    "type" => PaymentMethodSeller::TYPE['BANK'],
+                    "key" => $bank['code'],
+                    "name" => $bank['short_name'],
+                    "title" => $bank['name'],
+                    "description" => null,
+                    "details" => [
+                        "account_name" => trim($data['account_name']),
+                        "account_number" => trim($data['account_number']),
+                        "user_name" => trim($data['user_name']),
+                        "password" => trim($data['password']),
+                    ],
+                    "status" => PaymentMethodSeller::STATUS['ACTIVE'],
+                    "icon" => null,
+                    "is_verify_otp" => true,
+                ]);
+            } else {
+                $result = $this->paymentMethodSellerService->create([
+                    "type" => PaymentMethodSeller::TYPE['BANK'],
+                    "key" => $bank['code'],
+                    "name" => $bank['short_name'],
+                    "title" => $bank['name'],
+                    "description" => null,
+                    "details" => [
+                        "account_name" => trim($data['account_name']),
+                        "account_number" => trim($data['account_number']),
+                        "user_name" => trim($data['user_name']),
+                        "password" => trim($data['password']),
+                    ],
+                    "status" => PaymentMethodSeller::STATUS['ACTIVE'],
+                    "icon" => null,
+                    "is_verify_otp" => true,
+                ]);
+            }
             if ($result) {
                 return back()->with('success', 'Update successfully');
             }
@@ -241,27 +279,53 @@ class PaymentMethodController extends Controller
         return back()->with('error', 'Update failed');
     }
 
-    public function saveSePay($data)
+    public function saveSePay($data, $id = null)
     {
+
+        if ($id) {
+            $paymentMethod = $this->paymentMethodSellerService->findById($id);
+            if (!$paymentMethod) {
+                return back()->with('error', 'Payment method not found');
+            }
+        }
         $bank = $this->bankService->findByCode($data['key']);
         if (!$bank) {
             return back()->with('error', 'Bank not found');
         }
-        $result = $this->paymentMethodSellerService->updateOrCreate([
-            "type" => PaymentMethodSeller::TYPE['SEPAY'],
-            "key" => $bank['code'],
-            "name" => $bank['short_name'],
-            "title" => $bank['name'],
-            "description" => null,
-            "details" => [
-                "account_name" => trim($data['account_name']),
-                "account_number" => trim($data['account_number']),
-                "api_key" => trim($data['api_key']),
-            ],
-            "status" => PaymentMethodSeller::STATUS['ACTIVE'],
-            "icon" => null,
-            "is_verify_otp" => false,
-        ]);
+
+        if ($id && isset($paymentMethod) && $paymentMethod) {
+            $result = $this->paymentMethodSellerService->update($paymentMethod, [
+                "type" => PaymentMethodSeller::TYPE['SEPAY'],
+                "key" => $bank['code'],
+                "name" => $bank['short_name'],
+                "title" => $bank['name'],
+                "description" => null,
+                "details" => [
+                    "account_name" => trim($data['account_name']),
+                    "account_number" => trim($data['account_number']),
+                    "api_key" => trim($data['api_key']),
+                ],
+                "status" => PaymentMethodSeller::STATUS['ACTIVE'],
+                "icon" => null,
+                "is_verify_otp" => false,
+            ]);
+        } else {
+            $result = $this->paymentMethodSellerService->create([
+                "type" => PaymentMethodSeller::TYPE['SEPAY'],
+                "key" => $bank['code'],
+                "name" => $bank['short_name'],
+                "title" => $bank['name'],
+                "description" => null,
+                "details" => [
+                    "account_name" => trim($data['account_name']),
+                    "account_number" => trim($data['account_number']),
+                    "api_key" => trim($data['api_key']),
+                ],
+                "status" => PaymentMethodSeller::STATUS['ACTIVE'],
+                "icon" => null,
+                "is_verify_otp" => false,
+            ]);
+        }
         if ($result) {
             return back()->with('success', 'Update successfully');
         }

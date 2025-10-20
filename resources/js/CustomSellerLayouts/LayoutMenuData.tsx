@@ -12,6 +12,7 @@ const Navdata = () => {
     const [isSettings, setIsSettings] = useState<boolean>(false)
     const [isCustomerManager, setIsCustomerManager] = useState<boolean>(false)
     const [isOrderManager, setIsOrderManager] = useState<boolean>(false)
+    const [isPaymentMethod, setIsPaymentMethod] = useState<boolean>(false)
 
     function updateIconSidebar(e : any) {
         if (e && e.target && e.target.getAttribute("sub-items")) {
@@ -123,6 +124,19 @@ const Navdata = () => {
                 e.preventDefault();
                 setIsProduct(!isProduct);
                 setIscurrentState('Product');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "payment-method",
+            label: "Payment Method",
+            icon: "ri-money-dollar-circle-line",
+            link: route('seller.payment-method'),
+            stateVariables: isPaymentMethod,
+            click: function (e : any) {
+                e.preventDefault();
+                setIsPaymentMethod(!isPaymentMethod);
+                setIscurrentState('Payment Method');
                 updateIconSidebar(e);
             },
         },
