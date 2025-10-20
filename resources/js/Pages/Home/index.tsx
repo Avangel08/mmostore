@@ -19,7 +19,7 @@ export default function Index() {
 
     return (
         <React.Fragment>
-            <Head title="Tạo shop MMO của riêng bạn – trong 5 phút" />
+            <Head title="MMO Shop" />
             <div className="layout-wrapper landing">
                 <Navbar />
                 <Home />

@@ -34,8 +34,7 @@ const Home = () => {
                                     <span className="text-success">
                                         MMO SHOP{" "}
                                     </span>
-                                    - NỀN TẢNG SỞ HỮU WEBSITE <br /> BÁN HÀNG
-                                    CHUYÊN NGHIỆP
+                                    - Tạo shop MMO của riêng bạn trong 5 phút
                                 </h1>
                                 <p className="lead text-muted lh-base">
                                     MMO Shop là nền tảng giúp bạn nhanh chóng
