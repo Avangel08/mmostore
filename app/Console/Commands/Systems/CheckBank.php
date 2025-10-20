@@ -14,7 +14,7 @@ class CheckBank extends Command
      *
      * @var string
      */
-    protected $signature = 'system:check-bank';
+    protected $signature = 'systems:check-bank';
 
     /**
      * The console command description.

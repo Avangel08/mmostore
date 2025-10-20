@@ -260,7 +260,7 @@ class CheckBankService
             $regexContentBank = '/\b(SEVQR[0-9A-Z]+)\b/i';
             $regexUserId = '/\bSEVQR(\d+)/i';
         }
-
+        // $description = "020097042210141646172025XQBQ405027.30856.164618.QR3QGIRIH";
         // Lấy contentBank theo mẫu bắt đầu bằng 'QR' + chuỗi chữ/số liền kề, ví dụ: 'QR2SMTISH'
         if (preg_match($regexContentBank, $description, $output_array)) {
             $contentBank = $output_array[1];

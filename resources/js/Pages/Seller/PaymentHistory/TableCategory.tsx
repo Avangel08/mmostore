@@ -75,6 +75,15 @@ const TableCategory = ({
         enableSorting: true,
       },
       {
+        header: t("Gate Way"),
+        cell: (cell: any) => {
+          return <span className="fw-semibold">{cell.getValue()}</span>;
+        },
+        accessorKey: "gate_way",
+        enableColumnFilter: false,
+        enableSorting: true,
+      },
+      {
         header: t("Payment Method"),
         cell: (cell: any) => {
           return <span className="fw-semibold">{cell.getValue()}</span>;

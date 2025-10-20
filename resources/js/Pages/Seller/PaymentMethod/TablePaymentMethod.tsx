@@ -4,6 +4,7 @@ import TableWithContextMenu from "../../../Components/Common/TableWithContextMen
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { usePage } from "@inertiajs/react";
+import "./style.css";
 
 const TablePaymentMethod = ({
   data,
@@ -48,15 +49,6 @@ const TablePaymentMethod = ({
         enableSorting: true,
       },
       {
-        header: t("Bank Code"),
-        cell: (cell: any) => {
-          return <span className="fw-semibold">{cell.getValue()}</span>;
-        },
-        accessorKey: "key",
-        enableColumnFilter: false,
-        enableSorting: true,
-      },
-      {
         header: t("Name"),
         cell: (cell: any) => {
           return <span className="fw-semibold">{cell.getValue()}</span>;
@@ -64,6 +56,27 @@ const TablePaymentMethod = ({
         accessorKey: "name",
         enableColumnFilter: false,
         enableSorting: true,
+      },
+      {
+        header: t("Details"),
+        cell: (cell: any) => {
+          const details = cell.getValue() || {};
+          const detailsItems = Object.entries(details).map(([key, value]) => {
+            return (
+              <div key={key} className="mb-1 text-truncate" title={`${key}: ${value}`}>
+                <span className="fw-semibold">{key}:</span> {String(value)}
+              </div>
+            );
+          });
+          
+          return <div className="details-column">{detailsItems}</div>;
+        },
+        accessorKey: "details",
+        enableColumnFilter: false,
+        enableSorting: true,
+        meta: {
+          className: "details-column-header"
+        }
       },
       {
         header: t("Status"),
