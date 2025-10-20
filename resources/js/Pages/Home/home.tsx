@@ -12,13 +12,13 @@ import { Swiper, SwiperSlide } from "swiper/react";
 // Import Images
 import imgpattern from "../../../images/landing/img-pattern.png";
 
-import defaultDemo from "../../../images/demos/default.png";
-import saasDemo from "../../../images/demos/saas.png";
-import materialDemo from "../../../images/demos/material.png";
-import minimalDemo from "../../../images/demos/minimal.png";
-import creativeDemo from "../../../images/demos/creative.png";
-import modernDemo from "../../../images/demos/modern.png";
-import interactiveDemo from "../../../images/demos/interactive.png";
+import defaultDemo from "../../../images/landing/showcase/theme-store-1.png";
+import saasDemo from "../../../images/landing/showcase/theme-store-2.png";
+import materialDemo from "../../../images/landing/showcase/theme-store-3.png";
+// import minimalDemo from "../../../images/demos/minimal.png";
+// import creativeDemo from "../../../images/demos/creative.png";
+// import modernDemo from "../../../images/demos/modern.png";
+// import interactiveDemo from "../../../images/demos/interactive.png";
 import { Link } from "@inertiajs/react";
 
 const Home = () => {
@@ -53,7 +53,7 @@ const Home = () => {
                                         href="/register"
                                         className="btn btn-primary btn-bg-primary border-0"
                                     >
-                                        Create a Store{" "}
+                                        Thêm cửa hàng{" "}
                                         <i className="ri-add-line align-middle ms-1"></i>
                                     </Link>
                                 </div>
@@ -109,7 +109,7 @@ const Home = () => {
                                             alt="..."
                                         />
                                     </SwiperSlide>
-                                    <SwiperSlide className="carousel-inner shadow-lg p-2 bg-white rounded">
+                                    {/* <SwiperSlide className="carousel-inner shadow-lg p-2 bg-white rounded">
                                         <img
                                             src={minimalDemo}
                                             className="d-block w-100"
@@ -136,7 +136,7 @@ const Home = () => {
                                             className="d-block w-100"
                                             alt="..."
                                         />
-                                    </SwiperSlide>
+                                    </SwiperSlide> */}
                                 </Swiper>
                             </div>
                         </Col>

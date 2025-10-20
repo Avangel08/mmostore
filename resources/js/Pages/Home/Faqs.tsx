@@ -71,7 +71,7 @@ const Faqs = () => {
 
     return (
         <React.Fragment>
-            <section className="section">
+            <section className="section" id="faqs">
                 <Container>
                     <Row className="justify-content-center">
                         <Col lg={8}>

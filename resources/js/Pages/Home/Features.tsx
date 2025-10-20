@@ -10,7 +10,7 @@ import { Link } from "@inertiajs/react";
 const Features = () => {
     return (
         <React.Fragment>
-            <section className="section bg-light py-5" id="features">
+            <section className="section bg-light py-5" id="service">
                 <Container>
                     <Row className="align-items-center gy-4 gx-4">
                         <Col lg={6} sm={7} className="mx-auto">
@@ -91,11 +91,11 @@ const Features = () => {
                         <Col className="col-sm-auto">
                             <div>
                                 <Link
-                                    href="/1.envato.market/velzon-admin"
+                                    href="/register"
                                     target="_blank"
                                     className="btn bg-gradient btn-danger"
                                 >
-                                    CREATE A STORE{" "}
+                                    Theme cửa hàng{" "}
                                     <i className="ri-add-line align-middle me-1"></i>
                                 </Link>
                             </div>
