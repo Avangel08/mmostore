@@ -6,7 +6,7 @@ import image1 from "../../../images/landing/services/pattern.png";
 const Services = () => {
     return (
         <React.Fragment>
-            <section className="section" id="services">
+            <section className="section" id="features">
                 <Container>
                     <Row className="justify-content-center">
                         <Col lg={8}>
@@ -15,12 +15,12 @@ const Services = () => {
                                     TẠI SAO MMO STORE LÀ LỰA CHỌN <br /> SỐ 1
                                     CỦA CÁC SELLER TIKTOK SHOP
                                 </h1>
-                                <p className="text-muted">
+                                {/* <p className="text-muted">
                                     Hidemium empowers you to browse the web
                                     undetected, ensuring an anonymous <br /> and
                                     secure online journey that instills
                                     confidence and peace of mind.
-                                </p>
+                                </p> */}
                             </div>
                         </Col>
                     </Row>
