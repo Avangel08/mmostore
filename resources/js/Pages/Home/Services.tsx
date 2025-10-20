@@ -12,7 +12,7 @@ const Services = () => {
                         <Col lg={8}>
                             <div className="text-center mb-5">
                                 <h1 className="mb-3 ff-secondary fw-semibold lh-base">
-                                    TẠI SAO MMO STORE LÀ LỰA CHỌN <br /> SỐ 1
+                                    TẠI SAO MMO SHOP LÀ LỰA CHỌN <br /> SỐ 1
                                     CỦA CÁC SELLER TIKTOK SHOP
                                 </h1>
                                 {/* <p className="text-muted">

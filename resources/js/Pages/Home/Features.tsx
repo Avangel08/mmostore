@@ -42,11 +42,11 @@ const Features = () => {
                                     </div>
                                 </div>
                                 <h3 className="mb-3 fs-20">
-                                    MMO STORE - THỐNG KÊ HOẠT ĐỘNG
+                                    MMO SHOP - THỐNG KÊ HOẠT ĐỘNG
                                 </h3>
                                 <p className="mb-4 ff-secondary fs-16">
                                     Cung cấp giải pháp mail chất lượng cao, MMO
-                                    STORE luôn nỗ lực mang lại trải nghiệm tốt
+                                    SHOP luôn nỗ lực mang lại trải nghiệm tốt
                                     nhất cho khách hàng, từ khâu mua hàng đến
                                     phản hồi và đánh giá dịch vụ.
                                 </p>
@@ -95,7 +95,7 @@ const Features = () => {
                                     target="_blank"
                                     className="btn bg-gradient btn-danger"
                                 >
-                                    Theme cửa hàng{" "}
+                                    Thêm cửa hàng{" "}
                                     <i className="ri-add-line align-middle me-1"></i>
                                 </Link>
                             </div>

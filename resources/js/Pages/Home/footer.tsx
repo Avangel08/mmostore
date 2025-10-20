@@ -22,7 +22,7 @@ const Footer = () => {
                                 </div>
                                 <div className="mt-4">
                                     <p>
-                                        MMO Store là nền tảng giúp bạn nhanh chóng sở hữu website bán hàng chuyên nghiệp để
+                                        MMO Shop là nền tảng giúp bạn nhanh chóng sở hữu website bán hàng chuyên nghiệp để
                                         kinh doanh các digital products như tài nguyên Gmail, tài khoản TikTok Shop, eBay, Etsy…
                                     </p>
                                     {/* <p className="ff-secondary">
@@ -71,7 +71,7 @@ const Footer = () => {
                                                 </Link>
                                             </li>
                                             <li>
-                                                <Link href="/apps-mailbox">
+                                                <Link href="/">
                                                     Điều khoản sử dụng
                                                 </Link>
                                             </li>

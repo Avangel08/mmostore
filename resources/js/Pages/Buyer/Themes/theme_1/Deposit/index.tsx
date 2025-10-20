@@ -153,7 +153,7 @@ const Index: PageWithLayout = () => {
                                                                 />
                                                                 <Form.Check.Label className="form-check-label" htmlFor={paymentMethod.id}>
                                                                     <div className="d-flex align-items-center">
-                                                                        <span className="d-block justify-content-center">{paymentMethod.description} ( {paymentMethod.name} )</span>
+                                                                        <span className="d-block justify-content-center">{paymentMethod.title} ( {paymentMethod.name} )</span>
                                                                         <img
                                                                             src={vcb}
                                                                             alt="Bank Transfer"

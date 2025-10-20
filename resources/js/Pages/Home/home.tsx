@@ -32,13 +32,13 @@ const Home = () => {
                             <div className="text-center mt-lg-5 pt-5">
                                 <h1 className="display-6 mb-3 lh-base page-home-title-lg text-gray-title">
                                     <span className="text-success">
-                                        MMO STORE{" "}
+                                        MMO SHOP{" "}
                                     </span>
                                     - NỀN TẢNG SỞ HỮU WEBSITE <br /> BÁN HÀNG
                                     CHUYÊN NGHIỆP
                                 </h1>
                                 <p className="lead text-muted lh-base">
-                                    MMO Store là nền tảng giúp bạn nhanh chóng
+                                    MMO Shop là nền tảng giúp bạn nhanh chóng
                                     sở hữu website bán hàng chuyên nghiệp để{" "}
                                     <br />
                                     kinh doanh các digital products như tài

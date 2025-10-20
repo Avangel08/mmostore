@@ -101,6 +101,7 @@ Route::middleware(['validate.subdomain', 'tenant.mongo'])
                     Route::get('/edit/{id}', [PaymentMethodController::class, 'edit'])->name('seller.payment-method.edit');
                     Route::get('/create', [PaymentMethodController::class, 'create'])->name('seller.payment-method.create');
                     Route::post('/create', [PaymentMethodController::class, 'store'])->name('seller.payment-method.store');
+                    Route::put('/update/{id}', [PaymentMethodController::class, 'update'])->name('seller.payment-method.update');
                     Route::post('/verify-payment', [PaymentMethodController::class, 'verifyPayment'])->name('seller.payment-method.verify-payment');
                     Route::post('/verify-sepay', [PaymentMethodController::class, 'verifySePay'])->name('seller.payment-method.verify-sepay');
                     Route::delete('/destroy/{id}', [PaymentMethodController::class, 'destroy'])->name('seller.payment-method.destroy');

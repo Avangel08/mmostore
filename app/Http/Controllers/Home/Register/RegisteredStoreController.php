@@ -51,7 +51,9 @@ class RegisteredStoreController extends Controller
 
     public function register(): Response
     {
-        return Inertia::render('Register/index');
+        return Inertia::render('Register/index', [
+            'domainSuffix' => config('app.main_domain')
+        ]);
     }
 
     public function createStore(RegisterStoreRequest $registerStoreRequest)
