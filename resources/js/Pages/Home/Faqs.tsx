@@ -119,7 +119,7 @@ const Faqs = () => {
                                             onClick={t_col1}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            MMO Store là gì ?
+                                            MMO Shop là gì ?
                                         </button>
                                     </h2>
                                     <Collapse
@@ -127,7 +127,7 @@ const Faqs = () => {
                                         className="accordion-collapse"
                                     >
                                         <div className="accordion-body ff-secondary">
-                                            MMO Store là nền tảng quản lý Tiktok
+                                            MMO Shop là nền tảng quản lý Tiktok
                                             Shop chuyên nghiệp, Giúp bạn dễ dàng
                                             tạo, vận hành và quản lý hàng nghìn
                                             shop chỉ trên một giao diện duy
@@ -150,7 +150,7 @@ const Faqs = () => {
                                             onClick={t_col2}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            MMO Store có gì nổi bật?
+                                            MMO Shop có gì nổi bật?
                                         </button>
                                     </h2>
                                     <Collapse
@@ -184,7 +184,7 @@ const Faqs = () => {
                                             onClick={t_col3}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            Lợi ích khi sử dụng MMO Store để
+                                            Lợi ích khi sử dụng MMO Shop để
                                             quản lý Tiktok Shop?
                                         </button>
                                     </h2>
@@ -218,7 +218,7 @@ const Faqs = () => {
                                             onClick={t_col4}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            Tại sao chọn MMO Store để quán lý
+                                            Tại sao chọn MMO Shop để quán lý
                                             shop thay vì các công cụ khác?
                                         </button>
                                     </h2>
@@ -252,7 +252,7 @@ const Faqs = () => {
                                             onClick={t_col5}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            MMO Store có an toàn để quản lý Tiktok Shop không?
+                                            MMO Shop có an toàn để quản lý Tiktok Shop không?
                                         </button>
                                     </h2>
                                     <Collapse
@@ -285,7 +285,7 @@ const Faqs = () => {
                                             onClick={t_col6}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            Làm sao để bắt đầu quản lý shop với MMO Store?
+                                            Làm sao để bắt đầu quản lý shop với MMO Shop?
                                         </button>
                                     </h2>
                                     <Collapse
