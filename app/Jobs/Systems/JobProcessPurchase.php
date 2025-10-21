@@ -8,9 +8,13 @@ use App\Models\Mongo\SubProducts;
 use App\Models\Mongo\Accounts;
 use App\Models\Mongo\BalanceHistories;
 use App\Models\Mongo\Orders;
+use App\Models\Mongo\Products;
+use App\Models\Mongo\Categories;
 use App\Services\Customer\CustomerService;
 use App\Services\PaymentMethodSeller\PaymentMethodSellerService;
 use App\Services\Product\SubProductService;
+use App\Services\Product\ProductService;
+use App\Services\Category\CategoryService;
 use App\Services\BalanceHistory\BalanceHistoryService;
 use App\Services\Order\OrderService;
 use App\Services\Setting\SettingService;
@@ -76,14 +80,11 @@ class JobProcessPurchase implements ShouldQueue
         return Cache::driver('redis');
     }
 
-    public function backoff(): array|int
-    {
-        return [2, 5, 10];
-    }
-
     public function handle(
         SubProductService $subProductService,
         CustomerService $customerService,
+        ProductService $productService,
+        CategoryService $categoryService,
         BalanceHistoryService $balanceHistoryService,
         OrderService $orderService,
         StoreService $storeService,
@@ -93,35 +94,48 @@ class JobProcessPurchase implements ShouldQueue
         SettingService $settingService
     ): void {
         try {
+            // Validate store
             $store = $storeService->findById($this->storeId);
+            if (empty($store)) {
+                $this->updateOrderToFailed("Store not found");
+                return;
+            }
 
+            // Validate order
+            $order = $orderService->findById($this->orderId);
+            if (empty($order)) {
+                $this->updateOrderToFailed("Order not found");
+                return;
+            }
+
+            if ($order->status !== Orders::STATUS['PENDING']) {
+                $this->updateOrderToFailed("Order is not in pending status");
+                return;
+            }
+
+            if ($order->payment_status !== Orders::PAYMENT_STATUS['PENDING']) {
+                $this->updateOrderToFailed("Order payment is not in pending status");
+                return;
+            }
+
+            // Setup tenancy connection
             try {
                 $connection = $tenancyService->buildConnectionFromStore($store);
                 $tenancyService->applyConnection($connection, true);
             } catch (\Throwable $th) {
-                echo 'Lỗi jobDepositCustomer set store database config: ' . $th->getMessage().PHP_EOL;
-                throw $th;
-            }
-
-            $order = $orderService->findById($this->orderId);
-
-            if (empty($store)) {
-                echo "Store not found" . PHP_EOL;
-                $this->updateOrderToFailed("Store not found");
+                $this->updateOrderToFailed("Database connection failed - E105");
                 return;
             }
             
-            $this->cleanupStaleReservations($this->subProductId);
-            
-            $validationResult = $this->validatePurchaseData($subProductService, $customerService);
+            $validationResult = $this->validatePurchaseData($subProductService, $customerService, $productService, $categoryService);
 
             if (!$validationResult['valid']) {
-                echo "Validation failed: " . $validationResult['message'] . PHP_EOL;
-                $this->updateOrderToFailed("Lỗi khác - E103");
+                $this->updateOrderToFailed($validationResult['message'] ?? "Validation failed - E103");
                 return;
             }
 
             $subProduct = $validationResult['sub_product'];
+            $totalPrice = $subProduct->price * $this->quantity;
 
             $availableQuantity = $this->getAvailableQuantity($subProduct);
 
@@ -130,13 +144,6 @@ class JobProcessPurchase implements ShouldQueue
                 return;
             }
 
-            if ($subProduct->quantity < $this->quantity) {
-                $this->updateOrderToFailed("Số lượng sản phẩm không đủ");
-                return;
-            }
-
-            $totalPrice = $subProduct->price * $this->quantity;
-
             $deductResult = $this->deductCustomerBalanceAtomic($this->customerId, $totalPrice);
             if (!$deductResult['success']) {
                 $this->updateOrderToFailed("Số dư không đủ");
@@ -144,117 +151,237 @@ class JobProcessPurchase implements ShouldQueue
             }
 
             try {
+                // Get payment method
                 $paymentMethodId = null;
                 $method = $paymentMethodSellerService->findByKey(PaymentMethodSeller::KEY['BALANCE']);
-
-                if ($method) {
-                    $paymentMethodId = $method->_id;
+                if (!$method) {
+                    $this->refundCustomerBalance($this->customerId, $totalPrice);
+                    $this->updateOrderToFailed("Payment method not found - E106");
+                    return;
                 }
+                $paymentMethodId = $method->_id;
 
+                // Validate source key
+                if (!isset(BalanceHistories::GATEWAY[$this->sourceKey])) {
+                    $this->refundCustomerBalance($this->customerId, $totalPrice);
+                    $this->updateOrderToFailed("Invalid source key - E107");
+                    return;
+                }
                 $gateWay = BalanceHistories::GATEWAY[$this->sourceKey];
+
+                // Get currency settings
                 $currencySetting = $settingService->findByKey('currency');
+                if (!$currencySetting) {
+                    $this->refundCustomerBalance($this->customerId, $totalPrice);
+                    $this->updateOrderToFailed("Currency setting not found - E108");
+                    return;
+                }
                 $storeCurrency = $currencySetting->value ?? Settings::CURRENCY['VND'];
 
-                if ($storeCurrency === Settings::CURRENCY['USD']) {
-                    $amountUsd = (float) $totalPrice;
-                    $amountVnd = $currencyRateSellerService->convertUSDToVND($amountUsd);
-                } else {
-                    $amountVnd = (float) $totalPrice;
-                    $amountUsd = $currencyRateSellerService->convertVNDToUSD($amountVnd);
+                // Currency conversion
+                try {
+                    if ($storeCurrency === Settings::CURRENCY['USD']) {
+                        $amountUsd = (float) $totalPrice;
+                        $amountVnd = $currencyRateSellerService->convertUSDToVND($amountUsd);
+                    } else {
+                        $amountVnd = (float) $totalPrice;
+                        $amountUsd = $currencyRateSellerService->convertVNDToUSD($amountVnd);
+                    }
+                } catch (\Exception $e) {
+                    $this->refundCustomerBalance($this->customerId, $totalPrice);
+                    $this->updateOrderToFailed("Currency conversion failed - E109");
+                    return;
                 }
 
-                $balanceHistoryService->create([
-                    'customer_id' => $this->customerId,
-                    'payment_method_id' => $paymentMethodId,
-                    'type' => BalanceHistories::TYPE['purchase'],
-                    'amount' => $amountUsd,
-                    'amount_vnd' => $amountVnd,
-                    'before' => $deductResult['before'] ?? null,
-                    'after' => $deductResult['after'] ?? null,
-                    'description' => "{$subProduct->name}, {$this->quantity}",
-                    'date_at' => now(),
-                    'transaction' => $order->order_number ?? 'PURCHASE_' . time(),
-                    'gate_way' => $gateWay,
-                ]);
+                // Create balance history
+                try {
+                    $balanceHistory = $balanceHistoryService->create([
+                        'customer_id' => $this->customerId,
+                        'payment_method_id' => $paymentMethodId,
+                        'type' => BalanceHistories::TYPE['purchase'],
+                        'amount' => $amountUsd,
+                        'amount_vnd' => $amountVnd,
+                        'before' => $deductResult['before'] ?? null,
+                        'after' => $deductResult['after'] ?? null,
+                        'description' => "{$subProduct->name}, {$this->quantity}",
+                        'date_at' => now(),
+                        'transaction' => $order->order_number ?? 'PURCHASE_' . time(),
+                        'gate_way' => $gateWay,
+                    ]);
+
+                    if (!$balanceHistory) {
+                        $this->refundCustomerBalance($this->customerId, $totalPrice);
+                        $this->updateOrderToFailed("Failed to create balance history - E110");
+                        return;
+                    }
+                } catch (\Exception $e) {
+                    $this->refundCustomerBalance($this->customerId, $totalPrice);
+                    $this->updateOrderToFailed("Balance history creation failed - E101");
+                    return;
+                }
             } catch (\Exception $e) {
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
-                $this->updateOrderToFailed("Lỗi khác - E101");
+                $this->updateOrderToFailed("Payment processing failed - E111");
                 return;
             }
 
+            // Reserve accounts for sale
             $accountsToSell = $this->getAccountsToSell($subProduct, $this->quantity);
             if (count($accountsToSell) < $this->quantity) {
                 $this->rollbackReservedAccounts($accountsToSell);
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
-                $this->updateOrderToFailed("Hết tài nguyên");
+                $this->updateOrderToFailed("Insufficient accounts available - E112");
                 return;
             }
 
+            // Update accounts with order ID
             if ($this->orderId) {
-                foreach ($accountsToSell as $account) {
-                    $account->update([
-                        'order_id' => $this->orderId
-                    ]);
+                try {
+                    foreach ($accountsToSell as $account) {
+                        $updated = $account->update([
+                            'order_id' => $this->orderId
+                        ]);
+                        if (!$updated) {
+                            $this->rollbackReservedAccounts($accountsToSell);
+                            $this->refundCustomerBalance($this->customerId, $totalPrice);
+                            $this->updateOrderToFailed("Failed to assign order to accounts - E113");
+                            return;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    $this->rollbackReservedAccounts($accountsToSell);
+                    $this->refundCustomerBalance($this->customerId, $totalPrice);
+                    $this->updateOrderToFailed("Account assignment failed - E114");
+                    return;
                 }
             }
 
+            // Update sub-product stock
             $stockUpdated = $this->updateSubProductStock($subProduct, $this->quantity);
             if (!$stockUpdated) {
                 $this->rollbackReservedAccounts($accountsToSell);
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
-                $this->updateOrderToFailed("Lỗi khác - E102");
+                $this->updateOrderToFailed("Stock update failed - E102");
                 return;
             }
 
-            $this->updateOrderRecord($orderService, $subProduct, $totalPrice);
+            // Complete the order
+            $orderCompleted = $this->updateOrderRecord($orderService, $subProduct, $totalPrice);
+            if (!$orderCompleted) {
+                $this->rollbackReservedAccounts($accountsToSell);
+                $this->refundCustomerBalance($this->customerId, $totalPrice);
+                $this->rollbackSubProductStock($subProduct, $this->quantity);
+                $this->updateOrderToFailed("Order completion failed - E115");
+                return;
+            }
 
         } catch (Exception $e) {
+            // Rollback any changes made
             if (isset($subProduct) && isset($this->quantity)) {
                 $this->rollbackSubProductStock($subProduct, $this->quantity);
             }
+
+            // Refund customer balance if it was deducted
+            if (isset($totalPrice)) {
+                $this->refundCustomerBalance($this->customerId, $totalPrice);
+            }
+
+            // Update order to failed
+            $this->updateOrderToFailed("System error - E116: " . $e->getMessage());
             
+            // Re-throw the exception to mark job as failed
             throw $e;
         }
     }
 
-    private function validatePurchaseData($subProductService, $customerService): array
+    private function validatePurchaseData($subProductService, $customerService, $productService, $categoryService): array
     {
+        // Validate sub-product
         $subProduct = $subProductService->getById($this->subProductId);
-
-        if (empty($subProduct)) {
+        if (!$subProduct) {
             return [
                 'valid' => false,
-                'message' => "SubProduct not found: " . $this->subProductId
+                'message' => 'Sub product not found'
             ];
         }
 
         if ($subProduct->status !== SubProducts::STATUS['ACTIVE']) {
             return [
                 'valid' => false,
-                'message' => "SubProduct is not active: " . $this->subProductId
+                'message' => 'Sub product is inactive'
             ];
         }
 
-        $customer = $customerService->findById($this->customerId);
-
-        if (empty($customer)) {
+        if ($subProduct->quantity < $this->quantity) {
             return [
                 'valid' => false,
-                'message' => "Customer not found: " . $this->customerId
+                'message' => 'Số lượng sản phẩm không đủ'
+            ];
+        }
+
+        // Validate product
+        $product = $productService->getById($this->productId);
+        if (!$product) {
+            return [
+                'valid' => false,
+                'message' => 'Product not found'
+            ];
+        }
+
+        if ($product->status !== Products::STATUS['ACTIVE']) {
+            return [
+                'valid' => false,
+                'message' => 'Product is inactive'
+            ];
+        }
+
+        // Validate category
+        $category = $categoryService->getById($product->category_id);
+        if (!$category) {
+            return [
+                'valid' => false,
+                'message' => 'Category not found'
+            ];
+        }
+
+        if ($category->status !== Categories::STATUS['ACTIVE']) {
+            return [
+                'valid' => false,
+                'message' => 'Category is inactive'
+            ];
+        }
+
+        // Validate customer
+        $customer = $customerService->findById($this->customerId);
+        if (!$customer) {
+            return [
+                'valid' => false,
+                'message' => 'Customer not found'
             ];
         }
 
         if ($customer->status !== Customers::STATUS['ACTIVE']) {
             return [
                 'valid' => false,
-                'message' => "Customer is not active: " . $this->customerId
+                'message' => 'Customer is inactive'
+            ];
+        }
+
+        // Validate customer balance
+        $totalPrice = $subProduct->price * $this->quantity;
+        if ($customer->balance < $totalPrice) {
+            return [
+                'valid' => false,
+                'message' => 'Số dư không đủ'
             ];
         }
 
         return [
             'valid' => true,
             'sub_product' => $subProduct,
-            'customer' => $customer
+            'customer' => $customer,
+            'product' => $product,
+            'category' => $category
         ];
     }
 
@@ -266,7 +393,6 @@ class JobProcessPurchase implements ShouldQueue
             ->where('status', Accounts::STATUS['LIVE'])
             ->count();
             
-        // Trả về số lượng nhỏ hơn giữa accounts có sẵn và SubProduct quantity
         return min($availableAccounts, $subProduct->quantity);
     }
 
@@ -339,7 +465,6 @@ class JobProcessPurchase implements ShouldQueue
             
             return null;
         } catch (\Exception $e) {
-            echo "Error reserving account: " . $e->getMessage() . PHP_EOL;
             return null;
         }
     }
@@ -371,106 +496,58 @@ class JobProcessPurchase implements ShouldQueue
                 'after' => $after,
             ];
         } catch (\Exception $e) {
-            echo "Error deducting customer balance: " . $e->getMessage() . PHP_EOL;
             return ['success' => false];
         }
     }
 
     private function refundCustomerBalance($customerId, $amount): void
     {
-        try {
-            $mongoId = $customerId instanceof ObjectId ? $customerId : new ObjectId((string) $customerId);
-            $amountToAdd = (float) $amount;
+        $mongoId = $customerId instanceof ObjectId ? $customerId : new ObjectId((string) $customerId);
+        $amountToAdd = (float) $amount;
 
-            Customers::raw(function ($collection) use ($mongoId, $amountToAdd) {
-                return $collection->findOneAndUpdate(
-                    [ '_id' => $mongoId ],
-                    [ '$inc' => [ 'balance' => $amountToAdd ] ],
-                    [ 'returnDocument' => \MongoDB\Operation\FindOneAndUpdate::RETURN_DOCUMENT_AFTER ]
-                );
-            });
-        } catch (\Exception $e) {
-            echo "Error refunding customer balance: " . $e->getMessage() . PHP_EOL;
-        }
+        Customers::raw(function ($collection) use ($mongoId, $amountToAdd) {
+            return $collection->findOneAndUpdate(
+                [ '_id' => $mongoId ],
+                [ '$inc' => [ 'balance' => $amountToAdd ] ],
+                [ 'returnDocument' => FindOneAndUpdate::RETURN_DOCUMENT_AFTER ]
+            );
+        });
     }
 
     private function rollbackReservedAccounts($accounts)
     {
         foreach ($accounts as $account) {
-            try {
-                $account->update([
-                    'customer_id' => null,
-                    'order_id' => null,
-                    'status' => Accounts::STATUS['LIVE'],
-                    'reserved_at' => null,
-                    'reserved_by_job' => null
-                ]);
-            } catch (\Exception $e) {
-                echo "Error rolling back account {$account->_id}: " . $e->getMessage() . PHP_EOL;
-            }
+            $account->update([
+                'customer_id' => null,
+                'order_id' => null,
+                'status' => Accounts::STATUS['LIVE'],
+                'reserved_at' => null,
+                'reserved_by_job' => null
+            ]);
         }
     }
 
     private function rollbackSubProductStock($subProduct, $quantityToAdd)
     {
-        try {
-            $result = SubProducts::raw(function ($collection) use ($subProduct, $quantityToAdd) {
-                return $collection->findOneAndUpdate(
-                    ['_id' => $subProduct->_id],
-                    [
-                        '$inc' => [
-                            'quantity' => $quantityToAdd
-                        ]
-                    ],
-                    [
-                        'returnDocument' => \MongoDB\Operation\FindOneAndUpdate::RETURN_DOCUMENT_AFTER
+        SubProducts::raw(function ($collection) use ($subProduct, $quantityToAdd) {
+            return $collection->findOneAndUpdate(
+                ['_id' => $subProduct->_id],
+                [
+                    '$inc' => [
+                        'quantity' => $quantityToAdd
                     ]
-                );
-            });
-            
-            if ($result && isset($result['quantity'])) {
-                echo "Rolled back SubProduct stock: +{$quantityToAdd}, New quantity: {$result['quantity']}" . PHP_EOL;
-            }
-        } catch (\Exception $e) {
-            echo "Error rolling back SubProduct stock: " . $e->getMessage() . PHP_EOL;
-        }
+                ],
+                [
+                    'returnDocument' => FindOneAndUpdate::RETURN_DOCUMENT_AFTER
+                ]
+            );
+        });
     }
 
-    private function cleanupStaleReservations($subProductId)
-    {
-        try {
-            $staleTime = now()->subMinutes(10); // 10 phút trước
-            
-            $staleAccounts = Accounts::where('sub_product_id', $subProductId)
-                ->whereNotNull('reserved_at')
-                ->where('reserved_at', '<', $staleTime)
-                ->where('status', Accounts::STATUS['SOLD'])
-                ->whereNotNull('customer_id')
-                ->whereNotNull('order_id')
-                ->get();
-                
-            foreach ($staleAccounts as $account) {
-                $account->update([
-                    'customer_id' => null,
-                    'order_id' => null,
-                    'status' => Accounts::STATUS['LIVE'],
-                    'reserved_at' => null,
-                    'reserved_by_job' => null
-                ]);
-            }
-            
-            if ($staleAccounts->count() > 0) {
-                echo "Cleaned up {$staleAccounts->count()} stale reservations" . PHP_EOL;
-            }
-        } catch (\Exception $e) {
-            echo "Error cleaning up stale reservations: " . $e->getMessage() . PHP_EOL;
-        }
-    }
 
     private function updateSubProductStock($subProduct, $quantityToSubtract): bool
     {
         try {
-            // Update thường bằng Eloquent với điều kiện còn đủ tồn
             $matched = SubProducts::where('_id', $subProduct->_id)
                 ->where('quantity', '>=', (int) $quantityToSubtract)
                 ->decrement('quantity', (int) $quantityToSubtract);
@@ -481,12 +558,11 @@ class JobProcessPurchase implements ShouldQueue
 
             return true;
         } catch (\Exception $e) {
-            echo "Error updating SubProduct stock: " . $e->getMessage() . PHP_EOL;
             return false;
         }
     }
 
-    private function updateOrderRecord($orderService, $subProduct, $totalPrice)
+    private function updateOrderRecord($orderService, $subProduct, $totalPrice): bool
     {
         try {
             $order = Orders::where('_id', $this->orderId)
@@ -495,20 +571,22 @@ class JobProcessPurchase implements ShouldQueue
                 ->first();
 
             if (!$order) {
-                echo "Order not found for order_number: {$this->orderId}" . PHP_EOL;
-                return null;
+                return false;
             }
 
-            $order->update([
+            $updated = $order->update([
                 'status' => Orders::STATUS['COMPLETED'],
                 'payment_status' => Orders::PAYMENT_STATUS['PAID'],
                 'notes' => "Order completed via JobProcessPurchase - Payment successful"
             ]);
 
-            return $order;
+            if (!$updated) {
+                return false;
+            }
+
+            return true;
         } catch (\Exception $e) {
-            echo "Error in updateOrderRecord: " . $e->getMessage() . PHP_EOL;
-            return null;
+            return false;
         }
     }
 
@@ -519,10 +597,7 @@ class JobProcessPurchase implements ShouldQueue
         }
 
         try {
-            $order = Orders::where('_id', $this->orderId)
-                ->where('status', Orders::STATUS['PENDING'])
-                ->where('payment_status', Orders::PAYMENT_STATUS['PENDING'])
-                ->first();
+            $order = Orders::where('_id', $this->orderId)->first();
 
             if (!$order) {
                 return;
@@ -534,14 +609,22 @@ class JobProcessPurchase implements ShouldQueue
                 'notes' => $reason
             ]);
         } catch (\Exception $e) {
-            echo "Error updating order to failed: " . $e->getMessage() . PHP_EOL;
         }
     }
 
     public function failed(\Throwable $exception): void
     {
-        echo "JobProcessPurchase failed after maximum attempts: " . $exception->getMessage() . PHP_EOL;
-        
-        $this->updateOrderToFailed('Job failed after maximum retry attempts: ' . $exception->getMessage());
+        if ($this->storeId) {
+            $storeService = app(StoreService::class);
+            $tenancyService = app(TenancyService::class);
+
+            $store = $storeService->findById($this->storeId);
+            if ($store) {
+                $connection = $tenancyService->buildConnectionFromStore($store);
+                $tenancyService->applyConnection($connection, true);
+            }
+        }
+
+        $this->updateOrderToFailed('Lỗi khác - E104');
     }
 }
