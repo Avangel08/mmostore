@@ -42,21 +42,21 @@ class SePayWebHookController extends Controller
             $shortName = $data['gateway'];
             $bank = $this->bankService->findByShortName($shortName);
             if (!$bank) {
-                throw ValidationException::withMessages(['message' => ['Ngân hàng không tồn tại']]);
+                throw ValidationException::withMessages(['message' => ['Bank not found']]);
             }
             $paymentMethod = $this->paymentMethodSellerService->findByKey($bank['code']);
             if (!$paymentMethod) {
-                throw ValidationException::withMessages(['message' => ['Phương thức thanh toán không tồn tại']]);
+                throw ValidationException::withMessages(['message' => ['Payment method not found']]);
             }
 
             throw_if(
                 !empty($token) && $token !== $paymentMethod['details']['api_key'],
-                ValidationException::withMessages(['message' => ['Token không hợp lệ']])
+                ValidationException::withMessages(['message' => ['Token is invalid']])
             );
             
             throw_if(
                 WebhookLogBanks::query()->where('transaction', $data['referenceCode'])->exists(),
-                ValidationException::withMessages(['message' => ['Transaction này đã thực hiện']])
+                ValidationException::withMessages(['message' => ['Transaction already exists']])
             );
 
             WebhookLogBanks::create([
@@ -69,13 +69,13 @@ class SePayWebHookController extends Controller
 
             $contentBank = $this->checkBankService->parseDescription($data['description'], $bank['code']);
             if (empty($contentBank)) {
-                throw ValidationException::withMessages(['message' => ['Nội dung chuyển khoản không hợp lệ']]);
+                throw ValidationException::withMessages(['message' => ['Content bank is invalid']]);
             }
 
             JobDepositCustomer::dispatch($contentBank['user_id'], $contentBank['content_bank'], $data['transferAmount'], $data['referenceCode'], $paymentMethod['_id']);
             return response()->json([
                 'status' => 'success',
-                'message' => 'Webhook nhận thành công',
+                'message' => 'Webhook received successfully',
                 'data' => $data
             ]);
 
