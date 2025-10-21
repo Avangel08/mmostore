@@ -50,9 +50,10 @@ class PaymentMethodSellerService
     public function getForTable($request){
         $page = $request['page'] ?? 1;
         $perPage = $request['perPage'] ?? 10;
-
+        $typeNotIn = [PaymentMethodSeller::TYPE['BALANCE']];
         return PaymentMethodSeller::filterSearch($request)
         ->filterCreatedDate($request)
+        ->whereNotIn('type', $typeNotIn)
         ->orderBy('created_at', 'desc')
         ->paginate($perPage, ['*'], 'page', $page);
     }
