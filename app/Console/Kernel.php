@@ -41,11 +41,5 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping(10)
             ->runInBackground()
             ->appendOutputTo($pathLogs . '/check_bank_seller.txt');
-
-        $schedule->command(CleanupStaleReservations::class)
-            ->everyFiveMinutes()
-            ->withoutOverlapping()
-            ->runInBackground()
-            ->appendOutputTo($pathLogs . '/cleanup_stale_reservations.txt');
     }
 }

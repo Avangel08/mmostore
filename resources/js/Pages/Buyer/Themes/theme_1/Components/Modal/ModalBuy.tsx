@@ -278,7 +278,7 @@ const ModalBuy: React.FC<ProductModalProps> = ({ productId, show, onClose, }) =>
                             style={{ fontWeight: "bold" }}
                             disabled={isLoading || !product || !formik.isValid || formik.isSubmitting || (itemSubProduct?.quantity === 0)}
                         >
-                            {formik.isSubmitting ? t("Processing...") : t("Buy")}
+                            {formik.isSubmitting ? t("Buy") : t("Buy")}
                         </Button>
                     </div>
                 </Form>
