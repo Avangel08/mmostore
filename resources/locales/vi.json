@@ -601,5 +601,14 @@
     "Customer Name": "Tên khách hàng",
     "Enter customer name": "Nhập tên khách hàng",
     "System": "Hệ thống",
-    "Sales channel": "Kênh bán hàng"
-}   
+    "Sales channel": "Kênh bán hàng",
+    "No plans available": "Không có gói nào khả dụng",
+    "Please check back later": "Vui lòng quay lại sau",
+    "Subscription Plans": "Gói đăng ký",
+    "Invalid plan selected": "Gói đã chọn không hợp lệ",
+    "No payment methods available. Please contact support": "Không có phương thức thanh toán nào khả dụng. Vui lòng liên hệ hỗ trợ",
+    "No valid payment method found. Please contact support": "Không tìm thấy phương thức thanh toán hợp lệ. Vui lòng liên hệ hỗ trợ",
+    "Continue": "Tiếp tục",
+    "Select Payment Method": "Chọn phương thức thanh toán",
+    "Choose your preferred payment method": "Chọn phương thức thanh toán của bạn"
+}

@@ -142,7 +142,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                             </Dropdown>
 
                             {/* Plan Display - Before Language */}
-                            {/* <div className="header-item">
+                             <div className="header-item">
                                 <button
                                     type="button"
                                     className="btn btn-outline-primary btn-sm me-2"
@@ -163,7 +163,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                                         </div>
                                     </div>
                                 </button>
-                            </div> */}
+                            </div> 
 
                             {/* LanguageDropdown */}
                             <LanguageDropdown />
