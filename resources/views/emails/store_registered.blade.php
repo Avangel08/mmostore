@@ -16,12 +16,12 @@
 <div class="container">
     <h2>Chúc mừng bạn đã đăng ký cửa hàng thành công 🎉</h2>
     <div class="card">
-        <p><strong>Cửa hàng:</strong> {{ $store_name ?? '' }}</p>
-        <p><strong>Tên miền:</strong> <a href="{{ $redirect_url ?? '' }}" target="_blank">{{ $domain ?? '' }}</a></p>
-        <p><strong>Tài khoản:</strong> {{ $email ?? '' }}</p>
+        <p><strong>Cửa hàng:</strong> {{ $data['store_name'] ?? '' }}</p>
+        <p><strong>Tên miền:</strong> <a href="{{ $data['redirect_url'] ?? '' }}" target="_blank">{{ $data['domain'] ?? '' }}</a></p>
+        <p><strong>Tài khoản:</strong> {{ $data['email'] ?? '' }}</p>
         <p>Bạn có thể truy cập trang quản trị bằng nút bên dưới.</p>
         <p>
-            <a class="btn" href="{{ $redirect_url ?? '' }}" target="_blank">Vào trang quản trị</a>
+            <a class="btn" href="{{ $data['redirect_url'] ?? '' }}" target="_blank">Vào trang quản trị</a>
         </p>
     </div>
     <p class="muted">Nếu bạn không thực hiện thao tác này, vui lòng bỏ qua email.</p>

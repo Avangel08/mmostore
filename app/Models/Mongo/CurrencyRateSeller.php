@@ -10,6 +10,8 @@ class CurrencyRateSeller extends Model
         'ACTIVE' => 1,
         'INACTIVE' => 0,
     ];
+
+    protected $connection = 'tenant_mongo';
     protected $table = 'currency_rates';
 
     protected $fillable = [

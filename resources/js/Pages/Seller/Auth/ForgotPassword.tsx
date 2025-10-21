@@ -44,7 +44,6 @@ export default function ForgotPassword() {
                 router.visit(route('seller.forgot-password.success'));
             },
             onError: () => {
-                console.error('Error sending reset password email');
             }
         });
     };

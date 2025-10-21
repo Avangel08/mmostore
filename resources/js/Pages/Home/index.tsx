@@ -19,7 +19,7 @@ export default function Index() {
 
     return (
         <React.Fragment>
-            <Head title="Landing | Velzon - React Admin & Dashboard Template" />
+            <Head title="MMO Shop" />
             <div className="layout-wrapper landing">
                 <Navbar />
                 <Home />

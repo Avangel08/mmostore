@@ -6,10 +6,12 @@ import Scrollspy from "react-scrollspy";
 import logodark from "../../../images/logo-dark.png";
 import logolight from "../../../images/logo-light.png";
 import { Link } from "@inertiajs/react";
+import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
     const [isOpenMenu, setisOpenMenu] = useState<boolean>(false);
     const [navClass, setnavClass] = useState<any>("");
+    const { t } = useTranslation();
 
     const toggle = () => setisOpenMenu(!isOpenMenu);
 
@@ -63,7 +65,7 @@ const Navbar = () => {
                 id="navbar"
             >
                 <Container>
-                    <Link className="navbar-brand" href="/dashboard">
+                    <Link className="navbar-brand" href="/">
                         <img
                             src={logodark}
                             className="card-logo card-logo-dark"
@@ -109,26 +111,20 @@ const Navbar = () => {
                                 id="navbar-example"
                             >
                                 <li className="nav-item">
-                                    <NavLink href="#hero">Home</NavLink>
+                                    <NavLink href="#">Về chúng tôi</NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <NavLink href="#services">Services</NavLink>
+                                    <NavLink href="#features">Tính năng</NavLink>
                                 </li>
-                                <li className="nav-item">
-                                    <NavLink href="#features">Features</NavLink>
-                                </li>
-                                <li className="nav-item">
+                                {/* <li className="nav-item">
                                     <NavLink href="#plans">Plans</NavLink>
-                                </li>
+                                </li> */}
                                 <li className="nav-item">
-                                    <NavLink href="#reviews">Reviews</NavLink>
+                                    <NavLink href="#faqs">FAQ</NavLink>
                                 </li>
-                                <li className="nav-item">
-                                    <NavLink href="#team">Team</NavLink>
-                                </li>
-                                <li className="nav-item">
-                                    <NavLink href="#contact">Contact</NavLink>
-                                </li>
+                                {/* <li className="nav-item">
+                                    <NavLink href="/">Tài liệu</NavLink>
+                                </li> */}
                             </Scrollspy>
 
                             <div className="">
@@ -136,13 +132,13 @@ const Navbar = () => {
                                     href="/login"
                                     className="btn btn-link fw-medium text-decoration-none text-body"
                                 >
-                                    Sign in
+                                    Đăng nhập
                                 </Link>
                                 <Link
                                     href="/register"
                                     className="btn btn-primary btn-bg-primary border-0"
                                 >
-                                    Sign Up
+                                    Đăng ký
                                 </Link>
                             </div>
                         </div>

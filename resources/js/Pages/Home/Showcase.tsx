@@ -18,7 +18,7 @@ const Showcase = () => {
                         <Col lg={8}>
                             <div className="text-center mb-5">
                                 <h2 className="mb-3 lh-base display-6 page-home-title-md text-gray-title">
-                                    SELECT THEME
+                                    Đa dạng các theme
                                 </h2>
                             </div>
                         </Col>

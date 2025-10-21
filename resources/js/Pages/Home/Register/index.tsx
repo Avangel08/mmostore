@@ -182,7 +182,7 @@ const countryCodes = [
 
 export default function Register() {
     const { props } = usePage();
-    const DOMAIN_SUFFIX = (props as any)?.domainSuffix || "mmostore.local";
+    const DOMAIN_SUFFIX = (props as any)?.domainSuffix;
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
     const [confirmPasswordShow, setConfirmPasswordShow] = useState<boolean>(false);
     const [serverError, setServerError] = useState<string | null>(null);
@@ -307,7 +307,7 @@ export default function Register() {
                 `}
             </style>
             <GuestLayout>
-                <Head title="Basic SignUp | Velzon - React Admin & Dashboard Template" />
+                <Head title={t("Register")} />
                 <div className="auth-page-content mt-lg-5">
                     <Container>
                         <Row>

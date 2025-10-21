@@ -12,13 +12,13 @@ import { Swiper, SwiperSlide } from "swiper/react";
 // Import Images
 import imgpattern from "../../../images/landing/img-pattern.png";
 
-import defaultDemo from "../../../images/demos/default.png";
-import saasDemo from "../../../images/demos/saas.png";
-import materialDemo from "../../../images/demos/material.png";
-import minimalDemo from "../../../images/demos/minimal.png";
-import creativeDemo from "../../../images/demos/creative.png";
-import modernDemo from "../../../images/demos/modern.png";
-import interactiveDemo from "../../../images/demos/interactive.png";
+import defaultDemo from "../../../images/landing/showcase/theme-store-1.png";
+import saasDemo from "../../../images/landing/showcase/theme-store-2.png";
+import materialDemo from "../../../images/landing/showcase/theme-store-3.png";
+// import minimalDemo from "../../../images/demos/minimal.png";
+// import creativeDemo from "../../../images/demos/creative.png";
+// import modernDemo from "../../../images/demos/modern.png";
+// import interactiveDemo from "../../../images/demos/interactive.png";
 import { Link } from "@inertiajs/react";
 
 const Home = () => {
@@ -32,13 +32,12 @@ const Home = () => {
                             <div className="text-center mt-lg-5 pt-5">
                                 <h1 className="display-6 mb-3 lh-base page-home-title-lg text-gray-title">
                                     <span className="text-success">
-                                        MMO STORE{" "}
+                                        MMO SHOP{" "}
                                     </span>
-                                    - NỀN TẢNG SỞ HỮU WEBSITE <br /> BÁN HÀNG
-                                    CHUYÊN NGHIỆP
+                                    - Tạo shop MMO của riêng bạn trong 5 phút
                                 </h1>
                                 <p className="lead text-muted lh-base">
-                                    MMO Store là nền tảng giúp bạn nhanh chóng
+                                    MMO Shop là nền tảng giúp bạn nhanh chóng
                                     sở hữu website bán hàng chuyên nghiệp để{" "}
                                     <br />
                                     kinh doanh các digital products như tài
@@ -53,7 +52,7 @@ const Home = () => {
                                         href="/register"
                                         className="btn btn-primary btn-bg-primary border-0"
                                     >
-                                        Create a Store{" "}
+                                        Thêm cửa hàng{" "}
                                         <i className="ri-add-line align-middle ms-1"></i>
                                     </Link>
                                 </div>
@@ -109,7 +108,7 @@ const Home = () => {
                                             alt="..."
                                         />
                                     </SwiperSlide>
-                                    <SwiperSlide className="carousel-inner shadow-lg p-2 bg-white rounded">
+                                    {/* <SwiperSlide className="carousel-inner shadow-lg p-2 bg-white rounded">
                                         <img
                                             src={minimalDemo}
                                             className="d-block w-100"
@@ -136,7 +135,7 @@ const Home = () => {
                                             className="d-block w-100"
                                             alt="..."
                                         />
-                                    </SwiperSlide>
+                                    </SwiperSlide> */}
                                 </Swiper>
                             </div>
                         </Col>

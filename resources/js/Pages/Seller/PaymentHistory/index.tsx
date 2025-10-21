@@ -54,7 +54,6 @@ const PaymentHistory = () => {
       setDataEdit(response.data.paymentMethod);
       setShowModal(true);
     } catch (error) {
-      console.error("Error fetching payment method:", error);
     }
   };
 

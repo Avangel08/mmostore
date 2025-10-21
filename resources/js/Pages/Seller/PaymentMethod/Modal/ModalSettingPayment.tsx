@@ -18,7 +18,6 @@ export const ModalSettingPayment = ({
   dataEdit?: any;
   dataOptions?: any;
 }) => {
-  console.log(dataEdit);
   const maxLengthName = 150;
   const { t } = useTranslation();
   const errors = usePage().props.errors as any;
