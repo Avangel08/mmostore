@@ -22,12 +22,10 @@ use App\Services\Tenancy\TenancyService;
 use App\Services\Home\StoreService;
 use App\Services\CurrencyRateSeller\CurrencyRateSellerService;
 use App\Models\Mongo\Settings;
-use Illuminate\Cache\Repository;
-use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Exception;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Operation\FindOneAndUpdate;
 
@@ -43,7 +41,6 @@ class JobProcessPurchase implements ShouldQueue
     protected $orderId;
     protected $sourceKey;
 
-    public $uniqueFor = 300;
     public $timeout = 120;
 
     public function __construct(
@@ -65,20 +62,6 @@ class JobProcessPurchase implements ShouldQueue
         $this->queue = 'process_purchase';
     }
 
-    public function middleware(): array
-    {
-        $key = 'purchase_' . $this->productId . '_' . $this->subProductId;
-
-        return [
-            (new WithoutOverlapping($key))
-                ->expireAfter($this->uniqueFor ?? 300),
-        ];
-    }
-
-    public function uniqueVia(): Repository
-    {
-        return Cache::driver('redis');
-    }
 
     public function handle(
         SubProductService $subProductService,
@@ -144,8 +127,21 @@ class JobProcessPurchase implements ShouldQueue
                 return;
             }
 
+            // Lấy account data trước khi xử lý payment
+            $accountsToSell = $this->getAccountsToSell($subProduct, $this->quantity);
+            if (count($accountsToSell) < $this->quantity) {
+                $this->rollbackReservedAccounts($accountsToSell);
+                $this->updateOrderToFailed("Insufficient accounts available - E112");
+                return;
+            }
+
+            // Lưu account data vào Redis ngay sau khi lấy được
+            $this->storeAccountDataToRedis($subProduct->_id, $accountsToSell);
+
+            // Xử lý payment sau khi đã có account data
             $deductResult = $this->deductCustomerBalanceAtomic($this->customerId, $totalPrice);
             if (!$deductResult['success']) {
+                $this->rollbackReservedAccounts($accountsToSell);
                 $this->updateOrderToFailed("Số dư không đủ");
                 return;
             }
@@ -155,6 +151,7 @@ class JobProcessPurchase implements ShouldQueue
                 $paymentMethodId = null;
                 $method = $paymentMethodSellerService->findByKey(PaymentMethodSeller::KEY['BALANCE']);
                 if (!$method) {
+                    $this->rollbackReservedAccounts($accountsToSell);
                     $this->refundCustomerBalance($this->customerId, $totalPrice);
                     $this->updateOrderToFailed("Payment method not found - E106");
                     return;
@@ -163,6 +160,7 @@ class JobProcessPurchase implements ShouldQueue
 
                 // Validate source key
                 if (!isset(BalanceHistories::GATEWAY[$this->sourceKey])) {
+                    $this->rollbackReservedAccounts($accountsToSell);
                     $this->refundCustomerBalance($this->customerId, $totalPrice);
                     $this->updateOrderToFailed("Invalid source key - E107");
                     return;
@@ -172,6 +170,7 @@ class JobProcessPurchase implements ShouldQueue
                 // Get currency settings
                 $currencySetting = $settingService->findByKey('currency');
                 if (!$currencySetting) {
+                    $this->rollbackReservedAccounts($accountsToSell);
                     $this->refundCustomerBalance($this->customerId, $totalPrice);
                     $this->updateOrderToFailed("Currency setting not found - E108");
                     return;
@@ -188,6 +187,7 @@ class JobProcessPurchase implements ShouldQueue
                         $amountUsd = $currencyRateSellerService->convertVNDToUSD($amountVnd);
                     }
                 } catch (\Exception $e) {
+                    $this->rollbackReservedAccounts($accountsToSell);
                     $this->refundCustomerBalance($this->customerId, $totalPrice);
                     $this->updateOrderToFailed("Currency conversion failed - E109");
                     return;
@@ -210,27 +210,21 @@ class JobProcessPurchase implements ShouldQueue
                     ]);
 
                     if (!$balanceHistory) {
+                        $this->rollbackReservedAccounts($accountsToSell);
                         $this->refundCustomerBalance($this->customerId, $totalPrice);
                         $this->updateOrderToFailed("Failed to create balance history - E110");
                         return;
                     }
                 } catch (\Exception $e) {
+                    $this->rollbackReservedAccounts($accountsToSell);
                     $this->refundCustomerBalance($this->customerId, $totalPrice);
                     $this->updateOrderToFailed("Balance history creation failed - E101");
                     return;
                 }
             } catch (\Exception $e) {
-                $this->refundCustomerBalance($this->customerId, $totalPrice);
-                $this->updateOrderToFailed("Payment processing failed - E111");
-                return;
-            }
-
-            // Reserve accounts for sale
-            $accountsToSell = $this->getAccountsToSell($subProduct, $this->quantity);
-            if (count($accountsToSell) < $this->quantity) {
                 $this->rollbackReservedAccounts($accountsToSell);
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
-                $this->updateOrderToFailed("Insufficient accounts available - E112");
+                $this->updateOrderToFailed("Payment processing failed - E111");
                 return;
             }
 
@@ -279,6 +273,11 @@ class JobProcessPurchase implements ShouldQueue
             // Rollback any changes made
             if (isset($subProduct) && isset($this->quantity)) {
                 $this->rollbackSubProductStock($subProduct, $this->quantity);
+            }
+
+            // Rollback reserved accounts if they were reserved
+            if (isset($accountsToSell)) {
+                $this->rollbackReservedAccounts($accountsToSell);
             }
 
             // Refund customer balance if it was deducted
@@ -405,8 +404,8 @@ class JobProcessPurchase implements ShouldQueue
         
         while ($reservedCount < $quantity && $attempts < $maxAttempts) {
             $remaining = $quantity - $reservedCount;
-            
-            $account = $this->reserveAccount($subProduct->_id, $this->customerId, $this->orderId ?? 'TEMP_' . time());
+
+            $account = $this->reserveAccountWithRedisCheck($subProduct->_id, $this->customerId, $this->orderId ?? 'TEMP_' . time());
             
             if ($account) {
                 $accounts[] = $account;
@@ -426,6 +425,84 @@ class JobProcessPurchase implements ShouldQueue
         }
         
         return $accounts;
+    }
+
+    private function reserveAccountWithRedisCheck($subProductId, $customerId, $orderId)
+    {
+        try {
+            // Tạo key Redis cho cặp sản phẩm-account
+            $redisKey = "product_account:{$subProductId}";
+            
+            // Kiểm tra xem đã có account nào được cache cho sản phẩm này chưa
+            $cachedAccount = Redis::get($redisKey);
+
+            if ($cachedAccount) {
+                // Nếu đã có account trong Redis, lấy account khác
+                $account = $this->getNextAvailableAccount($subProductId, $customerId, $orderId);
+            } else {
+                // Nếu chưa có, lấy account đầu tiên và lưu vào Redis
+                $account = $this->reserveAccount($subProductId, $customerId, $orderId);
+                
+                if ($account) {
+                    // Lưu account data vào Redis với TTL 1 giờ
+                    $accountData = [
+                        'id' => (string) $account->_id,
+                        'key' => $account->key,
+                        'data' => $account->data,
+                        'sub_product_id' => (string) $account->sub_product_id,
+                        'reserved_at' => now()->toISOString()
+                    ];
+                    
+                    Redis::setex($redisKey, 3600, json_encode($accountData));
+                }
+            }
+            
+            return $account;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    private function getNextAvailableAccount($subProductId, $customerId, $orderId)
+    {
+        try {
+            // Lấy account tiếp theo (không phải account đã cache)
+            $result = Accounts::raw(function ($collection) use ($subProductId, $customerId, $orderId) {
+                return $collection->findOneAndUpdate(
+                    [
+                        'sub_product_id' => $subProductId,
+                        'customer_id' => null,
+                        'order_id' => null,
+                        'status' => Accounts::STATUS['LIVE']
+                    ],
+                    [
+                        '$set' => [
+                            'customer_id' => $customerId,
+                            'order_id' => $orderId,
+                            'status' => Accounts::STATUS['SOLD'],
+                            'reserved_at' => now()->toISOString(),
+                            'reserved_by_job' => $this->job->getJobId()
+                        ]
+                    ],
+                    [
+                        'returnDocument' => FindOneAndUpdate::RETURN_DOCUMENT_AFTER,
+                        'sort' => ['created_at' => 1]
+                    ]
+                );
+            });
+            
+            if ($result) {
+                $account = new Accounts();
+                $account->fill((array) $result);
+                $account->exists = true;
+                $account->setAttribute('_id', $result['_id']);
+                return $account;
+            }
+            
+            return null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     private function reserveAccount($subProductId, $customerId, $orderId)
@@ -525,6 +602,12 @@ class JobProcessPurchase implements ShouldQueue
                 'reserved_by_job' => null
             ]);
         }
+        
+        // Xóa Redis cache nếu có
+        if ($this->orderId) {
+            $orderRedisKey = "order_accounts:{$this->orderId}";
+            Redis::del($orderRedisKey);
+        }
     }
 
     private function rollbackSubProductStock($subProduct, $quantityToAdd)
@@ -609,6 +692,31 @@ class JobProcessPurchase implements ShouldQueue
                 'notes' => $reason
             ]);
         } catch (\Exception $e) {
+        }
+    }
+
+    private function storeAccountDataToRedis($subProductId, $accounts)
+    {
+        try {
+            $orderRedisKey = "order_accounts:{$this->orderId}";
+            $accountData = [];
+            
+            foreach ($accounts as $account) {
+                $accountData[] = [
+                    'id' => (string) $account->_id,
+                    'key' => $account->key,
+                    'data' => $account->data,
+                    'sub_product_id' => (string) $account->sub_product_id,
+                    'reserved_at' => $account->reserved_at ?? now()->toISOString()
+                ];
+            }
+            
+            // Lưu account data vào Redis với TTL 24 giờ
+            Redis::setex($orderRedisKey, 86400, json_encode($accountData));
+            
+        } catch (\Exception $e) {
+            // Log error nhưng không fail order
+            \Log::error("Failed to store account data to Redis: " . $e->getMessage());
         }
     }
 

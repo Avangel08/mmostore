@@ -33,6 +33,7 @@ class CheckoutService
     {
         try {
             $validationResult = $this->validateEntitiesAreActive($productId, $subProductId, $customerId, $quantity);
+
             if (!$validationResult['success']) {
                 return [
                     'status' => 'error',
@@ -52,7 +53,7 @@ class CheckoutService
                 ];
             }
 
-            JobProcessPurchase::dispatch(
+            JobProcessPurchase::dispatchSync(
                 $productId,
                 $subProductId,
                 $customerId,
