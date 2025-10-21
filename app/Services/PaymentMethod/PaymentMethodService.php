@@ -35,6 +35,11 @@ class PaymentMethodService
     {
         return PaymentMethods::find($id);
     }
+    
+    public function findActiveById($id)
+    {
+        return PaymentMethods::where('id', $id)->where('status', PaymentMethods::STATUS['ACTIVE'])->first();
+    }
 
     public function findByUserId($userId)
     {

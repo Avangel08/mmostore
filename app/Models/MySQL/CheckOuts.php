@@ -31,12 +31,14 @@ class CheckOuts extends Model
         'plan_id',
         'type',
         'name',
-        'price',
+        'amount',
+        'amount_vnd',
         'interval',
         'interval_type',
         'feature',
         'status',
         'creator_id',
+        'content_bank'
     ];
 
     protected $casts = [
