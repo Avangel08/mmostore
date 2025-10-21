@@ -25,7 +25,7 @@ class CustomerManagerRequest extends FormRequest
         $action = $this->route()->getActionMethod();
         return match ($action) {
             'deposit' => [
-                'payment_method_id' => 'required|integer',
+                'payment_method_id' => 'required',
                 'transaction_type' => 'required|integer|in:1,3',
                 'currency' => 'required|string|in:VND,USD',
                 'amount' => 'required|numeric|min:1',

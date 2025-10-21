@@ -5,29 +5,30 @@ namespace App\Http\Controllers\Seller\CustomerManager;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\CustomerManager\CustomerManagerRequest;
 use App\Models\Mongo\BalanceHistories;
+use App\Models\Mongo\PaymentMethodSeller;
 use App\Services\Customer\CustomerService;
-use App\Services\PaymentMethod\PaymentMethodService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use App\Services\BalanceHistory\BalanceHistoryService;
 use App\Services\CurrencyRate\CurrencyRateService;
+use App\Services\PaymentMethodSeller\PaymentMethodSellerService;
 
 class CustomerManagerController extends Controller
 {
     protected $customerService;
-    protected $paymentMethodService;
+    protected $paymentMethodSellerService;
     protected $balanceHistoryService;
     protected $currencyRateService;
     public function __construct(
         CustomerService $customerService, 
-        PaymentMethodService $paymentMethodService,
+        PaymentMethodSellerService $paymentMethodSellerService,
         BalanceHistoryService $balanceHistoryService,
         CurrencyRateService $currencyRateService
         )
     {
         $this->customerService = $customerService;
-        $this->paymentMethodService = $paymentMethodService;
+        $this->paymentMethodSellerService = $paymentMethodSellerService;
         $this->balanceHistoryService = $balanceHistoryService;
         $this->currencyRateService = $currencyRateService;
     }
@@ -37,10 +38,12 @@ class CustomerManagerController extends Controller
     public function index(Request $request)
     {
         $request = $request->all();
-        $paymentMethods = $this->paymentMethodService->listActive();
+        $paymentMethods = $this->paymentMethodSellerService->listActive();
+        $listPaymentType = array_flip(PaymentMethodSeller::TYPE);
         return Inertia::render('CustomerManager/index', [
             'customers' => fn() => $this->customerService->getForTable($request),
             'paymentMethods' => $paymentMethods,
+            'listPaymentType' => $listPaymentType,
         ]);
     }
 
@@ -131,6 +134,7 @@ class CustomerManagerController extends Controller
             }
 
             $dataInsert = [
+                'gate_way' => BalanceHistories::GATEWAY['SYSTEM'],
                 'customer_id' => $customer['_id'],
                 'payment_method_id' => $data['payment_method_id'],
                 'type' => intval($data['transaction_type']),
