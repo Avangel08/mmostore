@@ -41,4 +41,13 @@ class CurrencyRateSellerService
         }
         return $result;
     }
+
+    public function getForTable($request){
+        $page = $request['page'] ?? 1;
+        $perPage = $request['perPage'] ?? 10;
+        return CurrencyRateSeller::filterSearch($request)
+            ->filterDateRange($request)
+            ->orderBy('date', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
 }

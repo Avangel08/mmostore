@@ -13,7 +13,7 @@ import { ModalDeposit } from "./Modal/ModalDeposit";
 
 const CustomerManager = () => {
   const { t } = useTranslation();
-  const { customers, paymentMethods } = usePage().props;
+  const { customers, paymentMethods, listPaymentType } = usePage().props;
   const [showModal, setShowModal] = useState(false);
   const [showModalDeposit, setShowModalDeposit] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
@@ -106,6 +106,7 @@ const CustomerManager = () => {
         onHide={() => setShowModalDeposit(false)}
         dataEdit={dataDeposit}
         paymentMethods={paymentMethods}
+        listPaymentType={listPaymentType}
       />
     </React.Fragment>
   );

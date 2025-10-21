@@ -12,11 +12,13 @@ export const ModalDeposit = ({
   onHide,
   dataEdit,
   paymentMethods,
+  listPaymentType,
 }: {
   show: boolean;
   onHide: () => void;
   dataEdit?: any;
   paymentMethods?: any;
+  listPaymentType?: any;
 }) => {
 
   const { t } = useTranslation();
@@ -137,7 +139,7 @@ export const ModalDeposit = ({
             >
               <option value="">{t("Select payment method")}</option>
               {paymentMethods.map((paymentMethod: any) => (
-                <option key={paymentMethod.id} value={paymentMethod.id}>{paymentMethod.name}</option>
+                <option key={paymentMethod.id} value={paymentMethod.id}>{paymentMethod.name} ({listPaymentType[paymentMethod.type]})</option>
               ))}
             </Form.Select>
             <Form.Control.Feedback type="invalid">
