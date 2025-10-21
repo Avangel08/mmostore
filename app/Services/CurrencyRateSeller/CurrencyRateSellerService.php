@@ -10,6 +10,11 @@ use App\Models\Mongo\CurrencyRateSeller;
  */
 class CurrencyRateSellerService
 {
+    public function create($data)
+    {
+        return CurrencyRateSeller::create($data);
+    }
+
     public function currencyRateActive()
     {
         return CurrencyRateSeller::orderBy("date", "desc")->where("status", CurrencyRateSeller::STATUS["ACTIVE"])->first();
