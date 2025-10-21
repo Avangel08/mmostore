@@ -145,7 +145,7 @@ class RegisteredStoreController extends Controller
             $defaultCurrencyRates = [
                 [
                     "to_vnd" => 27000,
-                    "date" => Carbon::now()->format('Y-m-d H:i:s'),
+                    "date" => Carbon::now()->format('Y-m-d'),
                     "status" => CurrencyRateSeller::STATUS['ACTIVE'],
                 ]
             ];
