@@ -20,7 +20,6 @@ export default function Register() {
 
     const submit = (e: any) => {
         e.preventDefault();
-        console.log('here')
         post(route('register'));
     };
 

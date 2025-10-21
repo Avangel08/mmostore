@@ -206,10 +206,7 @@ class JobProcessPurchase implements ShouldQueue
                 return;
             }
 
-            try {
-                $this->updateOrderRecord($orderService, $subProduct, $totalPrice);
-            } catch (\Exception $e) {
-            }
+            $this->updateOrderRecord($orderService, $subProduct, $totalPrice);
 
         } catch (Exception $e) {
             if (isset($subProduct) && isset($this->quantity)) {
@@ -537,7 +534,14 @@ class JobProcessPurchase implements ShouldQueue
                 'notes' => $reason
             ]);
         } catch (\Exception $e) {
-
+            echo "Error updating order to failed: " . $e->getMessage() . PHP_EOL;
         }
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        echo "JobProcessPurchase failed after maximum attempts: " . $exception->getMessage() . PHP_EOL;
+        
+        $this->updateOrderToFailed('Job failed after maximum retry attempts: ' . $exception->getMessage());
     }
 }

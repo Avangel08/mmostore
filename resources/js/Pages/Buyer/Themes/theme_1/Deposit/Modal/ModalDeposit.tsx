@@ -14,7 +14,6 @@ export const ModalDeposit = ({
 }) => {
 
     const { t } = useTranslation();
-    console.log(data);
     const bankName = data?.bank_name ? String(data.bank_name) : "";
     const accountName = data?.account_name ? String(data.account_name) : "";
     const accountNumber = data?.account_number ? String(data.account_number) : "";

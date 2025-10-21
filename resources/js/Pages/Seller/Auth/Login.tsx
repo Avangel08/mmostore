@@ -77,7 +77,6 @@ export default function Login({}: any) {
                 window.location.reload();
             },
             onError: (errors: any) => {
-                console.error('Login failed:', errors);
             }
         });
     };

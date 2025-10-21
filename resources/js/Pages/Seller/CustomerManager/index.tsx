@@ -56,19 +56,15 @@ const CustomerManager = () => {
       setDataEdit(response.data.data);
       setShowModal(true);
     } catch (error) {
-      console.error("Error fetching customer:", error);
     }
   };
 
   const openModalDeposit = async (id: number | string) => {
     
     const response = await axios.get(route("seller.customer-manager.edit", { id })).then((response) => {
-      console.log(response.data.data);
-      
       setDataDeposit(response.data.data);
       setShowModalDeposit(true);
     }).catch((error) => {
-      console.error("Error fetching payment method:", error);
     });
   };
 

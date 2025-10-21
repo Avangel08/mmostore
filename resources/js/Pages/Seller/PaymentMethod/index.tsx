@@ -63,7 +63,6 @@ const PaymentSetting = () => {
       });
       setShowModal(true);
     } catch (error) {
-      console.error("Error fetching payment method:", error);
     }
   };
 
@@ -79,7 +78,6 @@ const PaymentSetting = () => {
       });
       setShowModal(true);
     } catch (error) {
-      console.error("Error fetching payment method:", error);
     }
   };
 
