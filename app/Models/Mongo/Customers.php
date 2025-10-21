@@ -11,8 +11,6 @@ use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use MongoDB\Laravel\Auth\User as Authenticatable;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
-use DateTimeInterface;
-use Illuminate\Support\Str;
 
 class Customers extends Authenticatable
 {

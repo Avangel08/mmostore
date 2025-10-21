@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 
 class ForgotPasswordController extends Controller
 {

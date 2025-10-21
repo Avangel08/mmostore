@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Validation\ValidationException;
-use App\Mail\StoreRegistered;
 use App\Services\Tenancy\TenancyService;
 
 class RegisteredStoreController extends Controller
