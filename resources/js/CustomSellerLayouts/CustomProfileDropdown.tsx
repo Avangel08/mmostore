@@ -1,5 +1,5 @@
 import React, { useState} from 'react';
-import { Dropdown } from 'react-bootstrap';
+import { Button, Dropdown } from 'react-bootstrap';
 import { Link, usePage, router } from '@inertiajs/react';
 import moment from "moment";
 //import images
@@ -50,7 +50,7 @@ const CustomProfileDropdown = () => {
                     <h6 className="dropdown-header">{t("Hello")}, {username}</h6>
                     
                     {/* Plan Information Section */}
-                    {/* <div className="px-3 py-2 bg-light-subtle rounded mx-2 mb-2">
+                     <div className="px-3 py-2 bg-light-subtle rounded mx-2 mb-2 mouse-pointer cursor-pointer">
                         <div className="d-flex flex-column" onClick={() => { window.open(route('seller.plan.index'), '_self'); }}>
                             <span className="fw-semibold text-primary mb-1" style={{fontSize: '0.875rem'}}>
                                 {currentPlan.name}
@@ -60,7 +60,7 @@ const CustomProfileDropdown = () => {
                                 {t("Expires")}: {formatExpiryDate(currentPlan.expires_at)}
                             </small>
                         </div>
-                    </div> */}
+                    </div> 
                     
                     <div className="dropdown-divider"></div>
                     <Dropdown.Item href={route("seller.profile")} className="dropdown-item">

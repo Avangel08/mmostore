@@ -637,5 +637,14 @@
     "Please enter group ID": "Vui lòng nhập group ID của bạn",
     "Please enter topic ID": "Vui lòng nhập topic ID của bạn",
     "Please enter message": "Vui lòng nhập tin nhắn của bạn",
-    "Test notification sent successfully": "Tin nhắn kiểm tra đã được gửi thành công"
+    "Test notification sent successfully": "Tin nhắn kiểm tra đã được gửi thành công",
+    "No plans available": "Không có gói nào khả dụng",
+    "Please check back later": "Vui lòng quay lại sau",
+    "Subscription Plans": "Gói đăng ký",
+    "Invalid plan selected": "Gói đã chọn không hợp lệ",
+    "No payment methods available. Please contact support": "Không có phương thức thanh toán nào khả dụng. Vui lòng liên hệ hỗ trợ",
+    "No valid payment method found. Please contact support": "Không tìm thấy phương thức thanh toán hợp lệ. Vui lòng liên hệ hỗ trợ",
+    "Continue": "Tiếp tục",
+    "Select Payment Method": "Chọn phương thức thanh toán",
+    "Choose your preferred payment method": "Chọn phương thức thanh toán của bạn"
 }

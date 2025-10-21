@@ -6,31 +6,113 @@ import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
 import { showToast } from "../../../utils/showToast";
-import { ModalPaymentPlan } from "./ModalPaymentPlan";
+import { ModalCheckoutPlan } from "./ModalCheckoutPlan";
+import { ModalSelectPaymentMethod } from "./ModalSelectPaymentMethod";
+import axios from "axios";
 
 const Plans = () => {
   const { t } = useTranslation();
-  const { plans, currentUserPlan } = usePage().props as any;
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const { plans, paymentMethods, currentUserPlan } = usePage().props as any;
+  const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false);
+  const [showCheckoutPlanModal, setShowCheckoutPlanModal] = useState(false);
+  const [data, setData] = useState<any>(null);
+  const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
 
-  const handleSelectPlan = (planId: number) => {
-    showToast(t("Plan selection functionality will be implemented"), "info");
-    // fetch data
-    router.post(route("seller.plan.select"), {
-      plan_id: planId
-    },
-      {
-        replace: true,
+  const handleSelectPlan = async (planId: number) => {
+    if (!planId) {
+      showToast(t("Invalid plan selected"), "error");
+      return;
+    }
 
+    if (!paymentMethods || paymentMethods?.length === 0) {
+      showToast(t("No payment methods available. Please contact support"), "error");
+      return;
+    }
+
+    setSelectedPlanId(planId);
+    router.reload({
+      only: ['paymentMethods'],
+      onSuccess: () => {
+        setShowPaymentMethodModal(true);
+        setData(null);
+      },
+      onError: () => {
+        showToast(t("Failed to load payment methods"), "error");
       }
-    );
+    });
+  };
+
+  const handlePaymentMethodSelect = async (paymentMethodId: number) => {
+    if (!selectedPlanId) {
+      showToast(t("No plan selected"), "error");
+      return;
+    }
+
+    const selectedPaymentMethod = paymentMethods.find((method: any) => method.id === paymentMethodId);
+
+    if (!selectedPaymentMethod || !selectedPaymentMethod?.id) {
+      showToast(t("No valid payment method found. Please contact support"), "error");
+      return;
+    }
+
+    const url = route("seller.plan.checkout");
+    await axios.post(url, {
+      plan_id: selectedPlanId,
+      payment_method_id: selectedPaymentMethod.id,
+    }).then((response) => {
+      if (response.data.status === "success") {
+        setData(response.data.data);
+        setShowPaymentMethodModal(false);
+        setShowCheckoutPlanModal(true);
+      } else {
+        showToast(t(response.data.message), "error");
+      }
+    }).catch((error) => {
+      showToast(t(error.response.data.message), "error");
+    });
+  };
+
+  const handleClosePaymentMethodModal = () => {
+    setShowPaymentMethodModal(false);
+    setSelectedPlanId(null);
+  };
+
+  const handleCloseCheckoutPlanModal = () => {
+    setShowCheckoutPlanModal(false);
+    setData(null);
+    setSelectedPlanId(null);
+  };
+
+  const handleBackToPaymentMethod = () => {
+    setShowCheckoutPlanModal(false);
+    setData(null);
+    router.reload({
+      only: ['paymentMethods'],
+      onSuccess: () => {
+        setShowPaymentMethodModal(true);
+      },
+      onError: () => {
+        showToast(t("Failed to load payment methods"), "error");
+      }
+    });
   };
 
   return (
     <React.Fragment>
       <Head title={t("Subscription Plans")} />
       <div className="page-content">
-        <ModalPaymentPlan show={showPaymentModal} onHide={() => setShowPaymentModal(false)} />
+        <ModalSelectPaymentMethod 
+          show={showPaymentMethodModal}
+          onHide={handleClosePaymentMethodModal}
+          paymentMethods={paymentMethods}
+          onSelectPaymentMethod={handlePaymentMethodSelect}
+        />
+        <ModalCheckoutPlan 
+          show={showCheckoutPlanModal} 
+          onHide={handleCloseCheckoutPlanModal} 
+          data={data}
+          onBack={handleBackToPaymentMethod}
+        />
         <ToastContainer />
         <Container fluid>
           <BreadCrumb
@@ -46,26 +128,26 @@ const Plans = () => {
                   <Card.Body>
                     <Row className="align-items-center">
                       <Col md={8}>
-                        <h5 className="text-white mb-2">{t("Current Plan")}: {currentUserPlan.name}</h5>
+                        <h5 className="text-white mb-2">{t("Current Plan")}: {currentUserPlan?.name}</h5>
                         <p className="text-white-50 mb-2">
-                          {parseFloat(currentUserPlan.price).toFixed(2)} {t("per")} {currentUserPlan.interval} {t('day')}
+                          {parseFloat(currentUserPlan?.price).toFixed(2)} {t("per")} {currentUserPlan?.interval} {t('day')}
                         </p>
                         <div className="d-flex flex-wrap gap-3 text-sm">
                           {!!currentUserPlan.sub_description && (
-                            <span><i className="ri-information-line me-1"></i>{currentUserPlan.sub_description}</span>
+                            <span><i className="ri-information-line me-1"></i>{currentUserPlan?.sub_description}</span>
                           )}
                           {currentUserPlan.off > 0 && (
-                            <span><i className="ri-percent-line me-1"></i>{currentUserPlan.off}% {t("discount")}</span>
+                            <span><i className="ri-percent-line me-1"></i>{currentUserPlan?.off}% {t("discount")}</span>
                           )}
                         </div>
                       </Col>
                       <Col md={4} className="text-md-end">
                         <Badge bg="success" className="mb-2 fs-6">
-                          {currentUserPlan.status === 1 ? t("Active") : t("Inactive")}
+                          {currentUserPlan?.status === 1 ? t("Active") : t("Inactive")}
                         </Badge>
-                        {!!currentUserPlan.created_at && (
+                        {!!currentUserPlan?.created_at && (
                           <p className="text-white-50 mb-0">
-                            {t("Started on")}: {new Date(currentUserPlan.created_at).toLocaleDateString()}
+                            {t("Started on")}: {new Date(currentUserPlan?.created_at).toLocaleDateString()}
                           </p>
                         )}
                       </Col>
@@ -99,7 +181,7 @@ const Plans = () => {
                         )}
                         <div className="mb-3">
                           <h2 className="fw-bold mb-0">
-                            {plan.price === 0 ? t("Free") : (plan.price)}
+                            {plan.price === 0 ? t("Free") : (plan.price + " đ")}
                             <span className="fs-6 text-muted">
                               /{plan.interval} {t('days')}
                             </span>
@@ -107,7 +189,7 @@ const Plans = () => {
                           {plan.off > 0 && (
                             <div className="mt-2">
                               <span className="text-decoration-line-through text-muted me-2">
-                                ${parseFloat(plan.price_origin).toFixed(2)}
+                                {plan.price_origin}
                               </span>
                               <Badge bg="danger" className="ms-1">
                                 {plan.off}% {t("OFF")}
@@ -119,13 +201,23 @@ const Plans = () => {
 
                       <div className="mb-4">
                         <Button
-                          variant={plan.best_choice ? "primary" : "outline-primary"}
+                          variant={isCurrentPlan ? "secondary" : "outline-primary"}
                           className="w-100 mb-3"
                           size="lg"
                           onClick={() => handleSelectPlan(plan.id)}
                           disabled={isCurrentPlan}
                         >
-                          {isCurrentPlan ? t("Current Plan") : t("Select Plan")}
+                          {isCurrentPlan ? (
+                            <>
+                              <i className="ri-check-line me-2"></i>
+                              {t("Current Plan")}
+                            </>
+                          ) : (
+                            <>
+                              <i className="ri-arrow-right-line me-2"></i>
+                              {t("Select Plan")}
+                            </>
+                          )}
                         </Button>
                       </div>
 
@@ -148,7 +240,7 @@ const Plans = () => {
                   <Card.Body>
                     <i className="ri-inbox-line display-4 text-muted mb-3"></i>
                     <h5 className="text-muted">{t("No plans available")}</h5>
-                    <p className="text-muted">{t("Please check back later for available subscription plans.")}</p>
+                    <p className="text-muted">{t("Please check back later")}</p>
                   </Card.Body>
                 </Card>
               </Col>
