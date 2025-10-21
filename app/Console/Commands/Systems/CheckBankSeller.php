@@ -34,8 +34,13 @@ class CheckBankSeller extends Command
         $total = 0;
         $listStore = Stores::where("status", Stores::STATUS['ACTIVE'])->cursor();
         foreach ($listStore as $store) {
-            $connect = $tenancyService->buildConnectionFromStore($store);
-            $tenancyService->applyConnection($connect);
+            try {
+                $connect = $tenancyService->buildConnectionFromStore($store);
+                $tenancyService->applyConnection($connect, true);
+            } catch (\Throwable $th) {
+                $this->error("Failed to apply connection: " . $th->getMessage() . " - Store: " . $store->id);
+                continue;
+            }
             PaymentMethodSeller::where('status', PaymentMethodSeller::STATUS["ACTIVE"])
                 ->where("type", PaymentMethodSeller::TYPE['BANK'])
                 ->where('is_verify_otp', true)
