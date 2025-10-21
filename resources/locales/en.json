@@ -303,5 +303,9 @@
     "Page header text": "Page header text",
     "Current domain": "Current domain",
     "Gate Way" : "Gate Way",
-    "Add Payment Method" : "Add Payment Method"
+    "Add Payment Method" : "Add Payment Method",
+    "Effective from date" : "Effective from date",
+    "VND Rate" : "VND Rate",
+    "Add currency rate" : "Add currency rate",
+    "Currency Rate" : "Currency Rate"
 }
