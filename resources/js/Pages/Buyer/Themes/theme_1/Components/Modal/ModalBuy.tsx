@@ -29,7 +29,6 @@ interface ProductFormValues {
     price: number;
 }
 
-// ⚡ fetch products detail (TanStack Query)
 const fetchProduct = async (id: number): Promise<Product> => {
     const res = await fetch(`/products/detail/${id}`);
     if (!res.ok) throw new Error("Failed to fetch products");
@@ -77,34 +76,30 @@ const ModalBuy: React.FC<ProductModalProps> = ({ productId, show, onClose, }) =>
                     showToast(t("Your balance is not enough, please recharge"), "error");
                     return;
                 }
-                const response = await axios.post('/products/checkout', {
+
+                await axios.post('/products/checkout', {
                     product_id: productId,
                     sub_product_id: values.subProduct,
                     quantity: values.quantity,
                     price: values.price
                 });
 
-                if (response.data.success) {
-                    handleClose();
-                    window.location.href = '/order';
-                } else {
-                    console.error('Checkout failed:', response.data.message);
-                }
+                handleClose();
+                window.location.href = '/order';
             } catch (error) {
-                console.error('Checkout errors:', error);
+                handleClose();
+                window.location.href = '/order';
             } finally {
                 formik.setSubmitting(false);
             }
         },
     });
 
-    // ✅ wrapper: reset form trước, gọi onClose sau
     const handleClose = () => {
         formik.resetForm();
         onClose();
     };
 
-    console.log({ formQuantity: formik.values.quantity, error: formik.errors });
     return (
         <Modal show={show} onHide={handleClose} centered backdrop="static" size="lg">
             <Modal.Header

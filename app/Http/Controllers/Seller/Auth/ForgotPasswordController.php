@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Seller\Auth;
 
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
-use App\Jobs\Mail\JobMailSellerResetPassword;
+use App\Jobs\Mail\JobSendMail;
+use App\Jobs\Mail\MailType;
 use App\Rules\SellerEmailBelongsToDomain;
 use App\Models\MySQL\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 
 class ForgotPasswordController extends Controller
 {
@@ -52,7 +52,7 @@ class ForgotPasswordController extends Controller
             'url' => route('seller.reset-password', ['token' => $token]) . '?email=' . urlencode($email),
         ];
 
-        dispatch(new JobMailSellerResetPassword($dataSendMail, app()->getLocale()));
+        dispatch(new JobSendMail(MailType::SELLER_RESET_PASSWORD, $dataSendMail, app()->getLocale()));
 
         return back()->with('status', trans(Helpers::getPwBrokerStatus(Password::RESET_LINK_SENT)));
     }

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Seller\CustomerManager;
+namespace App\Http\Requests\Seller\CurrencyRate;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Mongo\CurrencyRateSeller;
 use Illuminate\Validation\Rule;
-
-class CustomerManagerRequest extends FormRequest
+class CurrencyRateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,16 +24,17 @@ class CustomerManagerRequest extends FormRequest
     {
         $action = $this->route()->getActionMethod();
         return match ($action) {
-            'deposit' => [
-                'payment_method_id' => 'required',
-                'transaction_type' => 'required|integer|in:1,3',
-                'currency' => 'required|string|in:VND,USD',
-                'amount' => 'required|numeric|min:1',
-                'transaction_code' => 'required|string',
-                'note' => 'nullable|string|max:500',
-                'customer_id' => 'required|string',
+            'store' => [
+                'to_vnd' => ['required', 'numeric', 'min:1000'],
+                'date' => ['required', 'date'],
+                'status' => ['required', 'string'],
             ],
-
+            'update' => [
+                'id' => ['required'],
+                'to_vnd' => ['required', 'numeric', 'min:1000'],
+                'date' => ['required', 'date'],
+                'status' => ['required', 'string'],
+            ],
             default => [],
         };
     }

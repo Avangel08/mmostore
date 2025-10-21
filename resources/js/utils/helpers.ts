@@ -4,4 +4,7 @@ const formatDateTime = (date: string) => {
     return moment.parseZone(date).format("DD/MM/YYYY HH:mm");
 }
 
-export { formatDateTime };
+const formatDate = (date: string) => {
+    return moment.parseZone(date).format("DD/MM/YYYY");
+}
+export { formatDateTime, formatDate };

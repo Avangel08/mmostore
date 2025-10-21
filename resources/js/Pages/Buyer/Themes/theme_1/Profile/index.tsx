@@ -49,7 +49,6 @@ const Profile = () => {
             dispatch(changeLayoutTheme(theme?.theme));
         }
     }, [theme, dispatch]);
-    console.log({theme})
     React.useEffect(() => {
         const style = document.createElement('style');
         style.textContent = `

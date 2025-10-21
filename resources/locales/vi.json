@@ -587,5 +587,9 @@
     "The product type name has already been taken.": "Tên loại sản phẩm đã được sử dụng.",
     "Enter product type description": "Nhập mô tả loại sản phẩm",
     "Gate Way" : "Cổng thanh toán",
-    "Add Payment Method" : "Thêm phương thức thanh toán"
+    "Add Payment Method" : "Thêm phương thức thanh toán",
+    "Effective from date" : "Ngày hiệu lực",
+    "VND Rate" : "Tỷ giá VND",
+    "Add currency rate" : "Thêm tỷ giá VND",
+    "Currency Rate" : "Tỷ giá tiền tệ"
 }

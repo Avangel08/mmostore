@@ -81,7 +81,6 @@ const Index: React.FC = () => {
                 setPerPage(response.data.orders.pagination?.per_page || 10);
             }
         } catch (error) {
-            console.error("Error fetching orders:", error);
         }
     };
 
@@ -136,7 +135,6 @@ const Index: React.FC = () => {
                 setDetailsItems(items);
             }
         } catch (error) {
-            console.error("Error fetching order details:", error);
             setDetailsItems([]);
         }
     };

@@ -57,7 +57,6 @@ export default function ForgotPassword({ status }: any) {
                 // Show success message
             },
             onError: (errors: any) => {
-                console.error('Forgot password failed:', errors);
             }
         });
     };

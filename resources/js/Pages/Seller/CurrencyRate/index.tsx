@@ -1,21 +1,21 @@
-import { Head, router, usePage } from "@inertiajs/react";
-import React, { useEffect, useState } from "react";
-import Layout from "../../../CustomSellerLayouts";
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
-import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
+import { Head, router, usePage } from "@inertiajs/react";
+import React, { useState } from "react";
 import { ToastContainer } from "react-toastify";
-import { useQueryParams } from "../../../hooks/useQueryParam";
+import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import Filter from "./Filter";
-import { ModalSettingPayment } from "./Modal/ModalSettingPayment";
+import { useQueryParams } from "../../../hooks/useQueryParam";
 import axios from "axios";
-import TablePaymentMethod from "./TablePaymentMethod";
 import { showToast } from "../../../utils/showToast";
 import { confirmDelete } from "../../../utils/sweetAlert";
+import TableCurrencyRate from "./TableCurrencyRate";
+import Layout from "../../../CustomSellerLayouts";
+import { ModalCurrencyRate } from "./Modal/ModalCurrencyRate";
 
-const PaymentSetting = () => {
+const CurrencyRatePage = () => {
   const { t } = useTranslation();
-  const { paymentMethods } = usePage().props;
+  const { currencyRates } = usePage().props;
   const [showModal, setShowModal] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
   const [dataOptions, setDataOptions] = useState<any>(null);
@@ -34,7 +34,7 @@ const PaymentSetting = () => {
     filters?: any
   ) => {
     router.reload({
-      only: ["paymentMethods"],
+      only: ["currencyRates"],
       data: buildQuery({
         page: currentPage,
         perPage: perPage,
@@ -53,49 +53,45 @@ const PaymentSetting = () => {
 
   const openModalEdit = async (id: number | string) => {
     try {
-      const response = await axios.get(route("seller.payment-method.edit", { id }));
-      setDataEdit(response.data.paymentMethod);
+      const response = await axios.get(route("seller.currency-rate.edit", { id }));
+      setDataEdit(response.data.currencyRate);
       setDataOptions({
-        listTypeOptions: response.data.listTypeOptions,
-        listBank: response.data.listBank,
-        listBankSePay: response.data.listBankSePay,
-        linkWebhook: response.data.linkWebhook,
+        statusList: response.data.statusList,
       });
       setShowModal(true);
     } catch (error) {
+      console.error("Error fetching currency rate:", error);
     }
   };
 
   const openModalCreate = async () => {
     try {
-      const response = await axios.get(route("seller.payment-method.create"));
+      const response = await axios.get(route("seller.currency-rate.create"));
       setDataEdit(null);
       setDataOptions({
-        listTypeOptions: response.data.listTypeOptions,
-        listBank: response.data.listBank,
-        listBankSePay: response.data.listBankSePay,
-        linkWebhook: response.data.linkWebhook,
+        statusList: response.data.statusList,
       });
       setShowModal(true);
     } catch (error) {
+      console.error("Error fetching currency rate:", error);
     }
   };
 
-  const onDelete = async (id: number | string, name: any) => {
+  const onDelete = async (id: number | string) => {
     if (!id) {
       showToast(t("Invalid ID"), "error");
       return;
     }
 
     const confirmed = await confirmDelete({
-      title: t("Delete payment method '{{name}}'?", { name }),
+      title: t("Do you want to delete?"),
       text: t("Once deleted, you will not be able to recover it."),
       confirmButtonText: t("Delete now"),
       cancelButtonText: t("Cancel"),
     });
 
     if (confirmed) {
-      router.delete(route("seller.payment-method.destroy", { id }), {
+      router.delete(route("seller.currency-rate.destroy", { id }), {
         replace: true,
         preserveScroll: true,
         preserveState: true,
@@ -114,20 +110,21 @@ const PaymentSetting = () => {
 
   return (
     <React.Fragment>
-      <Head title={t("Payment Method")} />
+      <Head title={t("Currency Rate")} />
       <div className="page-content">
         <ToastContainer />
-        <ModalSettingPayment
+        <ModalCurrencyRate
           show={showModal}
           onHide={() => {
             setShowModal(false);
+            setDataEdit(null);
           }}
           dataEdit={dataEdit}
           dataOptions={dataOptions}
         />
         <Container fluid>
           <BreadCrumb
-            title={t("Payment Method")}
+            title={t("Currency Rate")}
             pageTitle={t("Homepage")}
           />
           <Row>
@@ -138,23 +135,20 @@ const PaymentSetting = () => {
                   <Row style={{ marginBottom: "32px" }}>
                     <Col>
                       <div className="d-flex gap-2">
-                        <Button
-                          variant="success"
-                          onClick={openModalCreate}
-                        >
+                        <Button variant="success" onClick={openModalCreate}>
                           <i className="ri-add-line align-bottom me-1"></i>{" "}
-                          {t("Add Payment Method")}
+                          {t("Add currency rate")}
                         </Button>
                       </div>
                     </Col>
                   </Row>
                   <Row>
                     <Col>
-                      <TablePaymentMethod
-                        data={paymentMethods || []}
+                      <TableCurrencyRate
+                        data={currencyRates || []}
                         onReloadTable={fetchData}
-                        onDelete={onDelete}
                         onEdit={openModalEdit}
+                        onDelete={onDelete}
                       />
                     </Col>
                   </Row>
@@ -168,5 +162,8 @@ const PaymentSetting = () => {
   );
 };
 
-PaymentSetting.layout = (page: any) => <Layout children={page} />;
-export default PaymentSetting;
+CurrencyRatePage.layout = (page: any) => <Layout children={page} />;
+
+export default CurrencyRatePage;
+
+
