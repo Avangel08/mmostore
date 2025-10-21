@@ -101,6 +101,15 @@ class JobProcessPurchase implements ShouldQueue
                 return;
             }
 
+            // Setup tenancy connection
+            try {
+                $connection = $tenancyService->buildConnectionFromStore($store);
+                $tenancyService->applyConnection($connection, true);
+            } catch (\Throwable $th) {
+                $this->updateOrderToFailed("Database connection failed - E105");
+                return;
+            }
+
             // Validate order
             $order = $orderService->findById($this->orderId);
             if (empty($order)) {
@@ -115,15 +124,6 @@ class JobProcessPurchase implements ShouldQueue
 
             if ($order->payment_status !== Orders::PAYMENT_STATUS['PENDING']) {
                 $this->updateOrderToFailed("Order payment is not in pending status");
-                return;
-            }
-
-            // Setup tenancy connection
-            try {
-                $connection = $tenancyService->buildConnectionFromStore($store);
-                $tenancyService->applyConnection($connection, true);
-            } catch (\Throwable $th) {
-                $this->updateOrderToFailed("Database connection failed - E105");
                 return;
             }
             
