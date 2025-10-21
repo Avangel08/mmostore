@@ -80,7 +80,7 @@ class JobProcessPurchase implements ShouldQueue
             // Validate store
             $store = $storeService->findById($this->storeId);
             if (empty($store)) {
-                $this->updateOrderToFailed("Store not found");
+                $this->updateOrderToFailed("Cửa hàng không tồn tại");
                 return;
             }
 
@@ -89,31 +89,31 @@ class JobProcessPurchase implements ShouldQueue
                 $connection = $tenancyService->buildConnectionFromStore($store);
                 $tenancyService->applyConnection($connection, true);
             } catch (\Throwable $th) {
-                $this->updateOrderToFailed("Database connection failed - E105");
+                $this->updateOrderToFailed("Kết nối dữ liệu bị lỗi");
                 return;
             }
 
             // Validate order
             $order = $orderService->findById($this->orderId);
             if (empty($order)) {
-                $this->updateOrderToFailed("Order not found");
+                $this->updateOrderToFailed("Đơn hàng không tồn tại");
                 return;
             }
 
             if ($order->status !== Orders::STATUS['PENDING']) {
-                $this->updateOrderToFailed("Order is not in pending status");
+                $this->updateOrderToFailed("Đơn hàng không ở trạng thái chờ");
                 return;
             }
 
             if ($order->payment_status !== Orders::PAYMENT_STATUS['PENDING']) {
-                $this->updateOrderToFailed("Order payment is not in pending status");
+                $this->updateOrderToFailed("Đơn hàng không ở trạng thái chờ - 2");
                 return;
             }
             
             $validationResult = $this->validatePurchaseData($subProductService, $customerService, $productService, $categoryService);
 
             if (!$validationResult['valid']) {
-                $this->updateOrderToFailed($validationResult['message'] ?? "Validation failed - E103");
+                $this->updateOrderToFailed($validationResult['message'] ?? "E100");
                 return;
             }
 
@@ -131,12 +131,12 @@ class JobProcessPurchase implements ShouldQueue
             $accountsToSell = $this->getAccountsToSell($subProduct, $this->quantity);
             if (count($accountsToSell) < $this->quantity) {
                 $this->rollbackReservedAccounts($accountsToSell);
-                $this->updateOrderToFailed("Insufficient accounts available - E112");
+                $this->updateOrderToFailed("Số lượng hiện có không đủ");
                 return;
             }
 
             // Lưu account data vào Redis ngay sau khi lấy được
-            $this->storeAccountDataToRedis($subProduct->_id, $accountsToSell);
+            $this->storeAccountDataToRedis($accountsToSell);
 
             // Xử lý payment sau khi đã có account data
             $deductResult = $this->deductCustomerBalanceAtomic($this->customerId, $totalPrice);
@@ -148,12 +148,11 @@ class JobProcessPurchase implements ShouldQueue
 
             try {
                 // Get payment method
-                $paymentMethodId = null;
                 $method = $paymentMethodSellerService->findByKey(PaymentMethodSeller::KEY['BALANCE']);
                 if (!$method) {
                     $this->rollbackReservedAccounts($accountsToSell);
                     $this->refundCustomerBalance($this->customerId, $totalPrice);
-                    $this->updateOrderToFailed("Payment method not found - E106");
+                    $this->updateOrderToFailed("Phương thức thanh toán không tồn tại");
                     return;
                 }
                 $paymentMethodId = $method->_id;
@@ -162,7 +161,7 @@ class JobProcessPurchase implements ShouldQueue
                 if (!isset(BalanceHistories::GATEWAY[$this->sourceKey])) {
                     $this->rollbackReservedAccounts($accountsToSell);
                     $this->refundCustomerBalance($this->customerId, $totalPrice);
-                    $this->updateOrderToFailed("Invalid source key - E107");
+                    $this->updateOrderToFailed("Loại thanh toán không tồn tại");
                     return;
                 }
                 $gateWay = BalanceHistories::GATEWAY[$this->sourceKey];
@@ -172,7 +171,7 @@ class JobProcessPurchase implements ShouldQueue
                 if (!$currencySetting) {
                     $this->rollbackReservedAccounts($accountsToSell);
                     $this->refundCustomerBalance($this->customerId, $totalPrice);
-                    $this->updateOrderToFailed("Currency setting not found - E108");
+                    $this->updateOrderToFailed("Cửa hàng chưa cấu hình tiền tệ");
                     return;
                 }
                 $storeCurrency = $currencySetting->value ?? Settings::CURRENCY['VND'];
@@ -189,7 +188,7 @@ class JobProcessPurchase implements ShouldQueue
                 } catch (\Exception $e) {
                     $this->rollbackReservedAccounts($accountsToSell);
                     $this->refundCustomerBalance($this->customerId, $totalPrice);
-                    $this->updateOrderToFailed("Currency conversion failed - E109");
+                    $this->updateOrderToFailed("Chuyển đổi tiền tệ bị lỗi");
                     return;
                 }
 
@@ -212,19 +211,19 @@ class JobProcessPurchase implements ShouldQueue
                     if (!$balanceHistory) {
                         $this->rollbackReservedAccounts($accountsToSell);
                         $this->refundCustomerBalance($this->customerId, $totalPrice);
-                        $this->updateOrderToFailed("Failed to create balance history - E110");
+                        $this->updateOrderToFailed("Lỗi tạo lịch sử giao dịch");
                         return;
                     }
                 } catch (\Exception $e) {
                     $this->rollbackReservedAccounts($accountsToSell);
                     $this->refundCustomerBalance($this->customerId, $totalPrice);
-                    $this->updateOrderToFailed("Balance history creation failed - E101");
+                    $this->updateOrderToFailed("Lỗi tạo lịch sử giao dịch - 2");
                     return;
                 }
             } catch (\Exception $e) {
                 $this->rollbackReservedAccounts($accountsToSell);
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
-                $this->updateOrderToFailed("Payment processing failed - E111");
+                $this->updateOrderToFailed("Thanh toán lỗi");
                 return;
             }
 
@@ -238,14 +237,14 @@ class JobProcessPurchase implements ShouldQueue
                         if (!$updated) {
                             $this->rollbackReservedAccounts($accountsToSell);
                             $this->refundCustomerBalance($this->customerId, $totalPrice);
-                            $this->updateOrderToFailed("Failed to assign order to accounts - E113");
+                            $this->updateOrderToFailed("Lỗi cập nhật tài nguyên");
                             return;
                         }
                     }
                 } catch (\Exception $e) {
                     $this->rollbackReservedAccounts($accountsToSell);
                     $this->refundCustomerBalance($this->customerId, $totalPrice);
-                    $this->updateOrderToFailed("Account assignment failed - E114");
+                    $this->updateOrderToFailed("Lỗi cập nhật tài nguyên - 2");
                     return;
                 }
             }
@@ -255,7 +254,7 @@ class JobProcessPurchase implements ShouldQueue
             if (!$stockUpdated) {
                 $this->rollbackReservedAccounts($accountsToSell);
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
-                $this->updateOrderToFailed("Stock update failed - E102");
+                $this->updateOrderToFailed("Lỗi cập nhật kho");
                 return;
             }
 
@@ -265,7 +264,7 @@ class JobProcessPurchase implements ShouldQueue
                 $this->rollbackReservedAccounts($accountsToSell);
                 $this->refundCustomerBalance($this->customerId, $totalPrice);
                 $this->rollbackSubProductStock($subProduct, $this->quantity);
-                $this->updateOrderToFailed("Order completion failed - E115");
+                $this->updateOrderToFailed("Đơn hàng lỗi");
                 return;
             }
 
@@ -286,7 +285,7 @@ class JobProcessPurchase implements ShouldQueue
             }
 
             // Update order to failed
-            $this->updateOrderToFailed("System error - E116: " . $e->getMessage());
+            $this->updateOrderToFailed("System error");
             
             // Re-throw the exception to mark job as failed
             throw $e;
@@ -300,14 +299,14 @@ class JobProcessPurchase implements ShouldQueue
         if (!$subProduct) {
             return [
                 'valid' => false,
-                'message' => 'Sub product not found'
+                'message' => 'Sản phẩm không tồn tại'
             ];
         }
 
         if ($subProduct->status !== SubProducts::STATUS['ACTIVE']) {
             return [
                 'valid' => false,
-                'message' => 'Sub product is inactive'
+                'message' => 'Sản phẩm không hoạt động'
             ];
         }
 
@@ -323,14 +322,14 @@ class JobProcessPurchase implements ShouldQueue
         if (!$product) {
             return [
                 'valid' => false,
-                'message' => 'Product not found'
+                'message' => 'Sản phẩm không tồn tại'
             ];
         }
 
         if ($product->status !== Products::STATUS['ACTIVE']) {
             return [
                 'valid' => false,
-                'message' => 'Product is inactive'
+                'message' => 'Sản phẩm không hoạt động'
             ];
         }
 
@@ -339,14 +338,14 @@ class JobProcessPurchase implements ShouldQueue
         if (!$category) {
             return [
                 'valid' => false,
-                'message' => 'Category not found'
+                'message' => 'Danh mục không tồn tại'
             ];
         }
 
         if ($category->status !== Categories::STATUS['ACTIVE']) {
             return [
                 'valid' => false,
-                'message' => 'Category is inactive'
+                'message' => 'Danh mục không hoạt động'
             ];
         }
 
@@ -355,14 +354,14 @@ class JobProcessPurchase implements ShouldQueue
         if (!$customer) {
             return [
                 'valid' => false,
-                'message' => 'Customer not found'
+                'message' => 'Người dùng không tồn tại'
             ];
         }
 
         if ($customer->status !== Customers::STATUS['ACTIVE']) {
             return [
                 'valid' => false,
-                'message' => 'Customer is inactive'
+                'message' => 'Người dùng không hoạt động'
             ];
         }
 
@@ -480,8 +479,7 @@ class JobProcessPurchase implements ShouldQueue
                             'customer_id' => $customerId,
                             'order_id' => $orderId,
                             'status' => Accounts::STATUS['SOLD'],
-                            'reserved_at' => now()->toISOString(),
-                            'reserved_by_job' => $this->job->getJobId()
+                            'reserved_at' => now()->toISOString()
                         ]
                     ],
                     [
@@ -521,8 +519,7 @@ class JobProcessPurchase implements ShouldQueue
                             'customer_id' => $customerId,
                             'order_id' => $orderId,
                             'status' => Accounts::STATUS['SOLD'],
-                            'reserved_at' => now()->toISOString(),
-                            'reserved_by_job' => $this->job->getJobId()
+                            'reserved_at' => now()->toISOString()
                         ]
                     ],
                     [
@@ -598,8 +595,7 @@ class JobProcessPurchase implements ShouldQueue
                 'customer_id' => null,
                 'order_id' => null,
                 'status' => Accounts::STATUS['LIVE'],
-                'reserved_at' => null,
-                'reserved_by_job' => null
+                'reserved_at' => null
             ]);
         }
         
@@ -660,7 +656,7 @@ class JobProcessPurchase implements ShouldQueue
             $updated = $order->update([
                 'status' => Orders::STATUS['COMPLETED'],
                 'payment_status' => Orders::PAYMENT_STATUS['PAID'],
-                'notes' => "Order completed via JobProcessPurchase - Payment successful"
+                'notes' => "Order completed - Payment successful"
             ]);
 
             if (!$updated) {
@@ -695,29 +691,23 @@ class JobProcessPurchase implements ShouldQueue
         }
     }
 
-    private function storeAccountDataToRedis($subProductId, $accounts)
+    private function storeAccountDataToRedis($accounts)
     {
-        try {
-            $orderRedisKey = "order_accounts:{$this->orderId}";
-            $accountData = [];
-            
-            foreach ($accounts as $account) {
-                $accountData[] = [
-                    'id' => (string) $account->_id,
-                    'key' => $account->key,
-                    'data' => $account->data,
-                    'sub_product_id' => (string) $account->sub_product_id,
-                    'reserved_at' => $account->reserved_at ?? now()->toISOString()
-                ];
-            }
-            
-            // Lưu account data vào Redis với TTL 24 giờ
-            Redis::setex($orderRedisKey, 86400, json_encode($accountData));
-            
-        } catch (\Exception $e) {
-            // Log error nhưng không fail order
-            \Log::error("Failed to store account data to Redis: " . $e->getMessage());
+        $orderRedisKey = "order_accounts:{$this->orderId}";
+        $accountData = [];
+
+        foreach ($accounts as $account) {
+            $accountData[] = [
+                'id' => (string) $account->_id,
+                'key' => $account->key,
+                'data' => $account->data,
+                'sub_product_id' => (string) $account->sub_product_id,
+                'reserved_at' => $account->reserved_at ?? now()->toISOString()
+            ];
         }
+
+        // Lưu account data vào Redis với TTL 24 giờ
+        Redis::setex($orderRedisKey, 86400, json_encode($accountData));
     }
 
     public function failed(\Throwable $exception): void
@@ -733,6 +723,6 @@ class JobProcessPurchase implements ShouldQueue
             }
         }
 
-        $this->updateOrderToFailed('Lỗi khác - E104');
+        $this->updateOrderToFailed('Lỗi khác');
     }
 }
