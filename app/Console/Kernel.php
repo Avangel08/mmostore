@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Console\Commands\Systems\CheckBank;
 use App\Console\Commands\Systems\CheckBankSeller;
+use App\Console\Commands\CleanupStaleReservations;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -40,5 +41,11 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping(10)
             ->runInBackground()
             ->appendOutputTo($pathLogs . '/check_bank_seller.txt');
+
+        $schedule->command(CleanupStaleReservations::class)
+            ->everyFiveMinutes()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo($pathLogs . '/cleanup_stale_reservations.txt');
     }
 }
