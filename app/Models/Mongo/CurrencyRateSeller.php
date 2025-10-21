@@ -12,7 +12,7 @@ class CurrencyRateSeller extends Model
     ];
 
     protected $connection = 'tenant_mongo';
-    protected $table = 'currency_rates';
+    protected $table = 'currency_rate_sellers';
 
     protected $fillable = [
         'to_vnd',
