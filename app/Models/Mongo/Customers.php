@@ -2,7 +2,8 @@
 
 namespace App\Models\Mongo;
 
-use App\Jobs\Mail\JobMailBuyerResetPassword;
+use App\Jobs\Mail\JobSendMail;
+use App\Jobs\Mail\MailType;
 use Auth;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
@@ -55,7 +56,7 @@ class Customers extends Authenticatable
             'first_name' => $this->first_name,
             'url' => route('buyer.password.reset', ['token' => $token, 'email' => $this->email]),
         ];
-        dispatch(new JobMailBuyerResetPassword($dataSendMail, app()->getLocale()));
+        dispatch(new JobSendMail(MailType::BUYER_RESET_PASSWORD, $dataSendMail, app()->getLocale()));
     }
 
     public function tokens()

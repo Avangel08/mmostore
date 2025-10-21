@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Home\Register;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Home\RegisterStore\RegisterStoreRequest;
-use App\Jobs\Mail\JobMailRegisteredStore;
+use App\Jobs\Mail\JobSendMail;
+use App\Jobs\Mail\MailType;
 use App\Models\Mongo\PaymentMethodSeller;
 use App\Models\Mongo\Settings;
 use App\Models\MySQL\Stores;
@@ -149,7 +150,7 @@ class RegisteredStoreController extends Controller
 				'redirect_url' => $redirectUrl,
 			];
 
-			dispatch(new JobMailRegisteredStore($dataSendMail, app()->getLocale()));
+			dispatch(new JobSendMail(MailType::REGISTERED_STORE, $dataSendMail, app()->getLocale()));
 
             return Inertia::render('Register/Redirect', [
                 'redirectUrl' => $redirectUrl,
