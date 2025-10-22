@@ -45,8 +45,8 @@ class Plans extends Model
     protected $fillable = [
         'type',
         'name',
-        'price',
-        'price_origin',
+        'price', // vnd
+        'price_origin', // vnd
         'off',
         'interval',
         'interval_type',
@@ -66,7 +66,7 @@ class Plans extends Model
     public function scopeFilterName($query, $request)
     {
         if (isset($request['name']) && $request['name'] != '') {
-            $query->where('name', 'like', '%'.$request['name'].'%');
+            $query->where('name', 'like', '%' . $request['name'] . '%');
         }
 
         return $query;
@@ -115,12 +115,12 @@ class Plans extends Model
     public function scopeFilterCreatedDate($query, $request)
     {
         try {
-            if (! empty($request['createdDateStart'])) {
+            if (!empty($request['createdDateStart'])) {
                 $start = Carbon::parse($request['createdDateStart'])->startOfDay();
                 $query->where('created_at', '>=', $start);
             }
 
-            if (! empty($request['createdDateEnd'])) {
+            if (!empty($request['createdDateEnd'])) {
                 $end = Carbon::parse($request['createdDateEnd'])->endOfDay();
                 $query->where('created_at', '<=', $end);
             }

@@ -1,25 +1,29 @@
+
 import { Modal, Button, Row, Col } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-export const ModalPaymentPlan = ({
+export const ModalCheckoutPlan = ({
     show,
     onHide,
     data,
+    onBack,
 }: {
     show: boolean;
     onHide: () => void;
     data?: any;
+    onBack?: () => void;
 }) => {
-
     const { t } = useTranslation();
-    const bankName = data?.bank ? String(data.bank) : "";
+    
+    const bankName = data?.bank_name ? String(data.bank_name) : "";
     const accountName = data?.account_name ? String(data.account_name) : "";
     const accountNumber = data?.account_number ? String(data.account_number) : "";
     const amountVnd = data?.amount_vnd ?? 0;
     const contentBank = data?.content_bank ? String(data.content_bank) : "";
     const bankCode = data?.bank_code ? String(data.bank_code) : "";
 
-    const qrSrc = `https://img.vietqr.io/image/VCB-${accountNumber}-compact.jpg?amount=${amountVnd}&addInfo=${encodeURIComponent(contentBank)}&accountName=${encodeURIComponent(accountName)}`;
+    const qrSrc = `https://qr.sepay.vn/img?acc=${accountNumber}&bank=${bankCode}&amount=${amountVnd}&des=${encodeURIComponent(contentBank)}&template=compact&download=true`;
+
     return (
         <Modal
             size="lg"
@@ -35,20 +39,23 @@ export const ModalPaymentPlan = ({
                 <h5 className="mb-0">{t("Instant bank transfer")}</h5>
             </Modal.Header>
             <Modal.Body>
+                {data && (
                 <Row>
-                    <Col md={6} className="d-flex justify-content-center align-items-start mb-3 mb-md-0">
-                        {qrSrc ? (
-                            <img
-                                src={qrSrc}
-                                alt="VietQR"
-                                style={{ maxWidth: 260, width: "100%", borderRadius: 8 }}
-                            />
-                        ) : null}
+                    <Col md={6} className=" mb-3 mb-md-0">
+                        <div className="d-flex justify-content-center align-items-start">
+                            {qrSrc ? (
+                                <img
+                                    src={qrSrc}
+                                    alt="VietQR"
+                                    style={{ maxWidth: 260, width: "100%", borderRadius: 8 }}
+                                />
+                            ) : null}
+                        </div>
                     </Col>
                     <Col md={6}>
                         <div className="mb-2">
                             <span>{t("Bank")}:</span>
-                            <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc" }}>{bankName || t("Vietcombank")}</span>
+                            <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc" }}>{bankName}</span>
                         </div>
                         <div className="mb-2 pt-3 border-top border-top-dashed mt-3">
                             <span>{t("Account Holder")}:</span>
@@ -86,9 +93,23 @@ export const ModalPaymentPlan = ({
                         </div>
                     </Col>
                 </Row>
+                )}
 
             </Modal.Body>
             <Modal.Footer>
+                <Button
+                    variant="outline-secondary"
+                    onClick={() => {
+                        if (onBack) {
+                            onBack();
+                        }
+                    }}
+                    className="me-2"
+                    disabled={!onBack}
+                >
+                    <i className="ri-arrow-left-line me-1"></i>
+                    {t("Back")}
+                </Button>
                 <Button
                     variant="light"
                     onClick={() => {
