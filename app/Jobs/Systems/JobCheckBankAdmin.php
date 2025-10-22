@@ -42,11 +42,11 @@ class JobCheckBankAdmin implements ShouldQueue
         }
         $infoBank = $bank->details;
 
-        $userName = $infoBank['user_name'] ?? "";
+        $accountName = $infoBank['account_name'] ?? "";
         $password = $infoBank['password'] ?? "";
         $accountNumber = $infoBank['account_number'] ?? "";
         $bankCode = $bank?->key ?? "";
-        if (empty($userName) || empty($password) || empty($accountNumber) || empty($bankCode)) {
+        if (empty($accountName) || empty($password) || empty($accountNumber) || empty($bankCode)) {
             echo "Thông tin ngân hàng không hợp lệ";
             return;
         }
@@ -82,7 +82,8 @@ class JobCheckBankAdmin implements ShouldQueue
 
                     $contentBank = $dataLog['content_bank'];
                     $transactionId = $dataLog['key_unique'];
-                    JobProcessPaymentPlan::dispatch($contentBank, $transactionId);
+                    $amount = $dataLog['amount'];
+                    JobProcessPaymentPlan::dispatch($contentBank, $transactionId, $amount);
                 }
             }
         }
