@@ -121,11 +121,12 @@ class DepositController extends Controller
     {
         $customer = Auth::guard(config('guard.buyer'))->user();
         if (isset($customer) && isset($customer->deposit_amount) && $customer->deposit_amount > 0) {
+            $amount = $customer->deposit_amount;
             $this->customerService->update($customer, ['deposit_amount' => 0]);
             return response()->json([
                 "status" => "success",
                 "message" => "Ping deposit",
-                "data" => []
+                "data" => $amount
             ]);
         }
         return response()->json([
