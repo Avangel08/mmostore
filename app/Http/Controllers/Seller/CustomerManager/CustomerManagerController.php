@@ -131,6 +131,9 @@ class CustomerManagerController extends Controller
             if($data['transaction_type'] == BalanceHistories::TYPE['deduct_money']) {
                 $before = $customer->balance;
                 $after = $before - $amount_vnd;
+                if($after < 0) {
+                    return back()->with('error', __('Insufficient balance'));
+                }
             }
 
             $dataInsert = [

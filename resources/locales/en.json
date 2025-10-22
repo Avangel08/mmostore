@@ -311,5 +311,6 @@
     "Deposit success" : "Deposit success",
     "Successful deposit": "Successful deposit",
     "Enter name or transaction" : "Enter name or transaction",
-    "Transaction" : "Transaction"
+    "Transaction" : "Transaction",
+    "Insufficient balance": "Insufficient balance"
 }
