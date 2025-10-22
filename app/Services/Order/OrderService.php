@@ -190,22 +190,16 @@ class OrderService
 
         $subProduct = SubProducts::where('_id', $order->sub_product_id)->first();
 
-        // Thử lấy account data từ Redis trước
-        $items = $this->getAccountDataFromRedis($order->_id);
-        
-        // Nếu không có trong Redis, lấy từ database
-        if (!$items) {
-            $accounts = Accounts::select(['key', 'data'])
-                ->where('order_id', $order->_id)
-                ->get();
+        $accounts = Accounts::select(['key', 'data'])
+            ->where('order_id', $order->_id)
+            ->get();
 
-            $items = $accounts->map(function ($acc) {
-                return [
-                    'key' => $acc->key,
-                    'data' => $acc->data,
-                ];
-            })->values()->toArray();
-        }
+        $items = $accounts->map(function ($acc) {
+            return [
+                'key' => $acc->key,
+                'data' => $acc->data,
+            ];
+        })->values()->toArray();
 
         return [
             'order_number' => $order->order_number,
@@ -219,29 +213,6 @@ class OrderService
             'notes' => $order->notes,
             'items' => $items,
         ];
-    }
-
-    private function getAccountDataFromRedis($orderId)
-    {
-        try {
-            $orderRedisKey = "order_accounts:{$orderId}";
-            $accountData = Redis::get($orderRedisKey);
-            
-            if ($accountData) {
-                $data = json_decode($accountData, true);
-                // Format lại data để phù hợp với format cũ
-                return array_map(function($item) {
-                    return [
-                        'key' => $item['key'],
-                        'data' => $item['data']
-                    ];
-                }, $data);
-            }
-            
-            return null;
-        } catch (\Exception $e) {
-            return null;
-        }
     }
 
     public function countQuantityPurchasedByOrder($customerId)
