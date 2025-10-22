@@ -4,23 +4,24 @@ namespace App\Http\Controllers\Home\Register;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Home\RegisterStore\RegisterStoreRequest;
-use App\Jobs\Mail\JobMailRegisteredStore;
+use App\Jobs\Mail\JobSendMail;
+use App\Jobs\Mail\MailType;
+use App\Models\Mongo\CurrencyRateSeller;
 use App\Models\Mongo\PaymentMethodSeller;
 use App\Models\Mongo\Settings;
 use App\Models\MySQL\Stores;
 use App\Models\MySQL\User;
+use App\Services\CurrencyRateSeller\CurrencyRateSellerService;
 use App\Services\Home\ServerService;
 use App\Services\Home\StoreService;
 use App\Services\Home\UserService;
 use App\Services\PaymentMethodSeller\PaymentMethodSellerService;
 use App\Services\Setting\SettingService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
-use App\Mail\StoreRegistered;
 use App\Services\Tenancy\TenancyService;
 
 class RegisteredStoreController extends Controller
@@ -31,6 +32,7 @@ class RegisteredStoreController extends Controller
     protected $settingService;
     protected $tenancyService;
     protected $paymentMethodSellerService;
+    protected $currencyRateSellerService;
 
     public function __construct(
         UserService $userService,
@@ -38,7 +40,8 @@ class RegisteredStoreController extends Controller
         ServerService $serverService,
         SettingService $settingService,
         TenancyService $tenancyService,
-        PaymentMethodSellerService $paymentMethodSellerService
+        PaymentMethodSellerService $paymentMethodSellerService,
+        CurrencyRateSellerService $currencyRateSellerService
     )
     {
         $this->userService = $userService;
@@ -47,6 +50,7 @@ class RegisteredStoreController extends Controller
         $this->settingService = $settingService;
         $this->tenancyService = $tenancyService;
         $this->paymentMethodSellerService = $paymentMethodSellerService;
+        $this->currencyRateSellerService = $currencyRateSellerService;
     }
 
     public function register(): Response
@@ -138,6 +142,18 @@ class RegisteredStoreController extends Controller
                 $this->paymentMethodSellerService->updateOrCreate($value);
             }
 
+            $defaultCurrencyRates = [
+                [
+                    "to_vnd" => 27000,
+                    "date" => Carbon::now()->format('Y-m-d'),
+                    "status" => CurrencyRateSeller::STATUS['ACTIVE'],
+                ]
+            ];
+
+            foreach ($defaultCurrencyRates as $value) {
+                $this->currencyRateSellerService->create($value);
+            }
+
             $scheme = request()->isSecure() ? 'https://' : 'http://';
             $redirectUrl = $scheme . $data['domain_store'] . '.' .env('APP_MAIN_DOMAIN') . '/admin';
 
@@ -149,7 +165,7 @@ class RegisteredStoreController extends Controller
 				'redirect_url' => $redirectUrl,
 			];
 
-			dispatch(new JobMailRegisteredStore($dataSendMail, app()->getLocale()));
+			dispatch(new JobSendMail(MailType::REGISTERED_STORE, $dataSendMail, app()->getLocale()));
 
             return Inertia::render('Register/Redirect', [
                 'redirectUrl' => $redirectUrl,

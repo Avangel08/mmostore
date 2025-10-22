@@ -7,6 +7,7 @@ use App\Http\Controllers\Seller\LoginController;
 use App\Http\Controllers\Seller\Order\OrderController;
 use App\Http\Controllers\Seller\PaymentHistory\PaymentHistoryController;
 use App\Http\Controllers\Seller\PaymentMethod\PaymentMethodController;
+use App\Http\Controllers\Seller\CurrencyRate\CurrencyRateController;
 use App\Http\Controllers\Seller\Plan\PlanController;
 use App\Http\Controllers\Seller\Product\ProductController;
 use App\Http\Controllers\Seller\Product\SellerAccountController;
@@ -73,9 +74,6 @@ Route::middleware(['validate.subdomain', 'tenant.mongo'])
 
                 Route::group(['prefix' => 'payment-history'], function () {
                     Route::get('/', [PaymentHistoryController::class, 'index'])->name('seller.payment-history');
-                    Route::get('/edit', [PaymentHistoryController::class, 'edit'])->name('seller.payment-history.edit');
-                    Route::post('/create', [PaymentHistoryController::class, 'store'])->name('seller.payment-history.store');
-                    Route::post('/verify-payment', [PaymentHistoryController::class, 'verifyPayment'])->name('seller.payment-history.verify-payment');
                 });
 
                 Route::group(['prefix' => 'theme-settings'], function() {
@@ -105,6 +103,15 @@ Route::middleware(['validate.subdomain', 'tenant.mongo'])
                     Route::post('/verify-payment', [PaymentMethodController::class, 'verifyPayment'])->name('seller.payment-method.verify-payment');
                     Route::post('/verify-sepay', [PaymentMethodController::class, 'verifySePay'])->name('seller.payment-method.verify-sepay');
                     Route::delete('/destroy/{id}', [PaymentMethodController::class, 'destroy'])->name('seller.payment-method.destroy');
+                });
+
+                Route::group(['prefix' => 'currency-rate'], function () {
+                    Route::get('/', [CurrencyRateController::class, 'index'])->name('seller.currency-rate');
+                    Route::get('/edit/{id}', [CurrencyRateController::class, 'edit'])->name('seller.currency-rate.edit');
+                    Route::get('/create', [CurrencyRateController::class, 'create'])->name('seller.currency-rate.create');
+                    Route::post('/create', [CurrencyRateController::class, 'store'])->name('seller.currency-rate.store');
+                    Route::put('/update/{id}', [CurrencyRateController::class, 'update'])->name('seller.currency-rate.update');
+                    Route::delete('/destroy/{id}', [CurrencyRateController::class, 'destroy'])->name('seller.currency-rate.destroy');
                 });
             });
 

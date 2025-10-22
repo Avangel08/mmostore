@@ -8,15 +8,20 @@ import { ToastContainer } from "react-toastify";
 import TableCategory from "./TableCategory";
 import { useQueryParams } from "../../../hooks/useQueryParam";
 import Filter from "./Filter";
-import { ModalSettingPayment } from "./Modal/ModalSettingPayment";
 import axios from "axios";
 
 const PaymentHistory = () => {
   const { t } = useTranslation();
-  const { paymentHistories, listBank, paymentMethod } = usePage().props;
-  const [showModal, setShowModal] = useState(false);
-  const [dataEdit, setDataEdit] = useState<any>(null);
+  const { paymentHistories } = usePage().props;
   const params = useQueryParams();
+  
+  // Store current filters in state
+  const [currentFilters, setCurrentFilters] = useState<any>({
+    name: params?.name || "",
+    createdDateStart: params?.createdDateStart || "",
+    createdDateEnd: params?.createdDateEnd || "",
+  });
+  
   const buildQuery = (p: any = {}) => ({
     page: Number(p.page || 1),
     perPage: Number(p.perPage || 10),
@@ -30,13 +35,15 @@ const PaymentHistory = () => {
     perPage: number = 10,
     filters?: any
   ) => {
+    const queryData = buildQuery({
+      page: currentPage,
+      perPage: perPage,
+      ...(filters || currentFilters),
+    });
+    
     router.reload({
       only: ["paymentHistories"],
-      data: buildQuery({
-        page: currentPage,
-        perPage: perPage,
-        ...(filters || {}),
-      }),
+      data: queryData,
     });
   };
 
@@ -45,25 +52,14 @@ const PaymentHistory = () => {
     perPage: number = 10,
     filters: any
   ) => {
+    setCurrentFilters(filters);
     fetchData(currentPage, perPage, filters);
   };
-
-  const openModalEdit = async () => {
-    try {
-      const response = await axios.get(route("seller.payment-history.edit"));
-      setDataEdit(response.data.paymentMethod);
-      setShowModal(true);
-    } catch (error) {
-      console.error("Error fetching payment method:", error);
-    }
+  
+  const handlePagination = (page: number, perPage: number) => {
+    fetchData(page, perPage, currentFilters);
   };
-
-  useEffect(() => {
-    if (paymentMethod) {
-      setDataEdit(paymentMethod);
-    }
-  }, [paymentMethod]);
-
+  
   return (
     <React.Fragment>
       <Head title={t("Payment History")} />
@@ -78,7 +74,7 @@ const PaymentHistory = () => {
             <Col xs={12}>
               <Card>
                 <Card.Body>
-                  <Filter onFilter={handleFilter} />
+                  <Filter onFilter={handleFilter} currentFilters={currentFilters} />
                   <Row style={{ marginBottom: "15px" }}>
                     <Col>
                       <div className="d-flex gap-2">
@@ -90,7 +86,7 @@ const PaymentHistory = () => {
                     <Col>
                       <TableCategory
                         data={paymentHistories || []}
-                        onReloadTable={fetchData}
+                        onReloadTable={handlePagination}
                       />
                     </Col>
                   </Row>

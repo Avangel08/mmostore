@@ -8,6 +8,7 @@ use App\Models\Mongo\Accounts;
 use Cache;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Support\Facades\Redis;
 
 class OrderService
 {

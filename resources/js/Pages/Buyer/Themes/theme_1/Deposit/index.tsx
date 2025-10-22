@@ -128,6 +128,7 @@ const Index: PageWithLayout = () => {
             <PageHeader title={theme?.pageHeaderText ?? ""} />
             <ModalDeposit show={showModal} onHide={() => setShowModal(false)} data={data} />
             <ToastContainer />
+            {listPaymentMethod?.length === 0 ? (
             <Container className="mt-4 custom-container" fluid>
                 <Card className="shadow-sm p-2" style={{ minHeight: "50vh" }}>
                     <Card.Body>
@@ -154,12 +155,12 @@ const Index: PageWithLayout = () => {
                                                                 <Form.Check.Label className="form-check-label" htmlFor={paymentMethod.id}>
                                                                     <div className="d-flex align-items-center">
                                                                         <span className="d-block justify-content-center">{paymentMethod.title} ( {paymentMethod.name} )</span>
-                                                                        <img
+                                                                        {/* <img
                                                                             src={vcb}
                                                                             alt="Bank Transfer"
                                                                             className="ms-3"
                                                                             style={{ height: "20px" }}
-                                                                        />
+                                                                        /> */}
                                                                     </div>
                                                                 </Form.Check.Label>
                                                             </div>
@@ -222,6 +223,15 @@ const Index: PageWithLayout = () => {
                     </Card.Body>
                 </Card>
             </Container>
+            ) : (
+                <Container className="mt-4 custom-container" fluid>
+                    <Card className="shadow-sm p-2" style={{ minHeight: "50vh" }}>
+                        <Card.Body>
+                            <h6>{t('No payment methods available. Please contact support')}</h6>
+                        </Card.Body>
+                    </Card>
+                </Container>
+            )}
         </React.Fragment>
     );
 };

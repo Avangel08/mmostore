@@ -66,7 +66,6 @@ export default function ResetPassword({ token, email, tokenExpired }: any) {
                 router.visit(route('seller.login') + '?reset=success');
             },
             onError: () => {
-                console.error('Error resetting password');
             }
         });
     };

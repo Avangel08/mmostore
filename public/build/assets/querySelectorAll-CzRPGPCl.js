@@ -1,1 +1,0 @@
-import{d as e}from"./ContextMenuProvider-Bgjy8Wg_.js";function u(t){const r=e.useRef(null);return e.useEffect(()=>{r.current=t}),r.current}var o=Function.prototype.bind.call(Function.prototype.call,[].slice);function c(t,r){return o(t.querySelectorAll(r))}export{c as q,u};

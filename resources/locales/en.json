@@ -303,5 +303,14 @@
     "Page header text": "Page header text",
     "Current domain": "Current domain",
     "Gate Way" : "Gate Way",
-    "Add Payment Method" : "Add Payment Method"
+    "Add Payment Method" : "Add Payment Method",
+    "Effective from date" : "Effective from date",
+    "VND Rate" : "VND Rate",
+    "Add currency rate" : "Add currency rate",
+    "Currency Rate" : "Currency Rate",
+    "Deposit success" : "Deposit success",
+    "Successful deposit": "Successful deposit",
+    "Enter name or transaction" : "Enter name or transaction",
+    "Transaction" : "Transaction",
+    "Insufficient balance": "Insufficient balance"
 }

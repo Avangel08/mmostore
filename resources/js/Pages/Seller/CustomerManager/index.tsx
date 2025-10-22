@@ -13,7 +13,7 @@ import { ModalDeposit } from "./Modal/ModalDeposit";
 
 const CustomerManager = () => {
   const { t } = useTranslation();
-  const { customers, paymentMethods } = usePage().props;
+  const { customers, paymentMethods, listPaymentType } = usePage().props;
   const [showModal, setShowModal] = useState(false);
   const [showModalDeposit, setShowModalDeposit] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
@@ -56,19 +56,15 @@ const CustomerManager = () => {
       setDataEdit(response.data.data);
       setShowModal(true);
     } catch (error) {
-      console.error("Error fetching customer:", error);
     }
   };
 
   const openModalDeposit = async (id: number | string) => {
     
     const response = await axios.get(route("seller.customer-manager.edit", { id })).then((response) => {
-      console.log(response.data.data);
-      
       setDataDeposit(response.data.data);
       setShowModalDeposit(true);
     }).catch((error) => {
-      console.error("Error fetching payment method:", error);
     });
   };
 
@@ -110,6 +106,7 @@ const CustomerManager = () => {
         onHide={() => setShowModalDeposit(false)}
         dataEdit={dataDeposit}
         paymentMethods={paymentMethods}
+        listPaymentType={listPaymentType}
       />
     </React.Fragment>
   );

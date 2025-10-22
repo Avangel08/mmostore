@@ -8,6 +8,7 @@ const Navdata = () => {
     const [isCategory, setIsCategory] = useState<boolean>(false);
     const [isProduct, setIsProduct] = useState<boolean>(false);
     const [isPaymentHistory, setIsPaymentHistory] = useState<boolean>(false);
+    const [isCurrencyRate, setIsCurrencyRate] = useState<boolean>(false);
     const [iscurrentState, setIscurrentState] = useState('Dashboard');
     const [isSettings, setIsSettings] = useState<boolean>(false)
     const [isCustomerManager, setIsCustomerManager] = useState<boolean>(false)
@@ -46,6 +47,14 @@ const Navdata = () => {
 
         if (iscurrentState !== 'Payment History') {
             setIsPaymentHistory(false);
+        }
+
+        if (iscurrentState !== 'Payment Method') {
+            setIsPaymentMethod(false);
+        }
+
+        if (iscurrentState !== 'Currency Rate') {
+            setIsCurrencyRate(false);
         }
 
         if (iscurrentState !== 'Theme Settings') {
@@ -130,7 +139,7 @@ const Navdata = () => {
         {
             id: "payment-method",
             label: "Payment Method",
-            icon: "ri-money-dollar-circle-line",
+            icon: "ri-wallet-fill",
             link: route('seller.payment-method'),
             stateVariables: isPaymentMethod,
             click: function (e : any) {
@@ -150,6 +159,19 @@ const Navdata = () => {
                 e.preventDefault();
                 setIsPaymentHistory(!isPaymentHistory);
                 setIscurrentState('Payment History');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "currency-rate",
+            label: "Currency Rate",
+            icon: "ri-exchange-line",
+            link: route('seller.currency-rate'),
+            stateVariables: isCurrencyRate,
+            click: function (e : any) {
+                e.preventDefault();
+                setIsCurrencyRate(!isCurrencyRate);
+                setIscurrentState('Currency Rate');
                 updateIconSidebar(e);
             },
         },

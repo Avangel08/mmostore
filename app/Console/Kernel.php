@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Console\Commands\Systems\CheckBank;
 use App\Console\Commands\Systems\CheckBankSeller;
+use App\Console\Commands\CleanupStaleReservations;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 

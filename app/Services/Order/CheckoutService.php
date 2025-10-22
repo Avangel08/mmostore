@@ -33,6 +33,7 @@ class CheckoutService
     {
         try {
             $validationResult = $this->validateEntitiesAreActive($productId, $subProductId, $customerId, $quantity);
+
             if (!$validationResult['success']) {
                 return [
                     'status' => 'error',
@@ -52,7 +53,7 @@ class CheckoutService
                 ];
             }
 
-            JobProcessPurchase::dispatch(
+            JobProcessPurchase::dispatchSync(
                 $productId,
                 $subProductId,
                 $customerId,
@@ -82,7 +83,6 @@ class CheckoutService
 
     protected function validateEntitiesAreActive(string $productId, string $subProductId, string $customerId, int $quantity): array
     {
-        // Validate sub product
         $subProduct = $this->subProductService->getById($subProductId);
         if (!$subProduct) {
             return [
@@ -98,7 +98,6 @@ class CheckoutService
             ];
         }
 
-        // Validate stock quantity
         if ($subProduct->quantity < $quantity) {
             return [
                 'success' => false,
@@ -106,7 +105,6 @@ class CheckoutService
             ];
         }
 
-        // Validate product
         $product = $this->productService->getById($productId);
         if (!$product) {
             return [
@@ -122,7 +120,6 @@ class CheckoutService
             ];
         }
 
-        // Validate category
         $category = $this->categoryService->getById($product->category_id);
         if (!$category) {
             return [
@@ -138,7 +135,6 @@ class CheckoutService
             ];
         }
 
-        // Validate customer
         $customer = $this->customerService->findById($customerId);
         if (!$customer) {
             return [
@@ -154,7 +150,6 @@ class CheckoutService
             ];
         }
 
-        // Validate customer balance
         $totalPrice = $subProduct->price * $quantity;
         if ($customer->balance < $totalPrice) {
             return [
