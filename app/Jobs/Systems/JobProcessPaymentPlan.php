@@ -11,6 +11,8 @@ use App\Services\PaymentTransaction\PaymentTransactionService;
 use App\Services\Plan\PlanService;
 use App\Services\PlanCheckout\PlanCheckoutService;
 use Carbon\Carbon;
+use Config;
+use DB;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Throwable;
@@ -21,15 +23,16 @@ class JobProcessPaymentPlan implements ShouldQueue
 
     protected $contentBank;
     protected $transactionId;
-
+    protected $amount;
     /**
      * Create a new job instance.
      */
-    public function __construct($contentBank, $transactionId)
+    public function __construct($contentBank, $transactionId, $amount)
     {
         $this->contentBank = $contentBank;
         $this->transactionId = $transactionId;
-        $this->queue = 'active-plan';
+        $this->amount = $amount;
+        $this->queue = 'process_payment_plan';
     }
 
     /**
@@ -46,66 +49,75 @@ class JobProcessPaymentPlan implements ShouldQueue
         echo "==========================================Start JobProcessPaymentPlan==========================================" . PHP_EOL;
 
         try {
+            DB::beginTransaction();
             $planCheckout = $planCheckoutService->findByContentBank($this->contentBank);
 
-            if (empty($planCheckout)) {
-                echo "Plan checkout data not found" . PHP_EOL;
+            if (!$planCheckout) {
+                echo "Không tìm thấy thông tin checkout" . PHP_EOL;
                 echo "content_bank: " . $this->contentBank . PHP_EOL;
+                DB::commit();
                 return;
             }
 
             $userId = $planCheckout->user_id;
             $user = $userService->findById($userId);
-            if (empty($user)) {
-                echo "User not found" . PHP_EOL;
+            if (!$user) {
+                echo "Không tìm thấy user cần thanh toán gói" . PHP_EOL;
                 echo "user_id: " . $userId . PHP_EOL;
+                DB::commit();
                 return;
             }
 
             $planId = $planCheckout->plan_id;
             $plan = $planService->getById($planId);
-            if (empty($plan)) {
-                echo "Plan not found" . PHP_EOL;
+            if (!$plan) {
+                echo "Không tìm thấy gói" . PHP_EOL;
                 echo "plan_id: " . $planId . PHP_EOL;
+                DB::commit();
                 return;
             }
 
-            $charge = $chargeService->getCurrentChargeByUser($userId);
-
-            if ($charge) {
-                
-            }
-
-            $chargeService->create([
-                'user_id' => $userId,
-                'type' => $planCheckout->type,
-                'name' => $planCheckout->name,
-                'interval' => $planCheckout->interval,
-                'interval_type' => $planCheckout->interval_type,
-                'feature' => $planCheckout->feature,
-                'active_on' => Carbon::now(),
-                'expires_on' => '', // TODO: Set expires_on
-                'check_out_id' => $planCheckout->id,
-                'creator_id' => $planCheckout->creator_id,
-            ]);
-
-            $paymentTransactionService->create([
+            $paymentTransaction = $paymentTransactionService->create([
                 'user_id' => $userId,
                 'check_out_id' => $planCheckout->id,
                 'payment_method_id' => $planCheckout->payment_method_id,
-                'amount' => $currencyRateService->convertVNDToUSD($planCheckout->amount_vnd),
-                'amount_vnd' => $planCheckout->amount_vnd,
+                'amount' => $currencyRateService->convertVNDToUSD($this->amount),
+                'amount_vnd' => $this->amount,
                 'currency' => 'VND',
                 'transaction_id' => $this->transactionId,
                 'payment_date' => Carbon::now(),
                 'creator_id' => $userId,
+                'status' => PaymentTransactions::STATUS['PENDING'],
+            ]);
+
+            if ($this->amount < $planCheckout->amount_vnd) {
+                echo "Số tiền cần thanh toán không đủ" . PHP_EOL;
+                echo "Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd . PHP_EOL;
+                echo "content_bank: " . $this->contentBank . PHP_EOL;
+                $paymentTransactionService->update($paymentTransaction, [
+                    'status' => PaymentTransactions::STATUS['REJECT'],
+                    'system_note' => 'Số tiền thanh toán không đủ',
+                ]);
+                // $planCheckoutService->update($planCheckout, ['status' => CheckOuts::STATUS['REJECT']]);
+                DB::commit();
+                return;
+            }
+
+            $charge = $chargeService->makePlanCharge($planCheckout, $userId);
+            $paymentTransactionService->update($paymentTransaction, [
                 'status' => PaymentTransactions::STATUS['COMPLETE'],
                 'active_plan_date' => Carbon::now(),
                 'charge_id' => $charge->id,
             ]);
 
             $planCheckoutService->update($planCheckout, ['status' => CheckOuts::STATUS['COMPLETE']]);
+            
+            echo "Kích hoạt gói " . $planCheckout->name . " thành công cho user_id: " . $userId . PHP_EOL;
+            echo "Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd . PHP_EOL;
+            echo "content_bank: " . $this->contentBank . PHP_EOL;
+            DB::commit();
         } catch (Throwable $th) {
+            DB::rollBack();
             echo 'Lỗi JobProcessPaymentPlan: ' . $th->getMessage() . PHP_EOL;
             throw $th;
         }

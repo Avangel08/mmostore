@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Systems;
 
 use App\Jobs\Systems\JobCheckBankAdmin;
+use App\Jobs\Systems\JobProcessPaymentPlan;
 use App\Models\MySQL\PaymentMethods;
 use Carbon\Carbon;
 use Illuminate\Console\Command;

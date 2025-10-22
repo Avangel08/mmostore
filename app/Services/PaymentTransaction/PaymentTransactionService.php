@@ -15,4 +15,9 @@ class PaymentTransactionService
     {
         return PaymentTransactions::create($data);
     }
+
+    public function update(PaymentTransactions $paymentTransaction, $data)
+    {
+        return $paymentTransaction->update($data);
+    }
 }
