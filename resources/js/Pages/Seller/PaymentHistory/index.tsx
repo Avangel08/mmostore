@@ -8,14 +8,11 @@ import { ToastContainer } from "react-toastify";
 import TableCategory from "./TableCategory";
 import { useQueryParams } from "../../../hooks/useQueryParam";
 import Filter from "./Filter";
-import { ModalSettingPayment } from "./Modal/ModalSettingPayment";
 import axios from "axios";
 
 const PaymentHistory = () => {
   const { t } = useTranslation();
-  const { paymentHistories, listBank, paymentMethod } = usePage().props;
-  const [showModal, setShowModal] = useState(false);
-  const [dataEdit, setDataEdit] = useState<any>(null);
+  const { paymentHistories } = usePage().props;
   const params = useQueryParams();
   const buildQuery = (p: any = {}) => ({
     page: Number(p.page || 1),
@@ -47,22 +44,7 @@ const PaymentHistory = () => {
   ) => {
     fetchData(currentPage, perPage, filters);
   };
-
-  const openModalEdit = async () => {
-    try {
-      const response = await axios.get(route("seller.payment-history.edit"));
-      setDataEdit(response.data.paymentMethod);
-      setShowModal(true);
-    } catch (error) {
-    }
-  };
-
-  useEffect(() => {
-    if (paymentMethod) {
-      setDataEdit(paymentMethod);
-    }
-  }, [paymentMethod]);
-
+  
   return (
     <React.Fragment>
       <Head title={t("Payment History")} />
