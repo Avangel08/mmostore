@@ -14,6 +14,14 @@ const PaymentHistory = () => {
   const { t } = useTranslation();
   const { paymentHistories } = usePage().props;
   const params = useQueryParams();
+  
+  // Store current filters in state
+  const [currentFilters, setCurrentFilters] = useState<any>({
+    name: params?.name || "",
+    createdDateStart: params?.createdDateStart || "",
+    createdDateEnd: params?.createdDateEnd || "",
+  });
+  
   const buildQuery = (p: any = {}) => ({
     page: Number(p.page || 1),
     perPage: Number(p.perPage || 10),
@@ -27,13 +35,15 @@ const PaymentHistory = () => {
     perPage: number = 10,
     filters?: any
   ) => {
+    const queryData = buildQuery({
+      page: currentPage,
+      perPage: perPage,
+      ...(filters || currentFilters),
+    });
+    
     router.reload({
       only: ["paymentHistories"],
-      data: buildQuery({
-        page: currentPage,
-        perPage: perPage,
-        ...(filters || {}),
-      }),
+      data: queryData,
     });
   };
 
@@ -42,7 +52,12 @@ const PaymentHistory = () => {
     perPage: number = 10,
     filters: any
   ) => {
+    setCurrentFilters(filters);
     fetchData(currentPage, perPage, filters);
+  };
+  
+  const handlePagination = (page: number, perPage: number) => {
+    fetchData(page, perPage, currentFilters);
   };
   
   return (
@@ -59,7 +74,7 @@ const PaymentHistory = () => {
             <Col xs={12}>
               <Card>
                 <Card.Body>
-                  <Filter onFilter={handleFilter} />
+                  <Filter onFilter={handleFilter} currentFilters={currentFilters} />
                   <Row style={{ marginBottom: "15px" }}>
                     <Col>
                       <div className="d-flex gap-2">
@@ -71,7 +86,7 @@ const PaymentHistory = () => {
                     <Col>
                       <TableCategory
                         data={paymentHistories || []}
-                        onReloadTable={fetchData}
+                        onReloadTable={handlePagination}
                       />
                     </Col>
                   </Row>

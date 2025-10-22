@@ -2,6 +2,7 @@
 
 namespace App\Models\Mongo;
 
+use Illuminate\Support\Carbon;
 use MongoDB\Laravel\Eloquent\Model;
 
 class BalanceHistories extends Model
@@ -54,14 +55,16 @@ class BalanceHistories extends Model
         return $query;
     }
 
-    public function scopeFilterCreatedDate($query, $request){
+    public function scopeFilterDateAt($query, $request){
         if(isset($request['start_time']) && $request['start_time'] != ''){
-            $query->where('created_at', '>=', $request['start_time']);
+            $start_time = Carbon::createFromFormat('Y-m-d', $request['start_time'])->startOfDay()->toDateTimeString();
+            $query->where('date_at', '>=', $start_time);
         }
 
         if(isset($request['end_time']) && $request['end_time'] != ''){
-            $query->where('created_at', '<=', $request['end_time']);
+            $end_time = Carbon::createFromFormat('Y-m-d', $request['end_time'])->endOfDay()->toDateTimeString();
+            $query->where('date_at', '<=', $end_time);
         }
         return $query;
-    }
+    }   
 }

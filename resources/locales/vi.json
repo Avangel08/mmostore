@@ -602,5 +602,7 @@
     "Select Payment Method": "Chọn phương thức thanh toán",
     "Choose your preferred payment method": "Chọn phương thức thanh toán của bạn",
     "Deposit success" : "Nạp tiền thành công",
-    "Successful deposit": "Số tiền nạp"
-}
+    "Successful deposit": "Số tiền nạp",
+    "Enter name or transaction" : "Nhập tên hoặc mã giao dịch",
+    "Transaction" : "Mã giao dịch"
+}   

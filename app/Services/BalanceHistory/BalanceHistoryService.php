@@ -29,8 +29,8 @@ class BalanceHistoryService
         return BalanceHistories::with('customer:_id,name')
             ->with('paymentMethod:id,name')
             ->filterSearch($request)
-            ->filterCreatedDate($request)   
-            ->orderBy('created_at', 'desc')
+            ->filterDateAt($request)   
+            ->orderBy('date_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
 

@@ -309,5 +309,7 @@
     "Add currency rate" : "Add currency rate",
     "Currency Rate" : "Currency Rate",
     "Deposit success" : "Deposit success",
-    "Successful deposit": "Successful deposit"
+    "Successful deposit": "Successful deposit",
+    "Enter name or transaction" : "Enter name or transaction",
+    "Transaction" : "Transaction"
 }
