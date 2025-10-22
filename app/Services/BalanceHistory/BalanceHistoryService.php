@@ -18,8 +18,8 @@ class BalanceHistoryService
         return BalanceHistories::where('customer_id', $customerId)
             ->with('paymentMethod:id,name')
             ->filterSearch($request)
-            ->filterCreatedDate($request)   
-            ->orderBy('created_at', 'desc')
+            ->filterDateAt($request)   
+            ->orderBy('date_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
     public function getForTable($request){
