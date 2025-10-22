@@ -600,5 +600,7 @@
     "No valid payment method found. Please contact support": "Không tìm thấy phương thức thanh toán hợp lệ. Vui lòng liên hệ hỗ trợ",
     "Continue": "Tiếp tục",
     "Select Payment Method": "Chọn phương thức thanh toán",
-    "Choose your preferred payment method": "Chọn phương thức thanh toán của bạn"
+    "Choose your preferred payment method": "Chọn phương thức thanh toán của bạn",
+    "Deposit success" : "Nạp tiền thành công",
+    "Successful deposit": "Số tiền nạp"
 }
