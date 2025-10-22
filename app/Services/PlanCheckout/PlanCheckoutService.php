@@ -18,6 +18,16 @@ class PlanCheckoutService
             ->first();
     }
 
+    public function update(CheckOuts $checkoutItem, $data)
+    {
+        return $checkoutItem->update($data);
+    }
+
+    public function findByContentBank($contentBank)
+    {
+        return CheckOuts::where('content_bank', $contentBank)->where('status', CheckOuts::STATUS['PENDING'])->first();
+    }
+
     public function createCheckout(User $user, Plans $plan, PaymentMethods $paymentMethod)
     {
         $currencyRateService = app(\App\Services\CurrencyRate\CurrencyRateService::class);

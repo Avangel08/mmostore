@@ -44,7 +44,6 @@ class PaymentMethodService
     public function findByUserId($userId)
     {
         return PaymentMethods::where('user_id', $userId)
-        ->where('user_type', PaymentMethods::USER_TYPE['SELLER'])
         ->where('type', PaymentMethods::TYPE['BANK'])
         ->where('status', PaymentMethods::STATUS['ACTIVE'])
         ->first();
