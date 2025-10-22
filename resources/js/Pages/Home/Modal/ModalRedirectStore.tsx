@@ -6,7 +6,11 @@ import { useTranslation } from 'react-i18next';
 interface ModalRedirectStoreProps {
     message?: {
         success?: string;
-        popup?: string;
+        popup?: {
+            user_id: string;
+            token: string;
+            expires_at: string;
+        };
     }
 }
 
@@ -15,7 +19,7 @@ const ModalRedirectStore = ({ message }: ModalRedirectStoreProps) => {
     const { t } = useTranslation();
     useEffect(() => {
         // Check if popup message exists in props
-        if (message?.success && message?.popup) {
+        if (message?.success && message?.popup?.user_id && message?.popup?.token) {
             setShow(true);
         }
     }, [message?.popup]);
@@ -33,8 +37,12 @@ const ModalRedirectStore = ({ message }: ModalRedirectStoreProps) => {
                     <Button
                         className="btn btn-primary me-2"
                         onClick={() => {
-                            const url = route("home.go-to-store", { id: message?.popup });
-                            window.open(url, "_blank");
+                            const userId = message?.popup?.user_id;
+                            const token = message?.popup?.token;
+                            if (userId && token) {
+                                const url = route("home.go-to-store", { id: userId }) + `?token=${token}`;
+                                window.open(url, "_blank");
+                            }
                         }}
                     >
                         {t("Go to store")}
