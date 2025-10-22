@@ -593,5 +593,7 @@
     "Add currency rate" : "Thêm tỷ giá VND",
     "Currency Rate" : "Tỷ giá tiền tệ",
     "Deposit success" : "Nạp tiền thành công",
-    "Successful deposit": "Số tiền nạp"
-}
+    "Successful deposit": "Số tiền nạp",
+    "Enter name or transaction" : "Nhập tên hoặc mã giao dịch",
+    "Transaction" : "Mã giao dịch"
+}   

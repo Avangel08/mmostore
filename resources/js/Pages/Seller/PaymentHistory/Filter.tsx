@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import Flatpickr from "react-flatpickr";
@@ -13,6 +13,7 @@ interface CategoryFilterProps {
     perPage: number,
     filters: CategoryFilters
   ) => void;
+  currentFilters?: CategoryFilters;
 }
 
 interface CategoryFilters {
@@ -21,7 +22,7 @@ interface CategoryFilters {
   createdDateEnd: string;
 }
 
-const Filter = ({ onFilter }: CategoryFilterProps) => {
+const Filter = ({ onFilter, currentFilters }: CategoryFilterProps) => {
   const { t, i18n } = useTranslation();
 
   const flatpickrRef = useRef<any>(null);
@@ -34,13 +35,20 @@ const Filter = ({ onFilter }: CategoryFilterProps) => {
 
   const getInitialFilters = (): CategoryFilters => {
     return {
-      name: paramsUrl?.name ?? "",
-      createdDateStart: paramsUrl?.createdDateStart ?? "",
-      createdDateEnd: paramsUrl?.createdDateEnd ?? "",
+      name: currentFilters?.name ?? paramsUrl?.name ?? "",
+      createdDateStart: currentFilters?.createdDateStart ?? paramsUrl?.createdDateStart ?? "",
+      createdDateEnd: currentFilters?.createdDateEnd ?? paramsUrl?.createdDateEnd ?? "",
     };
   };
 
   const [filters, setFilters] = useState<CategoryFilters>(getInitialFilters());
+  
+  // Update filters when currentFilters prop changes
+  useEffect(() => {
+    if (currentFilters) {
+      setFilters(currentFilters);
+    }
+  }, [currentFilters]);
 
   const getFlatpickrLocale = () => {
     switch (i18n.language) {
@@ -137,7 +145,7 @@ const Filter = ({ onFilter }: CategoryFilterProps) => {
               <Form.Control
                 type="text"
                 id="filter-name"
-                placeholder={t("Enter name and transaction")}
+                placeholder={t("Enter name or transaction")}
                 value={filters.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
               />

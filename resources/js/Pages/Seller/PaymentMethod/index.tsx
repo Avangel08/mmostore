@@ -20,6 +20,14 @@ const PaymentSetting = () => {
   const [dataEdit, setDataEdit] = useState<any>(null);
   const [dataOptions, setDataOptions] = useState<any>(null);
   const params = useQueryParams();
+  
+  // Store current filters in state
+  const [currentFilters, setCurrentFilters] = useState<any>({
+    name: params?.name || "",
+    createdDateStart: params?.createdDateStart || "",
+    createdDateEnd: params?.createdDateEnd || "",
+  });
+  
   const buildQuery = (p: any = {}) => ({
     page: Number(p.page || 1),
     perPage: Number(p.perPage || 10),
@@ -33,13 +41,15 @@ const PaymentSetting = () => {
     perPage: number = 10,
     filters?: any
   ) => {
+    const queryData = buildQuery({
+      page: currentPage,
+      perPage: perPage,
+      ...(filters || currentFilters),
+    });
+    
     router.reload({
       only: ["paymentMethods"],
-      data: buildQuery({
-        page: currentPage,
-        perPage: perPage,
-        ...(filters || {}),
-      }),
+      data: queryData,
     });
   };
 
@@ -48,7 +58,12 @@ const PaymentSetting = () => {
     perPage: number = 10,
     filters: any
   ) => {
+    setCurrentFilters(filters);
     fetchData(currentPage, perPage, filters);
+  };
+  
+  const handlePagination = (page: number, perPage: number) => {
+    fetchData(page, perPage, currentFilters);
   };
 
   const openModalEdit = async (id: number | string) => {
@@ -134,7 +149,7 @@ const PaymentSetting = () => {
             <Col xs={12}>
               <Card>
                 <Card.Body>
-                  <Filter onFilter={handleFilter} />
+                  <Filter onFilter={handleFilter} currentFilters={currentFilters} />
                   <Row style={{ marginBottom: "32px" }}>
                     <Col>
                       <div className="d-flex gap-2">
@@ -152,7 +167,7 @@ const PaymentSetting = () => {
                     <Col>
                       <TablePaymentMethod
                         data={paymentMethods || []}
-                        onReloadTable={fetchData}
+                        onReloadTable={handlePagination}
                         onDelete={onDelete}
                         onEdit={openModalEdit}
                       />
