@@ -9,7 +9,6 @@ interface ModalRedirectStoreProps {
         popup?: {
             user_id: string;
             token: string;
-            expires_at: string;
         };
     }
 }

@@ -44,12 +44,12 @@ class AuthenticatedSessionController extends Controller
         // Generate one-time popup token and store in cache (short TTL)
         $popupToken = Str::random(40);
         $cacheKey = "popup_login_token:{$user->id}:{$popupToken}";
-        Cache::put($cacheKey, true, now()->addMinutes(5));
+        Cache::put($cacheKey, true, now()->addMinutes(120));
 
         $request->session()->flash('popup', [
             'user_id' => (string) $user->id,
             'token' => $popupToken,
-            'expires_at' => now()->addMinutes(5)->toISOString(),
+            'expires_at' => now()->addMinutes(120)->toISOString(),
         ]);
 
         return redirect()->intended(RouteServiceProvider::getRedirectAfterAuthenticated());
@@ -57,6 +57,7 @@ class AuthenticatedSessionController extends Controller
 
     public function goToStore(Request $request, $id)
     {
+       
         // Validate popup token
         $token = (string) $request->input('token', '');
         if ($token === '') {
