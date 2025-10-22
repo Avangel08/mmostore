@@ -90,6 +90,7 @@ const ThemeConfigs = () => {
             formData.append("pageHeaderImage", values.pageHeaderImage);
             formData.append("pageHeaderText", values.pageHeaderText);
             formData.append("currency", values.currency);
+            formData.append("metaDescription", values.metaDescription);
             const url = route("seller.theme-settings.update", { id: settings.id })
             router.post(url, formData, {
                 preserveScroll: true,

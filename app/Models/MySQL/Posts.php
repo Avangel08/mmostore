@@ -8,6 +8,26 @@ class Posts extends Model
 {
     const STATUS = [
         'DRAFT' => 0,
+        'PUBLISHED' => 1
+    ];
+
+    const LIST_STATUS = [
+        'Draft' => 'DRAFT',
+        'Published' => 'PUBLISHED'
+    ];
+
+    const VISIBILITY = [
+        'PUBLIC' => 0,
+        'PRIVATE' => 1
+    ];
+
+    const LIST_VISIBILITY = [
+        'Public' => 'PUBLIC',
+        'Private' => 'PRIVATE'
+    ];
+
+    const CATEGORY = [
+        'News' => 0,
     ];
 
     protected $connection = 'mysql';
@@ -16,8 +36,12 @@ class Posts extends Model
 
     protected $fillable = [
         'title',
+        'user_id',
         'content',
-        'image',
-        'status'
+        'short_description',
+        'thumbnail',
+        'status',
+        'visibility',
+        'slug'
     ];
 }

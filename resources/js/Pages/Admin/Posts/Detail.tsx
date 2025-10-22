@@ -6,7 +6,7 @@ import Layout from "../../../CustomAdminLayouts";
 
 const DetailPost = () => {
   const { post }: any = usePage().props;
-
+  const storageUrl = usePage().props.storageUrl as string;
   document.title = `${post.title} | Bài viết`;
 
   const handleDelete = () => {
@@ -25,6 +25,13 @@ const DetailPost = () => {
 
   return (
     <div className="page-content">
+      <style>
+        {`
+          img {
+            width: 100%
+          }
+        `}
+      </style>
       <Container fluid>
         <BreadCrumb title={post.title} pageTitle="Bài viết" />
 
@@ -52,9 +59,9 @@ const DetailPost = () => {
                   </div>
                 </div>
 
-                {post.image ? (
+                {post.thumbnail ? (
                   <img
-                    src={`/storage/${post.image}`}
+                    src={`${storageUrl}/${post.thumbnail}`}
                     alt={post.title}
                     className="img-thumbnail mb-4"
                     style={{

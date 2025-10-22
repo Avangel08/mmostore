@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin\Posts;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Admin\Post\PostResource;
+use App\Models\MySQL\Posts;
+use App\Services\Posts\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -10,38 +13,61 @@ use Inertia\Inertia;
 
 class PostController extends Controller
 {
+    protected $postService;
+
+    public function __construct(PostService $postService)
+    {
+        $this->postService = $postService;
+    }
+
     public function index()
     {
-        $posts = DB::table('posts')->orderByDesc('id')->get();
-
+        $posts = $this->postService->getPosts();
+        $statusList = array_flip(Posts::LIST_STATUS);
+        
         return Inertia::render('Posts/Index', [
-            'posts' => $posts,
+            'posts' => fn() => PostResource::collection($posts),
+            'statusList' => $statusList
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Posts/create');
+
+        $optionStatus = [];
+        foreach (Posts::LIST_STATUS as $key => $value) {
+            $optionStatus[] = [
+                'label' => $key,
+                'value' => $value
+            ];
+        }
+
+        $optionVisibility = [];
+        foreach (Posts::LIST_VISIBILITY as $key => $value) {
+            $optionVisibility[] = [
+                'label' => $key,
+                'value' => $value
+            ];
+        }
+
+        return Inertia::render('Posts/PostForm', [
+            'optionStatus' => fn() => $optionStatus,
+            'optionVisibility' => fn() => $optionVisibility
+        ]);
     }
 
     public function store(Request $request)
     {
-        $path = null;
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time().'-'.$file->getClientOriginalName();
-            $path = $file->storeAs('images', $filename, 'public');
+        try {
+            $data = $request->all();
+            $userId = auth('admin')->user()->id;
+            $data['user_id'] = $userId;
+            $this->postService->createPost($data);
+            return redirect()->route('admin.posts.index')->with('success', 'Thêm bài viết thành công!');
+        } catch (\Exception $e) {
+            dd($e);
+            return back()->with('error', $e->getMessage());
         }
-
-        DB::table('posts')->insert([
-            'title' => $request->get('title'),
-            'content' => $request->get('content'),
-            'image' => $path,
-            'status' => $request->get('status') ?? 'draft',
-            'created_at' => now(),
-        ]);
-
-        return redirect()->route('admin.posts.index')->with('success', 'Thêm bài viết thành công!');
     }
 
     public function edit($id)
@@ -63,7 +89,7 @@ class PostController extends Controller
                 Storage::disk('public')->delete($post->image);
             }
             $file = $request->file('image');
-            $filename = time().'-'.$file->getClientOriginalName();
+            $filename = time() . '-' . $file->getClientOriginalName();
             $path = $file->storeAs('images', $filename, 'public');
         }
 
@@ -86,7 +112,7 @@ class PostController extends Controller
             abort(404, 'Bài viết không tồn tại');
         }
 
-        return Inertia::render('Posts/detailPost', [
+        return Inertia::render('Posts/Detail', [
             'post' => $post,
         ]);
     }
