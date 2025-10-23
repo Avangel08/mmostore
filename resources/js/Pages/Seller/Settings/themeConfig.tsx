@@ -185,7 +185,7 @@ const ThemeConfigs = () => {
                                 </Row>
                             </div>
                             {/** Currency */}
-                            <div className="mb-3">
+                            {/* <div className="mb-3">
                                 <Form.Group controlId="currency">
                                     <Form.Label>
                                         {t("Currency")}{" "}
@@ -218,7 +218,7 @@ const ThemeConfigs = () => {
                                             </div>
                                         )}
                                 </Form.Group>
-                            </div>
+                            </div> */}
                             {/** Store Name */}
                             <div className="mb-3">
                                 <Form.Group>
