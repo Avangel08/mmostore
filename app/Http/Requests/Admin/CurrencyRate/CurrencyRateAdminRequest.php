@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin\CurrencyRate;
 
+use App\Models\MySQL\CurrencyRates;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 class CurrencyRateAdminRequest extends FormRequest
 {
     /**
@@ -24,14 +26,14 @@ class CurrencyRateAdminRequest extends FormRequest
         return match ($action) {
             'store' => [
                 'to_vnd' => ['required', 'decimal:0,2', 'min:1000', 'max:999999999.99'],
-                'date' => ['required', 'date'],
-                'status' => ['required', 'string'],
+                'date' => ['required', 'date', Rule::unique('mysql.currency_rates')],
+                'status' => ['required', 'string', Rule::in(array_values(CurrencyRates::STATUS))],
             ],
             'update' => [
                 'id' => ['required'],
                 'to_vnd' => ['required', 'decimal:0,2', 'min:1000', 'max:999999999.99'],
-                'date' => ['required', 'date'],
-                'status' => ['required', 'string'],
+                'date' => ['required', 'date', Rule::unique('mysql.currency_rates')->ignore($this->route('currency_rate'))],
+                'status' => ['required', 'string', Rule::in(array_values(array: CurrencyRates::STATUS))],
             ],
             default => [],
         };

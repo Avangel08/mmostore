@@ -85,9 +85,7 @@ export const ModalCurrencyRate = ({
           }
         },
         onError: (errors: any) => {
-          Object.keys(errors).forEach((key) => {
-            showToast(t(errors[key]), "error");
-          });
+          showToast(t('An error occurred, please try again later'), 'error');
         }
       });
     },
@@ -106,7 +104,9 @@ export const ModalCurrencyRate = ({
     }
   }, [show, dataEdit]);
 
-  console.log(dataOptions?.statusList);
+  useEffect(() => {
+    formik.setErrors(errors || {});
+  }, [errors]);
 
   return (
     <Modal
@@ -121,7 +121,7 @@ export const ModalCurrencyRate = ({
     >
       <Form onSubmit={formik.handleSubmit} noValidate>
         <Modal.Header closeButton>
-          <h5>{t("Currency Rate")}</h5>
+          <h5>{isEditMode ? t("Update currency rate") : t("Create currency rate")}</h5>
         </Modal.Header>
         <Modal.Body>
           {/* VND Rate */}
@@ -138,7 +138,6 @@ export const ModalCurrencyRate = ({
               placeholder={t("Enter VND Rate")}
               fixedDecimalScale={false}
               allowNegative={false}
-
               onValueChange={(values) => {
                 formik.setFieldValue("to_vnd", values.floatValue || "");
               }}
@@ -151,7 +150,7 @@ export const ModalCurrencyRate = ({
               isInvalid={!!(formik.touched.to_vnd && formik.errors.to_vnd)}
             />
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.to_vnd || errors?.to_vnd)}
+              {t(formik.errors.to_vnd)}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -174,9 +173,9 @@ export const ModalCurrencyRate = ({
                 formik.setFieldValue("date", dates[0] ? moment(dates[0]).format("YYYY-MM-DD") : "");
               }}
             />
-            <Form.Control.Feedback type="invalid">
-              {t(formik.errors.date || errors?.date)}
-            </Form.Control.Feedback>
+            <small className="text-danger">
+              {t(formik.errors.date as string)}
+            </small>
           </Form.Group>
 
           {/* Status */}
@@ -189,7 +188,7 @@ export const ModalCurrencyRate = ({
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.status}
-              isInvalid={!!((formik.touched.status && formik.errors.status) || errors?.status)}
+              isInvalid={!!((formik.touched.status && formik.errors.status))}
             >
               {dataOptions?.statusList && Object.keys(dataOptions.statusList).map((key: any) => (
                 <option key={key} value={key}>
@@ -198,7 +197,7 @@ export const ModalCurrencyRate = ({
               ))}
             </Form.Select>
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.status || errors?.status)}
+              {t(formik.errors.status as string)}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -217,7 +216,7 @@ export const ModalCurrencyRate = ({
             variant="primary"
             type="submit"
           >
-            {t("Save changes")}
+            {isEditMode ? t("Update") : t("Add new")}
           </Button>
         </Modal.Footer>
       </Form>
