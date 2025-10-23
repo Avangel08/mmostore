@@ -22,6 +22,7 @@ class SubProductService
         $productId = $dataRequest['productId'] ?? null;
 
         return SubProducts::where('product_id', $productId)
+            ->filterSubProductId($dataRequest)
             ->with($relation)
             ->orderBy('_id', 'desc')
             ->paginate($perPage, $select, 'page', $page);
