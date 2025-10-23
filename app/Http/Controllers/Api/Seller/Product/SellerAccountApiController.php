@@ -61,8 +61,9 @@ class SellerAccountApiController extends Controller
                 'success_count' => 0,
                 'error_count' => 0,
                 'errors' => [],
+                'data_errors' => []
             ];
-            return $this->success('Uploaded successfully', ['data' => $result], Response::HTTP_CREATED);
+            return $this->success('Uploaded successfully', ['data' => $result]);
         } catch (Throwable $e) {
             Log::error($e, ['ip' => $request->ip(), 'user_id' => auth()->id() ?? null]);
             return $this->error($e->getMessage());
