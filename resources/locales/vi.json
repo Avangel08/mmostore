@@ -657,5 +657,18 @@
     "This field must be less than or equal to {{max}}": "Trường này phải nhỏ hơn hoặc bằng {{max}}",
     "Update currency rate": "Cập nhật tỉ giá tiền tệ",
     "Create currency rate": "Thêm mới tỉ giá tiền tệ",
-    "The date has already been taken.": "Ngày đã được sử dụng"
+    "The date has already been taken.": "Ngày đã được sử dụng",
+    "Payment history": "Lịch sử thanh toán",
+    "Transaction ID": "Mã giao dịch",
+    "Plan price": "Giá gói",
+    "Payment amount": "Số tiền thanh toán",
+    "Expiration date": "Ngày hết hạn",
+    "System note": "Ghi chú hệ thống",
+    "Payment method": "Phương thức thanh toán",
+    "Plan type": "Loại gói",
+    "Amount paid": "Số tiền đã thanh toán",
+    "Rejected": "Bị từ chối",
+    "Expiration date range": "Khoảng ngày hết hạn",
+    "Select expiration date range": "Chọn khoảng ngày hết hạn",
+    "Select plan type": "Chọn loại gói"
 }
