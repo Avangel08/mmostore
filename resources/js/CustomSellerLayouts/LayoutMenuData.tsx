@@ -15,15 +15,15 @@ const Navdata = () => {
     const [isOrderManager, setIsOrderManager] = useState<boolean>(false)
     const [isPaymentMethod, setIsPaymentMethod] = useState<boolean>(false)
 
-    function updateIconSidebar(e : any) {
+    function updateIconSidebar(e: any) {
         if (e && e.target && e.target.getAttribute("sub-items")) {
-            const ul : any = document.getElementById("two-column-menu");
-            const iconItems : any = ul.querySelectorAll(".nav-icon.active");
+            const ul: any = document.getElementById("two-column-menu");
+            const iconItems: any = ul.querySelectorAll(".nav-icon.active");
             let activeIconItems = [...iconItems];
             activeIconItems.forEach((item) => {
                 item.classList.remove("active");
                 var id = item.getAttribute("sub-items");
-                const getID : any = document.getElementById(id) as HTMLElement;
+                const getID: any = document.getElementById(id) as HTMLElement;
                 if (getID)
                     getID?.parentElement.classList.remove("show");
             });
@@ -79,9 +79,9 @@ const Navdata = () => {
         isOrderManager
     ]);
 
-    const menuItems : any = [
+    const menuItems: any = [
         {
-            label: "Menu",
+            label: "System",
             isHeader: true,
         },
         {
@@ -90,23 +90,10 @@ const Navdata = () => {
             icon: "ri-dashboard-2-line",
             link: route("seller.dashboard"),
             stateVariables: isDashboard,
-            click: function (e : any) {
+            click: function (e: any) {
                 e.preventDefault();
                 setIsDashboard(!isDashboard);
                 setIscurrentState('Dashboard');
-                updateIconSidebar(e);
-            },
-        },
-        {
-            id: "customer-manager",
-            label: "Customer",
-            icon: "ri-dashboard-2-line",
-            link: route("seller.customer-manager.index"),
-            stateVariables: isDashboard,
-            click: function (e : any) {
-                e.preventDefault();
-                setIsCustomerManager(!isCustomerManager);
-                setIscurrentState('Customer Manager');
                 updateIconSidebar(e);
             },
         },
@@ -116,7 +103,7 @@ const Navdata = () => {
             icon: "ri-file-list-fill",
             link: route('seller.category.index'),
             stateVariables: isCategory,
-            click: function (e : any) {
+            click: function (e: any) {
                 e.preventDefault();
                 setIsCategory(!isCategory);
                 setIscurrentState('Category');
@@ -129,62 +116,10 @@ const Navdata = () => {
             icon: "ri-box-3-fill",
             link: route('seller.product.index'),
             stateVariables: isProduct,
-            click: function (e : any) {
+            click: function (e: any) {
                 e.preventDefault();
                 setIsProduct(!isProduct);
                 setIscurrentState('Product');
-                updateIconSidebar(e);
-            },
-        },
-        {
-            id: "payment-method",
-            label: "Payment Method",
-            icon: "ri-wallet-fill",
-            link: route('seller.payment-method'),
-            stateVariables: isPaymentMethod,
-            click: function (e : any) {
-                e.preventDefault();
-                setIsPaymentMethod(!isPaymentMethod);
-                setIscurrentState('Payment Method');
-                updateIconSidebar(e);
-            },
-        },
-        {
-            id: "payment-history",
-            label: "Payment History",
-            icon: "ri-money-dollar-circle-line",
-            link: route('seller.payment-history'),
-            stateVariables: isPaymentHistory,
-            click: function (e : any) {
-                e.preventDefault();
-                setIsPaymentHistory(!isPaymentHistory);
-                setIscurrentState('Payment History');
-                updateIconSidebar(e);
-            },
-        },
-        {
-            id: "currency-rate",
-            label: "Currency Rate",
-            icon: "ri-exchange-line",
-            link: route('seller.currency-rate'),
-            stateVariables: isCurrencyRate,
-            click: function (e : any) {
-                e.preventDefault();
-                setIsCurrencyRate(!isCurrencyRate);
-                setIscurrentState('Currency Rate');
-                updateIconSidebar(e);
-            },
-        },
-        {
-            id: "setting",
-            label: "Theme setting",
-            icon: "ri-settings-2-line",
-            link: route('seller.theme-settings'),
-            stateVariables: isSettings,
-            click: function (e : any) {
-                e.preventDefault();
-                setIsDashboard(!isSettings);
-                setIscurrentState('Theme Settings');
                 updateIconSidebar(e);
             },
         },
@@ -194,10 +129,79 @@ const Navdata = () => {
             icon: "ri-shopping-cart-line",
             link: route('seller.order'),
             stateVariables: isOrderManager,
-            click: function (e : any) {
+            click: function (e: any) {
                 e.preventDefault();
                 setIsOrderManager(!isOrderManager);
                 setIscurrentState('Order Manager');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "customer-manager",
+            label: "Customer",
+            icon: "ri-dashboard-2-line",
+            link: route("seller.customer-manager.index"),
+            stateVariables: isCustomerManager,
+            click: function (e: any) {
+                e.preventDefault();
+                setIsCustomerManager(!isCustomerManager);
+                setIscurrentState('Customer Manager');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "payment-history",
+            label: "Payment History",
+            icon: "ri-money-dollar-circle-line",
+            link: route('seller.payment-history'),
+            stateVariables: isPaymentHistory,
+            click: function (e: any) {
+                e.preventDefault();
+                setIsPaymentHistory(!isPaymentHistory);
+                setIscurrentState('Payment History');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            label: "Sales channel",
+            isHeader: true,
+        },
+        {
+            id: "setting",
+            label: "Theme setting",
+            icon: "ri-settings-2-line",
+            link: route('seller.theme-settings'),
+            stateVariables: isSettings,
+            click: function (e: any) {
+                e.preventDefault();
+                setIsDashboard(!isSettings);
+                setIscurrentState('Theme Settings');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "payment-method",
+            label: "Payment Method",
+            icon: "ri-wallet-fill",
+            link: route('seller.payment-method'),
+            stateVariables: isPaymentMethod,
+            click: function (e: any) {
+                e.preventDefault();
+                setIsPaymentMethod(!isPaymentMethod);
+                setIscurrentState('Payment Method');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "currency-rate",
+            label: "Currency Rate",
+            icon: "ri-exchange-line",
+            link: route('seller.currency-rate'),
+            stateVariables: isCurrencyRate,
+            click: function (e: any) {
+                e.preventDefault();
+                setIsCurrencyRate(!isCurrencyRate);
+                setIscurrentState('Currency Rate');
                 updateIconSidebar(e);
             },
         },

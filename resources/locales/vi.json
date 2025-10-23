@@ -608,5 +608,7 @@
     "Insufficient balance": "Số dư không đủ",
     "All Customers": "Tất cả khách hàng",
     "Customer Name": "Tên khách hàng",
-    "Enter customer name": "Nhập tên khách hàng"
+    "Enter customer name": "Nhập tên khách hàng",
+    "System": "Hệ thống",
+    "Sales channel": "Kênh bán hàng"
 }   
