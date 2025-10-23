@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CurrencyRate\CurrencyRateAdminController;
 use App\Http\Controllers\Admin\Dashboard\DashboardController;
 use App\Http\Controllers\Admin\PermissionManagement\PermissionManagementController;
 use App\Http\Controllers\Admin\Plan\PlanController;
@@ -51,6 +52,8 @@ Route::domain($mainDomain)->group(function () {
             Route::delete('/delete-multiple', [ProductTypeController::class, 'deleteMultipleProductTypes'])->name('admin.product-types.delete-multiple');
         });
         Route::resource('product-types', ProductTypeController::class, ['as' => 'admin']);
+
+        Route::resource('currency-rates', CurrencyRateAdminController::class, ['as' => 'admin']);
     });
 
 });

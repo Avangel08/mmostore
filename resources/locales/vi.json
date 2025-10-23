@@ -610,5 +610,13 @@
     "No valid payment method found. Please contact support": "Không tìm thấy phương thức thanh toán hợp lệ. Vui lòng liên hệ hỗ trợ",
     "Continue": "Tiếp tục",
     "Select Payment Method": "Chọn phương thức thanh toán",
-    "Choose your preferred payment method": "Chọn phương thức thanh toán của bạn"
+    "Choose your preferred payment method": "Chọn phương thức thanh toán của bạn",
+    "Rate": "Tỷ giá",
+    "Enter rate": "Nhập tỷ giá",
+    "Effective date range": "Khoảng ngày hiệu lực",
+    "Select effective date range": "Chọn khoảng ngày hiệu lực",
+    "Rate range": "Khoảng tỷ giá",
+    "Delete rate {{rate}}?": "Xoá tỷ giá {{rate}}?",
+    "This field must be greater than or equal to {{min}}": "Trường này phải lớn hơn hoặc bằng {{min}}",
+    "This field must be less than or equal to {{max}}": "Trường này phải nhỏ hơn hoặc bằng {{max}}"
 }

@@ -236,9 +236,8 @@ const PlanFilter = ({ onFilter }: PlanFilterProps) => {
           className="d-flex align-items-center"
         >
           <i
-            className={`ri-filter-${
-              isFilterVisible ? "off" : "2"
-            }-line align-bottom me-2`}
+            className={`ri-filter-${isFilterVisible ? "off" : "2"
+              }-line align-bottom me-2`}
           ></i>
           {isFilterVisible ? t("Hide Filters") : t("Show Filters")}
         </Button>
@@ -297,10 +296,11 @@ const PlanFilter = ({ onFilter }: PlanFilterProps) => {
                   value={filters.priceMin}
                   onValueChange={handlePriceMinChange}
                   onKeyDown={handleKeyDown}
-                  thousandSeparator={true}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  decimalScale={2}
                   placeholder={t("From")}
                   allowNegative={false}
-                  decimalScale={2}
                   fixedDecimalScale={false}
                 />
                 <InputGroup.Text>–</InputGroup.Text>
@@ -310,10 +310,11 @@ const PlanFilter = ({ onFilter }: PlanFilterProps) => {
                   value={filters.priceMax}
                   onValueChange={handlePriceMaxChange}
                   onKeyDown={handleKeyDown}
-                  thousandSeparator={true}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  decimalScale={2}
                   placeholder={t("To")}
                   allowNegative={false}
-                  decimalScale={2}
                   fixedDecimalScale={false}
                 />
               </InputGroup>
@@ -336,12 +337,12 @@ const PlanFilter = ({ onFilter }: PlanFilterProps) => {
                 value={
                   filters.createdDateStart && filters.createdDateEnd
                     ? [
-                        new Date(filters.createdDateStart),
-                        new Date(filters.createdDateEnd),
-                      ]
+                      new Date(filters.createdDateStart),
+                      new Date(filters.createdDateEnd),
+                    ]
                     : filters.createdDateStart
-                    ? [new Date(filters.createdDateStart)]
-                    : []
+                      ? [new Date(filters.createdDateStart)]
+                      : []
                 }
                 onChange={handleDateChange}
               />
