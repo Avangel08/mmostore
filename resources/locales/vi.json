@@ -596,5 +596,8 @@
     "Successful deposit": "Số tiền nạp",
     "Enter name or transaction" : "Nhập tên hoặc mã giao dịch",
     "Transaction" : "Mã giao dịch",
-    "Insufficient balance": "Số dư không đủ"
+    "Insufficient balance": "Số dư không đủ",
+    "All Customers": "Tất cả khách hàng",
+    "Customer Name": "Tên khách hàng",
+    "Enter customer name": "Nhập tên khách hàng"
 }   

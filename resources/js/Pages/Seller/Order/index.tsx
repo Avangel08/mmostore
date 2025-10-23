@@ -16,6 +16,7 @@ const Order = () => {
 
     const [showModal, setShowModal] = useState(false);
     const [dataEdit, setDataEdit] = useState<any>(null);
+    const [customers, setCustomers] = useState<Array<{_id: string; name: string; email: string}>>([]);
     const params = useQueryParams();
     const buildQuery = (p: any = {}) => ({
         page: Number(p.page || 1),
@@ -27,6 +28,7 @@ const Order = () => {
         payment_status: p.payment_status || "",
         category_id: p.category_id || "",
         product_id: p.product_id || "",
+        customer_id: p.customer_id || "",
     });
 
     const fetchData = (
@@ -52,6 +54,22 @@ const Order = () => {
         fetchData(currentPage, perPage, filters);
     };
 
+    // Fetch customers data on component mount
+    useEffect(() => {
+        const fetchCustomers = async () => {
+            try {
+                const response = await axios.get('/admin/filter/customers');
+                if (response.data.success) {
+                    setCustomers(response.data.data);
+                }
+            } catch (error) {
+
+            }
+        };
+
+        fetchCustomers();
+    }, []);
+
     return (
         <React.Fragment>
             <Head title={t("Order")}/>
@@ -75,6 +93,7 @@ const Order = () => {
                                             category_id: string;
                                             category?: { _id: string; name: string }
                                         }>}
+                                        customers={customers}
                                     />
                                     <Row>
                                         <Col>

@@ -6,6 +6,7 @@ import moment from "moment";
 import {Vietnamese} from "flatpickr/dist/l10n/vn.js";
 import {english} from "flatpickr/dist/l10n/default.js";
 import {useQueryParams} from "../../../hooks/useQueryParam";
+import SearchableSelect from "../../../Components/Common/SearchableSelect";
 
 interface FilterProps {
     onFilter: (
@@ -26,6 +27,11 @@ interface FilterProps {
             name: string;
         };
     }>;
+    customers?: Array<{
+        _id: string;
+        name: string;
+        email: string;
+    }>;
 }
 
 interface Filters {
@@ -36,9 +42,10 @@ interface Filters {
     payment_status: string;
     category_id: string;
     product_id: string;
+    customer_id: string;
 }
 
-const Filter = ({onFilter, categories = [], products = []}: FilterProps) => {
+const Filter = ({onFilter, categories = [], products = [], customers = []}: FilterProps) => {
     const {t, i18n} = useTranslation();
     const flatpickrRef = useRef<any>(null);
     const [isFilterVisible, setIsFilterVisible] = useState(false);
@@ -54,6 +61,7 @@ const Filter = ({onFilter, categories = [], products = []}: FilterProps) => {
             payment_status: paramsUrl?.payment_status ?? "",
             category_id: paramsUrl?.category_id ?? "",
             product_id: paramsUrl?.product_id ?? "",
+            customer_id: paramsUrl?.customer_id ?? "",
         };
     };
 
@@ -105,7 +113,8 @@ const Filter = ({onFilter, categories = [], products = []}: FilterProps) => {
             (filters.status && filters.status !== "") ||
             (filters.payment_status && filters.payment_status !== "") ||
             (filters.category_id && filters.category_id !== "") ||
-            (filters.product_id && filters.product_id !== "")
+            (filters.product_id && filters.product_id !== "") ||
+            (filters.customer_id && filters.customer_id !== "")
         );
     };
 
@@ -117,7 +126,8 @@ const Filter = ({onFilter, categories = [], products = []}: FilterProps) => {
             status: "",
             payment_status: "",
             category_id: "",
-            product_id: ""
+            product_id: "",
+            customer_id: ""
         };
         setFilters(resetFilters);
 
@@ -173,6 +183,23 @@ const Filter = ({onFilter, categories = [], products = []}: FilterProps) => {
                                 onChange={(e) => handleInputChange("search", e.target.value)}
                             />
                         </Col>
+
+                        <Col md={2}>
+                            <SearchableSelect
+                                id="filter-customer"
+                                label={t("Customer")}
+                                value={filters.customer_id}
+                                onChange={(value) => handleInputChange("customer_id", value)}
+                                placeholder={t("All Customers")}
+                                searchEndpoint="/admin/filter/customers"
+                                searchParam="search"
+                                displayField="name"
+                                valueField="id"
+                                secondaryField="email"
+                            />
+                        </Col>
+
+                        
 
                         <Col md={2}>
                             <Form.Label htmlFor="filter-date">
@@ -244,7 +271,7 @@ const Filter = ({onFilter, categories = [], products = []}: FilterProps) => {
                                 <option value="">{t("All Categories")}</option>
                                 {categories && categories.length > 0 ? (
                                     categories.map((category) => (
-                                        <option key={category.id} value={category.id}>
+                                        <option key={category._id} value={category._id}>
                                             {category.name}
                                         </option>
                                     ))
@@ -270,7 +297,7 @@ const Filter = ({onFilter, categories = [], products = []}: FilterProps) => {
                                             !filters.category_id || product.category_id === filters.category_id
                                         )
                                         .map((product) => (
-                                            <option key={product.id} value={product.id}>{product.name}</option>
+                                            <option key={product._id} value={product._id}>{product.name}</option>
                                         ))
                                 ) : (
                                     <option value="" disabled>
