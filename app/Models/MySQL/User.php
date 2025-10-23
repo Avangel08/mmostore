@@ -81,6 +81,11 @@ class User extends Authenticatable
         return $newAccessToken;
     }
 
+    public function currentPlan()
+    {
+        return $this->hasOne(Charges::class, 'user_id', 'id')->orderByDesc('created_at');
+    }
+
     // Filter scopes
     public function scopeFilterName($query, $request)
     {

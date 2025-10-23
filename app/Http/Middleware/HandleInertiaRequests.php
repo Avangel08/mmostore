@@ -87,7 +87,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => AuthHelper::getCurrentUser(),
+                'user' => AuthHelper::getCurrentUser()->load(['currentPlan']),
             ],
             'subdomain' => $subdomain,
             'domainType' => $domainType,
