@@ -63,4 +63,39 @@ class UserService
 
         return $query->orderBy(...$orderBy)->get();
     }
+
+    public function getListUserPaginate($searchTerm = '', int $page = 1, int $perPage = 10)
+    {
+        $query = User::select(['id', 'name', 'email'])->where('type', User::TYPE['SELLER']);
+
+        if (!empty($searchTerm)) {
+            $query->where('name', 'like', '%' . $searchTerm . '%')
+                ->orWhere('email', 'like', '%' . $searchTerm . '%');
+        }
+
+        $paginatedResults = $query->orderBy('name')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        $listUserOptions = collect([]);
+        if ($page == 1 && empty($searchTerm)) {
+            $listUserOptions->push([
+                'value' => '',
+                'label' => __('All'),
+            ]);
+        }
+
+        $statusData = $paginatedResults->map(
+            fn($item) => [
+                'value' => $item->id,
+                'label' => $item->email . ' (' . $item->name . ')',
+            ]
+        );
+
+        $listUserOptions = $listUserOptions->merge($statusData);
+
+        return [
+            'results' => $listUserOptions,
+            'has_more' => $paginatedResults->hasMorePages(),
+        ];
+    }
 }

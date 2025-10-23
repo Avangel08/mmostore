@@ -7,11 +7,10 @@ use App\Models\MySQL\PaymentTransactions;
 use App\Services\Charge\ChargeService;
 use App\Services\CurrencyRate\CurrencyRateService;
 use App\Services\Home\UserService;
-use App\Services\PaymentTransaction\PaymentTransactionService;
+use App\Services\PaymentTransaction\PaymentTransactionAdminService;
 use App\Services\Plan\PlanService;
 use App\Services\PlanCheckout\PlanCheckoutService;
 use Carbon\Carbon;
-use Config;
 use DB;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -42,7 +41,7 @@ class JobProcessPaymentPlan implements ShouldQueue
         PlanCheckoutService $planCheckoutService,
         PlanService $planService,
         UserService $userService,
-        PaymentTransactionService $paymentTransactionService,
+        PaymentTransactionAdminService $paymentTransactionAdminService,
         CurrencyRateService $currencyRateService,
         ChargeService $chargeService
     ): void {
@@ -77,7 +76,7 @@ class JobProcessPaymentPlan implements ShouldQueue
                 return;
             }
 
-            $paymentTransaction = $paymentTransactionService->create([
+            $paymentTransaction = $paymentTransactionAdminService->create([
                 'user_id' => $userId,
                 'check_out_id' => $planCheckout->id,
                 'payment_method_id' => $planCheckout->payment_method_id,
@@ -94,7 +93,7 @@ class JobProcessPaymentPlan implements ShouldQueue
                 echo "Số tiền cần thanh toán không đủ" . PHP_EOL;
                 echo "Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd . PHP_EOL;
                 echo "content_bank: " . $this->contentBank . PHP_EOL;
-                $paymentTransactionService->update($paymentTransaction, [
+                $paymentTransactionAdminService->update($paymentTransaction, [
                     'status' => PaymentTransactions::STATUS['REJECT'],
                     'system_note' => 'Số tiền thanh toán không đủ',
                 ]);
@@ -104,7 +103,7 @@ class JobProcessPaymentPlan implements ShouldQueue
             }
 
             $charge = $chargeService->makePlanCharge($planCheckout, $userId);
-            $paymentTransactionService->update($paymentTransaction, [
+            $paymentTransactionAdminService->update($paymentTransaction, [
                 'status' => PaymentTransactions::STATUS['COMPLETE'],
                 'active_plan_date' => Carbon::now(),
                 'charge_id' => $charge->id,

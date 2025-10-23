@@ -150,7 +150,7 @@ export const ModalCurrencyRate = ({
               isInvalid={!!(formik.touched.to_vnd && formik.errors.to_vnd)}
             />
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.to_vnd)}
+              {t(formik.errors.to_vnd as any)}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -174,7 +174,7 @@ export const ModalCurrencyRate = ({
               }}
             />
             <small className="text-danger">
-              {t(formik.errors.date as string)}
+              {t(formik.errors.date as any)}
             </small>
           </Form.Group>
 
@@ -197,7 +197,7 @@ export const ModalCurrencyRate = ({
               ))}
             </Form.Select>
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.status as string)}
+              {t(formik.errors.status as any)}
             </Form.Control.Feedback>
           </Form.Group>
 

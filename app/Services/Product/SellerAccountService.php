@@ -223,7 +223,7 @@ class SellerAccountService
                 ->paginate($perPage, ['*'], 'page', $page);
 
             $statusOptions = collect([]);
-            if ($page == 1) {
+            if ($page == 1 && empty($searchTerm)) {
                 $statusOptions->push([
                     'value' => '',
                     'label' => 'All',
