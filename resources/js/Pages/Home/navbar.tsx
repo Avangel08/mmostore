@@ -122,9 +122,9 @@ const Navbar = () => {
                                 <li className="nav-item">
                                     <NavLink href="#faqs">FAQ</NavLink>
                                 </li>
-                                {/* <li className="nav-item">
-                                    <NavLink href="/">Tài liệu</NavLink>
-                                </li> */}
+                                <li className="nav-item">
+                                    <NavLink target="" href="https://hidemium-organization.gitbook.io/mmoshop-owner-store">Tài liệu</NavLink>
+                                </li>
                             </Scrollspy>
 
                             <div className="">
