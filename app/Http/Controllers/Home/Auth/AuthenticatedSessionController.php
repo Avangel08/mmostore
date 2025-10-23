@@ -66,7 +66,7 @@ class AuthenticatedSessionController extends Controller
 
         $cacheKey = "popup_login_token:{$id}:{$token}";
         // Use pull to make token one-time
-        $valid = Cache::pull($cacheKey);
+        $valid = Cache::get($cacheKey);
         if (!$valid) {
             return back()->with('error', 'Invalid or expired token');
         }
