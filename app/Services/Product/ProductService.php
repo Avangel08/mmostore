@@ -27,6 +27,17 @@ class ProductService
         return Products::select($select)->with($relation)->where('_id', $id)->first();
     }
 
+    public function getByIdWithActiveCategory($id, $select = ['*'], $relation = [])
+    {
+        return Products::select($select)
+            ->with($relation)
+            ->where('_id', $id)
+            ->whereHas('category', function ($q) {
+                $q->where('status', 'ACTIVE');
+            })
+            ->first();
+    }
+
     public function generateProductSlug($productName)
     {
         $slug = \Str::slug($productName);

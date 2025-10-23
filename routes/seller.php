@@ -3,6 +3,7 @@
 use App\Http\Controllers\Seller\Category\CategoryController;
 use App\Http\Controllers\Seller\CustomerManager\CustomerManagerController;
 use App\Http\Controllers\Seller\DashBoardController;
+use App\Http\Controllers\Seller\Filter\CustomerController;
 use App\Http\Controllers\Seller\LoginController;
 use App\Http\Controllers\Seller\Order\OrderController;
 use App\Http\Controllers\Seller\PaymentHistory\PaymentHistoryController;
@@ -114,7 +115,12 @@ Route::middleware(['validate.subdomain', 'tenant.mongo'])
                     Route::put('/update/{id}', [CurrencyRateController::class, 'update'])->name('seller.currency-rate.update');
                     Route::delete('/destroy/{id}', [CurrencyRateController::class, 'destroy'])->name('seller.currency-rate.destroy');
                 });
-            });
 
+                // filter
+                Route::group(['prefix' => 'filter'], function () {
+                    Route::get('/customers', [CustomerController::class, 'index'])->name('seller.filter.customers.index');
+                    Route::get('/customers/{id}', [CustomerController::class, 'show'])->name('seller.filter.customers.show');
+                });
+            });
         });
     });

@@ -37,41 +37,14 @@ class OrderService
         $page = $request['page'] ?? 1;
         $perPage = $request['perPage'] ?? 10;
 
-        $query = Orders::query();
-
-        if (isset($request['search']) && $request['search'] != '') {
-            $search = $request['search'];
-            $query->where(function($q) use ($search) {
-                $q->where('order_number', 'like', '%' . $search . '%')
-                  ->orWhere('notes', 'like', '%' . $search . '%');
-            });
-        }
-
-        if (isset($request['status']) && $request['status'] != '') {
-            $query->where('status', $request['status']);
-        }
-
-        if (isset($request['payment_status']) && $request['payment_status'] != '') {
-            $query->where('payment_status', $request['payment_status']);
-        }
-
-        if (isset($request['date_from']) && $request['date_from'] != '') {
-            $start = Carbon::parse($request['date_from'])->startOfDay();
-            $query->where('created_at', '>=', $start);
-        }
-
-        if (isset($request['date_to']) && $request['date_to'] != '') {
-            $end = Carbon::parse($request['date_to'])->endOfDay();
-            $query->where('created_at', '<=', $end);
-        }
-
-        if (isset($request['category_id']) && $request['category_id'] != '') {
-            $query->where('category_id', $request['category_id']);
-        }
-
-        if (isset($request['product_id']) && $request['product_id'] != '') {
-            $query->where('product_id', $request['product_id']);
-        }
+        $query = Orders::query()
+            ->filterSearch($request)
+            ->filterStatus($request)
+            ->filterPaymentStatus($request)
+            ->filterCategory($request)
+            ->filterProduct($request)
+            ->filterCustomer($request)
+            ->filterDate($request);
 
         return $query->with([
                 'category:_id,name',
@@ -196,8 +169,7 @@ class OrderService
 
         $items = $accounts->map(function ($acc) {
             return [
-                'key' => $acc->key,
-                'data' => $acc->data,
+                $acc->data
             ];
         })->values()->toArray();
 
