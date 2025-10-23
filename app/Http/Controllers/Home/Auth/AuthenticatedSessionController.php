@@ -13,6 +13,8 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -38,13 +40,37 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::guard('seller')->user();
         // Lưu message vào session trước khi redirect
         $request->session()->flash('success', 'Đăng nhập thành công!');
-        $request->session()->flash('popup', $user->id);
+
+        // Generate one-time popup token and store in cache (short TTL)
+        $popupToken = Str::random(40);
+        $cacheKey = "popup_login_token:{$user->id}:{$popupToken}";
+        Cache::put($cacheKey, true, now()->addMinutes(120));
+
+        $request->session()->flash('popup', [
+            'user_id' => (string) $user->id,
+            'token' => $popupToken,
+            'expires_at' => now()->addMinutes(120)->toISOString(),
+        ]);
 
         return redirect()->intended(RouteServiceProvider::getRedirectAfterAuthenticated());
     }
 
-    public function goToStore($id)
+    public function goToStore(Request $request, $id)
     {
+       
+        // Validate popup token
+        $token = (string) $request->input('token', '');
+        if ($token === '') {
+            return back()->with('error', 'Missing token');
+        }
+
+        $cacheKey = "popup_login_token:{$id}:{$token}";
+        // Use pull to make token one-time
+        $valid = Cache::get($cacheKey);
+        if (!$valid) {
+            return back()->with('error', 'Invalid or expired token');
+        }
+
         $user = $this->userService->findById($id);
         if (!$user) {
             return back()->with('error', 'User not found');
