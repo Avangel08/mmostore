@@ -32,4 +32,13 @@ class SubProducts extends Model
         'ACTIVE' => 'ACTIVE',
         'INACTIVE' => 'INACTIVE',
     ];
+
+    public function scopeFilterSubProductId($query, $request)
+    {
+        if (isset($request['subId']) && $request['subId'] != '') {
+            $query->where('_id', $request['subId']);
+        }
+
+        return $query;
+    }
 }

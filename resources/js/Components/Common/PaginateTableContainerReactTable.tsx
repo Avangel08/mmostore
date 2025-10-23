@@ -122,8 +122,8 @@ const PaginateTableContainer = ({
   tableStyle,
   keyPageParam = 'page',
   keyPerPageParam = 'perPage',
-  showPaginationEllipsis = false,
-  maxVisiblePages = 5,
+  showPaginationEllipsis = true,
+  maxVisiblePages = 10,
 }: TableContainerProps) => {
   const {t} = useTranslation();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
