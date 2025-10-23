@@ -634,5 +634,8 @@
     "Rejected": "Bị từ chối",
     "Expiration date range": "Khoảng ngày hết hạn",
     "Select expiration date range": "Chọn khoảng ngày hết hạn",
-    "Select plan type": "Chọn loại gói"
+    "Select plan type": "Chọn loại gói",
+    "Expired on": "Hết hạn vào",
+    "Expires date": "Ngày hết hạn",
+    "Expired": "Hết hạn"
 }
