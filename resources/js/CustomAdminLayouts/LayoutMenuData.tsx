@@ -8,6 +8,7 @@ const Navdata = () => {
     const [isRoleManagement, setIsRoleManagement] = useState<boolean>(false);
     const [isPermissionManagement, setIsPermissionManagement] = useState<boolean>(false);
     const [isPlanManagement, setIsPlanManagement] = useState<boolean>(false);
+    const [isCurrencyRate, setIsCurrencyRate] = useState<boolean>(false);
     const [iscurrentState, setIscurrentState] = useState('Role Management');
     const { t } = useTranslation();
 
@@ -39,6 +40,9 @@ const Navdata = () => {
         }
         if (iscurrentState !== 'Plan Management') {
             setIsPlanManagement(false);
+        }
+        if (iscurrentState !== 'Currency Rate') {
+            setIsCurrencyRate(false);
         }
     }, [
         history,
@@ -117,11 +121,24 @@ const Navdata = () => {
             label: t("Plan"),
             icon: "ri-money-dollar-box-fill",
             link: route("admin.plans.index"),
-            stateVariables: isRoleManagement,
+            stateVariables: isPlanManagement,
             click: function (e: any) {
                 e.preventDefault();
                 setIsPlanManagement(!isPlanManagement);
                 setIscurrentState('Plan Management');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "currency-rate",
+            label: "Currency Rate",
+            icon: "ri-exchange-line",
+            link: route('admin.currency-rates.index'),
+            stateVariables: isCurrencyRate,
+            click: function (e: any) {
+                e.preventDefault();
+                setIsCurrencyRate(!isCurrencyRate);
+                setIscurrentState('Currency Rate');
                 updateIconSidebar(e);
             },
         },
