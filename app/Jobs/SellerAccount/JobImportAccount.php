@@ -105,6 +105,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
         $successCount = 0;
         $errorCount = 0;
         $errors = [];
+        $data_errors = [];
         $isNeedCheckMail = str_contains(strtolower($this->typeName), 'mail');
 
         LazyCollection::make(function () use ($fullPath) {
@@ -114,12 +115,13 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             }
             fclose($handle);
         })
-            ->map(function ($line) use (&$totalCount, &$successCount, &$errorCount, $timeStart, $isNeedCheckMail, &$errors) {
+            ->map(function ($line) use (&$totalCount, &$successCount, &$errorCount, $timeStart, $isNeedCheckMail, &$errors, &$data_errors) {
                 $totalCount++;
                 $line = trim($line);
                 if (empty($line)) {
                     $errorCount++;
                     $errors["Line {$totalCount}"] = 'Empty line';
+                    $data_errors[] = $line;
                     return null;
                 }
 
@@ -127,6 +129,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 if (count($parts) < 1) {
                     $errorCount++;
                     $errors["Line {$totalCount} ({$line})"] = 'Empty format';
+                    $data_errors[] = $line;
                     return null;
                 }
 
@@ -143,12 +146,14 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 if (empty($mainData)) {
                     $errorCount++;
                     $errors["Line {$totalCount} ({$line})"] = 'Empty main data';
+                    $data_errors[] = $line;
                     return null;
                 }
 
                 if ($isNeedCheckMail && !filter_var($mainData, FILTER_VALIDATE_EMAIL)) {
                     $errorCount++;
                     $errors["Line {$totalCount} ({$line})"] = 'Invalid email';
+                    $data_errors[] = $line;
                     return null;
                 }
 
@@ -159,6 +164,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                     if (trim($remainPart) == '') {
                         $errorCount++;
                         $errors["Line {$totalCount} ({$line})"] = 'Empty remain data';
+                        $data_errors[] = $line;
                         return null;
                     }
                 }
@@ -166,6 +172,7 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
                 if (isset($this->uniqueKeys[$key])) {
                     $errorCount++;
                     $errors["Line {$totalCount} ({$line})"] = 'Duplicate data';
+                    $data_errors[] = $line;
                     return null;
                 }
 
@@ -208,7 +215,8 @@ class JobImportAccount implements ShouldBeUnique, ShouldQueue
             'total_count' => (int) $totalCount,
             'success_count' => (int) $successCount,
             'error_count' => (int) $errorCount,
-            'errors' => $errors
+            'errors' => $errors,
+            'data_errors' => $data_errors,
         ];
     }
 
