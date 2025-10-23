@@ -126,13 +126,13 @@ const DomainConfig = () => {
                                                     </Col>}
                                                 </Row>
                                             ))}
-                                            <Button
+                                            {/* <Button
                                                 variant="secondary"
                                                 onClick={() => arrayHelpers.push("")}
                                                 disabled
                                             >
                                                 <i className="ri-add-circle-line"></i>{" "}{t("Add domain")}
-                                            </Button>
+                                            </Button> */}
                                         </div>
                                     )}
                                 />
