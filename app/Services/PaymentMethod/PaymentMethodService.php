@@ -40,11 +40,6 @@ class PaymentMethodService
         return PaymentMethods::where('id', $id)->where('status', PaymentMethods::STATUS['ACTIVE'])->first();
     }
 
-    public function findActiveById($id)
-    {
-        return PaymentMethods::where('id', $id)->where('status', PaymentMethods::STATUS['ACTIVE'])->first();
-    }
-
     public function findByUserId($userId)
     {
         return PaymentMethods::where('user_id', $userId)
