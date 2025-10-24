@@ -128,7 +128,7 @@ const Index: PageWithLayout = () => {
             <PageHeader title={theme?.pageHeaderText ?? ""} />
             <ModalDeposit show={showModal} onHide={() => setShowModal(false)} data={data} />
             <ToastContainer />
-            {listPaymentMethod?.length === 0 ? (
+            {listPaymentMethod?.length > 0 ? (
             <Container className="mt-4 custom-container" fluid>
                 <Card className="shadow-sm p-2" style={{ minHeight: "50vh" }}>
                     <Card.Body>
