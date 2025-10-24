@@ -119,6 +119,7 @@ class PlanService
         return Plans::select($select)
             ->where('status', Plans::STATUS['ACTIVE'])
             ->where('show_public', Plans::SHOW_PUBLIC['true'])
+            ->where('type', '!=', Plans::TYPE['DEFAULT'])
             ->with($relation)
             ->get();
     }
