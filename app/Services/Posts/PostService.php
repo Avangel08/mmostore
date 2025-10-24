@@ -51,4 +51,12 @@ class PostService
         }
         return $post;
     }
+
+    public function findById($id, $select = ['*'], $relation = [])
+    {
+        return Posts::select($select)
+            ->with($relation)
+            ->where('id', $id)
+            ->first();
+    }
 }

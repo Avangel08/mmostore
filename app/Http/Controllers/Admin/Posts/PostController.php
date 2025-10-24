@@ -24,7 +24,7 @@ class PostController extends Controller
     {
         $posts = $this->postService->getPosts();
         $statusList = array_flip(Posts::LIST_STATUS);
-        
+
         return Inertia::render('Posts/Index', [
             'posts' => fn() => PostResource::collection($posts),
             'statusList' => $statusList
@@ -72,10 +72,28 @@ class PostController extends Controller
 
     public function edit($id)
     {
-        $post = DB::table('posts')->find($id);
+        $post = $this->postService->findById($id);
 
-        return Inertia::render('Posts/edit', [
-            'post' => $post,
+        $optionStatus = [];
+        foreach (Posts::LIST_STATUS as $key => $value) {
+            $optionStatus[] = [
+                'label' => $key,
+                'value' => $value
+            ];
+        }
+
+        $optionVisibility = [];
+        foreach (Posts::LIST_VISIBILITY as $key => $value) {
+            $optionVisibility[] = [
+                'label' => $key,
+                'value' => $value
+            ];
+        }
+
+        return Inertia::render('Posts/PostForm', [
+            'optionStatus' => fn() => $optionStatus,
+            'optionVisibility' => fn() => $optionVisibility,
+            'post' => fn() => new PostResource($post)
         ]);
     }
 

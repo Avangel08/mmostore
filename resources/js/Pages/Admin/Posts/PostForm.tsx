@@ -31,14 +31,14 @@ const PostForm = () => {
 
     const formik = useFormik({
         initialValues: {
-            title: post?.title || "",
-            content: post?.content || "",
+            title: post?.data?.title || "",
+            content: post?.data?.content || "",
             thumbnail: null as File | null,
-            status: post?.status || "PUBLISHED",
-            visibility: post?.visibility || "PUBLIC",
+            status: post?.data?.status || "PUBLISHED",
+            visibility: post?.data?.visibility || "PUBLIC",
             category_id: null,
-            published_at: post?.published_at || null,
-            shortDescription: post?.shortDescription || ""
+            published_at: post?.data?.published_at || null,
+            shortDescription: post?.data?.short_description || ""
         },
         // validationSchema: ({}),
         onSubmit: (values) => {
