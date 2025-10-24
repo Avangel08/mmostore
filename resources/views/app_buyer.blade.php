@@ -4,16 +4,13 @@
     foreach ($settings as $setting) {
         $result[$setting->key] = $setting->value;
     }
-    $user = auth('seller')->user();
-    $store = \App\Models\MySQL\Stores::where('user_id', $user->id)->first();
-
+    $store = app('store');
     $domainSuffix = config('app.domain_suffix');
 
     $matchedDomain = collect($store->domain)
         ->first(fn($d) => str_contains($d, $domainSuffix));
 
     $domain = $matchedDomain ? "https://{$matchedDomain}" : null;
-    //dd($content);
 @endphp
 
 <!DOCTYPE html>
@@ -22,26 +19,26 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ $result['storeName'] }}</title>
+        <title inertia>{{ $result['storeName'] ?? '' }}</title>
         <meta
             name="description"
-            content="{{ $result['metaDescription'] }}"
+            content="{{ $result['metaDescription'] ?? '' }}"
         />
-        <meta name="author" content="{{ $result['storeName'] }}" />
+        <meta name="author" content="{{ $result['storeName'] ?? '' }}" />
 
         <!-- Open Graph meta tags -->
-        <meta property="og:title" content="{{ $result['storeName'] }}" />
-        <meta property="og:description" content="{{ $result['metaDescription'] }}" />
-        <meta property="og:image" content="{{ asset('storage/'.$result['storeLogo']) }}" />
+        <meta property="og:title" content="{{ $result['storeName'] ?? '' }}" />
+        <meta property="og:description" content="{{ $result['metaDescription'] ?? '' }}" />
+        <meta property="og:image" content="{{ asset('storage/' . ($result['storeLogo'] ?? '')) }}" />
         <meta property="og:url" content="{{ $domain }}" />
         <meta property="og:type" content="product" />
-        <meta property="og:site_name" content="{{ $result['storeName'] }}" />
+        <meta property="og:site_name" content="{{ $result['storeName'] ?? ''}}" />
 
         <!-- Twitter card tags -->
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="{{ $result['storeName'] }}" />
-        <meta name="twitter:description" content="{{ $result['metaDescription'] }}" />
-        <meta name="twitter:image" content="{{ asset('storage/'.$result['storeLogo']) }}" />
+        <meta name="twitter:title" content="{{ $result['storeName'] ?? '' }}" />
+        <meta name="twitter:description" content="{{ $result['metaDescription'] ?? '' }}" />
+        <meta name="twitter:image" content="{{ asset('storage/' . ($result['storeLogo'] ?? '')) }}" />
 
         <meta name="robots" content="index, follow" />
 
