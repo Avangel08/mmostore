@@ -3,6 +3,7 @@
 namespace App\Services\CurrencyRate;
 
 use App\Models\MySQL\CurrencyRates;
+use Carbon\Carbon;
 
 /**
  * Class CurrencyRateService
@@ -10,12 +11,31 @@ use App\Models\MySQL\CurrencyRates;
  */
 class CurrencyRateService
 {
-    public function currencyRateActive()
+    public function getPaginateData($request)
     {
-        return CurrencyRates::orderBy("date", "desc")->first();
+        $page = $request['page'] ?? 1;
+        $perPage = $request['perPage'] ?? 10;
+        return CurrencyRates::filterRateRange($request)
+            ->filterEffectiveDate($request)
+            ->filterCreatedDate($request)
+            ->orderBy('date', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function convertVNDToUSD(float $amount)  : float
+    public function create($data)
+    {
+        return CurrencyRates::create($data);
+    }
+
+    public function currencyRateActive()
+    {
+        return CurrencyRates::where('status', CurrencyRates::STATUS['ACTIVE'])
+            ->where('date', '<=', now())
+            ->orderByDesc('date')
+            ->first();
+    }
+
+    public function convertVNDToUSD(float $amount): float
     {
         $rate = $this->currencyRateActive();
         $result = 0;
@@ -26,7 +46,7 @@ class CurrencyRateService
         return $result;
     }
 
-    public function convertUSDToVND(float $amount) : float
+    public function convertUSDToVND(float $amount): float
     {
         $rate = $this->currencyRateActive();
         $result = 0;

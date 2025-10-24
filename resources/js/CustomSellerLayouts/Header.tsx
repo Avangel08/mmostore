@@ -25,9 +25,28 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
     const { t } = useTranslation();
     const user = usePage().props.auth.user as any;
 
-    const currentPlan = user?.plan || { name: "Basic Plan", expires_at: "2025-12-31" };
+    const currentPlan = user?.current_plan || { name: "Free", expires_on: null };
     const formatExpiryDate = (dateString: string) => {
         return moment(dateString).format('DD/MM/YYYY');
+    };
+
+    const getPlanStatus = () => {
+        if (!currentPlan.expires_on) return 'free'; // Free plan
+        
+        const now = moment();
+        const expiryDate = moment(currentPlan.expires_on);
+        const daysUntilExpiry = expiryDate.diff(now, 'days');
+        
+        if (daysUntilExpiry < 0) return 'expired';
+        if (daysUntilExpiry <= 7) return 'expiring-soon';
+        if (daysUntilExpiry <= 30) return 'expiring';
+        return 'active';
+    };
+
+    const planStatus = getPlanStatus();
+    const getDaysUntilExpiry = () => {
+        if (!currentPlan.expires_on) return 0;
+        return moment(currentPlan.expires_on).diff(moment(), 'days');
     };
 
     const selectDashboardData = createSelector(
@@ -145,7 +164,12 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                              <div className="header-item">
                                 <button
                                     type="button"
-                                    className="btn btn-outline-primary btn-sm me-2"
+                                    className={`btn btn-sm me-2 ${
+                                        planStatus === 'expired' ? 'btn-danger' :
+                                        planStatus === 'expiring-soon' ? 'btn-warning' :
+                                        planStatus === 'expiring' ? 'btn-outline-warning' :
+                                        'btn-outline-primary'
+                                    }`}
                                     onClick={handlePlanClick}
                                     style={{
                                         borderRadius: '20px',
@@ -154,29 +178,31 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                                     }}
                                 >
                                     <div className="d-flex align-items-center">
-                                        <i className="mdi mdi-crown text-warning me-1"></i>
+                                        <i className={`mdi me-1 ${
+                                            planStatus === 'expired' ? 'mdi-alert-circle text-white' :
+                                            planStatus === 'expiring-soon' ? 'mdi-clock-alert text-white' :
+                                            planStatus === 'expiring' ? 'mdi-clock-outline text-warning' :
+                                            'mdi-crown text-warning'
+                                        }`}></i>
                                         <div className="d-flex flex-column text-start" onClick={handlePlanClick}>
                                             <span className="fw-semibold">{currentPlan.name}</span>
-                                            <small className="text-muted" style={{ fontSize: '0.65rem' }}>
-                                                {t("Exp")}: {formatExpiryDate(currentPlan.expires_at)}
-                                            </small>
+                                            {currentPlan.expires_on && (
+                                                <small className={`${
+                                                    planStatus === 'expired' ? 'text-white' :
+                                                    planStatus === 'expiring-soon' ? 'text-white' :
+                                                    planStatus === 'expiring' ? 'text-warning' :
+                                                    'text-muted'
+                                                }`} style={{ fontSize: '0.65rem' }}>
+                                                    {planStatus === 'expired' ? `${t("Expires date")}: ${formatExpiryDate(currentPlan.expires_on)}` :
+                                                     planStatus === 'expiring-soon' ? `${getDaysUntilExpiry()} ${t("days left")}` :
+                                                     planStatus === 'expiring' ? `${getDaysUntilExpiry()} ${t("days left")}` :
+                                                     `${t("Exp")}: ${formatExpiryDate(currentPlan.expires_on)}`}
+                                                </small>
+                                            )}
                                         </div>
                                     </div>
                                 </button>
                             </div> 
-
-                            {/* View store */}
-                            <div className="ms-1">
-                                <a
-                                    href="/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn btn-sm btn-outline-success"
-                                >
-                                    <i className="ri-eye-line align-bottom me-1"></i>
-                                    {t("View store")}
-                                </a>
-                            </div>
 
                             {/* LanguageDropdown */}
                             <LanguageDropdown />

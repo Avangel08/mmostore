@@ -8,11 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PaymentMethods extends Model
 {
     use SoftDeletes;
-
-    const USER_TYPE = [
-        'ADMIN' => 0,
-        'SELLER' => 1,
-    ];
     
     const KEY = [
         'VCB' => 'VCB',
@@ -21,11 +16,6 @@ class PaymentMethods extends Model
     const TYPE = [
         'BANK' => 0,
         'CRYPTO' => 1,
-    ];
-
-    const LIST_BANK = [
-        'VCB' => 'Vietcombank',
-        // 'MB' => 'MB Bank',
     ];
 
     const STATUS = [
@@ -37,12 +27,10 @@ class PaymentMethods extends Model
     protected $table = 'payment_methods';
 
     protected $fillable = [
-        "user_id", 
-        "user_type",
         "type",
         "key", // giống bank_code
         "name",
-        "details", //{account_name, password, account_number}
+        "details", //{user_name, password, account_number}
         "status",
         "icon",
         "is_verify_otp"  //check xem đã xác thực OTP chưa (true/false)

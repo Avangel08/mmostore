@@ -25,11 +25,12 @@ class Charges extends Model
         'name',
         'interval',
         'interval_type',
+        'description',
         'feature',
         'active_on',
         'expires_on',
         'check_out_id',
-        'creator_id'
+        'creator_id',
     ];
 
     protected $casts = [

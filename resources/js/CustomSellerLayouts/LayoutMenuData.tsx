@@ -9,11 +9,12 @@ const Navdata = () => {
     const [isProduct, setIsProduct] = useState<boolean>(false);
     const [isPaymentHistory, setIsPaymentHistory] = useState<boolean>(false);
     const [isCurrencyRate, setIsCurrencyRate] = useState<boolean>(false);
-    const [iscurrentState, setIscurrentState] = useState('Dashboard');
     const [isSettings, setIsSettings] = useState<boolean>(false)
     const [isCustomerManager, setIsCustomerManager] = useState<boolean>(false)
     const [isOrderManager, setIsOrderManager] = useState<boolean>(false)
     const [isPaymentMethod, setIsPaymentMethod] = useState<boolean>(false)
+    const [isPlan, setIsPlan] = useState<boolean>(false)
+    const [iscurrentState, setIscurrentState] = useState('Dashboard');
 
     function updateIconSidebar(e: any) {
         if (e && e.target && e.target.getAttribute("sub-items")) {
@@ -159,6 +160,19 @@ const Navdata = () => {
                 e.preventDefault();
                 setIsPaymentHistory(!isPaymentHistory);
                 setIscurrentState('Payment History');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "plan",
+            label: "Plan",
+            icon: "ri-wallet-3-line",
+            link: route('seller.plan.index'),
+            stateVariables: isPlan,
+            click: function (e: any) {
+                e.preventDefault();
+                setIsPlan(!isPlan);
+                setIscurrentState('Plan');
                 updateIconSidebar(e);
             },
         },

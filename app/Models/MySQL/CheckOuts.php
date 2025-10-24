@@ -35,6 +35,7 @@ class CheckOuts extends Model
         'amount_vnd',
         'interval',
         'interval_type',
+        'description',
         'feature',
         'status',
         'creator_id',

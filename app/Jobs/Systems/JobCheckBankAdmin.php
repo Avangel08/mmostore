@@ -1,8 +1,7 @@
 <?php
 
 namespace App\Jobs\Systems;
-
-use App\Models\Mongo\BankHistoryLogs;
+use App\Models\MySQL\BankHistoryLogsAdmin;
 use App\Services\CheckBank\CheckBankService;
 use App\Services\PaymentMethod\PaymentMethodService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -43,10 +42,10 @@ class JobCheckBankAdmin implements ShouldQueue
         }
         $infoBank = $bank->details;
 
-        $accountName = $infoBank['account_name'];
-        $password = $infoBank['password'];
-        $accountNumber = $infoBank['account_number'];
-        $bankCode = $bank->key;
+        $accountName = $infoBank['account_name'] ?? "";
+        $password = $infoBank['password'] ?? "";
+        $accountNumber = $infoBank['account_number'] ?? "";
+        $bankCode = $bank?->key ?? "";
         if (empty($accountName) || empty($password) || empty($accountNumber) || empty($bankCode)) {
             echo "Thông tin ngân hàng không hợp lệ";
             return;
@@ -68,23 +67,23 @@ class JobCheckBankAdmin implements ShouldQueue
                 }
 
                 //check giao dịch này đã tồn tại hay chưa
-                $checkExist = BankHistoryLogs::where('key_unique', $dataLog['key_unique'])->doesntExist();
+                $checkExist = BankHistoryLogsAdmin::where('key_unique', $dataLog['key_unique'])->doesntExist();
                 if ($checkExist) {
                     //Lưu lại giao dịch này
-                    BankHistoryLogs::insert($dataLog);
+                    BankHistoryLogsAdmin::insert($dataLog);
 
                     //Valid transaction 
                     $validate = $this->checkBankService->validateTransaction($dataLog);
                     if ($validate['success'] == false) {
                         echo "Giao dịch không hợp lệ" . PHP_EOL;
-                        BankHistoryLogs::where('key_unique', $dataLog['key_unique'])->update(['error_info' => $validate['message']]);
+                        BankHistoryLogsAdmin::where('key_unique', $dataLog['key_unique'])->update(['error_info' => $validate['message']]);
                         continue;
                     }
 
+                    $contentBank = $dataLog['content_bank'];
+                    $transactionId = $dataLog['key_unique'];
                     $amount = $dataLog['amount'];
-                    $userId = $dataLog['user_id'];
-
-                    //Do some thing
+                    JobProcessPaymentPlan::dispatch($contentBank, $transactionId, $amount);
                 }
             }
         }

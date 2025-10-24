@@ -22,8 +22,7 @@ class UserController extends Controller
     public function __construct(
         UserService $userService,
         StoreService $storeService,
-    )
-    {
+    ) {
         $this->userService = $userService;
         $this->storeService = $storeService;
     }
@@ -140,5 +139,27 @@ class UserController extends Controller
         }
 
         return Redirect::away($signedUrl);
+    }
+
+    public function getUserPaginateSelect(Request $request)
+    {
+        try {
+            $searchTerm = $request->input('search', '');
+            $page = (int) $request->input('page', 1);
+
+            $options = $this->userService->getListUserPaginate($searchTerm, $page, 10);
+
+            return response()->json([
+                'results' => $options['results'] ?? [],
+                'has_more' => $options['has_more'] ?? false,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error($e, ['ip' => $request->ip(), 'user_id' => auth(config('guard.admin'))->id() ?? null]);
+
+            return response()->json([
+                'results' => [],
+                'has_more' => false,
+            ], 500);
+        }
     }
 }

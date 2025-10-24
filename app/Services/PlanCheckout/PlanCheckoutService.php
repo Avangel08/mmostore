@@ -18,13 +18,32 @@ class PlanCheckoutService
             ->first();
     }
 
+    public function update(CheckOuts $checkoutItem, $data)
+    {
+        return $checkoutItem->update($data);
+    }
+
+    public function findByContentBank($contentBank)
+    {
+        return CheckOuts::where('content_bank', $contentBank)->where('status', CheckOuts::STATUS['PENDING'])->first();
+    }
+
+    public function findExist($data)
+    {
+        return CheckOuts::where('user_id', $data['user_id'])
+            ->where('plan_id', $data['plan_id'])
+            ->where('payment_method_id', $data['payment_method_id'])
+            ->where('amount', $data['amount'])
+            ->where('amount_vnd', $data['amount_vnd'])
+            ->where('status', $data['status'])
+            ->first();
+    }
+
     public function createCheckout(User $user, Plans $plan, PaymentMethods $paymentMethod)
     {
-        $currencyRateService = app(\App\Services\CurrencyRate\CurrencyRateService::class);
-        $checkoutModel = CheckOuts::updateOrCreate([
+        $currencyRateService = app(abstract: \App\Services\CurrencyRate\CurrencyRateService::class);
+        $dataInsert = [
             'user_id' => $user->id,
-            'status' => CheckOuts::STATUS['PENDING']
-        ], [
             'plan_id' => $plan->id,
             'payment_method_id' => $paymentMethod->id,
             'type' => $plan->type,
@@ -33,16 +52,20 @@ class PlanCheckoutService
             'amount_vnd' => $plan->price,
             'interval' => $plan->interval,
             'interval_type' => $plan->interval_type,
+            'description' => $plan->description,
             'status' => CheckOuts::STATUS['PENDING'],
             'creator_id' => $user->id,
-            'content_bank' => CheckBankService::genContentBank($user->id, $paymentMethod->key)
-        ]);
-        if (!$checkoutModel) {
-            return null;
+            'content_bank' => CheckBankService::genContentBank($user->id, $plan->id, null, 8)
+        ];
+
+        $existingCheckout = $this->findExist($dataInsert);
+        if (!$existingCheckout) {
+            $existingCheckout = CheckOuts::create($dataInsert);
+            $this->update($existingCheckout, [
+                'content_bank' => CheckBankService::genContentBank($user->id, $existingCheckout->id, $paymentMethod->key, 8)
+            ]);
         }
-        $checkoutModel->update([
-            'content_bank' => CheckBankService::genContentBank($user->id, $checkoutModel->id)
-        ]);
-        return $checkoutModel;
+
+        return $existingCheckout;
     }
 }

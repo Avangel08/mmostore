@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\CurrencyRate\CurrencyRateAdminController;
 use App\Http\Controllers\Admin\Dashboard\DashboardController;
+use App\Http\Controllers\Admin\PaymentHistory\PaymentHistoryAdminController;
+use App\Http\Controllers\Admin\PaymentMethod\PaymentMethodAdminController;
 use App\Http\Controllers\Admin\PermissionManagement\PermissionManagementController;
 use App\Http\Controllers\Admin\Plan\PlanController;
 use App\Http\Controllers\Admin\ProductType\ProductTypeController;
@@ -40,6 +43,7 @@ Route::domain($mainDomain)->group(function () {
             Route::put('/update/{id}', [UserController::class, 'update'])->name('admin.user.update');
             Route::delete('/delete', [UserController::class, 'delete'])->name('admin.user.delete');
             Route::get('/{id}/login-as', [UserController::class, 'loginAs'])->name('admin.user.login-as');
+            Route::get('/list-user', [UserController::class, 'getUserPaginateSelect'])->name('admin.user.list-user');
         });
 
         Route::group(['prefix' => 'plans'], function () {
@@ -51,6 +55,14 @@ Route::domain($mainDomain)->group(function () {
             Route::delete('/delete-multiple', [ProductTypeController::class, 'deleteMultipleProductTypes'])->name('admin.product-types.delete-multiple');
         });
         Route::resource('product-types', ProductTypeController::class, ['as' => 'admin']);
+
+        Route::resource('currency-rates', CurrencyRateAdminController::class, ['as' => 'admin']);
+
+        Route::resource('payment-history', PaymentHistoryAdminController::class, ['as' => 'admin'])->only(['index']);
+
+        Route::group(['prefix' => 'payment-methods'], function () {
+            Route::get('/list-method', [PaymentMethodAdminController::class, 'getListPaymentMethod'])->name('admin.payment-method.list-method');
+        });
     });
 
 });
