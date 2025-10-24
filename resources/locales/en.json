@@ -312,5 +312,10 @@
     "Successful deposit": "Successful deposit",
     "Enter name or transaction" : "Enter name or transaction",
     "Transaction" : "Transaction",
-    "Insufficient balance": "Insufficient balance"
+    "Insufficient balance": "Insufficient balance",
+    "Enter name store": "Enter name store",
+    "Meta description": "Meta description",
+    "Enter meta description": "Enter meta description",
+    "Enter your domain": "Enter your domain",
+    "Meta description for a website on search engines": "Meta description for a website on search engines"
 }

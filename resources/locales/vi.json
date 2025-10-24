@@ -611,15 +611,6 @@
     "Enter customer name": "Nhập tên khách hàng",
     "System": "Hệ thống",
     "Sales channel": "Kênh bán hàng",
-    "No plans available": "Không có gói nào khả dụng",
-    "Please check back later": "Vui lòng quay lại sau",
-    "Subscription Plans": "Gói đăng ký",
-    "Invalid plan selected": "Gói đã chọn không hợp lệ",
-    "No payment methods available. Please contact support": "Không có phương thức thanh toán nào khả dụng. Vui lòng liên hệ hỗ trợ",
-    "No valid payment method found. Please contact support": "Không tìm thấy phương thức thanh toán hợp lệ. Vui lòng liên hệ hỗ trợ",
-    "Continue": "Tiếp tục",
-    "Select Payment Method": "Chọn phương thức thanh toán",
-    "Choose your preferred payment method": "Chọn phương thức thanh toán của bạn",
     "Rate": "Tỷ giá",
     "Enter rate": "Nhập tỷ giá",
     "Effective date range": "Khoảng ngày hiệu lực",
@@ -671,5 +662,10 @@
     "Failed to load payment methods": "Không thể tải phương thức thanh toán",
     "Simple pricing. No hidden fees. Advanced features for you.": "Giá cả đơn giản. Không phí ẩn. Tính năng nâng cao dành cho bạn.",
     "Current your plan": "Gói hiện tại của bạn",
-    "Explore subscription plans designed to fit your needs": "Khám phá các gói đăng ký được thiết kế để phù hợp với nhu cầu của bạn"
+    "Explore subscription plans designed to fit your needs": "Khám phá các gói đăng ký được thiết kế để phù hợp với nhu cầu của bạn",
+    "Enter name store": "Nhập tên cửa hàng",
+    "Meta description": "Thẻ mô tả",
+    "Enter meta description": "Nhập mô tả thẻ",
+    "Enter your domain": "Nhập tên miền của bạn",
+    "Meta description for a website on search engines": "Thẻ mô tả cho trang web trên các công cụ tìm kiếm"
 }
