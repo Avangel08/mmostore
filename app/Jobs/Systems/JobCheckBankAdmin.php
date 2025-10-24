@@ -66,15 +66,16 @@ class JobCheckBankAdmin implements ShouldQueue
 
                 //check giao dịch này đã tồn tại hay chưa
                 $checkExist = BankHistoryLogsAdmin::where('key_unique', $dataLog['key_unique'])->doesntExist();
+
                 if ($checkExist) {
                     //Lưu lại giao dịch này
-                    BankHistoryLogsAdmin::insert($dataLog);
+                    $bankHistoryLog = BankHistoryLogsAdmin::create($dataLog);
 
                     //Valid transaction 
                     $validate = $this->checkBankService->validateTransaction($dataLog);
                     if ($validate['success'] == false) {
                         echo "Giao dịch không hợp lệ" . PHP_EOL;
-                        BankHistoryLogsAdmin::where('key_unique', $dataLog['key_unique'])->update(['error_info' => $validate['message']]);
+                        $bankHistoryLog->update(['error_info' => $validate['message']]);
                         continue;
                     }
 
