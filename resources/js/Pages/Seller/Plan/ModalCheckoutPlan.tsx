@@ -22,7 +22,7 @@ export const ModalCheckoutPlan = ({
     const contentBank = data?.content_bank ? String(data.content_bank) : "";
     const bankCode = data?.bank_code ? String(data.bank_code) : "";
 
-    const qrSrc = `https://qr.sepay.vn/img?acc=${accountNumber}&bank=${bankCode}&amount=${amountVnd}&des=${encodeURIComponent(contentBank)}&template=compact&download=true`;
+    const qrSrc = `https://img.vietqr.io/image/${bankCode}-${accountNumber}-compact.jpg?amount=${amountVnd}&addInfo=${encodeURIComponent(contentBank)}&accountName=${encodeURIComponent(accountName)}`;
 
     return (
         <Modal

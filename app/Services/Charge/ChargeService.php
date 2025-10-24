@@ -27,6 +27,7 @@ class ChargeService
             'name' => $planCheckout->name,
             'interval' => $planCheckout->interval,
             'interval_type' => $planCheckout->interval_type,
+            'description' => $planCheckout->description,
             'feature' => $planCheckout->feature,
             'active_on' => Carbon::now(),
             'expires_on' => $this->getDatetimeExpiresCharge($planCheckout, $userId),
