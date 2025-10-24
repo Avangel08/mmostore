@@ -21,7 +21,7 @@ class AuthHelper
         if ($route && str_contains($route->getName(), 'admin')) {
             return Auth::guard('admin')->user();
         } elseif ($route && str_contains($route->getName(), 'seller')) {
-            return Auth::guard('seller')->user();
+            return Auth::guard('seller')->user()?->load(['currentPlan']);
         } elseif ($route && str_contains($route->getName(), 'buyer')) {
             return Auth::guard('buyer')->user();
         }
