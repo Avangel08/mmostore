@@ -1,9 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Seller\Plan;
-use App\Models\MySQL\PaymentMethods;
+use App\Services\Charge\ChargeService;
 use App\Services\CurrencyRate\CurrencyRateService;
-use App\Services\Order\CheckoutService;
 use App\Services\PaymentMethod\PaymentMethodService;
 use App\Services\PlanCheckout\PlanCheckoutService;
 use Auth;
@@ -21,20 +20,23 @@ class PlanController extends Controller
     protected $paymentMethodService;
     protected $planCheckoutService;
     public $currencyRateService;
+    public $chargeService;
 
-    public function __construct(PlanService $planService, PaymentMethodService $paymentMethodService, PlanCheckoutService $planCheckoutService, CurrencyRateService $currencyRateService)
+    public function __construct(PlanService $planService, PaymentMethodService $paymentMethodService, PlanCheckoutService $planCheckoutService, CurrencyRateService $currencyRateService, ChargeService $chargeService)
     {
         $this->planService = $planService;
         $this->paymentMethodService = $paymentMethodService;
         $this->planCheckoutService = $planCheckoutService;
         $this->currencyRateService = $currencyRateService;
+        $this->chargeService = $chargeService;
     }
 
     public function index()
     {
         return Inertia::render('Plan/index', [
             'plans' => fn() => $this->planService->sellerGetAllPlans(),
-            'paymentMethods' => fn() => $this->paymentMethodService->listActive()
+            'paymentMethods' => fn() => $this->paymentMethodService->listActive(),
+            'currentUserPlan' => fn() => $this->chargeService->getCurrentChargeByUser(Auth::guard(config('guard.seller'))->id()),
         ]);
     }
 

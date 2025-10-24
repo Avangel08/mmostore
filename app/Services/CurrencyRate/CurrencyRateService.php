@@ -3,6 +3,7 @@
 namespace App\Services\CurrencyRate;
 
 use App\Models\MySQL\CurrencyRates;
+use Carbon\Carbon;
 
 /**
  * Class CurrencyRateService
@@ -28,7 +29,10 @@ class CurrencyRateService
 
     public function currencyRateActive()
     {
-        return CurrencyRates::orderBy("date", "desc")->where("status", CurrencyRates::STATUS["ACTIVE"])->first();
+        return CurrencyRates::where('status', CurrencyRates::STATUS['ACTIVE'])
+            ->where('date', '<=', now())
+            ->orderByDesc('date')
+            ->first();
     }
 
     public function convertVNDToUSD(float $amount): float

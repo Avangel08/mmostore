@@ -52,6 +52,7 @@ class PlanCheckoutService
             'amount_vnd' => $plan->price,
             'interval' => $plan->interval,
             'interval_type' => $plan->interval_type,
+            'description' => $plan->description,
             'status' => CheckOuts::STATUS['PENDING'],
             'creator_id' => $user->id,
             'content_bank' => CheckBankService::genContentBank($user->id, $plan->id, null, 8)
