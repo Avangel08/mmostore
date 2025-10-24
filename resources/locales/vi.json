@@ -596,5 +596,10 @@
     "Successful deposit": "Số tiền nạp",
     "Enter name or transaction" : "Nhập tên hoặc mã giao dịch",
     "Transaction" : "Mã giao dịch",
-    "Insufficient balance": "Số dư không đủ"
+    "Insufficient balance": "Số dư không đủ",
+    "Enter name store": "Nhập tên cửa hàng",
+    "Meta description": "Thẻ mô tả",
+    "Enter meta description": "Nhập mô tả thẻ",
+    "Enter your domain": "Nhập tên miền của bạn",
+    "Meta description for a website on search engines": "Thẻ mô tả cho trang web trên các công cụ tìm kiếm"
 }   

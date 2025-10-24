@@ -234,6 +234,28 @@ const ThemeConfigs = () => {
                                     {formik.errors.storeName}{" "}
                                 </Form.Control.Feedback>
                             </div>
+                            {/** Meta description */}
+                            <div className="mb-3">
+                                <Form.Group>
+                                    <Form.Label
+                                        className="form-label"
+                                        htmlFor="setting-meta-description-input"
+                                    >
+                                        {t('Meta description')}
+                                    </Form.Label>
+                                    <p className="text-muted fst-italic">{t("Meta description for a website on search engines")}</p>
+                                    <Form.Control
+                                        type="text"
+                                        className="form-control"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        name="metaDescription"
+                                        id="setting-meta-description-input"
+                                        placeholder={t("Enter meta description")}
+                                        value={formik.values.metaDescription}
+                                    />
+                                </Form.Group>
+                            </div>
                             {/** Store Logo */}
                             {isEditMode && settings?.storeLogo && (
                                 <div className="mb-3">
@@ -399,29 +421,6 @@ const ThemeConfigs = () => {
                                         </Form.Control.Feedback>
                                     )
                                 }
-                            </div>
-                            {/** Meta tags */}
-                            <h5 className="mb-3">{t("Meta tags")}</h5>
-                            {/** Meta description */}
-                            <div className="mb-3">
-                                <Form.Group>
-                                    <Form.Label
-                                        className="form-label"
-                                        htmlFor="setting-meta-description-input"
-                                    >
-                                        {t('Meta description')}
-                                    </Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        className="form-control"
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        name="metaDescription"
-                                        id="setting-meta-description-input"
-                                        placeholder={t("Enter meta description")}
-                                        value={formik.values.metaDescription}
-                                    />
-                                </Form.Group>
                             </div>
                         </Col>
                     </Row>
