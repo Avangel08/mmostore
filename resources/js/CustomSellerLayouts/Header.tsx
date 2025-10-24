@@ -164,6 +164,8 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                                     </div>
                                 </button>
                             </div> */}
+
+                            {/* View store */}
                             <div className="ms-1">
                                 <a
                                     href="/"
