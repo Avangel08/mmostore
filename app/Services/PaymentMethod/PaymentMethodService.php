@@ -10,14 +10,27 @@ use App\Models\MySQL\PaymentMethods;
  */
 class PaymentMethodService
 {
+    public function getForTable($request)
+    {
+        $page = $request['page'] ?? 1;
+        $perPage = $request['perPage'] ?? 10;
+        return PaymentMethods::filterSearch($request)
+            ->filterCreatedDate($request)
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
     public function updateOrCreate($data)
     {
         return PaymentMethods::updateOrCreate([
-            'user_id' => $data['user_id'],
-            'user_type' => $data['user_type'],
             'type' => $data['type'],
             'key' => $data['key']
         ], $data);
+    }
+
+    public function create($data)
+    {
+        return PaymentMethods::create($data);
     }
 
     public function update($item, $data)
@@ -35,17 +48,20 @@ class PaymentMethodService
         return PaymentMethods::find($id);
     }
 
+    public function findByKey($key)
+    {
+        return PaymentMethods::where('key', $key)->where('status', PaymentMethods::STATUS['ACTIVE'])->first();
+    }
+
+    public function renderLinkWebhook($host)
+    {
+        $endPoint = "api/v1/webhook/sepay-admin";
+        return $host . "/" . $endPoint;
+    }
+
     public function findActiveById($id)
     {
         return PaymentMethods::where('id', $id)->where('status', PaymentMethods::STATUS['ACTIVE'])->first();
-    }
-
-    public function findByUserId($userId)
-    {
-        return PaymentMethods::where('user_id', $userId)
-            ->where('type', PaymentMethods::TYPE['BANK'])
-            ->where('status', PaymentMethods::STATUS['ACTIVE'])
-            ->first();
     }
 
     public function listActive()

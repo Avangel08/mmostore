@@ -8,14 +8,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PaymentMethods extends Model
 {
     use SoftDeletes;
-    
+
     const KEY = [
         'VCB' => 'VCB',
         'MB' => 'MB',
     ];
+
     const TYPE = [
         'BANK' => 0,
         'CRYPTO' => 1,
+        'SEPAY' => 2,
+    ];
+
+    const LIST_BANK = [
+        'VCB' => 'Vietcombank',
     ];
 
     const STATUS = [
@@ -30,7 +36,9 @@ class PaymentMethods extends Model
         "type",
         "key", // giống bank_code
         "name",
-        "details", //{user_name, password, account_number}
+        "title",
+        "description",
+        "details", //{account_name, account_number, user_name, password}
         "status",
         "icon",
         "is_verify_otp"  //check xem đã xác thực OTP chưa (true/false)
@@ -39,4 +47,25 @@ class PaymentMethods extends Model
     protected $casts = [
         'details' => 'array',
     ];
+
+    public function scopeFilterSearch($query, $request)
+    {
+        if (isset($request['search']) && $request['search'] != '') {
+            $query->where('name', 'like', '%' . $request['search'] . '%');
+            $query->orWhere('title', 'like', '%' . $request['search'] . '%');
+        }
+        return $query;
+    }
+
+    public function scopeFilterCreatedDate($query, $request)
+    {
+        if (isset($request['start_time']) && $request['start_time'] != '') {
+            $query->where('created_at', '>=', $request['start_time']);
+        }
+        if (isset($request['end_time']) && $request['end_time'] != '') {
+            $query->where('created_at', '<=', $request['end_time']);
+        }
+        return $query;
+    }
+
 }
