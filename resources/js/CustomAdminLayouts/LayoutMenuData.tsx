@@ -10,6 +10,7 @@ const Navdata = () => {
     const [isPlanManagement, setIsPlanManagement] = useState<boolean>(false);
     const [isCurrencyRate, setIsCurrencyRate] = useState<boolean>(false);
     const [isPaymentHistory, setIsPaymentHistory] = useState<boolean>(false);
+    const [isPaymentMethod, setIsPaymentMethod] = useState<boolean>(false);
     const [iscurrentState, setIscurrentState] = useState('Role Management');
     const { t } = useTranslation();
 
@@ -47,6 +48,9 @@ const Navdata = () => {
         }
         if (iscurrentState !== 'Currency Rate') {
             setIsCurrencyRate(false);
+        }
+        if (iscurrentState !== 'Payment Method') {
+            setIsPaymentMethod(false);
         }
     }, [
         history,
@@ -156,6 +160,19 @@ const Navdata = () => {
                 e.preventDefault();
                 setIsCurrencyRate(!isCurrencyRate);
                 setIscurrentState('Currency Rate');
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "payment-method",
+            label: "Payment Method",
+            icon: "ri-wallet-fill",
+            link: route('admin.payment-method'),
+            stateVariables: isPaymentMethod,
+            click: function (e: any) {
+                e.preventDefault();
+                setIsPaymentMethod(!isPaymentMethod);
+                setIscurrentState('Payment Method');
                 updateIconSidebar(e);
             },
         },

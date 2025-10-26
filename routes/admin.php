@@ -61,6 +61,14 @@ Route::domain($mainDomain)->group(function () {
         Route::resource('payment-history', PaymentHistoryAdminController::class, ['as' => 'admin'])->only(['index']);
 
         Route::group(['prefix' => 'payment-methods'], function () {
+            Route::get('/', [PaymentMethodAdminController::class, 'index'])->name('admin.payment-method');
+            Route::get('/edit/{id}', [PaymentMethodAdminController::class, 'edit'])->name('admin.payment-method.edit');
+            Route::get('/create', [PaymentMethodAdminController::class, 'create'])->name('admin.payment-method.create');
+            Route::post('/create', [PaymentMethodAdminController::class, 'store'])->name('admin.payment-method.store');
+            Route::put('/update/{id}', [PaymentMethodAdminController::class, 'update'])->name('admin.payment-method.update');
+            Route::post('/verify-payment', [PaymentMethodAdminController::class, 'verifyPayment'])->name('admin.payment-method.verify-payment');
+            Route::post('/verify-sepay', [PaymentMethodAdminController::class, 'verifySePay'])->name('admin.payment-method.verify-sepay');
+            Route::delete('/destroy/{id}', [PaymentMethodAdminController::class, 'destroy'])->name('admin.payment-method.destroy');
             Route::get('/list-method', [PaymentMethodAdminController::class, 'getListPaymentMethod'])->name('admin.payment-method.list-method');
         });
     });
