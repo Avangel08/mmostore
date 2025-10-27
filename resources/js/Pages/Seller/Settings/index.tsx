@@ -50,13 +50,13 @@ const ThemeSettings = () => {
                                         </Nav>
                                         <Tab.Content className="mt-4">
                                             <Tab.Pane eventKey="themeTab">
-                                                <ThemeConfigs />
+                                                <ThemeConfigs activeTab={activeTab} />
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="contactTab">
-                                                <ContactConfig />
+                                                <ContactConfig activeTab={activeTab} />
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="domainTab">
-                                                <DomainConfig />
+                                                <DomainConfig activeTab={activeTab} />
                                             </Tab.Pane>
                                         </Tab.Content>
                                     </Tab.Container>

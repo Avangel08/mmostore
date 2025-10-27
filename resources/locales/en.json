@@ -317,5 +317,16 @@
     "Meta description": "Meta description",
     "Enter meta description": "Enter meta description",
     "Enter your domain": "Enter your domain",
-    "Meta description for a website on search engines": "Meta description for a website on search engines"
+    "Meta description for a website on search engines": "Meta description for a website on search engines",
+    "General Questions": "General Questions",
+    "The domain must not end with :suffix.": "The domain must not end with :suffix.",
+    "The domain ':value' is invalid.": "The domain ':value' is invalid.",
+    "Cannot duplicate system domains": "Cannot duplicate system domains.",
+    "Domains must be unique": "Domains must be unique.",
+    "Please enter domain": "Please enter domain.",
+    "Please enter store name": "Please enter store name.",
+    "Please select a page header image": "Please select a page header image",
+    "Please select a logo store": "Please select a logo store",
+    "Please choose currency": "Please choose currency",
+    "Please enter page header text": "Please enter page header text."
 }

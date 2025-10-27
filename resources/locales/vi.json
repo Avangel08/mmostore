@@ -601,5 +601,16 @@
     "Meta description": "Thẻ mô tả",
     "Enter meta description": "Nhập mô tả thẻ",
     "Enter your domain": "Nhập tên miền của bạn",
-    "Meta description for a website on search engines": "Thẻ mô tả cho trang web trên các công cụ tìm kiếm"
+    "Meta description for a website on search engines": "Thẻ mô tả cho trang web trên các công cụ tìm kiếm",
+    "General Questions": "Câu hỏi chung",
+    "The domain must not end with :suffix.": "Tên miền không được kết thúc bằng :suffix.",
+    "The domain ':value' is invalid.": "Tên miền ':value' không hợp lệ.",
+    "Cannot duplicate system domains": "Không được phép trùng với tên miền hệ thống.",
+    "Domains must be unique": "Không được phép trùng tên miền.",
+    "Please enter domain": "Vui lòng nhập tên miền.",
+    "Please enter store name": "Vui lòng nhập tên cửa hàng.",
+    "Please select a page header image": "Vui lòng chọn ảnh tiêu đề trang.",
+    "Please select a logo store": "Vui lòng chọn logo cửa hàng.",
+    "Please choose currency": "Vui lòng chọn đơn vị tiền tệ.",
+    "Please enter page header text": "Vui lòng nhập nội dung tiêu đề trang."
 }   

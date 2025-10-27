@@ -12,7 +12,7 @@ type initialValuesProps = {
 
 const domainRegex = /^(?!-)[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/; // chỉ check domain hợp lệ
 
-const DomainConfig = () => {
+const DomainConfig = ({ activeTab }: any) => {
     const { t } = useTranslation()
     const { settings, domains, domainSuffix } = usePage().props as any
 
@@ -49,6 +49,7 @@ const DomainConfig = () => {
         onSubmit: (values) => {
             const formData = new FormData();
             formData.append("domains", JSON.stringify(values.domains));
+            formData.append("tab", activeTab);
             const url = route("seller.theme-settings.update", { id: settings.id })
             router.post(url, formData, {
                 preserveScroll: true,

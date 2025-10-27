@@ -110,7 +110,7 @@ class RegisteredStoreController extends Controller
 
             $defaultSettings = [
                 "theme" => "theme_1",
-                "storeName" => "",
+                "storeName" => $data['store_name'],
                 "storeLogo" => "",
                 "pageHeaderImage" => "",
                 "pageHeaderText" => "",

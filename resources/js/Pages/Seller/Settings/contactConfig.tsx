@@ -13,7 +13,7 @@ type initialValuesProps = {
     }>;
 };
 
-const ContactConfig = () => {
+const ContactConfig = ({ activeTab }: any) => {
     const { t } = useTranslation();
     const { contact_types } = usePage().props as any;
     const { settings } = usePage().props as any
@@ -68,6 +68,7 @@ const ContactConfig = () => {
 
             const formData = new FormData();
             formData.append("contacts", JSON.stringify(values.contacts));
+            formData.append("tab", activeTab);
             const url = route("seller.theme-settings.update", { id: settings.id })
             router.post(url, formData, {
                 preserveScroll: true,
