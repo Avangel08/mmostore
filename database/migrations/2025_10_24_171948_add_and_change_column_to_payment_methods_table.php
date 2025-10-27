@@ -26,7 +26,6 @@ return new class extends Migration {
             $table->dropColumn('title');
             $table->dropColumn('description');
             $table->string('details')->nullable()->change();
-            $table->dropTimestamps();
         });
     }
 };
