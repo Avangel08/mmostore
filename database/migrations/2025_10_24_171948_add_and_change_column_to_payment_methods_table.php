@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->string('title')->nullable();
             $table->longText('description')->nullable();
             $table->json('details')->nullable()->change();
-            $table->timestamps();
         });
     }
 
