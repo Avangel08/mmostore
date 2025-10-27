@@ -3,6 +3,7 @@ use App\Http\Controllers\Api\Seller\Product\ProductApiController;
 use App\Http\Controllers\Api\Seller\Product\SellerAccountApiController;
 use App\Http\Controllers\Api\Buyer\Product\ProductController;
 use App\Http\Controllers\Api\Buyer\Order\OrderController;
+use App\Http\Controllers\Api\Webhook\SePay\SePayWebHookAdminController;
 use App\Http\Controllers\Api\Webhook\SePay\SePayWebHookController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,8 +44,12 @@ Route::group(['prefix' => 'v1','as' => 'api.'], function () use ($mainDomain) {
             });
         });
 
-        // Webhook Seller
-        Route::group(['prefix' => 'webhook', "middleware" => ["validate.subdomain","tenant.mongo"]], function () {
-            Route::any("/sepay", [SePayWebHookController::class, 'callBack'])->name('webhook.sepay');
+        Route::group(['prefix' => 'webhook'], function () {
+            // Webhook Seller
+            Route::group(['middleware' => ["validate.subdomain", "tenant.mongo"]], function () {
+                Route::any("/sepay", [SePayWebHookController::class, 'callBack'])->name('webhook.sepay');
+            });
+
+            Route::any("/sepay-admin", [SePayWebHookAdminController::class, 'callBack'])->name('admin.webhook.sepay');
         });
     });
