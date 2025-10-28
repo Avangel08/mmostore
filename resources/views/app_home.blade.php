@@ -7,7 +7,8 @@
         <title inertia>MMO Shop</title>
 
         <meta name="csrf-token" content="{{ csrf_token() }}">
-
+        <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+        
         <meta
             name="description"
             content="Tạo shop MMO của riêng bạn trong 5 phút"

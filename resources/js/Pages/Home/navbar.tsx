@@ -123,7 +123,7 @@ const Navbar = () => {
                                     <NavLink href="#faqs">FAQ</NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <NavLink target="" href="https://hidemium-organization.gitbook.io/mmoshop-owner-store">Tài liệu</NavLink>
+                                    <NavLink target="_blank" href="https://hidemium-organization.gitbook.io/mmoshop-owner-store">Tài liệu</NavLink>
                                 </li>
                             </Scrollspy>
 

@@ -165,6 +165,19 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                                 </button>
                             </div> */}
 
+                            {/* View store */}
+                            <div className="ms-1">
+                                <a
+                                    href="/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn btn-sm btn-outline-success"
+                                >
+                                    <i className="ri-eye-line align-bottom me-1"></i>
+                                    {t("View store")}
+                                </a>
+                            </div>
+
                             {/* LanguageDropdown */}
                             <LanguageDropdown />
 

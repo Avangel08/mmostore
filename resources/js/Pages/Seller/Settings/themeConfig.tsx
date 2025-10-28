@@ -28,8 +28,8 @@ import img3 from "../../../../images/landing/showcase/theme-store-3.png"
 type initialValuesProps = {
     theme: string;
     storeName: string;
-    storeLogo: string;
-    pageHeaderImage: string;
+    storeLogo: File | null;
+    pageHeaderImage: File | null;
     pageHeaderText: string;
     currency: string;
     metaDescription: string;
@@ -55,7 +55,7 @@ const LIST_THEMES = [
 ]
 
 
-const ThemeConfigs = () => {
+const ThemeConfigs = ({ activeTab }: any) => {
     const { t } = useTranslation()
     const [selectedImage, setSelectedImage] = useState<any>(null);
     const [files, setFiles] = useState<any>([]);
@@ -69,28 +69,33 @@ const ThemeConfigs = () => {
         initialValues: {
             theme: settings?.theme || "theme_1",
             storeName: settings?.storeName || "",
-            storeLogo: settings?.storeLogo || "",
-            pageHeaderImage: settings?.pageHeaderImage || "",
+            storeLogo: null,
+            pageHeaderImage: null,
             pageHeaderText: settings?.pageHeaderText || "Hello, welcome to my store",
             currency: settings?.currency || "VND",
             metaDescription: settings?.metaDescription || ""
         },
         validationSchema: Yup.object({
-            storeName: Yup.string().required("Please enter store name"),
-            pageHeaderImage: Yup.mixed().required("Please select a image"),
-            storeLogo: Yup.mixed().required("Please select a logo store"),
-            pageHeaderText: Yup.string().required("Please enter page header text"),
+            storeName: Yup.string().required(t("Please enter store name")),
+            pageHeaderImage: settings?.pageHeaderImage
+                ? Yup.mixed().nullable()
+                : Yup.mixed().required(t("Please select a page header image")),
+            storeLogo: settings?.storeLogo
+                ? Yup.mixed().nullable()
+                : Yup.mixed().required(t("Please select a logo store")),
+            pageHeaderText: Yup.string().required(t("Please enter page header text")),
             currency: Yup.string().required(t("Please choose currency")),
         }),
         onSubmit: (values) => {
             const formData = new FormData();
             formData.append("theme", values.theme);
             formData.append("storeName", values.storeName);
-            formData.append("storeLogo", values.storeLogo);
-            formData.append("pageHeaderImage", values.pageHeaderImage);
+            values.storeLogo && formData.append("storeLogo", values.storeLogo);
+            values.pageHeaderImage && formData.append("pageHeaderImage", values.pageHeaderImage);
             formData.append("pageHeaderText", values.pageHeaderText);
             formData.append("currency", values.currency);
             formData.append("metaDescription", values.metaDescription);
+            formData.append("tab", activeTab);
             const url = route("seller.theme-settings.update", { id: settings.id })
             router.post(url, formData, {
                 preserveScroll: true,
@@ -133,17 +138,6 @@ const ThemeConfigs = () => {
                 <div className="mb-3">
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <h5 className="mb-0">{t("Store")}</h5>
-                        <div className="d-flex gap-2">
-                            <a
-                                href="/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn btn-sm btn-outline-success"
-                            >
-                                <i className="ri-eye-line align-bottom me-1"></i>
-                                {t("View store")}
-                            </a>
-                        </div>
                     </div>
                     <Row>
                         <Col>
@@ -185,7 +179,7 @@ const ThemeConfigs = () => {
                                 </Row>
                             </div>
                             {/** Currency */}
-                            <div className="mb-3">
+                            {/* <div className="mb-3">
                                 <Form.Group controlId="currency">
                                     <Form.Label>
                                         {t("Currency")}{" "}
@@ -218,7 +212,7 @@ const ThemeConfigs = () => {
                                             </div>
                                         )}
                                 </Form.Group>
-                            </div>
+                            </div> */}
                             {/** Store Name */}
                             <div className="mb-3">
                                 <Form.Group>
@@ -244,6 +238,28 @@ const ThemeConfigs = () => {
                                     {" "}
                                     {formik.errors.storeName}{" "}
                                 </Form.Control.Feedback>
+                            </div>
+                            {/** Meta description */}
+                            <div className="mb-3">
+                                <Form.Group>
+                                    <Form.Label
+                                        className="form-label"
+                                        htmlFor="setting-meta-description-input"
+                                    >
+                                        {t('Meta description')}
+                                    </Form.Label>
+                                    <p className="text-muted fst-italic">{t("Meta description for a website on search engines")}</p>
+                                    <Form.Control
+                                        type="text"
+                                        className="form-control"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        name="metaDescription"
+                                        id="setting-meta-description-input"
+                                        placeholder={t("Enter meta description")}
+                                        value={formik.values.metaDescription}
+                                    />
+                                </Form.Group>
                             </div>
                             {/** Store Logo */}
                             {isEditMode && settings?.storeLogo && (
@@ -410,29 +426,6 @@ const ThemeConfigs = () => {
                                         </Form.Control.Feedback>
                                     )
                                 }
-                            </div>
-                            {/** Meta tags */}
-                            <h5 className="mb-3">{t("Meta tags")}</h5>
-                            {/** Meta description */}
-                            <div className="mb-3">
-                                <Form.Group>
-                                    <Form.Label
-                                        className="form-label"
-                                        htmlFor="setting-meta-description-input"
-                                    >
-                                        {t('Meta description')}
-                                    </Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        className="form-control"
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        name="metaDescription"
-                                        id="setting-meta-description-input"
-                                        placeholder={t("Enter meta description")}
-                                        value={formik.values.metaDescription}
-                                    />
-                                </Form.Group>
                             </div>
                         </Col>
                     </Row>

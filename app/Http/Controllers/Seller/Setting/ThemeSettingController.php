@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Seller\Setting;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Seller\Settings\SettingsRequest;
 use App\Models\Mongo\Settings;
 use App\Services\Home\StoreService;
 use App\Services\Setting\SettingService;
@@ -61,10 +62,10 @@ class ThemeSettingController extends Controller
         $this->settingService->createSetting($data);
     }
 
-    public function update(Request $request)
+    public function update(SettingsRequest $request)
     {
         $theme = $request->input('theme');
-        $data = $request->all();
+        $data = $request->validated();
         $domainSettings = $request->input('domains');
         $user = auth('seller')->user();
         $store = $this->storeService->findByUserId($user->id);
@@ -79,17 +80,19 @@ class ThemeSettingController extends Controller
                 $imagePath = $data[$key]->storeAs("{$host}/settings", $fileName, 'public');
                 $value = $imagePath;
             }
+            if ($key === 'contacts' || $key === 'domains') {
+                $value = json_encode($value);
+            }
             $this->settingService->updateOrCreateSetting($key, $value);
         }
         if ($domainSettings) {
-            $newDomains = json_decode($domainSettings);
             $domains = $store->domain;
             $domainDefault = collect($domains)->first(fn($d) => str_contains($d, config('app.domain_suffix')));
             $mergedDomains[] = $domainDefault;
             // tránh trùng lặp
-            if (!in_array($newDomains, $domains)) {
+            if (!in_array($domainSettings, $domains)) {
                 // ✅ Merge và loại bỏ trùng
-                $mergedDomains = array_values(array_unique(array_merge($mergedDomains, $newDomains)));
+                $mergedDomains = array_values(array_unique(array_merge($mergedDomains, $domainSettings)));
                 $this->storeService->update($store, ['domain' => $mergedDomains]);
             }
         }

@@ -37,22 +37,16 @@ const Home = () => {
                                     - Tạo shop MMO của riêng bạn trong 5 phút
                                 </h1>
                                 <p className="lead text-muted lh-base">
-                                    MMO Shop là nền tảng giúp bạn nhanh chóng
-                                    sở hữu website bán hàng chuyên nghiệp để{" "}
-                                    <br />
-                                    kinh doanh các digital products như tài
-                                    nguyên Gmail, tài khoản TikTok Shop, eBay,
-                                    Etsy… Chỉ với vài bước đơn giản, bạn có thể
-                                    tự xây dựng store cá nhân của riêng mình,
-                                    quản lý dễ dàng và bắt đầu tạo thu nhập
-                                    online bền vững..
+                                    Biến tài nguyên số của bạn thành lợi nhuận chỉ với vài thao tác. 
+                                    Với MMO Store, bạn dễ dàng tạo website bán hàng chuyên nghiệp, 
+                                    quản lý đơn hàng, khách hàng và doanh thu – tất cả trong một nền tảng duy nhất, không cần biết lập trình.
                                 </p>
                                 <div className="d-flex gap-2 justify-content-center mt-4 mb-4">
                                     <Link
                                         href="/register"
                                         className="btn btn-primary btn-bg-primary border-0"
                                     >
-                                        Thêm cửa hàng{" "}
+                                        Bắt đầu tạo website miễn phí ngay hôm nay{" "}
                                         <i className="ri-add-line align-middle ms-1"></i>
                                     </Link>
                                 </div>
