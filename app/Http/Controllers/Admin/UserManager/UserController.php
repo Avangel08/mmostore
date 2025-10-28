@@ -37,7 +37,7 @@ class UserController extends Controller
         $perPage = $request->input('perPage', 10);
 
         return Inertia::render('UserManager/index', [
-            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: [], request: $request),
+            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: ['stores:id,user_id,verified_at'], request: $request),
             'status' => fn() => User::STATUS,
             'type' => fn() => User::TYPE,
             'detail' => fn() => $this->userService->findById(id: $request->input('id'), relation: []),

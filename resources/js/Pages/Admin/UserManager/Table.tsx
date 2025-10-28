@@ -124,8 +124,23 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
             },
             {
                 header: t("Name"),
-                accessorKey: "name",
+                accessorKey: "",
                 enableColumnFilter: false,
+                cell: (cell: any) => {
+                    const row = cell.row.original;
+                    const name = row?.name;
+                    const stores = row?.stores || [];
+                    const verifiedAt = !!(stores[0]?.verified_at);
+
+                    return <span>{name} {verifiedAt && (
+                        <OverlayTrigger
+                            placement="top"
+                            overlay={<Tooltip>{t("Verified at {{time}}", { time: verifiedAt ? moment(stores[0]?.verified_at).format("DD/MM/YYYY HH:mm") : "" })}</Tooltip>}
+                        >
+                            <i className="ri-checkbox-circle-fill text-secondary fs-5"></i>
+                        </OverlayTrigger>)}
+                    </span>
+                }
             },
             {
                 header: t("Email"),
@@ -180,7 +195,7 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                             overlay={<Tooltip>{t("Verify store")}</Tooltip>}
                         >
                             <Button
-                            size="sm"
+                                size="sm"
                                 variant="outline-primary"
                                 onClick={() => adminVerifyStore(id)}>
                                 <i className="ri-check-double-line"></i>
@@ -192,7 +207,7 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                             overlay={<Tooltip>{t("Login")}</Tooltip>}
                         >
                             <Button
-                            size="sm"
+                                size="sm"
                                 variant="outline-info"
                                 onClick={() => {
                                     const url = route("admin.user.login-as", { id });
