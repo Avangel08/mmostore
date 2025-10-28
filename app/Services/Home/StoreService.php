@@ -17,9 +17,10 @@ class StoreService
         return $item->update($data);
     }
 
-    public function delete($id)
+    public function delete(Stores $store)
     {
-        return Stores::destroy($id);
+        $store->storeCategories()->detach();
+        return $store->delete();
     }
 
     public function findById($id, $select = ["*"], $relation = [])
@@ -40,5 +41,20 @@ class StoreService
     public function updateByUserId($userId, $data)
     {
         return Stores::where('user_id', $userId)->update($data);
+    }
+
+    public function verifyStore($dataVerifyStore)
+    {
+        DB::transaction(function () use ($dataVerifyStore) {
+            foreach ($dataVerifyStore as $storeData) {
+                $store = Stores::find($storeData['store_id']);
+                if ($store) {
+                    $storeIds = $storeData['store_category_ids'] ?? [];
+                    $store->storeCategories()->sync($storeIds);
+                    $verifiedAt = empty($storeIds) ? null : now();
+                    $store->update(['verified_at' => $verifiedAt]);
+                }
+            }
+        });
     }
 }

@@ -26,7 +26,8 @@ class Stores extends Model
         'database_config',
         'server_id',
         'status',
-        'setting_id'
+        'setting_id',
+        'verified_at'
     ];
 
     protected $casts = [
@@ -37,6 +38,11 @@ class Stores extends Model
     public function setting()
     {
         return $this->hasOne(Settings::class, '_id', 'setting_id');
+    }
+
+    public function storeCategories()
+    {
+        return $this->belongsToMany(StoreCategory::class, 'store_category_mapping', 'store_id', 'store_category_id')->withTimestamps();
     }
 }
 

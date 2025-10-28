@@ -2,11 +2,12 @@ import React, { useMemo, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { router, usePage } from "@inertiajs/react";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
-import { Button, OverlayTrigger, Tooltip, Form } from "react-bootstrap";
+import { Button, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import moment from "moment";
-import { useQueryParams } from "../../../hooks/useQueryParam";
-// Using global route() helper injected by Ziggy/Inertia
+import { ToastContainer } from "react-toastify";
+import { showToast } from "../../../utils/showToast";
+import { ModalVerifyStore } from "./VerifyStore/ModalVerifyStore";
 
 const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
     data: any;
@@ -17,6 +18,9 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
     const { t } = useTranslation();
     const [selectedItems, setSelectedItems] = useState<(string | number)[]>([]);
     const [selectAll, setSelectAll] = useState(false);
+    const [showVerifyModal, setShowVerifyModal] = useState(false);
+    const [verifyStoreData, setVerifyStoreData] = useState<any>(null);
+    const [storeCategoryOptions, setStoreCategoryOptions] = useState<{ value: string; label: string }[]>([]);
 
     useEffect(() => {
         onSelectionChange && onSelectionChange(selectedItems);
@@ -56,6 +60,41 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
             setSelectAll(false);
         }
     }, []);
+
+    const adminVerifyStore = async (id: string | number) => {
+        router.reload({
+            only: ["verifyStoreData", "storeCategoryOptions"],
+            data: { id },
+            replace: true,
+            onSuccess: (page: any) => {
+                if (!page?.props?.verifyStoreData) {
+                    showToast(t("Failed to load user store data"), "error");
+                    return;
+                }
+                setVerifyStoreData(page.props.verifyStoreData);
+                setStoreCategoryOptions(page?.props?.storeCategoryOptions || []);
+                setShowVerifyModal(true);
+            },
+            onError: () => {
+                showToast(t("Failed to load user store data"), "error");
+            }
+        });
+    }
+
+    const onReloadOptions = () => {
+        router.reload({
+            only: ["storeCategoryOptions"],
+            replace: true,
+            onSuccess: (page: any) => {
+                setStoreCategoryOptions(page?.props?.storeCategoryOptions || []);
+            },
+        });
+    };
+
+    const handleCloseVerifyModal = () => {
+        setShowVerifyModal(false);
+        setVerifyStoreData(null);
+    };
 
     const columns = useMemo(
         () => [
@@ -129,25 +168,43 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                 },
             },
             {
-                header: " ",
+                header: t("Actions"),
                 enableColumnFilter: false,
                 cell: (cell: any) => {
                     const row = cell.row.original;
-                    return (
-                        <Button
-                            variant="link"
-                            onClick={() => {
-                                const url = route("admin.user.login-as", { id: row.id });
-                                window.open(url, "_blank");
-                            }}
+                    const id = row?.id;
+
+                    return <div className="d-flex gap-2">
+                        <OverlayTrigger
+                            placement="top"
+                            overlay={<Tooltip>{t("Verify store")}</Tooltip>}
                         >
-                            {t("Login")} <i className="ri-login-box-line"></i>
-                        </Button>
-                    );
+                            <Button
+                            size="sm"
+                                variant="outline-primary"
+                                onClick={() => adminVerifyStore(id)}>
+                                <i className="ri-check-double-line"></i>
+                            </Button>
+                        </OverlayTrigger>
+
+                        <OverlayTrigger
+                            placement="top"
+                            overlay={<Tooltip>{t("Login")}</Tooltip>}
+                        >
+                            <Button
+                            size="sm"
+                                variant="outline-info"
+                                onClick={() => {
+                                    const url = route("admin.user.login-as", { id });
+                                    window.open(url, "_blank");
+                                }}><i className="ri-login-box-line"></i>
+                            </Button>
+                        </OverlayTrigger>
+                    </div>
                 },
             },
         ],
-        [t, selectAll, selectedItems, handleSelectAll, handleItemSelect]
+        [t, selectAll, selectedItems, handleSelectAll, handleItemSelect, adminVerifyStore]
     );
 
     return (
@@ -163,6 +220,13 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                 contextMenuOptions={contextMenuOptions}
                 isPaginateTable={true}
                 onReloadTable={onReloadTable}
+            />
+            <ModalVerifyStore
+                show={showVerifyModal}
+                onHide={handleCloseVerifyModal}
+                dataVerifyStore={verifyStoreData}
+                storeCategoryOptions={storeCategoryOptions}
+                onReloadOptions={onReloadOptions}
             />
         </div>
     );
