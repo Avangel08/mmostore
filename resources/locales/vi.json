@@ -676,5 +676,6 @@
     "Verify store": "Xác minh cửa hàng",
     "Save verify information": "Lưu thông tin xác minh",
     "Some store categories not found": "Không tìm thấy một số danh mục cửa hàng",
-    "Store categories deleted successfully": "Xoá danh mục cửa hàng thành công"
+    "Store categories deleted successfully": "Xoá danh mục cửa hàng thành công",
+    "Verified at {{time}}": "Đã xác minh vào {{time}}"
 }
