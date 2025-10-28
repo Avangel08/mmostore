@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Api\Buyer\Product;
 
 use App\Http\Controllers\Controller;
-use App\Models\Mongo\Orders;
+use App\Models\Mongo\Categories;
+use App\Models\Mongo\SubProducts;
 use App\Services\Order\CheckoutService;
 use App\Services\Category\CategoryService;
 use App\Services\Product\ProductService;
 use App\Services\Product\SubProductService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class ProductController extends Controller
@@ -33,16 +33,18 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $page = $request->get('page', 1);
-        $perPage = $request->get('per_page', 10);
-        $perPage = min($perPage, 100); // Limit max per page to 100
+        $filters = [
+            'name' => $request->get('name'),
+        ];
 
-        $products = $this->productService->getForTable([
-            'page' => $page,
-            'perPage' => $perPage
-        ], ['*'], ['subProducts', 'productType', 'category']);
+        $categories = $this->categoryService->getWithProductsAndSubProducts($filters);
 
-        $result = $products->map(function ($product) {
+        $allProducts = collect();
+        foreach ($categories as $category) {
+            $allProducts = $allProducts->merge($category->products);
+        }
+
+        $result = $allProducts->map(function ($product) {
             return [
                 'id' => $product->_id,
                 'name' => $product->name,
@@ -71,23 +73,21 @@ class ProductController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Products retrieved successfully',
-            'data' => [
-                'rows' => $result,
-                'pagination' => [
-                    'current_page' => $products->currentPage(),
-                    'per_page' => $products->perPage(),
-                    'total' => $products->total(),
-                    'last_page' => $products->lastPage(),
-                    'from' => $products->firstItem(),
-                    'to' => $products->lastItem(),
-                ]
-            ],
-        ], 200);
+            'data' => $result,
+        ]);
     }
 
     public function show(string $productId)
     {
-        $product = $this->productService->getById($productId, ['*'], ['subProducts', 'productType', 'category']);
+        $product = $this->productService->getByIdWithActiveCategory($productId, ['*'], [
+            'subProducts' => function ($query) {
+                $query->where('status', SubProducts::STATUS['ACTIVE']);
+            },
+            'productType',
+            'category' => function ($query) {
+                $query->where('status', Categories::STATUS['ACTIVE']);
+            }
+        ]);
 
         if (!$product) {
             return response()->json([
@@ -128,7 +128,7 @@ class ProductController extends Controller
             'status' => 'success',
             'message' => 'Product retrieved successfully',
             'data' => $formattedProduct,
-        ], 200);
+        ]);
     }
 }
 

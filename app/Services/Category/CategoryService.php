@@ -5,6 +5,7 @@ namespace App\Services\Category;
 use App\Models\Mongo\Categories;
 use App\Models\Mongo\Products;
 use App\Models\Mongo\SubProducts;
+use Carbon\Carbon;
 
 class CategoryService
 {
@@ -69,13 +70,18 @@ class CategoryService
         return Categories::whereIn('_id', $ids)->delete();
     }
 
-    public function getWithProductsAndSubProducts()
+    public function getWithProductsAndSubProducts($filters = [])
     {
         return Categories::where('status', Categories::STATUS['ACTIVE'])
             ->with([
-                'products' => function ($query) {
-                    $query->where('status', Products::STATUS['ACTIVE'])
-                        ->latest()
+                'products' => function ($query) use ($filters) {
+                    $query->where('status', Products::STATUS['ACTIVE']);
+                    
+                    if (isset($filters['name']) && $filters['name'] != '') {
+                        $query->where('name', 'like', '%' . $filters['name'] . '%');
+                    }
+                    
+                    $query->latest()
                         ->with([
                             'subProducts' => function ($q) {
                                 $q->where('status', SubProducts::STATUS['ACTIVE']);
