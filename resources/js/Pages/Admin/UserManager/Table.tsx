@@ -128,18 +128,19 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                 enableColumnFilter: false,
                 cell: (cell: any) => {
                     const row = cell.row.original;
-                    const name = row?.name;
+                    const name = row?.name ?? "";
                     const stores = row?.stores || [];
                     const verifiedAt = !!(stores[0]?.verified_at);
 
-                    return <span>{name} {verifiedAt && (
+                    return <>
+                        <span className="fw-bold">{name}</span> {verifiedAt && (
                         <OverlayTrigger
                             placement="top"
                             overlay={<Tooltip>{t("Verified at {{time}}", { time: verifiedAt ? moment(stores[0]?.verified_at).format("DD/MM/YYYY HH:mm") : "" })}</Tooltip>}
                         >
                             <i className="ri-checkbox-circle-fill text-secondary fs-5"></i>
                         </OverlayTrigger>)}
-                    </span>
+                    </>
                 }
             },
             {
