@@ -66,9 +66,9 @@ class SettingsRequest extends FormRequest
                 'storeName' => ['required', 'string', 'max:20'],
                 'storeLogo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
                 'pageHeaderImage' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-                'pageHeaderText' => ['required', 'string', 'max:200'],
+                'pageHeaderText' => ['required', 'string'],
                 'currency' => ['required', 'string', Rule::in(array_values(Settings::CURRENCY))],
-                'metaDescription' => ['nullable', 'string', 'max:60']
+                'metaDescription' => ['nullable', 'string', 'max:200']
             ],
             'contactTab' => [
                 'contacts' => ['required', 'array'],
