@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 const Navdata = () => {
     //state data
+    const [isStoreCategory, setIsStoreCategory] = useState<boolean>(false);
     const [isProductType, setIsProductType] = useState<boolean>(false);
     const [isRoleManagement, setIsRoleManagement] = useState<boolean>(false);
     const [isPermissionManagement, setIsPermissionManagement] = useState<boolean>(false);
@@ -31,6 +32,9 @@ const Navdata = () => {
 
     useEffect(() => {
         document.body.classList.remove('twocolumn-panel');
+        if (iscurrentState !== 'Store Category') {
+            setIsStoreCategory(false);
+        }
         if (iscurrentState !== 'Product Type') {
             setIsProductType(false);
         }
@@ -71,6 +75,19 @@ const Navdata = () => {
             link: route("admin.dashboard"),
             click: function (e: any) {
                 e.preventDefault();
+                updateIconSidebar(e);
+            },
+        },
+        {
+            id: "storeCategory",
+            label: t("Store category"),
+            icon: "ri-store-3-fill",
+            link: route("admin.store-categories.index"),
+            stateVariables: isStoreCategory,
+            click: function (e: any) {
+                e.preventDefault();
+                setIsStoreCategory(!isStoreCategory);
+                setIscurrentState('Store Category');
                 updateIconSidebar(e);
             },
         },

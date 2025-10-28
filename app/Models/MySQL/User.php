@@ -60,6 +60,12 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function stores()
+    {
+        return $this->hasMany(Stores::class, 'user_id');
+    }
+
+
     // Override createToken from HasApiTokens trait
     public function createToken(string $name, array $abilities = ['*'], ?DateTimeInterface $expiresAt = null)
     {
