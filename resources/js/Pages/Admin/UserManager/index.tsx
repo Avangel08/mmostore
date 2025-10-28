@@ -61,10 +61,10 @@ const UserManager = () => {
     // Handle flash messages from session
     useEffect(() => {
         if (message?.success) {
-            showToast(message.success, "success");
+            showToast(t(message.success), "success");
         }
         if (message?.error) {
-            showToast(message.error, "error");
+            showToast(t(message.error), "error");
         }
     }, [message]);
 
