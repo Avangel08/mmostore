@@ -79,7 +79,7 @@ class StoreCategoryService
 
         return StoreCategory::whereIn('id', $ids)->delete();
     }
-    
+
     public function getCategoryOptions()
     {
         return StoreCategory::where('status', StoreCategory::STATUS['ACTIVE'])
@@ -92,5 +92,14 @@ class StoreCategoryService
                 ];
             })
             ->toArray();
+    }
+
+    public function getAllCategories($select = ['*'], $relation = [])
+    {
+        return StoreCategory::where('status', StoreCategory::STATUS['ACTIVE'])
+            ->select($select)
+            ->with($relation)
+            ->orderBy('name', 'asc')
+            ->get();
     }
 }
