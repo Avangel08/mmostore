@@ -44,6 +44,29 @@ class Stores extends Model
     {
         return $this->belongsToMany(StoreCategory::class, 'store_category_mapping', 'store_id', 'store_category_id')->withTimestamps();
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function scopeFilterName($query, $request)
+    {
+        if (isset($request['search']) && $request['search'] != '') {
+            $query->where('name', 'like', '%' . $request['search'] . '%');
+        }
+        return $query;
+    }
+
+    public function scopeFilterStoreCategory($query, $request)
+    {
+        if (isset($request['categoryId']) && $request['categoryId'] != '') {
+            $query->whereHas('storeCategories', function ($q) use ($request) {
+                $q->where('store_category_id', $request['categoryId']);
+            });
+        }
+        return $query;
+    }
 }
 
 

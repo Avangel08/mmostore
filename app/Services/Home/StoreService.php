@@ -1,12 +1,42 @@
 <?php
 namespace App\Services\Home;
 
+use App\Models\Mongo\Settings;
 use App\Models\MySQL\Stores;
+use Cache;
 use DB;
 
 
 class StoreService
 {
+    public function getStoresVerified($request, $select = ['*'], $relation = [])
+    {
+        $page = $request['page'] ?? 1;
+        $perPage = min($request['perPage'] ?? 10, 200);
+
+        $storesVerified = Stores::whereNotNull('verified_at')
+            ->filterName($request)
+            ->filterStoreCategory($request)
+            ->select($select)
+            ->with($relation)
+            ->orderBy('verified_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        $timeout = 60; // second
+
+        $storesVerified->getCollection()->transform(function ($store) use ($timeout) {
+            $cacheKey = "store:store_description:" . $store->id;
+            $store->data_setting = Cache::remember($cacheKey, $timeout, function () use ($store) {
+                $tenantService = app(\App\Services\Tenancy\TenancyService::class);
+                $connection = $tenantService->buildConnectionFromStore($store);
+                $tenantService->applyConnection($connection, false);
+                return Settings::pluck('value', 'key');
+            });
+            return $store;
+        });
+        return $storesVerified;
+    }
+
     public function create(array $data)
     {
         return Stores::create($data);

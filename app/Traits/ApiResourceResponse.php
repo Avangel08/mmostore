@@ -5,10 +5,11 @@ namespace App\Traits;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 
 trait ApiResourceResponse
 {
-    protected function success(?string $message = 'Success', array|JsonResource $resourceData = [], int $code = Response::HTTP_OK)
+    protected function success(?string $message = 'Success', array|Collection|JsonResource $resourceData = [], int $code = Response::HTTP_OK)
     {
         if ($resourceData instanceof JsonResource) {
             $resourceData = $resourceData->response()->getData(true);
