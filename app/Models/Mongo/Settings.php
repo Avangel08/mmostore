@@ -103,6 +103,6 @@ class Settings extends Model
 
     const CURRENCY_TYPES = [
         'VND' => 'VND',
-        'USD' => 'USD'
+        // 'USD' => 'USD'
     ];
 }

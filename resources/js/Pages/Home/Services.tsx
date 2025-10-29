@@ -52,14 +52,12 @@ const Services = () => {
                                 </div>
                                 <div className="flex-grow-1">
                                     <h5 className="fs-18">
-                                        Tiết kiệm thời gian và chi phí
+                                        Thiết kế website dễ dàng
                                     </h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        Loại bỏ thao tác thủ công, giảm nhu cầu
-                                        nhân sự, và tối ưu quy trình quản lý,
-                                        giúp bạn tập trung vào việc phát triển
-                                        kinh doanh mà không phải lo về chi phí
-                                        vận hành.
+                                        - Giao diện hiện đại, tối ưu hiển thị trên mọi thiết bị và chuẩn SEO giúp bạn xây dựng thương hiệu chuyên nghiệp ngay từ đầu.<br/>
+                                        - Kéo-thả, thay màu, đổi banner, thêm mục nội dung – không cần code.<br/>
+                                        - Chọn mẫu – tùy chỉnh – xuất bản chỉ trong vài phút.
                                     </p>
                                 </div>
                             </div>
@@ -89,14 +87,11 @@ const Services = () => {
                                 </div>
                                 <div className="flex-grow-1">
                                     <h5 className="fs-18">
-                                        Tăng trưởng doanh thu
+                                        Xử lý đơn hàng nhanh chóng
                                     </h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        Tích hợp bộ công cụ toàn diện từ nuôi
-                                        tài khoản, spy và listing sản phẩm tự
-                                        động, quản lý hàng nghìn shop cùng lúc.
-                                        dễ dàng scale up business của bạn không
-                                        giới hạn!.
+                                        - Hệ thống tự động hóa toàn bộ quy trình bán hàng: từ xác nhận đơn, thanh toán đến gửi sản phẩm số cho khách.<br/>
+                                        - Bạn không cần thao tác thủ công – mọi thứ diễn ra mượt mà 24/7, giúp bạn tiết kiệm thời gian và giảm sai sót.
                                     </p>
                                 </div>
                             </div>
@@ -136,12 +131,12 @@ const Services = () => {
                                 </div>
                                 <div className="flex-grow-1">
                                     <h5 className="fs-18">
-                                        Hỗ trợ nhiệt tình 20/7
+                                        Báo cáo & phân tích
                                     </h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        Đội ngũ hỗ trợ luôn sẵn sàng đồng hành,
-                                        giải đáp mọi thắc mắc và đảm bảo bạn
-                                        không bỏ lỡ bất kỳ cơ hội nào..
+                                        - Thống kê doanh thu, đơn hàng, top sản phẩm bán chạy, tỷ lệ chuyển đổi.<br/>
+                                        - Hỗ trợ xuất báo cáo định kỳ, giúp tối ưu chiến lược kinh doanh.<br/>
+                                        - Các biểu đồ và số liệu chi tiết giúp bạn nắm rõ hiệu quả kinh doanh, tối ưu chiến lược bán hàng chỉ bằng vài cú click.
                                     </p>
                                 </div>
                             </div>
@@ -197,14 +192,11 @@ const Services = () => {
                                 </div>
                                 <div className="flex-grow-1">
                                     <h5 className="fs-18">
-                                        Đội ngũ chuyên gia cố vấn
+                                        Quản lý khách hàng hiệu quả
                                     </h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        Merdify được phát triển với sự cố vấn và
-                                        test bán trực tiếp từ các top saller
-                                        triệu đô trên TikTok Shop, chúng tôi
-                                        thấu hiểu những gì seller cần và sẽ luôn
-                                        hết sức mình đáp ứng điều đó.
+                                        - Lưu trữ thông tin khách hàng, lịch sử giao dịch, hành vi mua hàng và tệp khách trung thành.<br/>
+                                        - Hỗ trợ chăm sóc tự động, remarketing và phân nhóm khách để tăng tỷ lệ quay lại mua.
                                     </p>
                                 </div>
                             </div>
@@ -251,11 +243,9 @@ const Services = () => {
                                     </div>
                                 </div>
                                 <div className="flex-grow-1">
-                                    <h5 className="fs-18">Công cụ miễn phí</h5>
+                                    <h5 className="fs-18">Đội ngũ hỗ trợ & tư vấn tận tâm</h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        Trải nghiệm công cụ quản lý hàng đầu mà
-                                        không cần tốn chi phí, giúp bạn an tâm
-                                        triển khai và phát triển kinh doanh.
+                                        Đội ngũ chuyên viên MMO giàu kinh nghiệm sẽ đồng hành cùng bạn từ lúc tạo shop, thiết lập thanh toán đến tối ưu SEO – đảm bảo shop vận hành trơn tru và đạt hiệu quả cao nhất.
                                     </p>
                                 </div>
                             </div>
@@ -303,12 +293,11 @@ const Services = () => {
                                 </div>
                                 <div className="flex-grow-1">
                                     <h5 className="fs-18">
-                                        Cập nhật nhanh chóng
+                                        Theo dõi tồn kho & hàng bán dễ dàng
                                     </h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        Luôn sẵn sàng thích ứng với mọi update
-                                        trên TikTok Shop, đảm bảo bạn luôn đi
-                                        trước đối thủ một bước..
+                                        - Nắm rõ tình trạng sản phẩm, số lượng bán ra, và doanh thu theo thời gian thực.<br/>
+                                        - Hệ thống cảnh báo tồn kho giúp bạn chủ động quản lý tài nguyên số, tránh thiếu hàng hoặc sai sót trong xử lý đơn.
                                     </p>
                                 </div>
                             </div>

@@ -57,7 +57,7 @@ export function columnsApi(columns: columns[], actions: {
                             <>
                                 <div className="d-flex align-items-center">
                                     <div className="flex-shrink-0 me-3">
-                                        <div className="avatar-sm bg-light rounded p-1">
+                                        <div className="avatar-sm bg-light rounded p-1 overflow-hidden">
                                             <img
                                                 src={`${storageUrl}/${cell.row.original.image}`}
                                                 alt=""
@@ -69,7 +69,7 @@ export function columnsApi(columns: columns[], actions: {
                                         <h5 className="fs-14 mb-1 text-white">
                                             {cell.getValue()}
                                         </h5>
-                                        <p className="text-white mb-0">
+                                        <p className="text-white mb-0 fs-12">
                                             <span className="fw-medium">
                                                 {" "}
                                                 {cell.row.original.short_description}
