@@ -66,7 +66,7 @@ const ThemeSettings = () => {
                                                 <DomainConfig activeTab={activeTab} />
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="menuTab">
-                                                <MenuConfig />
+                                                <MenuConfig activeTab={activeTab} />
                                             </Tab.Pane>
                                         </Tab.Content>
                                     </Tab.Container>

@@ -33,7 +33,7 @@ class ThemeSettingController extends Controller
         $result = [];
 
         foreach ($settings as $setting) {
-            if ($setting->key === 'contacts' || $setting->key === 'domains') {
+            if ($setting->key === 'contacts' || $setting->key === 'domains' || $setting->key === 'menus') {
                 $result[$setting->key] = json_decode($setting->value, true) ?: [];
             } else {
                 $result[$setting->key] = $setting->value;
@@ -80,7 +80,7 @@ class ThemeSettingController extends Controller
                 $imagePath = $data[$key]->storeAs("{$host}/settings", $fileName, 'public');
                 $value = $imagePath;
             }
-            if ($key === 'contacts' || $key === 'domains') {
+            if ($key === 'contacts' || $key === 'domains' || $key === 'menus') {
                 $value = json_encode($value);
             }
             $this->settingService->updateOrCreateSetting($key, $value);
