@@ -21,6 +21,7 @@ use App\Services\Setting\SettingService;
 use App\Services\Tenancy\TenancyService;
 use App\Services\Home\StoreService;
 use App\Services\CurrencyRateSeller\CurrencyRateSellerService;
+use App\Services\Notification\TelegramNotificationService;
 use App\Models\Mongo\Settings;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -77,14 +78,12 @@ class JobProcessPurchase implements ShouldQueue
         SettingService $settingService
     ): void {
         try {
-            // Validate store
             $store = $storeService->findById($this->storeId);
             if (empty($store)) {
                 $this->updateOrderToFailed("Cửa hàng không tồn tại");
                 return;
             }
 
-            // Setup tenancy connection
             try {
                 $connection = $tenancyService->buildConnectionFromStore($store);
                 $tenancyService->applyConnection($connection, true);
@@ -93,7 +92,6 @@ class JobProcessPurchase implements ShouldQueue
                 return;
             }
 
-            // Validate order
             $order = $orderService->findById($this->orderId);
             if (empty($order)) {
                 $this->updateOrderToFailed("Đơn hàng không tồn tại");
@@ -213,6 +211,20 @@ class JobProcessPurchase implements ShouldQueue
                         $this->refundCustomerBalance($this->customerId, $totalPrice);
                         $this->updateOrderToFailed("Lỗi tạo lịch sử giao dịch");
                         return;
+                    }
+
+                    // Send notification Telegram using unified `notification` settings
+                    try {
+                        $telegramService = new TelegramNotificationService($settingService);
+                        $orderData = [
+                            'order_number' => $order->order_number,
+                            'total_price' => number_format($totalPrice, 0, ',', '.') . ' VND',
+                            'quantity' => $this->quantity,
+                            'paid_time' => now()->format('Y-m-d H:i:s'),
+                            'product_name' => $subProduct->name ?? 'N/A'
+                        ];
+                        $telegramService->sendOrderNotification($orderData);
+                    } catch (\Exception $e) {
                     }
                 } catch (\Exception $e) {
                     $this->rollbackReservedAccounts($accountsToSell);

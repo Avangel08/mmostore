@@ -617,5 +617,25 @@
     "Please select a page header image": "Vui lòng chọn ảnh tiêu đề trang.",
     "Please select a logo store": "Vui lòng chọn logo cửa hàng.",
     "Please choose currency": "Vui lòng chọn đơn vị tiền tệ.",
-    "Please enter page header text": "Vui lòng nhập nội dung tiêu đề trang."
-}   
+    "Please enter page header text": "Vui lòng nhập nội dung tiêu đề trang.",
+    "Notification": "Thông báo",
+    "Telegram Notifications": "Thông báo Telegram",
+    "How to setup Telegram notifications": "Hướng dẫn thiết lập thông báo Telegram",
+    "Create a Telegram group and add bot @mmoshopio_bot to the group": "Tạo một nhóm Telegram và thêm bot @mmoshopio_bot vào nhóm",
+    "Get the group ID (usually starts with -)": "Lấy ID nhóm (thường bắt đầu bằng -)",
+    "Create a topic in the group and get the topic ID": "Tạo một chủ đề trong nhóm và lấy ID chủ đề",
+    "Enter the group ID and topic ID below": "Nhập ID nhóm và ID chủ đề bên dưới",
+    "Enable Telegram notifications": "Bật thông báo Telegram",
+    "Message": "Tin nhắn",
+    "Send Test Notification": "Gửi thông báo kiểm tra",
+    "Group ID usually starts with - (e.g., -1001234567890)": "Group ID thường bắt đầu bằng - (ví dụ: -1001234567890)",
+    "Topic ID is a number after Group ID (e.g., 123)": "Topic ID là một số đằng sau Group ID (ví dụ: 123)",
+    "Available : {paid_time}, {order_id}, {amount}, {quantity}, {line_items}": "Có sẵn : {paid_time}, {order_id}, {amount}, {quantity}, {line_items}",
+    "Enter your group ID": "Nhập group ID của bạn",
+    "Enter your topic ID": "Nhập topic ID của bạn",
+    "Enter your message": "Nhập tin nhắn của bạn",
+    "Please enter group ID": "Vui lòng nhập group ID của bạn",
+    "Please enter topic ID": "Vui lòng nhập topic ID của bạn",
+    "Please enter message": "Vui lòng nhập tin nhắn của bạn",
+    "Test notification sent successfully": "Tin nhắn kiểm tra đã được gửi thành công"
+}
