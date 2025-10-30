@@ -9,10 +9,11 @@ import ThemeConfigs from "./themeConfig";
 import DomainConfig from "./domainConfig";
 import ContactConfig from "./contactConfig";
 import MenuConfig from "./menuConfig";
+import NotificationConfig from "./notificationConfig";
 
 const ThemeSettings = () => {
     const { t } = useTranslation()
-    const [activeTab, setActiveTab] = useState<"themeTab" | "contactTab" | "domainTab">("themeTab")
+    const [activeTab, setActiveTab] = useState<"themeTab" | "contactTab" | "domainTab" | "notificationTab">("themeTab")
 
     return (
         <React.Fragment>
@@ -54,6 +55,12 @@ const ThemeSettings = () => {
                                                     {t("Menu")}
                                                 </Nav.Link>
                                             </Nav.Item>
+                                            <Nav.Item>
+                                                <Nav.Link eventKey="notificationTab">
+                                                    <i className="ri-notification-3-line me-1"></i>
+                                                    {t("Notification")}
+                                                </Nav.Link>
+                                            </Nav.Item>
                                         </Nav>
                                         <Tab.Content className="mt-4">
                                             <Tab.Pane eventKey="themeTab">
@@ -67,6 +74,9 @@ const ThemeSettings = () => {
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="menuTab">
                                                 <MenuConfig activeTab={activeTab} />
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="notificationTab">
+                                                <NotificationConfig activeTab={activeTab} />
                                             </Tab.Pane>
                                         </Tab.Content>
                                     </Tab.Container>

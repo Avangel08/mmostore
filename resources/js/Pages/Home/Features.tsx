@@ -6,8 +6,11 @@ import img4 from "../../../images/landing/features/img-4.png";
 import img2 from "../../../images/landing/features/img-2.png";
 import img3 from "../../../images/landing/features/img-3.png";
 import { Link } from "@inertiajs/react";
+import { useTranslation } from "react-i18next";
 
 const Features = () => {
+    const { t } = useTranslation();
+
     return (
         <React.Fragment>
             <section className="section bg-light py-5" id="service">
@@ -42,32 +45,29 @@ const Features = () => {
                                     </div>
                                 </div>
                                 <h3 className="mb-3 fs-20">
-                                    MMO SHOP - THỐNG KÊ HOẠT ĐỘNG
+                                    {t("MMO SHOP – Activity Statistics")}
                                 </h3>
                                 <p className="mb-4 ff-secondary fs-16">
-                                    Cung cấp giải pháp mail chất lượng cao, MMO
-                                    SHOP luôn nỗ lực mang lại trải nghiệm tốt
-                                    nhất cho khách hàng, từ khâu mua hàng đến
-                                    phản hồi và đánh giá dịch vụ.
+                                    {t("Providing high-quality email solutions, MMO SHOP is committed to delivering the best customer experience — from purchasing to feedback and service evaluation.")}
                                 </p>
 
                                 <Row className="pt-3">
                                     <Col className="col-3">
                                         <div className="text-center">
                                             <h4>14,800+</h4>
-                                            <p>Lượt mua</p>
+                                            <p>{t("Purchases")}</p>
                                         </div>
                                     </Col>
                                     <Col className="col-3">
                                         <div className="text-center">
                                             <h4>3,200+</h4>
-                                            <p>Feedback</p>
+                                            <p>{t("Feedback")}</p>
                                         </div>
                                     </Col>
                                     <Col className="col-4">
                                         <div className="text-center">
                                             <h4>2,850+</h4>
-                                            <p>Đánh giá</p>
+                                            <p>{t("Reviews")}</p>
                                         </div>
                                     </Col>
                                 </Row>
@@ -84,7 +84,7 @@ const Features = () => {
                         <Col className="col-sm">
                             <div>
                                 <h4 className="text-white mb-0 fw-semibold">
-                                    NHANH TAY SỞ HỮU STORE CỦA RIÊNG MÌNH
+                                    {t("Grab your own store now!")}
                                 </h4>
                             </div>
                         </Col>
@@ -95,7 +95,7 @@ const Features = () => {
                                     target="_blank"
                                     className="btn bg-gradient btn-danger"
                                 >
-                                    Thêm cửa hàng{" "}
+                                    {t("Add Store")}{" "}
                                     <i className="ri-add-line align-middle me-1"></i>
                                 </Link>
                             </div>

@@ -4,8 +4,11 @@ import { Col, Container, Row } from "react-bootstrap";
 // Import Images
 import logolight from "../../../images/logo-light.png";
 import { Link } from "@inertiajs/react";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+    const { t } = useTranslation();
+
     return (
         <React.Fragment>
             <footer className="custom-footer bg-dark py-5 position-relative">
@@ -22,8 +25,7 @@ const Footer = () => {
                                 </div>
                                 <div className="mt-4">
                                     <p>
-                                        MMO Shop là nền tảng giúp bạn nhanh chóng sở hữu website bán hàng chuyên nghiệp để
-                                        kinh doanh các digital products như tài nguyên Gmail, tài khoản TikTok Shop, eBay, Etsy…
+                                        {t("MMO Shop is a platform that helps you quickly create a professional e-commerce website to sell digital products such as Gmail accounts, TikTok Shop accounts, eBay, Etsy, and more.")}
                                     </p>
                                     {/* <p className="ff-secondary">
                                         You can build any type of web
@@ -43,12 +45,12 @@ const Footer = () => {
                                         <ul className="list-unstyled ff-secondary footer-list">
                                             <li>
                                                 <Link href="/">
-                                                    Về chúng tôi
+                                                    {t("About")}
                                                 </Link>
                                             </li>
                                             <li>
                                                 <Link href="#features">
-                                                    Tính năng
+                                                    {t("Features")}
                                                 </Link>
                                             </li>
                                             <li>
@@ -76,18 +78,18 @@ const Footer = () => {
                                 </Col>
                                 <Col sm={4} className="mt-4">
                                     <h5 className="text-white mb-0">
-                                        Chính sách
+                                        {t("Policy")}
                                     </h5>
                                     <div className="text-muted mt-3">
                                         <ul className="list-unstyled ff-secondary footer-list">
                                             <li>
                                                 <Link href="/">
-                                                    Chính sách bảo mật
+                                                    {t("Privacy Policy")}
                                                 </Link>
                                             </li>
                                             <li>
                                                 <Link href="/">
-                                                    Điều khoản sử dụng
+                                                    {t("Terms of Use")}
                                                 </Link>
                                             </li>
                                         </ul>
