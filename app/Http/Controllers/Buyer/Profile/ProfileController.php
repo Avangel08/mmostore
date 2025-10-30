@@ -18,6 +18,7 @@ class ProfileController extends Controller
 {
     protected $buyerProfileService;
     protected $customerAccessTokenService;
+    protected $orderService;
 
     public function __construct(
         BuyerProfileService $buyerProfileService,
