@@ -3,9 +3,11 @@
 namespace App\Services\StoreCategory;
 use App\Models\MySQL\StoreCategory;
 use App\Models\MySQL\Stores;
+use Cache;
 
 class StoreCategoryService
 {
+    private $cacheTimeout = 120; //second
     public function getPaginateData($request)
     {
         $page = $request['page'] ?? 1;
@@ -30,6 +32,7 @@ class StoreCategoryService
 
     public function createStoreCategory(array $data)
     {
+        $this->flushCache();
         return StoreCategory::create([
             'name' => $data['store_category_name'],
             'status' => $data['store_category_status'],
@@ -39,6 +42,7 @@ class StoreCategoryService
 
     public function updateStoreCategory(StoreCategory $storeCategory, array $data)
     {
+        $this->flushCache();
         return $storeCategory->update([
             'name' => $data['store_category_name'],
             'status' => $data['store_category_status'],
@@ -60,6 +64,7 @@ class StoreCategoryService
             ->whereIn('id', $stores->pluck('id'))
             ->update(['verified_at' => null]);
 
+        $this->flushCache();
         return $storeCategory->delete();
     }
 
@@ -77,6 +82,7 @@ class StoreCategoryService
             ->whereDoesntHave('storeCategories')
             ->update(['verified_at' => null]);
 
+        $this->flushCache();
         return StoreCategory::whereIn('id', $ids)->delete();
     }
 
@@ -96,10 +102,23 @@ class StoreCategoryService
 
     public function getAllCategories($select = ['*'], $relation = [])
     {
-        return StoreCategory::where('status', StoreCategory::STATUS['ACTIVE'])
-            ->select($select)
-            ->with($relation)
-            ->orderBy('name', 'asc')
-            ->get();
+        $cacheKey = "all_category_" . md5(json_encode([$select, $relation]));
+        return Cache::tags([$this->getCacheTag()])->remember($cacheKey, $this->cacheTimeout, function () use ($select, $relation) {
+            return StoreCategory::where('status', StoreCategory::STATUS['ACTIVE'])
+                ->select($select)
+                ->with($relation)
+                ->orderBy('name', 'asc')
+                ->get();
+        });
+    }
+
+    public function getCacheTag()
+    {
+        return 'store_categories';
+    }
+
+    public function flushCache()
+    {
+        Cache::tags([$this->getCacheTag()])->flush();
     }
 }
