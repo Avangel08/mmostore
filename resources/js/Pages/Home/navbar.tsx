@@ -119,7 +119,7 @@ const Navbar = () => {
                                 id="navbar-example"
                             >
                                 <li className="nav-item">
-                                    <NavLink href="#">{t("About")}</NavLink>
+                                    <NavLink href="#hero">{t("About")}</NavLink>
                                 </li>
                                 <li className="nav-item">
                                     <NavLink href="#features">{t("Features")}</NavLink>
