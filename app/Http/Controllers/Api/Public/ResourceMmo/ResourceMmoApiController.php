@@ -42,7 +42,7 @@ class ResourceMmoApiController extends Controller
     {
         try {
             $dataRequest = Helpers::transformArrayKeys($request->all(), 'camel');
-            $responseData = StoreResource::collection($this->storeService->getStoresVerified($dataRequest, ['id', 'name', 'user_id', 'domain', 'database_config'], ['user:id,name', 'storeCategories:id,name']));
+            $responseData = StoreResource::collection($this->storeService->getStoresVerified($dataRequest, ['id', 'name', 'user_id', 'domain', 'database_config'], ['storeCategories:id,name']));
             return $this->success('Stores Retrieved Successfully', $responseData);
         } catch (Throwable $e) {
             Log::error($e, ['ip' => $request->ip()]);

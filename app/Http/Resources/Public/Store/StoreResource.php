@@ -17,7 +17,6 @@ class StoreResource extends JsonResource
         return [
             'id' => $this['id'] ?? null,
             'name' => $this['name'] ?? null,
-            'owner_name' => $this?->whenLoaded('user', fn() => $this['user']['name'] ?? null) ?? null,
             'domain' => empty($this['domain'][0]) ? null : $this['domain'][0],
             'logo' => empty($this['data_setting']['storeLogo']) ? null : ($request->getSchemeAndHttpHost() . '/storage/' . $this['data_setting']['storeLogo']),
             'meta_description' => $this['data_setting']['metaDescription'] ?? null,
