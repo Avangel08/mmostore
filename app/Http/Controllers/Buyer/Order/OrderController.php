@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Mongo\Orders;
 use App\Models\Mongo\Accounts;
 use App\Services\Order\OrderService;
+use App\Services\Setting\SettingService;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
@@ -14,10 +15,12 @@ use Illuminate\Support\Facades\Auth;
 class OrderController extends Controller
 {
     protected $orderService;
+    protected $settingService;
 
-    public function __construct(OrderService $orderService)
+    public function __construct(OrderService $orderService, SettingService $settingService)
     {
         $this->orderService = $orderService;
+        $this->settingService = $settingService;
     }
 
     public function page(Request $request): Response
@@ -58,10 +61,22 @@ class OrderController extends Controller
             ]);
         }
         $store = app('store');
+
+        $settings = $this->settingService->getSettings(true);
+        $result = [];
+        foreach ($settings as $setting) {
+            if ($setting->key === 'contacts' || $setting->key === 'domains' || $setting->key === 'menus') {
+                $result[$setting->key] = json_decode($setting->value, true) ?: [];
+            } else {
+                $result[$setting->key] = $setting->value;
+            }
+        }
+
         return Inertia::render("Themes/{$theme}/Order/index", [
             'orders' => $ordersData,
             'store' =>  fn() => $store,
             'domainSuffix' => config('app.domain_suffix'),
+            'settings' => fn() => $result
         ]);
     }
 
