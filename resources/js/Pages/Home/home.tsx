@@ -20,8 +20,11 @@ import materialDemo from "../../../images/landing/showcase/theme-store-3.png";
 // import modernDemo from "../../../images/demos/modern.png";
 // import interactiveDemo from "../../../images/demos/interactive.png";
 import { Link } from "@inertiajs/react";
+import { useTranslation } from "react-i18next";
 
 const Home = () => {
+    const { t } = useTranslation();
+
     return (
         <React.Fragment>
             <section className="section pb-0 hero-section" id="hero">
@@ -34,19 +37,17 @@ const Home = () => {
                                     <span className="text-success">
                                         MMO SHOP{" "}
                                     </span>
-                                    - Tạo shop MMO của riêng bạn trong 5 phút
+                                    - {t("Create your own MMO shop in just 5 minutes")}
                                 </h1>
                                 <p className="lead text-muted lh-base">
-                                    Biến tài nguyên số của bạn thành lợi nhuận chỉ với vài thao tác. 
-                                    Với MMO Store, bạn dễ dàng tạo website bán hàng chuyên nghiệp, 
-                                    quản lý đơn hàng, khách hàng và doanh thu – tất cả trong một nền tảng duy nhất, không cần biết lập trình.
+                                    {t("txtHomePageHeader")}
                                 </p>
                                 <div className="d-flex gap-2 justify-content-center mt-4 mb-4">
                                     <Link
                                         href="/register"
                                         className="btn btn-primary btn-bg-primary border-0"
                                     >
-                                        Bắt đầu tạo website miễn phí ngay hôm nay{" "}
+                                        {t("Start building your website for free today.")}{" "}
                                         <i className="ri-add-line align-middle ms-1"></i>
                                     </Link>
                                 </div>

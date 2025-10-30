@@ -79,10 +79,10 @@ const Faqs = () => {
                         <Col lg={8}>
                             <div className="text-center mb-5">
                                 <h3 className="mb-3 fw-semibold">
-                                    CÂU HỎI THƯỜNG GẶP (FAQ)
+                                    {t("Frequently Asked Questions")} (FAQ)
                                 </h3>
                                 <p className="text-muted mb-4 ff-secondary">
-                                    Tìm câu trả lời nhanh cho mọi thắc mắc của bạn về cách sử dụng, mua gói, cập nhật và hỗ trợ từ đội ngũ MMO Store.
+                                    {t("Find quick answers to all your questions about using the platform, purchasing plans, updates, and support from the MMO Store team.")}
                                 </p>
                             </div>
                         </Col>
@@ -119,7 +119,7 @@ const Faqs = () => {
                                             onClick={t_col1}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            MMO Shop là gì ?
+                                            {t("What is MMO Shop?")}
                                         </button>
                                     </h2>
                                     <Collapse
@@ -127,8 +127,7 @@ const Faqs = () => {
                                         className="accordion-collapse"
                                     >
                                         <div className="accordion-body ff-secondary">
-                                            MMO Store là nền tảng xây dựng website bán hàng chuyên biệt cho sản phẩm số, giúp bạn dễ dàng bán tài nguyên kỹ thuật số như: Gmail, tài khoàn Facebook, tài khoản Tiktok, tài khoản Telegram,... Tạo shop bán hàng online trong 5 phút, hỗ trợ các nền tảng như WooCommerce, Shopify, Sapo Web và Zozo Web Sale.
-                                            Bạn có thể dễ dàng xây dựng website riêng, quản lý sản phẩm số, xử lý đơn hàng, chăm sóc khách hàng và theo dõi hiệu quả bán hàng trên một giao diện duy nhất.
+                                            {t("txtQuestionsWhatIsMMO")}
                                         </div>
                                     </Collapse>
                                 </div>
@@ -147,7 +146,7 @@ const Faqs = () => {
                                             onClick={t_col2}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            MMO Shop có phù hợp cho người mới bắt đầu không?
+                                            {t("Is MMO Shop suitable for beginners?")}
                                         </button>
                                     </h2>
                                     <Collapse
@@ -155,9 +154,7 @@ const Faqs = () => {
                                         className="accordion-collapse"
                                     >
                                         <div className="accordion-body ff-secondary">
-                                            Hoàn toàn phù hợp!
-                                            Giao diện trực quan, thao tác kéo – thả, mẫu website có sẵn giúp bạn tạo shop MMO riêng mà không cần kỹ năng kỹ thuật.
-                                            Chỉ vài phút là bạn đã có một trang bán hàng hoàn chỉnh, tối ưu SEO và sẵn sàng hoạt động.
+                                            {t("txtQuestionsBeginners")}
                                         </div>
                                     </Collapse>
                                 </div>
@@ -176,7 +173,7 @@ const Faqs = () => {
                                             onClick={t_col3}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            Lợi ích khi sử dụng MMO Shop để quản lý là gì?
+                                            {t("What are the benefits of using MMO Shop for management?")}
                                         </button>
                                     </h2>
                                     <Collapse
@@ -184,10 +181,10 @@ const Faqs = () => {
                                         className="accordion-collapse"
                                     >
                                         <div className="accordion-body ff-secondary">
-                                            - Tạo website trong 5 phút: Chọn giao diện, thêm sản phẩm, kết nối thanh toán – website sẵn sàng hoạt động ngay.
-                                            - Chuẩn SEO – Chuẩn Google: Tối ưu tốc độ tải, URL thân thiện, dễ lên top tìm kiếm.
-                                            - Báo cáo & quản lý thông minh: Thống kê doanh thu, tồn kho, hành vi khách hàng – tất cả hiển thị rõ ràng trên dashboard.
-                                            - Hỗ trợ & tư vấn tận tâm: Đội ngũ MMO chuyên môn cao, hỗ trợ từ thiết kế đến vận hành.
+                                            - {t("Create a website in 5 minutes: Choose a template, add products, connect payment – your site is ready to go instantly.")}<br />
+                                            - {t("SEO & Google-friendly: Optimized loading speed, user-friendly URLs, and easy to rank in search results.")}<br />
+                                            - {t("Smart reporting & management: Track revenue, inventory, and customer behavior – all clearly displayed on your dashboard.")}<br />
+                                            - {t("Dedicated support & consulting: Experienced MMO team assists you from design to operation.")}
                                         </div>
                                     </Collapse>
                                 </div>
@@ -206,7 +203,7 @@ const Faqs = () => {
                                             onClick={t_col4}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            MMO Shop có giúp tôi tối ưu SEO cho website không?
+                                            {t("Does MMO Shop help me optimize SEO for my website?")}
                                         </button>
                                     </h2>
                                     <Collapse
@@ -214,7 +211,7 @@ const Faqs = () => {
                                         className="accordion-collapse"
                                     >
                                         <div className="accordion-body ff-secondary">
-                                            Có! MMO Shop được tích hợp các công cụ SEO thân thiện, giúp website của bạn dễ dàng lên top tìm kiếm Google. Từ việc tạo URL thân thiện, tối ưu tốc độ tải trang cho đến thêm từ khóa và meta tag – tất cả đều được hỗ trợ tự động.
+                                            {t("txtQuestionsOptimizeSEO")}
                                         </div>
                                     </Collapse>
                                 </div>
@@ -233,7 +230,7 @@ const Faqs = () => {
                                             onClick={t_col5}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            MMO Shop có tính năng quản lý đơn hàng và khách hàng không?
+                                            {t("Does MMO Shop have order and customer management features?")}
                                         </button>
                                     </h2>
                                     <Collapse
@@ -241,8 +238,7 @@ const Faqs = () => {
                                         className="accordion-collapse"
                                     >
                                         <div className="accordion-body ff-secondary">
-                                            Có. Bạn có thể xử lý đơn hàng, gửi sản phẩm, theo dõi khách hàng và doanh thu ngay trong một dashboard.
-                                            Hệ thống báo cáo chi tiết giúp bạn nắm bắt tình hình kinh doanh theo thời gian thực, mà không cần dùng thêm công cụ ngoài.
+                                            {t("txtQuestionsFeatures")}
                                         </div>
                                     </Collapse>
                                 </div>
@@ -261,7 +257,7 @@ const Faqs = () => {
                                             onClick={t_col6}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            MMO Shop có gói dùng thử không?
+                                            {t("Does MMO Shop offer a trial plan?")}
                                         </button>
                                     </h2>
                                     <Collapse
@@ -269,7 +265,7 @@ const Faqs = () => {
                                         className="accordion-collapse"
                                     >
                                         <div className="accordion-body ff-secondary">
-                                            Có. Bạn có thể tạo shop miễn phí trong 5 phút, trải nghiệm toàn bộ tính năng trước khi nâng cấp lên gói trả phí để mở khóa các tiện ích nâng cao như SEO chuyên sâu, tích hợp thanh toán tự động và tùy chỉnh giao diện mở rộng.
+                                            {t("txtQuestionsTrialPlan")}
                                         </div>
                                     </Collapse>
                                 </div>

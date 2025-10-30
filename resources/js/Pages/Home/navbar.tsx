@@ -7,6 +7,7 @@ import logodark from "../../../images/logo-dark.png";
 import logolight from "../../../images/logo-light.png";
 import { Link } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
+import LanguageDropdown from "../../Components/Common/LanguageDropdown";
 
 const Navbar = () => {
     const [isOpenMenu, setisOpenMenu] = useState<boolean>(false);
@@ -57,6 +58,13 @@ const Navbar = () => {
 
     return (
         <React.Fragment>
+            <style>
+                {`
+                    .dropdown-toggle::after {
+                        display: none;
+                    }
+                `}
+            </style>
             <nav
                 className={
                     "navbar navbar-expand-lg navbar-landing fixed-top " +
@@ -111,10 +119,10 @@ const Navbar = () => {
                                 id="navbar-example"
                             >
                                 <li className="nav-item">
-                                    <NavLink href="#">Về chúng tôi</NavLink>
+                                    <NavLink href="#">{t("About")}</NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <NavLink href="#features">Tính năng</NavLink>
+                                    <NavLink href="#features">{t("Features")}</NavLink>
                                 </li>
                                 {/* <li className="nav-item">
                                     <NavLink href="#plans">Plans</NavLink>
@@ -123,22 +131,25 @@ const Navbar = () => {
                                     <NavLink href="#faqs">FAQ</NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <NavLink target="_blank" href="https://hidemium-organization.gitbook.io/mmoshop-owner-store">Tài liệu</NavLink>
+                                    <NavLink target="_blank" href="https://hidemium-organization.gitbook.io/mmoshop-owner-store">{t("Document")}</NavLink>
                                 </li>
                             </Scrollspy>
 
-                            <div className="">
+                            <div className="d-flex align-items-center">
+                                {/* LanguageDropdown */}
+                                <LanguageDropdown />
+
                                 <Link
                                     href="/login"
                                     className="btn btn-link fw-medium text-decoration-none text-body"
                                 >
-                                    Đăng nhập
+                                    {t("Log in")}
                                 </Link>
                                 <Link
                                     href="/register"
                                     className="btn btn-primary btn-bg-primary border-0"
                                 >
-                                    Đăng ký
+                                    {t("Sign in")}
                                 </Link>
                             </div>
                         </div>

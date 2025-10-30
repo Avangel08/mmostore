@@ -2,8 +2,11 @@ import React from "react";
 import { Col, Container, Row } from "react-bootstrap";
 
 import image1 from "../../../images/landing/services/pattern.png";
+import { useTranslation } from "react-i18next";
 
 const Services = () => {
+    const { t } = useTranslation();
+
     return (
         <React.Fragment>
             <section className="section" id="features">
@@ -12,8 +15,7 @@ const Services = () => {
                         <Col lg={8}>
                             <div className="text-center mb-5">
                                 <h1 className="mb-3 ff-secondary fw-semibold lh-base">
-                                    TẠI SAO MMO SHOP LÀ LỰA CHỌN <br /> SỐ 1
-                                    CỦA CÁC SELLER TIKTOK SHOP
+                                    {t("Why MMO Shop is the right choice")} <br /> {t("The leading platform for TikTok shop sellers")}
                                 </h1>
                                 {/* <p className="text-muted">
                                     Hidemium empowers you to browse the web
@@ -52,12 +54,12 @@ const Services = () => {
                                 </div>
                                 <div className="flex-grow-1">
                                     <h5 className="fs-18">
-                                        Thiết kế website dễ dàng
+                                        {t("Design Your Website Easily")}
                                     </h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        - Giao diện hiện đại, tối ưu hiển thị trên mọi thiết bị và chuẩn SEO giúp bạn xây dựng thương hiệu chuyên nghiệp ngay từ đầu.<br/>
-                                        - Kéo-thả, thay màu, đổi banner, thêm mục nội dung – không cần code.<br/>
-                                        - Chọn mẫu – tùy chỉnh – xuất bản chỉ trong vài phút.
+                                        - {t("A modern interface, optimized for all devices and SEO-ready — helping you build a professional brand from the very start.")}<br />
+                                        - {t("Drag, drop, change colors, update banners, and add content — no coding required.")}<br />
+                                        - {t("Choose a template – customize – publish in just a few minutes.")}
                                     </p>
                                 </div>
                             </div>
@@ -87,11 +89,11 @@ const Services = () => {
                                 </div>
                                 <div className="flex-grow-1">
                                     <h5 className="fs-18">
-                                        Xử lý đơn hàng nhanh chóng
+                                        {t("Fast Order Processing")}
                                     </h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        - Hệ thống tự động hóa toàn bộ quy trình bán hàng: từ xác nhận đơn, thanh toán đến gửi sản phẩm số cho khách.<br/>
-                                        - Bạn không cần thao tác thủ công – mọi thứ diễn ra mượt mà 24/7, giúp bạn tiết kiệm thời gian và giảm sai sót.
+                                        - {t("The system automates the entire sales process: from order confirmation and payment to delivering digital products to customers.")}<br />
+                                        - {t("No manual work needed — everything runs smoothly 24/7, helping you save time and reduce errors.")}
                                     </p>
                                 </div>
                             </div>
@@ -131,12 +133,12 @@ const Services = () => {
                                 </div>
                                 <div className="flex-grow-1">
                                     <h5 className="fs-18">
-                                        Báo cáo & phân tích
+                                        {t("Reports & Analytics")}
                                     </h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        - Thống kê doanh thu, đơn hàng, top sản phẩm bán chạy, tỷ lệ chuyển đổi.<br/>
-                                        - Hỗ trợ xuất báo cáo định kỳ, giúp tối ưu chiến lược kinh doanh.<br/>
-                                        - Các biểu đồ và số liệu chi tiết giúp bạn nắm rõ hiệu quả kinh doanh, tối ưu chiến lược bán hàng chỉ bằng vài cú click.
+                                        - {t("Track revenue, orders, best-selling products, and conversion rates.")}<br />
+                                        - {t("Generate periodic reports to optimize your business strategy.")}<br />
+                                        - {t("Detailed charts and metrics help you understand performance and refine your sales strategy with just a few clicks.")}
                                     </p>
                                 </div>
                             </div>
@@ -192,11 +194,11 @@ const Services = () => {
                                 </div>
                                 <div className="flex-grow-1">
                                     <h5 className="fs-18">
-                                        Quản lý khách hàng hiệu quả
+                                        {t("Effective Customer Management")}
                                     </h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        - Lưu trữ thông tin khách hàng, lịch sử giao dịch, hành vi mua hàng và tệp khách trung thành.<br/>
-                                        - Hỗ trợ chăm sóc tự động, remarketing và phân nhóm khách để tăng tỷ lệ quay lại mua.
+                                        - {t("Store customer information, transaction history, purchasing behavior, and loyal customer profiles.")}<br />
+                                        - {t("Support automated customer care, remarketing, and segmentation to increase repeat purchase rates.")}
                                     </p>
                                 </div>
                             </div>
@@ -243,9 +245,9 @@ const Services = () => {
                                     </div>
                                 </div>
                                 <div className="flex-grow-1">
-                                    <h5 className="fs-18">Đội ngũ hỗ trợ & tư vấn tận tâm</h5>
+                                    <h5 className="fs-18">{t("Dedicated Support & Consultation Team")}</h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        Đội ngũ chuyên viên MMO giàu kinh nghiệm sẽ đồng hành cùng bạn từ lúc tạo shop, thiết lập thanh toán đến tối ưu SEO – đảm bảo shop vận hành trơn tru và đạt hiệu quả cao nhất.
+                                        {t("Our experienced MMO specialists accompany you every step of the way — from shop creation and payment setup to SEO optimization — ensuring your store runs smoothly and achieves the best performance.")}
                                     </p>
                                 </div>
                             </div>
@@ -293,11 +295,11 @@ const Services = () => {
                                 </div>
                                 <div className="flex-grow-1">
                                     <h5 className="fs-18">
-                                        Theo dõi tồn kho & hàng bán dễ dàng
+                                        {t("Easy Inventory & Sales Tracking")}
                                     </h5>
                                     <p className="text-muted my-3 ff-secondary">
-                                        - Nắm rõ tình trạng sản phẩm, số lượng bán ra, và doanh thu theo thời gian thực.<br/>
-                                        - Hệ thống cảnh báo tồn kho giúp bạn chủ động quản lý tài nguyên số, tránh thiếu hàng hoặc sai sót trong xử lý đơn.
+                                        - {t("Keep track of product status, sales quantity, and real-time revenue effortlessly.")}<br />
+                                        - {t("The inventory alert system helps you proactively manage your digital assets, preventing stock shortages or order processing errors.")}
                                     </p>
                                 </div>
                             </div>
