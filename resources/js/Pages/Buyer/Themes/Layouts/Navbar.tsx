@@ -112,7 +112,7 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
             return newMenu;
         }
         return []
-    }, [])
+    }, [settings?.menus])
 
     return (
         <React.Fragment>
