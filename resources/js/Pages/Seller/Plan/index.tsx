@@ -6,6 +6,7 @@ import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
 import { showToast } from "../../../utils/showToast";
+import { CKEditorContent } from "../../../Components/CKEditorContent";
 import { ModalCheckoutPlan } from "./ModalCheckoutPlan";
 import { ModalSelectPaymentMethod } from "./ModalSelectPaymentMethod";
 import axios from "axios";
@@ -416,7 +417,7 @@ const Plans = () => {
                             {t("Description")}
                           </h6>
                           <div className="text-muted small">
-                            <div dangerouslySetInnerHTML={{ __html: plan.description }} />
+                            <CKEditorContent htmlContent={plan.description} />
                           </div>
                         </div>
                       )}
