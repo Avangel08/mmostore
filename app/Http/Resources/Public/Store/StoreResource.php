@@ -16,21 +16,23 @@ class StoreResource extends JsonResource
     {
         return [
             'id' => $this['id'] ?? null,
-            'name' => $this['name'] ?? null,
+            'name' => empty($this['name']) ? null : strip_tags($this['name']),
             'domain' => empty($this['domain'][0]) ? null : $this['domain'][0],
+            
             'logo' => empty($this['data_setting']['storeLogo']) ? null : ($request->getSchemeAndHttpHost() . '/storage/' . $this['data_setting']['storeLogo']),
-            'meta_description' => $this['data_setting']['metaDescription'] ?? null,
+            'meta_description' => empty($this['data_setting']['metaDescription']) ? null : strip_tags($this['data_setting']['metaDescription']),
             'header_image' => empty($this['data_setting']['pageHeaderImage']) ? null : ($request->getSchemeAndHttpHost() . '/storage/' . $this['data_setting']['pageHeaderImage']),
-            'header_text' => $this['data_setting']['pageHeaderText'] ?? null,
+            'header_text' => empty($this['data_setting']['pageHeaderText']) ? null : strip_tags($this['data_setting']['pageHeaderText']),
+
             'store_categories' => $this?->whenLoaded(
                 'storeCategories',
                 fn() =>
-                $this['storeCategories']->map(function ($category) {
+                $this['storeCategories']?->map(function ($category) {
                     return [
                         'id' => $category['id'] ?? null,
-                        'name' => $category['name'] ?? null,
+                        'name' => empty($category['name']) ? null : strip_tags($category['name']),
                     ];
-                }),
+                }) ?? null,
             ) ?? null,
         ];
     }
