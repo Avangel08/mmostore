@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
 import { showToast } from "../../../utils/showToast";
 import { ModalPaymentPlan } from "./ModalPaymentPlan";
+import { CKEditorContent } from "../../../Components/CKEditorContent";
 
 const Plans = () => {
   const { t } = useTranslation();
@@ -134,7 +135,7 @@ const Plans = () => {
                         <div>
                           <h6 className="text-uppercase text-muted mb-3 fw-bold">{t("Description")}</h6>
                           <div className="text-muted small">
-                            <div dangerouslySetInnerHTML={{ __html: plan.description }} />
+                            <CKEditorContent htmlContent={plan.description} />
                           </div>
                         </div>
                       )}

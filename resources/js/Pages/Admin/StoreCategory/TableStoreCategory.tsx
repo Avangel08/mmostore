@@ -5,6 +5,7 @@ import { Form, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import moment from "moment";
 import { usePage } from "@inertiajs/react";
 import DOMPurify from 'dompurify';
+import { CKEditorContent } from "../../../Components/CKEditorContent";
 
 const TableStoreCategory = ({
   data,
@@ -91,8 +92,7 @@ const TableStoreCategory = ({
         header: t("Description"),
         cell: (cell: any) => {
           const html = cell.getValue() ?? "";
-          const safe = DOMPurify.sanitize(html);
-          return <span dangerouslySetInnerHTML={{ __html: safe }} className="text-break text-wrap" />;
+          return <div className="text-break text-wrap"><CKEditorContent htmlContent={html}/></div>;
         },
         accessorKey: "description",
         enableColumnFilter: false,
