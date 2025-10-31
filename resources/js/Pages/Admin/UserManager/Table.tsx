@@ -8,11 +8,12 @@ import moment from "moment";
 import { useQueryParams } from "../../../hooks/useQueryParam";
 // Using global route() helper injected by Ziggy/Inertia
 
-const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
+const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
     data: any;
     onReloadTable?: (page: number, perPage: number) => void;
     onEdit?: (id: number | string) => void;
     onSelectionChange?: (selectedItems: (string | number)[]) => void;
+    onAddPlan?: (userData: any) => void;
 }) => {
     const { t } = useTranslation();
     const [selectedItems, setSelectedItems] = useState<(string | number)[]>([]);
@@ -57,6 +58,10 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
         }
     }, []);
 
+    const adminAddPlanSeller = (rowData: any) => {
+        onAddPlan && onAddPlan(rowData);
+    }
+
     const columns = useMemo(
         () => [
             {
@@ -94,6 +99,31 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                 enableColumnFilter: false,
             },
             {
+                header: t("Plan"),
+                accessorKey: "",
+                enableColumnFilter: false,
+                cell: (cell: any) => {
+                    const currentPlan = cell.row.original?.current_plan;
+                    
+                    if (!currentPlan) {
+                        return <span className="text-muted">{t("No plan")}</span>;
+                    }
+
+                    const expiresOn = moment(currentPlan.expires_on);
+                    const isExpired = expiresOn.isBefore(moment());
+                    const expirationColor = isExpired ? "text-danger" : "text-success";
+
+                    return (
+                        <div className="d-flex flex-column gap-0">
+                            <div className="fw-semibold">{currentPlan.name}</div>
+                            <div className={`small ${expirationColor}`}>
+                                {t("Expires")}: {expiresOn.format("DD/MM/YYYY HH:mm")}
+                            </div>
+                        </div>
+                    );
+                }
+            },
+            {
                 header: t("Type"),
                 accessorKey: "type",
                 enableColumnFilter: false,
@@ -129,21 +159,39 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                 },
             },
             {
-                header: " ",
+                header: t("Actions"),
                 enableColumnFilter: false,
                 cell: (cell: any) => {
                     const row = cell.row.original;
-                    return (
-                        <Button
-                            variant="link"
-                            onClick={() => {
-                                const url = route("admin.user.login-as", { id: row.id });
-                                window.open(url, "_blank");
-                            }}
+                    const id = row?.id;
+
+                    return <div className="d-flex gap-2">
+                        <OverlayTrigger
+                            placement="top"
+                            overlay={<Tooltip>{t("Login")}</Tooltip>}
                         >
-                            {t("Login")} <i className="ri-login-box-line"></i>
-                        </Button>
-                    );
+                            <Button
+                                size="sm"
+                                variant="outline-info"
+                                onClick={() => {
+                                    const url = route("admin.user.login-as", { id });
+                                    window.open(url, "_blank");
+                                }}><i className="ri-login-box-line"></i>
+                            </Button>
+                        </OverlayTrigger>
+
+                        <OverlayTrigger
+                            placement="top"
+                            overlay={<Tooltip>{t("Add plan")}</Tooltip>}
+                        >
+                            <Button
+                                size="sm"
+                                variant="outline-primary"
+                                onClick={() => adminAddPlanSeller(id)}>
+                                <i className="ri-wallet-line"></i>
+                            </Button>
+                        </OverlayTrigger>
+                    </div>
                 },
             },
         ],

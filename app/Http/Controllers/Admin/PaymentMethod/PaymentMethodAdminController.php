@@ -296,8 +296,9 @@ class PaymentMethodAdminController extends Controller
         try {
             $searchTerm = $request->input('search', '');
             $page = (int) $request->input('page', 1);
+            $includeAll = $request->input('includeAll', true);
 
-            $options = $this->paymentMethodService->getListPaymentMethod($searchTerm, $page, 10);
+            $options = $this->paymentMethodService->getListPaymentMethod($searchTerm, $page, 10, $includeAll);
 
             return response()->json([
                 'results' => $options['results'] ?? [],

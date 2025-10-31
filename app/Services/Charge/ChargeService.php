@@ -19,7 +19,7 @@ class ChargeService
             ->first();
     }
 
-    public function makePlanCharge(CheckOuts $planCheckout, $userId)
+    public function makePlanCharge(CheckOuts $planCheckout, $userId, ?Carbon $expireTimeByAdmin = null)
     {
         return Charges::create([
             'user_id' => $userId,
@@ -30,9 +30,10 @@ class ChargeService
             'description' => $planCheckout->description,
             'feature' => $planCheckout->feature,
             'active_on' => Carbon::now(),
-            'expires_on' => $this->getDatetimeExpiresCharge($planCheckout, $userId),
+            'expires_on' => $expireTimeByAdmin ?? $this->getDatetimeExpiresCharge($planCheckout, $userId),
             'check_out_id' => $planCheckout->id,
             'creator_id' => $planCheckout->creator_id,
+            'admin_set_expires_on' => $expireTimeByAdmin ? Charges::ADMIN_SET_EXPIRES_ON['YES'] : Charges::ADMIN_SET_EXPIRES_ON['NO'],
         ]);
     }
 

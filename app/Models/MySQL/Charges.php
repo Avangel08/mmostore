@@ -11,6 +11,11 @@ class Charges extends Model
         'NORMAL' => 1,
     ];
 
+    const ADMIN_SET_EXPIRES_ON = [
+        'NO' => 'NO',
+        'YES' => 'YES',
+    ];
+
     const LIST_TYPE = [
         'DEFAULT' => "Default",
         'NORMAL' => "Normal",
@@ -31,6 +36,7 @@ class Charges extends Model
         'expires_on',
         'check_out_id',
         'creator_id',
+        'admin_set_expires_on',
     ];
 
     protected $casts = [

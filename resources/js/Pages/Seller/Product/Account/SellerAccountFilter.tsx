@@ -65,16 +65,24 @@ const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterPro
   const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
   const [selectedSellStatus, setSelectedSellStatus] = useState(sellStatusOptions[0]);
 
-  // Set initial status from URL parameter
   useEffect(() => {
     const urlStatus = paramsUrl?.status;
-    if (urlStatus !== null) {
-      const matchingStatus = statusOptions.find(
-        (option) => option.value.toString() === urlStatus
-      );
-      if (matchingStatus) {
-        setSelectedStatus(matchingStatus);
-      }
+    if (urlStatus && subProductId) {
+      axios.get(route("seller.account.status-options", { sub_product_id: subProductId, search: "", page: 1 }))
+        .then((response) => {
+          const statuses = response?.data?.results ?? [];
+          const matchingStatus = statuses.find(
+            (option: any) => option.value.toString() === urlStatus
+          );
+          if (matchingStatus) {
+            setSelectedStatus({ value: matchingStatus.value, label: t(matchingStatus.label) });
+          } else {
+            setSelectedStatus({ value: urlStatus, label: urlStatus });
+          }
+        })
+        .catch(() => {
+          setSelectedStatus({ value: urlStatus, label: urlStatus });
+        });
     }
 
     const urlSellStatus = paramsUrl?.sellStatus ?? "unsold";
@@ -84,7 +92,7 @@ const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterPro
     if (matchingSellStatus) {
       setSelectedSellStatus(matchingSellStatus);
     }
-  }, []);
+  }, [subProductId]);
 
   const getFlatpickrLocale = () => {
     switch (i18n.language) {
@@ -260,6 +268,7 @@ const SellerAccountFilter = ({ onFilter, subProductId }: ProductAccountFilterPro
               <AsyncPaginate
                 id="filter-status"
                 value={selectedStatus}
+                isClearable
                 loadOptions={async (search, loadedOptions, { page }) => {
                   if (!subProductId) {
                     return {

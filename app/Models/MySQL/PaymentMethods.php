@@ -18,6 +18,7 @@ class PaymentMethods extends Model
         'BANK' => 0,
         'CRYPTO' => 1,
         'SEPAY' => 2,
+        'NO_BANK' => 3,
     ];
 
     const LIST_BANK = [

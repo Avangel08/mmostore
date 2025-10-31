@@ -7,6 +7,7 @@ use App\Models\MySQL\PaymentMethods;
 use App\Models\MySQL\Plans;
 use App\Models\MySQL\User;
 use App\Services\CheckBank\CheckBankService;
+use Auth;
 
 class PlanCheckoutService
 {
@@ -36,12 +37,13 @@ class PlanCheckoutService
             ->where('amount', $data['amount'])
             ->where('amount_vnd', $data['amount_vnd'])
             ->where('status', $data['status'])
+            ->where('content_bank', $data['content_bank'])
             ->first();
     }
 
-    public function createCheckout(User $user, Plans $plan, PaymentMethods $paymentMethod)
+    public function createCheckout(User $user, Plans $plan, PaymentMethods $paymentMethod, bool $isAdminCreate = false)
     {
-        $currencyRateService = app(abstract: \App\Services\CurrencyRate\CurrencyRateService::class);
+        $currencyRateService = app(\App\Services\CurrencyRate\CurrencyRateService::class);
         $dataInsert = [
             'user_id' => $user->id,
             'plan_id' => $plan->id,
@@ -54,18 +56,15 @@ class PlanCheckoutService
             'interval_type' => $plan->interval_type,
             'description' => $plan->description,
             'status' => CheckOuts::STATUS['PENDING'],
-            'creator_id' => $user->id,
-            'content_bank' => CheckBankService::genContentBank($user->id, $plan->id, null, 8)
+            'creator_id' => $isAdminCreate ? Auth::guard(config('guard.admin'))->id() : $user->id,
+            'content_bank' => CheckBankService::genContentBank($user->id, $plan->id, $paymentMethod->key, 8) . ($isAdminCreate ? '_ADMIN': ''),
         ];
 
-        $existingCheckout = $this->findExist($dataInsert);
-        if (!$existingCheckout) {
-            $existingCheckout = CheckOuts::create($dataInsert);
-            $this->update($existingCheckout, [
-                'content_bank' => CheckBankService::genContentBank($user->id, $existingCheckout->id, $paymentMethod->key, 8)
-            ]);
+        $checkout = $this->findExist($dataInsert);
+        if (!$checkout) {
+            $checkout = CheckOuts::create($dataInsert);
         }
 
-        return $existingCheckout;
+        return $checkout;
     }
 }

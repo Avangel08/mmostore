@@ -44,10 +44,12 @@ Route::domain($mainDomain)->group(function () {
             Route::delete('/delete', [UserController::class, 'delete'])->name('admin.user.delete');
             Route::get('/{id}/login-as', [UserController::class, 'loginAs'])->name('admin.user.login-as');
             Route::get('/list-user', [UserController::class, 'getUserPaginateSelect'])->name('admin.user.list-user');
+            Route::post('/add-plan', [UserController::class, 'adminAddPlanSeller'])->name('admin.user.add-plan');
         });
 
         Route::group(['prefix' => 'plans'], function () {
             Route::post('/duplicate-plan/{id}', [PlanController::class, 'duplicatePlan'])->name('admin.plans.duplicate-plan');
+            Route::get('/list-user', [PlanController::class, 'getPlanPaginateSelect'])->name('admin.plans.list-plan');
         });
         Route::resource('plans', PlanController::class, ['as' => 'admin']);
 

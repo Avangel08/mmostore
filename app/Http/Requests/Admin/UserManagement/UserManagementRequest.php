@@ -47,6 +47,18 @@ class UserManagementRequest extends FormRequest
                 'ids' => ['required', 'array', 'min:1'],
                 'ids.*' => ['integer', Rule::exists('users', 'id')],
             ],
+            'adminAddPlanSeller' => [
+                'userId' => ['required', 'integer'],
+                'planId' => ['required', 'integer'],
+                'paymentMethodId' => ['required', 'integer'],
+                'datetimeExpired' => [
+                    'required',
+                    'date_format:Y-m-d H:i',
+                    'after:' . now()->format('Y-m-d H:i'),
+                ],
+                'amount' => ['required', 'decimal:0,2', 'min:0', 'max:999999999'],
+                'note' => ['nullable', 'string', 'max:10000'],
+            ],
             default => [],
         };
     }
