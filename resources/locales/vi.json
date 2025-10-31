@@ -637,5 +637,13 @@
     "Please enter group ID": "Vui lòng nhập group ID của bạn",
     "Please enter topic ID": "Vui lòng nhập topic ID của bạn",
     "Please enter message": "Vui lòng nhập tin nhắn của bạn",
-    "Test notification sent successfully": "Tin nhắn kiểm tra đã được gửi thành công"
+    "Test notification sent successfully": "Tin nhắn kiểm tra đã được gửi thành công",
+    "Earning": "Kiếm được",
+    "New customer": "Khách hàng mới",
+    "Total order": "Số lượng đơn hàng",
+    "Order status": "Trạng thái đơn hàng",
+    "PAID": "Đã thanh toán",
+    "FAILED": "Lỗi",
+    "COMPLETED": "Thành công",
+    "No data": "Không có dữ liệu"
 }
