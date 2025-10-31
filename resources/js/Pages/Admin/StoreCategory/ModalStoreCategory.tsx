@@ -9,7 +9,7 @@ import * as Yup from "yup";
 import { showToast } from "../../../utils/showToast";
 import CustomCKEditor from "../../../Components/CustomCKEditor";
 
-export const ModelStoreCategory = ({
+export const ModalStoreCategory = ({
   show,
   onHide,
   dataEdit,
@@ -101,6 +101,7 @@ export const ModelStoreCategory = ({
       }}
       centered
       size="xl"
+      enforceFocus={false}
     >
       <Form onSubmit={formik.handleSubmit} noValidate>
         <Modal.Header closeButton>

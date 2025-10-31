@@ -101,6 +101,7 @@ export const ModelProductType = ({
       }}
       centered
       size="xl"
+      enforceFocus={false}
     >
       <Form onSubmit={formik.handleSubmit} noValidate>
         <Modal.Header closeButton>
