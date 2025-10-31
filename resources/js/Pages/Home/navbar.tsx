@@ -149,7 +149,7 @@ const Navbar = () => {
                                     href="/register"
                                     className="btn btn-primary btn-bg-primary border-0"
                                 >
-                                    {t("Sign in")}
+                                    {t("Register")}
                                 </Link>
                             </div>
                         </div>
