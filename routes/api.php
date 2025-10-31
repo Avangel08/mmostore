@@ -60,4 +60,11 @@ Route::group(['prefix' => 'v1','as' => 'api.'], function () use ($mainDomain) {
             Route::get('/categories', [ResourceMmoApiController::class, 'getStoreCategories'])->name('resources.categories.index');
             Route::get('/banner', [ResourceMmoApiController::class, 'getBanner'])->name('resources.banner.index');
         });
+
+        // resource market
+        Route::group(['prefix' => 'resources'], function () {
+            Route::get('/stores', [ResourceMmoApiController::class, 'getStores'])->name('resources.stores.index');
+            Route::get('/categories', [ResourceMmoApiController::class, 'getStoreCategories'])->name('resources.categories.index');
+            Route::get('/banner', [ResourceMmoApiController::class, 'getBanner'])->name('resources.banner.index');
+        });
     });

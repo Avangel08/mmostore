@@ -40,6 +40,10 @@ class UserController extends Controller
             'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: ['stores:id,user_id,verified_at'], request: $request),
             'status' => fn() => User::STATUS,
             'type' => fn() => User::TYPE,
+            'verifyStatus' => fn() => [
+                'Verified' => 'VERIFIED',
+                'Unverified' => 'UNVERIFIED',
+            ],
             'detail' => fn() => $this->userService->findById(id: $request->input('id'), relation: []),
             'verifyStoreData' => Inertia::optional(fn() => $this->userService->findById(id: $request->input('id'), relation: ['stores:id,user_id,name,domain,verified_at', 'stores.storeCategories:id,name,status'])),
             'storeCategoryOptions' => Inertia::optional(fn() => $this->storeCategoryService->getCategoryOptions()),

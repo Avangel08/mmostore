@@ -64,7 +64,8 @@ class UserService
                   ->filterEmail($request)
                   ->filterType($request)
                   ->filterStatus($request)
-                  ->filterCreatedDate($request);
+                  ->filterCreatedDate($request)
+                  ->filterStoreVerifyStatus($request);
         }
 
         if ($isPaginate) {
