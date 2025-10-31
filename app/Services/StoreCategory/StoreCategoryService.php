@@ -103,12 +103,17 @@ class StoreCategoryService
     public function getAllCategories($select = ['*'], $relation = [])
     {
         $cacheKey = "all_category_" . md5(json_encode([$select, $relation]));
+
         return Cache::tags([$this->getCacheTag()])->remember($cacheKey, $this->cacheTimeout, function () use ($select, $relation) {
             return StoreCategory::where('status', StoreCategory::STATUS['ACTIVE'])
                 ->select($select)
                 ->with($relation)
                 ->orderBy('name', 'asc')
-                ->get();
+                ->get()
+                ->map(function ($item) {
+                    $item->name = strip_tags($item->name);
+                    return $item;
+                });
         });
     }
 
