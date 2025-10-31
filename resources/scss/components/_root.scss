@@ -43,6 +43,10 @@
     --#{$prefix}grid-gutter-width: 1.5rem;
 
     --#{$prefix}card-shadow: 0 1px 2px rgba(56, 65, 74, 0.15);
+
+    // fix floating for ckeditor in bootstrap css: https://ckeditor.com/docs/ckeditor5/latest/getting-started/installation/css.html
+    --ck-z-default: 100 !important;
+	--ck-z-panel: calc( var(--ck-z-default) + 999 ) !important;
 }
 
 //sidebar gradient light theme
