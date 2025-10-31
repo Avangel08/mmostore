@@ -146,4 +146,21 @@ class User extends Authenticatable
         }
         return $query;
     }
+
+    public function scopeFilterStoreVerifyStatus($query, $request)
+    {
+        if ($request?->filled('verifyStatus')) {
+            $verifyStatus = $request->input('verifyStatus');
+            if ($verifyStatus == 'VERIFIED') {
+                $query->whereHas('stores', function ($q) {
+                    $q->whereNotNull('verified_at');
+                });
+            } elseif ($verifyStatus == 'UNVERIFIED') {
+                $query->whereHas('stores', function ($q) {
+                    $q->whereNull('verified_at');
+                });
+            }
+        }
+        return $query;
+    }
 }

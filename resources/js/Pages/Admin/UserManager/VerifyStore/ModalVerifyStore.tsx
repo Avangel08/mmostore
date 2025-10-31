@@ -146,7 +146,7 @@ export const ModalVerifyStore = ({
 
                         {!!dataVerifyStore?.stores && dataVerifyStore?.stores.length > 0 && (
                             <div className="stores-container">
-                                <h6 className="fw-semibold mb-3">{t('Registered stores')} ({dataVerifyStore.stores.length} {t('stores')})</h6>
+                                <h6 className="fw-semibold mb-3">{t('Registered stores')}:</h6>
 
                                 {dataVerifyStore?.stores?.map((store: any, storeIdx: number) => {
                                     const storeFieldName = `stores.${storeIdx}.store_category_ids`;
