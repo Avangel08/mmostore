@@ -815,5 +815,13 @@
     "Does MMO Shop offer a trial plan?": "MMO Shop có gói dùng thử không?",
     "txtQuestionsTrialPlan": "Có. Bạn có thể tạo shop miễn phí trong 5 phút, trải nghiệm toàn bộ tính năng trước khi nâng cấp lên gói trả phí để mở khóa các tiện ích nâng cao như SEO chuyên sâu, tích hợp thanh toán tự động và tùy chỉnh giao diện mở rộng.",
     "Policy": "Chính sách",
-    "MMO Shop is a platform that helps you quickly create a professional e-commerce website to sell digital products such as Gmail accounts, TikTok Shop accounts, eBay, Etsy, and more.": "MMO Shop là nền tảng giúp bạn nhanh chóng sở hữu website bán hàng chuyên nghiệp để kinh doanh các digital products như tài nguyên Gmail, tài khoản TikTok Shop, eBay, Etsy..."
+    "MMO Shop is a platform that helps you quickly create a professional e-commerce website to sell digital products such as Gmail accounts, TikTok Shop accounts, eBay, Etsy, and more.": "MMO Shop là nền tảng giúp bạn nhanh chóng sở hữu website bán hàng chuyên nghiệp để kinh doanh các digital products như tài nguyên Gmail, tài khoản TikTok Shop, eBay, Etsy...",
+    "Earning": "Kiếm được",
+    "New customer": "Khách hàng mới",
+    "Total order": "Số lượng đơn hàng",
+    "Order status": "Trạng thái đơn hàng",
+    "PAID": "Đã thanh toán",
+    "FAILED": "Lỗi",
+    "COMPLETED": "Thành công",
+    "No data": "Không có dữ liệu"
 }
