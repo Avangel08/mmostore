@@ -172,6 +172,7 @@ export const ModalPlan = ({
       centered
       size="xl"
       scrollable
+      enforceFocus={false}
     >
       <Modal.Header closeButton>
         <h5>{isEditMode ? t("Edit plan") : t("Add plan")}</h5>

@@ -8,7 +8,7 @@ import { ToastContainer } from "react-toastify";
 import { confirmDelete } from "../../../utils/sweetAlert";
 import { showToast } from "../../../utils/showToast";
 import TableStoreCategory from "./TableStoreCategory";
-import { ModelStoreCategory } from "./ModalStoreCategory";
+import { ModalStoreCategory } from "./ModalStoreCategory";
 import StoreCategoryFilter from "./StoreCategoryFilter";
 
 const StoreCategory = () => {
@@ -124,7 +124,7 @@ const StoreCategory = () => {
       <Head title={t("Store category")} />
       <div className="page-content">
         <ToastContainer />
-        <ModelStoreCategory
+        <ModalStoreCategory
           show={showModal}
           onHide={() => {
             setShowModal(false);
