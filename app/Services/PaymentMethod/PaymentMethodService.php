@@ -16,6 +16,7 @@ class PaymentMethodService
         $perPage = $request['perPage'] ?? 10;
         return PaymentMethods::filterSearch($request)
             ->filterCreatedDate($request)
+            ->where('type', '!=', PaymentMethods::TYPE['NO_BANK'])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
@@ -66,33 +67,55 @@ class PaymentMethodService
 
     public function listActive()
     {
-        return PaymentMethods::where('status', PaymentMethods::STATUS['ACTIVE'])->get();
+        return PaymentMethods::where('type', '!=', PaymentMethods::TYPE['NO_BANK'])->where('status', PaymentMethods::STATUS['ACTIVE'])->get();
     }
 
-    public function getListPaymentMethod($searchTerm = '', int $page = 1, int $perPage = 10)
+    public function findNoBankMethod()
     {
-        $query = PaymentMethods::select(['id', 'name', 'key']);
+        return PaymentMethods::firstOrCreate([
+            'type' => PaymentMethods::TYPE['NO_BANK'],
+        ], [
+            'name' => 'No Bank',
+            'key' => 'no_bank',
+            'title' => 'No Bank',
+            'status' => PaymentMethods::STATUS['ACTIVE']
+        ]);
+    }
+
+    public function getListPaymentMethod($searchTerm = '', int $page = 1, int $perPage = 10, $includeAll = true)
+    {
+        $this->findNoBankMethod();
+        $query = PaymentMethods::select(['id', 'name', 'key', 'type', 'details']);
 
         if (!empty($searchTerm)) {
-            $query->where('name', 'like', '%' . $searchTerm . '%')
-                ->orWhere('key', 'like', '%' . $searchTerm . '%');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('key', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('details->account_name', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('details->account_number', 'like', '%' . $searchTerm . '%');
+            });
         }
 
         $paginatedResults = $query->orderBy('name')
             ->paginate($perPage, ['*'], 'page', $page);
 
         $listPaymentMethod = collect([]);
-        if ($page == 1 && empty($searchTerm)) {
+        if ($includeAll && $page == 1 && empty($searchTerm)) {
             $listPaymentMethod->push([
                 'value' => '',
                 'label' => __('All'),
             ]);
         }
 
+        $typeMap = array_flip(PaymentMethods::TYPE);
+
         $statusData = $paginatedResults->map(
             fn($item) => [
                 'value' => $item->id,
                 'label' => $item->name . ' - ' . $item->key,
+                'type' => $typeMap[$item->type] ?? $item->type,
+                'account_name' => $item?->details['account_name'] ?? '',
+                'account_number' => $item?->details['account_number'] ?? '',
             ]
         );
 

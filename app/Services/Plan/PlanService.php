@@ -103,7 +103,7 @@ class PlanService
     public function duplicatePlan(Plans $plan)
     {
         $newPlan = $plan->replicate();
-        $newPlan->name = $plan->name . ' (Copy_' . Carbon::now()->getTimestamp(). ')';
+        $newPlan->name = $plan->name . ' (Copy_' . Carbon::now()->getTimestamp() . ')';
         $newPlan->status = Plans::STATUS['INACTIVE'];
         $newPlan->type = $newPlan?->type == Plans::TYPE['DEFAULT'] ? Plans::TYPE['NORMAL'] : $newPlan->type;
         $newPlan->creator_id = auth(config('guard.admin'))->id();
@@ -122,5 +122,34 @@ class PlanService
             ->where('type', '!=', Plans::TYPE['DEFAULT'])
             ->with($relation)
             ->get();
+    }
+
+    public function getListPlanPaginate($searchTerm = '', int $page = 1, int $perPage = 10)
+    {
+        $query = Plans::select(['id', 'name', 'price', 'interval', 'status']);
+
+        if (!empty($searchTerm)) {
+            $query->where('name', 'like', '%' . $searchTerm . '%')
+                ->orWhere('price', 'like', '%' . $searchTerm . '%')
+                ->orWhere('interval', 'like', '%' . $searchTerm . '%');
+        }
+
+        $paginatedResults = $query->orderBy('price', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+       $listPlanOptions = $paginatedResults->map(
+            fn($item) => [
+                'value' => $item->id,
+                'label' => $item->name,
+                'price' => $item->price,
+                'interval' => $item->interval,
+                'status' => $item->status,
+            ]
+        );
+
+        return [
+            'results' => $listPlanOptions,
+            'has_more' => $paginatedResults->hasMorePages(),
+        ];
     }
 }

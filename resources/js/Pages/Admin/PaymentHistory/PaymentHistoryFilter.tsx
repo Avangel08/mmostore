@@ -90,13 +90,40 @@ const PaymentHistoryFilter = ({ onFilter, additionalButtons }: PaymentHistoryFil
 
     const urlUser = paramsUrl?.userId;
     if (urlUser) {
-      setSelectedUser({ value: urlUser, label: urlUser });
+      axios.get(route("admin.user.list-user", { search: "", page: 1 }))
+        .then((response) => {
+          const users = response?.data?.results ?? [];
+          const matchingUser = users.find(
+            (option: any) => option.value.toString() === urlUser
+          );
+          if (matchingUser) {
+            setSelectedUser(matchingUser);
+          } else {
+            setSelectedUser({ value: urlUser, label: urlUser });
+          }
+        })
+        .catch(() => {
+          setSelectedUser({ value: urlUser, label: urlUser });
+        });
     }
 
-    // Set initial payment method from URL
     const urlPaymentMethod = paramsUrl?.paymentMethodId;
     if (urlPaymentMethod) {
-      setSelectedPaymentMethod({ value: urlPaymentMethod, label: urlPaymentMethod });
+      axios.get(route("admin.payment-method.list-method", { search: "", page: 1 }))
+        .then((response) => {
+          const paymentMethods = response?.data?.results ?? [];
+          const matchingPaymentMethod = paymentMethods.find(
+            (option: any) => option.value.toString() === urlPaymentMethod
+          );
+          if (matchingPaymentMethod) {
+            setSelectedPaymentMethod(matchingPaymentMethod);
+          } else {
+            setSelectedPaymentMethod({ value: urlPaymentMethod, label: urlPaymentMethod });
+          }
+        })
+        .catch(() => {
+          setSelectedPaymentMethod({ value: urlPaymentMethod, label: urlPaymentMethod });
+        });
     }
 
     const urlPlanType = paramsUrl?.planType;
@@ -247,6 +274,7 @@ const PaymentHistoryFilter = ({ onFilter, additionalButtons }: PaymentHistoryFil
               <AsyncPaginate
                 id="filter-user"
                 value={selectedUser}
+                isClearable
                 loadOptions={async (search, loadedOptions, { page }: any) => {
                   const response = await axios.get(route("admin.user.list-user", { search, page }));
 
@@ -283,13 +311,11 @@ const PaymentHistoryFilter = ({ onFilter, additionalButtons }: PaymentHistoryFil
               <AsyncPaginate
                 id="filter-payment-method"
                 value={selectedPaymentMethod}
+                isClearable
                 loadOptions={async (search, loadedOptions, { page }: any) => {
                   const response = await axios.get(route("admin.payment-method.list-method", { search, page }));
 
-                  const options = response?.data?.results?.map((option: any) => ({
-                    value: option?.value ?? "",
-                    label: option?.label ?? "",
-                  })) ?? [];
+                  const options = response?.data?.results ?? [];
 
                   return {
                     options,
@@ -308,6 +334,27 @@ const PaymentHistoryFilter = ({ onFilter, additionalButtons }: PaymentHistoryFil
                 classNamePrefix="select"
                 placeholder={t("Select payment method")}
                 menuPortalTarget={document.body}
+                formatOptionLabel={(option: any) => (
+                  <div className="d-flex flex-column">
+                    <span className="fw-semibold">{option.label}</span>
+                    {(option.type || option.account_name) && (
+                      <small className="text-muted">
+                        {option.type && (
+                          <>
+                            <span className="fw-medium">{t("Type")}:</span> {option.type}
+                          </>
+                        )}
+                        {option.type && option.account_name && ' | '}
+                        {option.account_name && (
+                          <>
+                            <span className="fw-medium">{t("Account")}  :</span> {option.account_name}
+                            {option.account_number && ` - ${option.account_number}`}
+                          </>
+                        )}
+                      </small>
+                    )}
+                  </div>
+                )}
                 styles={{
                   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                 }}

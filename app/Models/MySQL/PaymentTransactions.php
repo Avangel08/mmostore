@@ -43,6 +43,11 @@ class PaymentTransactions extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'creator_id');
+    }
+
     public function paymentMethod()
     {
         return $this->belongsTo(PaymentMethods::class, 'payment_method_id');

@@ -9,11 +9,12 @@ import { ToastContainer } from "react-toastify";
 import { showToast } from "../../../utils/showToast";
 import { ModalVerifyStore } from "./VerifyStore/ModalVerifyStore";
 
-const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
+const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
     data: any;
     onReloadTable?: (page: number, perPage: number) => void;
     onEdit?: (id: number | string) => void;
     onSelectionChange?: (selectedItems: (string | number)[]) => void;
+    onAddPlan?: (userData: any) => void;
 }) => {
     const { t } = useTranslation();
     const [selectedItems, setSelectedItems] = useState<(string | number)[]>([]);
@@ -96,6 +97,10 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
         setVerifyStoreData(null);
     };
 
+    const adminAddPlanSeller = (rowData: any) => {
+        onAddPlan && onAddPlan(rowData);
+    }
+
     const columns = useMemo(
         () => [
             {
@@ -147,6 +152,31 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                 header: t("Email"),
                 accessorKey: "email",
                 enableColumnFilter: false,
+            },
+            {
+                header: t("Plan"),
+                accessorKey: "",
+                enableColumnFilter: false,
+                cell: (cell: any) => {
+                    const currentPlan = cell.row.original?.current_plan;
+
+                    if (!currentPlan) {
+                        return <span className="text-muted">{t("No plan")}</span>;
+                    }
+
+                    const expiresOn = moment(currentPlan.expires_on);
+                    const isExpired = expiresOn.isBefore(moment());
+                    const expirationColor = isExpired ? "text-danger" : "text-success";
+
+                    return (
+                        <div className="d-flex flex-column gap-0">
+                            <div className="fw-semibold">{currentPlan.name}</div>
+                            <div className={`small ${expirationColor}`}>
+                                {t("Expires")}: {expiresOn.format("DD/MM/YYYY HH:mm")}
+                            </div>
+                        </div>
+                    );
+                }
             },
             {
                 header: t("Type"),
@@ -214,6 +244,18 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                                     const url = route("admin.user.login-as", { id });
                                     window.open(url, "_blank");
                                 }}><i className="ri-login-box-line"></i>
+                            </Button>
+                        </OverlayTrigger>
+                        
+                        <OverlayTrigger
+                            placement="top"
+                            overlay={<Tooltip>{t("Add plan")}</Tooltip>}
+                        >
+                            <Button
+                                size="sm"
+                                variant="outline-primary"
+                                onClick={() => adminAddPlanSeller(id)}>
+                                <i className="ri-wallet-line"></i>
                             </Button>
                         </OverlayTrigger>
                     </div>

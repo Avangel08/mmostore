@@ -6,10 +6,10 @@ import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
 import { ModalDetail } from "./ModalDetail";
+import { ModalAddPlan } from "./ModalAddPlan";
 import UserFilter from "./Filter";
 import Table from "../UserManager/Table";
 import { showToast } from "../../../utils/showToast";
-import PlanFilter from "../Plan/PlanFilter";
 
 const UserManager = () => {
     const { t } = useTranslation();
@@ -17,8 +17,10 @@ const UserManager = () => {
     const { users, message, status, type, verifyStatus } = usePage().props as any;
     const [isOpenAddModal, setIsOpenAddModal] = useState(false);
     const [isOpenEditModal, setIsOpenEditModal] = useState(false);
+    const [isOpenAddPlanModal, setIsOpenAddPlanModal] = useState(false);
     const [dataEdit, setDataEdit] = useState<any>(null);
     const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+    const [userDataPlan, setUserDataPlan] = useState<any>(null);
     const handleSelectionChange = (ids: (string | number)[]) => {
         setSelectedIds(ids);
     };
@@ -95,19 +97,44 @@ const UserManager = () => {
         setIsOpenEditModal((prevState) => !prevState);
     };
 
+    const openModalAddPlan = (userId: string | number) => {
+        if (!userId) return;
+        router.reload({
+            only: ["detail"],
+            data: { id: userId },
+            replace: true,
+            onSuccess: (page) => {
+                setUserDataPlan(page?.props?.detail || null);
+                setIsOpenAddPlanModal(true);
+            },
+            onError: () => {
+                showToast(t("Failed to load user data. Please try again later"), "error");
+            }
+        });
+    };
+
+    const toggleOpenAddPlanModal = () => {
+        setIsOpenAddPlanModal((prevState) => !prevState);
+    };
+
     return (
         <React.Fragment>
-            <Head title={ titleWeb } />
+            <Head title={titleWeb} />
             <div className="page-content">
                 <ToastContainer />
-                <ModalDetail show={ isOpenAddModal } onHide={ toggleOpenAddModal } />
+                <ModalDetail show={isOpenAddModal} onHide={toggleOpenAddModal} />
                 <ModalDetail
-                    show={ isOpenEditModal }
-                    onHide={ toggleOpenEditModal }
-                    dataEdit={ dataEdit }
+                    show={isOpenEditModal}
+                    onHide={toggleOpenEditModal}
+                    dataEdit={dataEdit}
+                />
+                <ModalAddPlan
+                    show={isOpenAddPlanModal}
+                    onHide={toggleOpenAddPlanModal}
+                    userDataPlan={userDataPlan}
                 />
                 <Container fluid>
-                    <BreadCrumb title={ t("User") } pageTitle={ t("Homepage") } />
+                    <BreadCrumb title={t("User")} pageTitle={t("Homepage")} />
                     <Row>
                         <Col xs={12}>
                             <Card>
@@ -116,7 +143,7 @@ const UserManager = () => {
                                     <Row style={{ marginBottom: "32px" }}>
                                         <Col>
                                             {selectedIds.length > 0 && (
-                                                <Button variant="danger" onClick={ handleBulkDelete }>
+                                                <Button variant="danger" onClick={handleBulkDelete}>
                                                     <i className="ri-delete-bin-5-line align-bottom me-1"></i>{" "} {t("Delete")}
                                                 </Button>
                                             )}
@@ -124,7 +151,7 @@ const UserManager = () => {
                                     </Row>
                                     <Row>
                                         <Col>
-                                            <Table data={ users } onReloadTable={ onReloadTable } onEdit={ openModalEdit } onSelectionChange={ handleSelectionChange } />
+                                            <Table data={users} onReloadTable={onReloadTable} onEdit={openModalEdit} onSelectionChange={handleSelectionChange} onAddPlan={openModalAddPlan} />
                                         </Col>
                                     </Row>
                                 </Card.Body>

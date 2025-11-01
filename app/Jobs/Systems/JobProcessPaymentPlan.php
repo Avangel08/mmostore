@@ -23,14 +23,18 @@ class JobProcessPaymentPlan implements ShouldQueue
     protected $contentBank;
     protected $transactionId;
     protected $amount;
+    protected ?Carbon $expireTimeByAdmin;
+    protected $note;
     /**
      * Create a new job instance.
      */
-    public function __construct($contentBank, $transactionId, $amount)
+    public function __construct($contentBank, $transactionId, $amount, ?Carbon $expireTimeByAdmin = null, $note = null)
     {
         $this->contentBank = $contentBank;
         $this->transactionId = $transactionId;
         $this->amount = $amount;
+        $this->expireTimeByAdmin = $expireTimeByAdmin;
+        $this->note = $note;
         $this->queue = 'process_payment_plan';
     }
 
@@ -46,6 +50,10 @@ class JobProcessPaymentPlan implements ShouldQueue
         ChargeService $chargeService
     ): void {
         echo "==========================================Start JobProcessPaymentPlan==========================================" . PHP_EOL;
+
+        if ($this->expireTimeByAdmin) {
+            echo "Admin thêm gói cho user" . PHP_EOL;
+        }
 
         try {
             DB::beginTransaction();
@@ -85,11 +93,12 @@ class JobProcessPaymentPlan implements ShouldQueue
                 'currency' => 'VND',
                 'transaction_id' => $this->transactionId,
                 'payment_date' => Carbon::now(),
-                'creator_id' => $userId,
+                'creator_id' => $planCheckout->creator_id,
                 'status' => PaymentTransactions::STATUS['PENDING'],
+                'note' => $this->note,
             ]);
 
-            if ($this->amount < $planCheckout->amount_vnd) {
+            if (empty($this->expireTimeByAdmin) && $this->amount < $planCheckout->amount_vnd) {
                 echo "Số tiền cần thanh toán không đủ" . PHP_EOL;
                 echo "Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd . PHP_EOL;
                 echo "content_bank: " . $this->contentBank . PHP_EOL;
@@ -102,7 +111,7 @@ class JobProcessPaymentPlan implements ShouldQueue
                 return;
             }
 
-            $charge = $chargeService->makePlanCharge($planCheckout, $userId);
+            $charge = $chargeService->makePlanCharge($planCheckout, $userId, $this->expireTimeByAdmin);
             $paymentTransactionAdminService->update($paymentTransaction, [
                 'status' => PaymentTransactions::STATUS['COMPLETE'],
                 'active_plan_date' => Carbon::now(),

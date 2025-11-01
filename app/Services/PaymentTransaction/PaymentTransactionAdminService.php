@@ -11,8 +11,8 @@ class PaymentTransactionAdminService
         $page = $request['page'] ?? 1;
         $perPage = $request['perPage'] ?? 10;
 
-        return PaymentTransactions::with(['checkout:id,name,type,amount_vnd', 'user:id,name,email', 'paymentMethod:id,name', 'charge:id,expires_on'])
-            ->select(['transaction_id', 'amount_vnd', 'note', 'system_note', 'status', 'created_at', 'check_out_id', 'payment_method_id', 'user_id', 'charge_id'])
+        return PaymentTransactions::with(['checkout:id,name,type,amount_vnd', 'user:id,name,email', 'paymentMethod:id,name', 'charge:id,expires_on', 'creator:id,name,email'])
+            ->select(['transaction_id', 'amount_vnd', 'note', 'system_note', 'status', 'created_at', 'check_out_id', 'payment_method_id', 'user_id', 'charge_id', 'creator_id'])
             ->filterPlanName($request)
             ->filterUserId($request)
             ->filterPaymentMethod($request)

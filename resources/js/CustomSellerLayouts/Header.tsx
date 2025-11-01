@@ -160,8 +160,21 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }: any) => {
                                 </Dropdown.Menu>
                             </Dropdown>
 
+                        {/* View store */}
+                            <div className="ms-1">
+                                <a
+                                    href="/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn btn-sm btn-outline-success"
+                                >
+                                    <i className="ri-eye-line align-bottom me-1"></i>
+                                    {t("View store")}
+                                </a>
+                            </div>
+
                             {/* Plan Display - Before Language */}
-                             <div className="header-item">
+                             <div className="header-item ms-3">
                                 <button
                                     type="button"
                                     className={`btn btn-sm me-2 ${

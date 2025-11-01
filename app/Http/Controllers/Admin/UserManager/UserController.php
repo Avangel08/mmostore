@@ -2,33 +2,60 @@
 
 namespace App\Http\Controllers\Admin\UserManager;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserManagement\UserManagementRequest;
+use App\Jobs\Systems\JobProcessPaymentPlan;
 use App\Models\MySQL\Stores;
 use App\Models\MySQL\User;
+use App\Services\Charge\ChargeService;
+use App\Services\CurrencyRate\CurrencyRateService;
 use App\Services\Home\StoreService;
 use App\Services\Home\UserService;
+use App\Services\PaymentMethod\PaymentMethodService;
+use App\Services\PaymentTransaction\PaymentTransactionAdminService;
+use App\Services\Plan\PlanService;
+use App\Services\PlanCheckout\PlanCheckoutService;
+use Carbon\Carbon;
 use App\Services\StoreCategory\StoreCategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Throwable;
 
 class UserController extends Controller
 {
     protected $userService;
+    protected $planService;
+    protected $paymentMethodService;
     protected $storeService;
     protected $storeCategoryService;
+    protected $planCheckoutService;
+    protected $chargeService;
+    protected $paymentTransactionAdminService;
+    protected $currencyRateService;
 
     public function __construct(
         UserService $userService,
+        PlanService $planService,
+        PaymentMethodService $paymentMethodService,
         StoreService $storeService,
-        StoreCategoryService $storeCategoryService
+        StoreCategoryService $storeCategoryService,   PlanCheckoutService $planCheckoutService,
+        ChargeService $chargeService,
+        PaymentTransactionAdminService $paymentTransactionAdminService,
+        CurrencyRateService $currencyRateService
     ) {
         $this->userService = $userService;
+        $this->planService = $planService;
+        $this->paymentMethodService = $paymentMethodService;
         $this->storeService = $storeService;
         $this->storeCategoryService = $storeCategoryService;
+        $this->planCheckoutService = $planCheckoutService;
+        $this->chargeService = $chargeService;
+        $this->paymentTransactionAdminService = $paymentTransactionAdminService;
+        $this->currencyRateService = $currencyRateService;
     }
 
     public function index(Request $request)
@@ -37,14 +64,14 @@ class UserController extends Controller
         $perPage = $request->input('perPage', 10);
 
         return Inertia::render('UserManager/index', [
-            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: ['stores:id,user_id,verified_at'], request: $request),
+            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: ['stores:id,user_id,verified_at','currentPlan'], request: $request),
             'status' => fn() => User::STATUS,
             'type' => fn() => User::TYPE,
             'verifyStatus' => fn() => [
                 'Verified' => 'VERIFIED',
                 'Unverified' => 'UNVERIFIED',
             ],
-            'detail' => fn() => $this->userService->findById(id: $request->input('id'), relation: []),
+            'detail' => fn() => $this->userService->findById(id: $request->input('id'), relation: ['currentPlan']),
             'verifyStoreData' => Inertia::optional(fn() => $this->userService->findById(id: $request->input('id'), relation: ['stores:id,user_id,name,domain,verified_at', 'stores.storeCategories:id,name,status'])),
             'storeCategoryOptions' => Inertia::optional(fn() => $this->storeCategoryService->getCategoryOptions()),
         ]);
@@ -151,6 +178,21 @@ class UserController extends Controller
         return Redirect::away($signedUrl);
     }
 
+    public function verifyStore(UserManagementRequest $request)
+    {
+        try {
+            $data = $request->validated();
+            $this->storeService->verifyStore($data['stores']);
+            return back()->with('success', 'Saved verification information successfully');
+        } catch (\Exception $e) {
+            \Log::error($e, [
+                'ip' => $request->ip(),
+                'user_id' => auth(config('guard.admin'))->id() ?? null
+            ]);
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
     public function getUserPaginateSelect(Request $request)
     {
         try {
@@ -173,18 +215,35 @@ class UserController extends Controller
         }
     }
 
-    public function verifyStore(UserManagementRequest $request)
+    public function adminAddPlanSeller(UserManagementRequest $request)
     {
         try {
             $data = $request->validated();
-            $this->storeService->verifyStore($data['stores']);
-            return back()->with('success', 'Saved verification information successfully');
-        } catch (\Exception $e) {
-            \Log::error($e, [
-                'ip' => $request->ip(),
-                'user_id' => auth(config('guard.admin'))->id() ?? null
-            ]);
-            return back()->with('error', $e->getMessage());
+            $user = $this->userService->findById($data['userId']);
+
+            if (!$user) {
+                return back()->with('error', 'User not found');
+            }
+
+            $plan = $this->planService->getById($data['planId']);
+            if (!$plan) {
+                return back()->with('error', 'Plan not found');
+            }
+
+            $paymentMethod = $this->paymentMethodService->findById($data['paymentMethodId']);
+            if (!$paymentMethod) {
+                return back()->with('error', 'Payment method not found');
+            }
+
+            $planCheckout = $this->planCheckoutService->createCheckout($user, $plan, $paymentMethod, true);
+            $transactionId = Helpers::generateTransactionId('ADMIN_ADD_PLAN');
+            $expireTimeByAdmin = Carbon::parse($data['datetimeExpired']);
+            dispatch_sync(new JobProcessPaymentPlan($planCheckout->content_bank, $transactionId, $data['amount'], $expireTimeByAdmin, $data['note'] ?? null));
+            
+            return back()->with('success', 'Plan added to user successfully');
+        } catch(Throwable $th){
+            \Log::error($th, ['ip' => $request->ip(), 'user_id' => auth(config('guard.admin'))->id() ?? null]);
+            return back()->with('error', 'An error occurred, please try again later');
         }
     }
 }

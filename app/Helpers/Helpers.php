@@ -60,4 +60,12 @@ class Helpers
 
         return $result;
     }
+
+    public static function generateTransactionId($prefix = 'RANDOM')
+    {
+        $datetime = date('Ymd-His');
+        $random = strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
+
+        return "{$prefix}-{$datetime}-{$random}";
+    }
 }
