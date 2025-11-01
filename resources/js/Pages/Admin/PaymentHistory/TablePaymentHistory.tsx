@@ -105,12 +105,19 @@ const TablePaymentHistory = ({
         accessorKey: "transaction_id",
         enableColumnFilter: false,
         enableSorting: true,
+        cell: (cell: any) => {
+          return <span className="text-break text-wrap">{cell.getValue()}</span>;
+        }
       },
       {
         header: t("Plan price"),
         cell: (cell: any) => {
           const checkoutData = cell?.row?.original?.checkout || {};
-          return <span className="text-break text-wrap">{checkoutData?.amount_vnd ?? 0}</span>;
+          return (
+            <span className="text-break text-wrap">
+              {new Intl.NumberFormat('vi-VN').format(checkoutData?.amount_vnd ?? 0)}
+            </span>
+          );
         },
         accessorKey: "",
         enableColumnFilter: false,
@@ -124,7 +131,11 @@ const TablePaymentHistory = ({
         cell: (cell: any) => {
           const amountPaid = parseFloat(cell.getValue() || 0);
           const planPrice = parseFloat(cell?.row?.original?.checkout?.amount_vnd || 0);
-          return <span className={`fw-bold text-break text-wrap ${amountPaid < planPrice ? "text-warning" : ""}`}>{amountPaid}</span>;
+          return (
+            <span className={`fw-bold text-break text-wrap ${amountPaid < planPrice ? "text-warning" : ""}`}>
+              {new Intl.NumberFormat('vi-VN').format(amountPaid)}
+            </span>
+          );
         }
       },
       {
@@ -134,6 +145,21 @@ const TablePaymentHistory = ({
           return <span className="text-break text-wrap">{!!chargeData?.expires_on && moment(chargeData?.expires_on).format("DD/MM/YYYY HH:mm")}</span>;
         },
         accessorKey: "expires_on",
+        enableColumnFilter: false,
+        enableSorting: true,
+      },
+      {
+        header: t("Created by"),
+        cell: (cell: any) => {
+          console.log(cell?.row?.original);
+          const creatorData = cell?.row?.original?.creator || {};
+          return <>
+            <span className="text-break text-wrap">{creatorData?.name ?? ""}</span>
+            <br />
+            <span className="text-muted text-break text-wrap">{creatorData?.email ?? ""}</span>
+          </>;
+        },
+        accessorKey: "",
         enableColumnFilter: false,
         enableSorting: true,
       },
@@ -187,7 +213,7 @@ const TablePaymentHistory = ({
         enableSorting: true,
         cell: (cell: any) => {
           return (
-            <span>{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
+            <span className="text-break text-wrap">{moment(cell.getValue()).format("DD/MM/YYYY HH:mm")}</span>
           );
         },
       },

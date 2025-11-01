@@ -16,6 +16,7 @@ class PaymentMethodService
         $perPage = $request['perPage'] ?? 10;
         return PaymentMethods::filterSearch($request)
             ->filterCreatedDate($request)
+            ->where('type', '!=', PaymentMethods::TYPE['NO_BANK'])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
@@ -69,8 +70,21 @@ class PaymentMethodService
         return PaymentMethods::where('type', '!=', PaymentMethods::TYPE['NO_BANK'])->where('status', PaymentMethods::STATUS['ACTIVE'])->get();
     }
 
+    public function findNoBankMethod()
+    {
+        return PaymentMethods::firstOrCreate([
+            'type' => PaymentMethods::TYPE['NO_BANK'],
+        ], [
+            'name' => 'No Bank',
+            'key' => 'no_bank',
+            'title' => 'No Bank',
+            'status' => PaymentMethods::STATUS['ACTIVE']
+        ]);
+    }
+
     public function getListPaymentMethod($searchTerm = '', int $page = 1, int $perPage = 10, $includeAll = true)
     {
+        $this->findNoBankMethod();
         $query = PaymentMethods::select(['id', 'name', 'key', 'type', 'details']);
 
         if (!empty($searchTerm)) {
