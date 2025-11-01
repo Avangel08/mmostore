@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PaymentMethods extends Model
 {
-    use SoftDeletes;
-
     const KEY = [
         'VCB' => 'VCB',
         'MB' => 'MB',
