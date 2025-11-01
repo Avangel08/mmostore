@@ -49,7 +49,7 @@ Route::domain($mainDomain)->group(function () {
 
         Route::group(['prefix' => 'plans'], function () {
             Route::post('/duplicate-plan/{id}', [PlanController::class, 'duplicatePlan'])->name('admin.plans.duplicate-plan');
-            Route::get('/list-user', [PlanController::class, 'getPlanPaginateSelect'])->name('admin.plans.list-plan');
+            Route::get('/list-plan', [PlanController::class, 'getPlanPaginateSelect'])->name('admin.plans.list-plan');
         });
         Route::resource('plans', PlanController::class, ['as' => 'admin']);
 
