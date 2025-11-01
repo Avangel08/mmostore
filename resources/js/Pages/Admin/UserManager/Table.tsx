@@ -106,7 +106,7 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
                     const currentPlan = cell.row.original?.current_plan;
                     
                     if (!currentPlan) {
-                        return <span className="text-muted">{t("No plan")}</span>;
+                        return <span className="text-muted"></span>;
                     }
 
                     const expiresOn = moment(currentPlan.expires_on);
