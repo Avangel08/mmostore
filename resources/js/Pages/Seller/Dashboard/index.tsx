@@ -249,10 +249,10 @@ const Dashboard = ({
     const getChartDataFromDailyData = () => {
         if (!serverDailyChartData || Object.keys(serverDailyChartData).length === 0) {
             return {
-                earningsChart: [{ name: t("Earning"), type: "column", data: [] }],
-                ordersChart: [{ name: t("Order"), type: "column", data: [] }],
-                depositsChart: [{ name: t("Deposit"), type: "column", data: [] }],
-                customersChart: [{ name: t("New customer"), type: "column", data: [] }],
+                earningsChart: [{ name: t("Earning"), type: "line", data: [] }],
+                ordersChart: [{ name: t("Order"), type: "line", data: [] }],
+                depositsChart: [{ name: t("Deposit"), type: "line", data: [] }],
+                customersChart: [{ name: t("New customer"), type: "line", data: [] }],
                 categories: [],
                 maxEarnings: 0,
                 maxOrders: 0,
@@ -274,10 +274,10 @@ const Dashboard = ({
         const maxCustomers = Math.max(...customersData, 0);
 
         return {
-            earningsChart: [{ name: t("Earning"), type: "column", data: earningsData }],
-            ordersChart: [{ name: t("Order"), type: "column", data: ordersData }],
-            depositsChart: [{ name: t("Deposit"), type: "column", data: depositsData }],
-            customersChart: [{ name: t("New customer"), type: "column", data: customersData }],
+            earningsChart: [{ name: t("Earning"), type: "line", data: earningsData }],
+            ordersChart: [{ name: t("Order"), type: "line", data: ordersData }],
+            depositsChart: [{ name: t("Deposit"), type: "line", data: depositsData }],
+            customersChart: [{ name: t("New customer"), type: "line", data: customersData }],
             categories: dates,
             maxEarnings,
             maxOrders,
@@ -364,7 +364,7 @@ const Dashboard = ({
 
     const revenueMetrics = getRevenueMetrics();
 
-    // Chart options for daily column charts
+    // Chart options for daily line charts
     const getChartOptions = (formatter: (y: any) => string, maxValue?: number) => {
         // Calculate y-axis min and max based on maxValue
         let yaxisConfig: any = {
@@ -388,36 +388,18 @@ const Dashboard = ({
 
         return {
             chart: {
-                type: 'column',
+                type: 'line',
                 height: 280,
                 toolbar: {
                     show: false,
                 }
             },
-            plotOptions: {
-                bar: {
-                    borderRadius: 4,
-                    dataLabels: {
-                        position: 'top',
-                    }
-                }
+            stroke: {
+                curve: 'smooth',
+                width: 3
             },
             dataLabels: {
-                enabled: false,
-                formatter: formatter,
-                offsetY: -20,
-                style: {
-                    fontSize: '12px',
-                    colors: ["#304758"]
-                }
-            },
-            stroke: {
-                show: true,
-                width: 2,
-                colors: ['transparent']
-            },
-            fill: {
-                opacity: 1
+                enabled: false
             },
             xaxis: {
                 categories: chartData.categories,
@@ -428,9 +410,7 @@ const Dashboard = ({
                     show: false
                 },
                 labels: {
-                    style: {
-                        fontSize: '11px'
-                    }
+                    show: false
                 }
             },
             yaxis: yaxisConfig,
@@ -458,8 +438,14 @@ const Dashboard = ({
         },
         colors: revenueChartColors,
         tooltip: {
-            shared: true,
+            shared: false,
             intersect: false,
+            x: {
+                show: true,
+                formatter: function(value: number) {
+                    return chartData.categories[value];
+                }
+            },
             y: {
                 formatter: formatter
             }
@@ -760,7 +746,7 @@ const Dashboard = ({
                                                             dir="ltr"
                                                             options={earningsChartOptions}
                                                             series={chartData.earningsChart}
-                                                            type="bar"
+                                                            type="line"
                                                             height="280"
                                                             className="apex-charts"
                                                         />
@@ -777,7 +763,7 @@ const Dashboard = ({
                                                             dir="ltr"
                                                             options={ordersChartOptions}
                                                             series={chartData.ordersChart}
-                                                            type="bar"
+                                                            type="line"
                                                             height="280"
                                                             className="apex-charts"
                                                         />
@@ -794,7 +780,7 @@ const Dashboard = ({
                                                             dir="ltr"
                                                             options={depositsChartOptions}
                                                             series={chartData.depositsChart}
-                                                            type="bar"
+                                                            type="line"
                                                             height="280"
                                                             className="apex-charts"
                                                         />
@@ -811,7 +797,7 @@ const Dashboard = ({
                                                             dir="ltr"
                                                             options={customersChartOptions}
                                                             series={chartData.customersChart}
-                                                            type="bar"
+                                                            type="line"
                                                             height="280"
                                                             className="apex-charts"
                                                         />
