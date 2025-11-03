@@ -1,6 +1,7 @@
 
 import { Modal, Button, Row, Col } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
+import { NumericFormat } from "react-number-format";
 
 export const ModalCheckoutPlan = ({
     show,
@@ -14,7 +15,7 @@ export const ModalCheckoutPlan = ({
     onBack?: () => void;
 }) => {
     const { t } = useTranslation();
-    
+
     const bankName = data?.bank_name ? String(data.bank_name) : "";
     const accountName = data?.account_name ? String(data.account_name) : "";
     const accountNumber = data?.account_number ? String(data.account_number) : "";
@@ -40,59 +41,72 @@ export const ModalCheckoutPlan = ({
             </Modal.Header>
             <Modal.Body>
                 {data && (
-                <Row>
-                    <Col md={6} className=" mb-3 mb-md-0">
-                        <div className="d-flex justify-content-center align-items-start">
-                            {qrSrc ? (
-                                <img
-                                    src={qrSrc}
-                                    alt="VietQR"
-                                    style={{ maxWidth: 260, width: "100%", borderRadius: 8 }}
-                                />
-                            ) : null}
-                        </div>
-                    </Col>
-                    <Col md={6}>
-                        <div className="mb-2">
-                            <span>{t("Bank")}:</span>
-                            <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc" }}>{bankName}</span>
-                        </div>
-                        <div className="mb-2 pt-3 border-top border-top-dashed mt-3">
-                            <span>{t("Account Holder")}:</span>
-                            <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc" }}>{accountName}</span>
-                        </div>
-                        <div className="mb-2 pt-3 border-top border-top-dashed mt-3">
-                            <span>{t("Account Number")}:</span>
-                            <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc" }}>{accountNumber}</span>
-                        </div>
-                        <div className="mb-2 pt-3 border-top border-top-dashed mt-3">
-                            <span>{t("Total Price")}:</span>
-                            <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc" }}>{amountVnd?.toLocaleString?.() || amountVnd} VND</span>
-                        </div>
-                        <div className="mb-2 pt-3 border-top border-top-dashed mt-3">
-                            <span>{t("Transfer Content")}:</span>
-                            <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc", wordBreak: "break-word" }}>{contentBank}</span>
-                        </div>
-                    </Col>
-                    <Col md={12}>
-                        <div className="border-top border-top-dashed mt-3">
-                            <ul className="mt-3" style={{ paddingLeft: 18 }}>
-                                <li className="mb-2">
-                                    {t("If you make a transaction according to the above information, it may take a few minutes for the system to verify the transaction. Once the transaction is successful, your account will be automatically credited.")}
-                                </li>
-                                <li className="mb-2">
-                                    {t("If it's been more than 10 minutes since the transaction was successful and your account has not been credited, please contact customer service.")}
-                                </li>
-                                <li className="mb-2">
-                                    {t("Please check product and account information carefully to deposit just enough for use, the system does not support account withdrawal.")}
-                                </li>
-                                <li className="mb-0">
-                                    {t("Customers who make a payment without providing invoice information are understood to be individual buyers who do not request an invoice. In this case, the company will issue an electronic invoice without the buyer's name.")}
-                                </li>
-                            </ul>
-                        </div>
-                    </Col>
-                </Row>
+                    <Row>
+                        <Col md={6} className=" mb-3 mb-md-0">
+                            <div className="d-flex justify-content-center align-items-start">
+                                {qrSrc ? (
+                                    <img
+                                        src={qrSrc}
+                                        alt="VietQR"
+                                        style={{ maxWidth: 260, width: "100%", borderRadius: 8 }}
+                                    />
+                                ) : null}
+                            </div>
+                            <div className="d-flex justify-content-center align-items-start">
+                                <span>
+                                    {t("Status")}: {t("Waiting for payment")}... <div className="spinner-border" role="status" style={{ marginLeft: 10, width: 20, height: 20 }}></div>
+                                </span>
+                            </div>
+                        </Col>
+                        <Col md={6}>
+                            <div className="mb-2">
+                                <span>{t("Bank")}:</span>
+                                <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc" }}>{bankName}</span>
+                            </div>
+                            <div className="mb-2 pt-3 border-top border-top-dashed mt-3">
+                                <span>{t("Account Holder")}:</span>
+                                <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc" }}>{accountName}</span>
+                            </div>
+                            <div className="mb-2 pt-3 border-top border-top-dashed mt-3">
+                                <span>{t("Account Number")}:</span>
+                                <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc" }}>{accountNumber}</span>
+                            </div>
+                            <div className="mb-2 pt-3 border-top border-top-dashed mt-3">
+                                <span>{t("Total Price")}:</span>
+                                <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc" }}>
+                                    <NumericFormat
+                                        value={Number(amountVnd ?? 0) || 0}
+                                        displayType="text"
+                                        thousandSeparator="."
+                                        decimalSeparator=","
+                                        renderText={(value) => <span style={{ fontWeight: 'bold' }}>{value} VND</span>}
+                                    />
+                                    </span>
+                            </div>
+                            <div className="mb-2 pt-3 border-top border-top-dashed mt-3">
+                                <span>{t("Transfer Content")}:</span>
+                                <span className="fw-semibold ms-2" style={{ fontSize: 16, color: "#0066cc", wordBreak: "break-word" }}>{contentBank}</span>
+                            </div>
+                        </Col>
+                        <Col md={12}>
+                            <div className="border-top border-top-dashed mt-3">
+                                <ul className="mt-3" style={{ paddingLeft: 18 }}>
+                                    <li className="mb-2">
+                                        {t("If you make a transaction according to the above information, it may take a few minutes for the system to verify the transaction. Once the transaction is successful, your account will be automatically credited.")}
+                                    </li>
+                                    <li className="mb-2">
+                                        {t("If it's been more than 10 minutes since the transaction was successful and your account has not been credited, please contact customer service.")}
+                                    </li>
+                                    <li className="mb-2">
+                                        {t("Please check product and account information carefully to deposit just enough for use, the system does not support account withdrawal.")}
+                                    </li>
+                                    <li className="mb-0">
+                                        {t("Customers who make a payment without providing invoice information are understood to be individual buyers who do not request an invoice. In this case, the company will issue an electronic invoice without the buyer's name.")}
+                                    </li>
+                                </ul>
+                            </div>
+                        </Col>
+                    </Row>
                 )}
 
             </Modal.Body>

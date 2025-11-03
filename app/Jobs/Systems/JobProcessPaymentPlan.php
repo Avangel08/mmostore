@@ -55,6 +55,8 @@ class JobProcessPaymentPlan implements ShouldQueue
             echo "Admin thêm gói cho user" . PHP_EOL;
         }
 
+        $isCreatedPaymentTransaction = false;
+
         try {
             DB::beginTransaction();
             $planCheckout = $planCheckoutService->findByContentBank($this->contentBank);
@@ -98,10 +100,7 @@ class JobProcessPaymentPlan implements ShouldQueue
                 'note' => $this->note,
             ]);
 
-            $paymentTransactionAdminService->rememberPurchaseCache([
-                'user_id' => $userId,
-                'payment_transaction_id' => $paymentTransaction->id,
-            ]);
+            $isCreatedPaymentTransaction = $paymentTransaction ? true : false;
 
             if (empty($this->expireTimeByAdmin) && $this->amount < $planCheckout->amount_vnd) {
                 echo "Số tiền cần thanh toán không đủ" . PHP_EOL;
@@ -133,8 +132,14 @@ class JobProcessPaymentPlan implements ShouldQueue
             DB::rollBack();
             echo 'Lỗi JobProcessPaymentPlan: ' . $th->getMessage() . PHP_EOL;
             throw $th;
+        } finally {
+            if ($isCreatedPaymentTransaction && empty($this->expireTimeByAdmin)) {
+                $paymentTransactionAdminService->rememberPurchaseCache([
+                    'user_id' => $userId,
+                    'payment_transaction_id' => $paymentTransaction->id,
+                ]);
+            }
+            echo "==========================================End JobProcessPaymentPlan==========================================" . PHP_EOL;
         }
-
-        echo "==========================================End JobProcessPaymentPlan==========================================" . PHP_EOL;
     }
 }

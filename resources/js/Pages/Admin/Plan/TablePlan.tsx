@@ -52,7 +52,7 @@ const TablePlan = ({
         cell: (cell: any) => {
           return (
             <NumericFormat
-              value={cell.getValue() ?? 0}
+              value={Number(cell.getValue() ?? 0) || 0}
               displayType="text"
               thousandSeparator="."
               decimalSeparator=","
