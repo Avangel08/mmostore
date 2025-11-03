@@ -3,6 +3,7 @@
 namespace App\Services\PaymentTransaction;
 
 use App\Models\MySQL\PaymentTransactions;
+use Cache;
 
 class PaymentTransactionAdminService
 {
@@ -23,6 +24,12 @@ class PaymentTransactionAdminService
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
+
+    public function findById($id, $select = ['*'], $relation = [])
+    {
+        return PaymentTransactions::where('id', $id)->select($select)->with($relation)->first();
+    }
+
     public function create($data)
     {
         return PaymentTransactions::create($data);
@@ -31,5 +38,30 @@ class PaymentTransactionAdminService
     public function update(PaymentTransactions $paymentTransaction, $data)
     {
         return $paymentTransaction->update($data);
+    }
+
+    public function getCacheTag()
+    {
+        return 'payment_transaction';
+    }
+
+    public function getCacheKey($userId)
+    {
+        return 'purchase_user_id_' . $userId;
+    }
+
+    public function rememberPurchaseCache(array $data)
+    {
+        return Cache::tags([$this->getCacheTag()])->forever($this->getCacheKey($data['user_id']), $data);
+    }
+
+    public function forgetPurchaseCache($userId)
+    {
+        Cache::tags([$this->getCacheTag()])->forget($this->getCacheKey($userId));
+    }
+
+    public function checkPurchaseCache($userId)
+    {
+        return Cache::tags([$this->getCacheTag()])->get($this->getCacheKey($userId));
     }
 }

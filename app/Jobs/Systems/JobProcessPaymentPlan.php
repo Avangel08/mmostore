@@ -98,6 +98,11 @@ class JobProcessPaymentPlan implements ShouldQueue
                 'note' => $this->note,
             ]);
 
+            $paymentTransactionAdminService->rememberPurchaseCache([
+                'user_id' => $userId,
+                'payment_transaction_id' => $paymentTransaction->id,
+            ]);
+
             if (empty($this->expireTimeByAdmin) && $this->amount < $planCheckout->amount_vnd) {
                 echo "Số tiền cần thanh toán không đủ" . PHP_EOL;
                 echo "Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd . PHP_EOL;
@@ -119,7 +124,7 @@ class JobProcessPaymentPlan implements ShouldQueue
             ]);
 
             $planCheckoutService->update($planCheckout, ['status' => CheckOuts::STATUS['COMPLETE']]);
-            
+
             echo "Kích hoạt gói " . $planCheckout->name . " thành công cho user_id: " . $userId . PHP_EOL;
             echo "Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd . PHP_EOL;
             echo "content_bank: " . $this->contentBank . PHP_EOL;

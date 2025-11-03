@@ -734,5 +734,20 @@
     "Are you sure?": "Bạn có chắc chắn không?",
     "Do you want to add this plan for the user?": "Bạn có muốn thêm gói này cho người dùng không?",
     "Yes, add plan": "Có, thêm gói",
-    "Created by": "Được tạo bởi"
+    "Created by": "Được tạo bởi",
+    "Plan Activated Successfully": "Kích Hoạt Gói Thành Công",
+    "Payment Rejected": "Thanh Toán Bị Từ Chối",
+    "Payment Processing": "Đang Xử Lý Thanh Toán",
+    "Congratulations!": "Chúc mừng!",
+    "Your plan has been activated successfully": "Gói của bạn đã được kích hoạt thành công",
+    "Payment Failed": "Thanh Toán Thất Bại",
+    "Transaction Details": "Chi Tiết Giao Dịch",
+    "Plan Name": "Tên Gói",
+    "Amount Paid": "Số Tiền Đã Thanh Toán",
+    "Required Amount": "Số Tiền Yêu Cầu",
+    "Insufficient amount": "Số tiền không đủ",
+    "Payment Date": "Ngày Thanh Toán",
+    "Your plan is now active. Please refresh the page to see the updated information.": "Gói của bạn đã được kích hoạt. Vui lòng làm mới trang để xem thông tin cập nhật.",
+    "Refresh Page": "Làm Mới Trang",
+    "Số tiền thanh toán không đủ": "Số tiền thanh toán không đủ"
 }
