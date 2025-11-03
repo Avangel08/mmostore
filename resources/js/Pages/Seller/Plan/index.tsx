@@ -1,5 +1,5 @@
 import { Head, router, usePage } from "@inertiajs/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Layout from "../../../CustomSellerLayouts";
 import { Container, Row, Col, Card, Button, Badge } from "react-bootstrap";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
@@ -9,6 +9,7 @@ import { showToast } from "../../../utils/showToast";
 import { CKEditorContent } from "../../../Components/CKEditorContent";
 import { ModalCheckoutPlan } from "./ModalCheckoutPlan";
 import { ModalSelectPaymentMethod } from "./ModalSelectPaymentMethod";
+import { ModalPurchaseResult } from "./ModalPurchaseResult";
 import axios from "axios";
 import moment from "moment";
 
@@ -17,8 +18,46 @@ const Plans = () => {
   const { plans, paymentMethods, currentUserPlan } = usePage().props as any;
   const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false);
   const [showCheckoutPlanModal, setShowCheckoutPlanModal] = useState(false);
+  const [showPurchaseResultModal, setShowPurchaseResultModal] = useState(false);
   const [data, setData] = useState<any>(null);
+  const [purchaseResultData, setPurchaseResultData] = useState<any>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
+  const pingIntervalRef = useRef<null|any>(null);
+
+  const pingPurchaseStatus = async () => {
+    try {
+      const url = route("seller.plan.ping");
+      const response = await axios.get(url);
+      
+      if (response.data.status === "success") {
+        if (pingIntervalRef.current) {
+          clearInterval(pingIntervalRef.current);
+          pingIntervalRef.current = null;
+        }
+        
+        setShowCheckoutPlanModal(false);
+        setShowPaymentMethodModal(false);
+        setData(null);
+        
+        setPurchaseResultData(response.data.data);
+        setShowPurchaseResultModal(true);
+      }
+    } catch (error) {
+      console.error("Error pinging purchase status:", error);
+    }
+  };
+
+  useEffect(() => {
+    pingIntervalRef.current = setInterval(() => {
+      pingPurchaseStatus();
+    }, 3000);
+
+    return () => {
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current);
+      }
+    };
+  }, []);
 
   const handleSelectPlan = async (planId: number) => {
     if (!planId) {
@@ -83,6 +122,21 @@ const Plans = () => {
     setShowCheckoutPlanModal(false);
     setData(null);
     setSelectedPlanId(null);
+  };
+
+  const handleClosePurchaseResultModal = () => {
+    setShowPurchaseResultModal(false);
+    setPurchaseResultData(null);
+  };
+
+  const handleShowCheckoutFromResult = () => {
+    setShowPurchaseResultModal(false);
+    
+    if (data) {
+      setShowCheckoutPlanModal(true);
+    } else {
+      setShowPaymentMethodModal(true);
+    }
   };
 
   const handleBackToPaymentMethod = () => {
@@ -191,6 +245,12 @@ const Plans = () => {
           onHide={handleCloseCheckoutPlanModal}
           data={data}
           onBack={handleBackToPaymentMethod}
+        />
+        <ModalPurchaseResult
+          show={showPurchaseResultModal}
+          onHide={handleClosePurchaseResultModal}
+          data={purchaseResultData}
+          onShowCheckout={handleShowCheckoutFromResult}
         />
         <ToastContainer />
         <Container fluid>
