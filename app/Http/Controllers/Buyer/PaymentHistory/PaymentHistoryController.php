@@ -7,13 +7,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Services\BalanceHistory\BalanceHistoryService;
+use App\Services\Setting\SettingService;
 
 class PaymentHistoryController extends Controller
 {
     protected $balanceHistoryService;
-    public function __construct(BalanceHistoryService $balanceHistoryService)
+    protected $settingService;
+    public function __construct(BalanceHistoryService $balanceHistoryService, SettingService $settingService)
     {
         $this->balanceHistoryService = $balanceHistoryService;
+        $this->settingService = $settingService;
     }
 
     /**
@@ -26,10 +29,21 @@ class PaymentHistoryController extends Controller
         $customerId = Auth::guard('buyer')->user()->id;
         $store = app('store');
         $listBalanceHistory = $this->balanceHistoryService->getForTableCustomer($request, $customerId);
+
+        $settings = $this->settingService->getSettings(true);
+        $result = [];
+        foreach ($settings as $setting) {
+            if ($setting->key === 'contacts' || $setting->key === 'domains' || $setting->key === 'menus') {
+                $result[$setting->key] = json_decode($setting->value, true) ?: [];
+            } else {
+                $result[$setting->key] = $setting->value;
+            }
+        }
         return Inertia::render("Themes/{$theme}/PaymentHistory/index", [
             'listBalanceHistory' => $listBalanceHistory,
             'store' =>  fn() => $store,
             'domainSuffix' => config('app.domain_suffix'),
+            'settings' => fn() => $result
         ]);
     }
 
