@@ -5,18 +5,19 @@ use App\Models\Mongo\Settings;
 use App\Models\MySQL\Stores;
 use Cache;
 use DB;
+use Http;
 
 
 class StoreService
 {
     public function getStoresVerified($request, $select = ['*'], $relation = [])
     {
-        $timeout = 60; // second
+        $timeout = 6000; // second
         $cacheKey = "store:stores_verified:" . md5(json_encode([$request, $select, $relation]));
-        return Cache::tags([$this->getCacheTag()])->remember($cacheKey, $timeout, function () use ($request, $select, $relation) {
+        return Cache::tags([$this->getCacheTagVerify()])->remember($cacheKey, $timeout, function () use ($request, $select, $relation) {
             $page = $request['page'] ?? 1;
             $perPage = min($request['perPage'] ?? 10, 200);
-            
+
             $storesVerified = Stores::whereNotNull('verified_at')
                 ->filterName($request)
                 ->filterStoreCategory($request)
@@ -30,6 +31,7 @@ class StoreService
                 $connection = $tenantService->buildConnectionFromStore($store);
                 $tenantService->applyConnection($connection, false);
                 $store->data_setting = Settings::pluck('value', 'key');
+                $store->domain = $this->getAccessibleDomain($store->domain);
                 return $store;
             });
 
@@ -39,20 +41,20 @@ class StoreService
 
     public function create(array $data)
     {
-        $this->flushCache();
+        $this->flushCacheVerify();
         return Stores::create($data);
     }
 
     public function update($item, array $data)
     {
-        $this->flushCache();
+        $this->flushCacheVerify();
         return $item->update($data);
     }
 
     public function delete(Stores $store)
     {
         $store->storeCategories()->detach();
-        $this->flushCache();
+        $this->flushCacheVerify();
         return $store->delete();
     }
 
@@ -73,14 +75,14 @@ class StoreService
 
     public function updateByUserId($userId, $data)
     {
-        $this->flushCache();
+        $this->flushCacheVerify();
         return Stores::where('user_id', $userId)->update($data);
     }
 
     public function verifyStore($dataVerifyStore)
     {
         DB::transaction(function () use ($dataVerifyStore) {
-            $this->flushCache();
+            $this->flushCacheVerify();
             foreach ($dataVerifyStore as $storeData) {
                 $store = Stores::find($storeData['store_id']);
                 if ($store) {
@@ -93,13 +95,54 @@ class StoreService
         });
     }
 
-    public function getCacheTag()
+    public function getCacheTagVerify()
     {
         return 'store_verified';
     }
 
-    public function flushCache()
+    public function flushCacheVerify()
     {
-        Cache::tags([$this->getCacheTag()])->flush();
+        Cache::tags([$this->getCacheTagVerify()])->flush();
+    }
+
+    
+    public static function getAccessibleDomain(string|array|null $domains, $timeoutSecond = 1, $tryCount = 1): ?string
+    {
+        if (is_string($domains)) {
+            return $domains;
+        }
+
+        if (empty($domains)) {
+            return null;
+        }
+
+        if (count($domains) == 1) {
+            return $domains[0];
+        }
+
+        // loop last to first
+        for ($index = count($domains) - 1; $index >= 0; $index--) {
+            $domain = $domains[$index];
+            if (empty($domain)) {
+                continue;
+            }
+
+            if (!str_starts_with($domain, 'http://') && !str_starts_with($domain, 'https://')) {
+                $url = 'https://' . $domain;
+            } else {
+                $url = $domain;
+            }
+
+            try {
+                $response = Http::retry($tryCount, 100)->timeout($timeoutSecond)->head($url);
+                if ($response->successful()) {
+                    return $domain;
+                }
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+
+        return $domains[0] ?? null;
     }
 }

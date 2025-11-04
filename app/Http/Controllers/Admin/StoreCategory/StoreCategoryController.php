@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\StoreCategory;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreCategory\StoreCategoryRequest;
 use App\Models\MySQL\StoreCategory;
+use App\Services\Home\StoreService;
 use App\Services\StoreCategory\StoreCategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -13,10 +14,12 @@ use Inertia\Inertia;
 class StoreCategoryController extends Controller
 {
     protected $storeCategoryService;
+    protected $storeService;
 
-    public function __construct(StoreCategoryService $storeCategoryService)
+    public function __construct(StoreCategoryService $storeCategoryService, StoreService $storeService)
     {
         $this->storeCategoryService = $storeCategoryService;
+        $this->storeService = $storeService;
     }
 
     public function index(Request $request)
@@ -61,6 +64,7 @@ class StoreCategoryController extends Controller
             }
             $data = $request->validated();
             $this->storeCategoryService->updateStoreCategory($storeCategory, $data);
+            $this->storeService->flushCacheVerify();
 
             return back()->with('success', 'Store category updated successfully');
         } catch (ValidationException $ve) {
@@ -84,6 +88,7 @@ class StoreCategoryController extends Controller
             }
 
             $this->storeCategoryService->delete($storeCategory);
+            $this->storeService->flushCacheVerify();
 
             return back()->with('success', 'Store category deleted successfully');
         } catch (\Exception $e) {
@@ -106,6 +111,7 @@ class StoreCategoryController extends Controller
             }
 
             $this->storeCategoryService->deleteMultiple($ids);
+            $this->storeService->flushCacheVerify();
 
             return back()->with('success', 'Store categories deleted successfully');
         } catch (\Exception $e) {

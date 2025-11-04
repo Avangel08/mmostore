@@ -123,6 +123,8 @@ class ThemeSettingController extends Controller
         //     }
         // }
 
+        $this->storeService->flushCacheVerify();
+
         return redirect()->back()->with([
             'message' => [
                 'success' => 'Settings updated successfully'
