@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Public\Store;
 
+use App\Helpers\Helpers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,7 +18,7 @@ class StoreResource extends JsonResource
         return [
             'id' => $this['id'] ?? null,
             'name' => empty($this['name']) ? null : strip_tags($this['name']),
-            'domain' => empty($this['domain'][0]) ? null : $this['domain'][0],
+            'domain' => $this['domain'] ?? null,
             
             'logo' => empty($this['data_setting']['storeLogo']) ? null : ($request->getSchemeAndHttpHost() . '/storage/' . $this['data_setting']['storeLogo']),
             'meta_description' => empty($this['data_setting']['metaDescription']) ? null : strip_tags($this['data_setting']['metaDescription']),
