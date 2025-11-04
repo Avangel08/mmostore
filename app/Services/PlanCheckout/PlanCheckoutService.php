@@ -37,7 +37,6 @@ class PlanCheckoutService
             ->where('amount', $data['amount'])
             ->where('amount_vnd', $data['amount_vnd'])
             ->where('status', $data['status'])
-            ->where('content_bank', $data['content_bank'])
             ->first();
     }
 
@@ -57,12 +56,13 @@ class PlanCheckoutService
             'description' => $plan->description,
             'status' => CheckOuts::STATUS['PENDING'],
             'creator_id' => $isAdminCreate ? Auth::guard(config('guard.admin'))->id() : $user->id,
-            'content_bank' => CheckBankService::genContentBank($user->id, $plan->id, $paymentMethod->key, 8) . ($isAdminCreate ? '_ADMIN': ''),
+            'content_bank' => CheckBankService::genContentBank($user->id, $plan->id, $paymentMethod->key, 8) . ($isAdminCreate ? '_ADMIN' : ''),
         ];
 
         $checkout = $this->findExist($dataInsert);
         if (!$checkout) {
             $checkout = CheckOuts::create($dataInsert);
+            $checkout->update(['content_bank' => CheckBankService::genContentBank($user->id, $checkout->id, $paymentMethod->key, 8) . ($isAdminCreate ? '_ADMIN' : '')]);
         }
 
         return $checkout;
