@@ -557,7 +557,6 @@ export default function Register() {
                                                         { t("Sign up store") }
                                                     </button>
                                                 </div>
-
                                                 {/*<div className="mt-4 text-center">*/}
                                                 {/*    <div className="signin-other-title">*/}
                                                 {/*        <h5 className="fs-13 mb-4 title text-muted">Create account with</h5>*/}
@@ -574,6 +573,13 @@ export default function Register() {
                                         </div>
                                     </Card.Body>
                                 </Card>
+                                <div className="text-center">
+                                    <a 
+                                        href={route('home.login')}
+                                    >
+                                        <i className="ri-arrow-left-line"></i> {t("Back to login")}
+                                    </a>
+                                </div>
                             </Col>
                         </Row>
                     </Container>

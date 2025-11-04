@@ -113,14 +113,16 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => 'password_reset_tokens',
-            'expire' => 60,
-            'throttle' => 60, //second
+            'expire' => 60, // minutes
+            'throttle' => 60, // seconds/token
+            'connection' => 'mysql'
         ],
         'customers' => [
             'provider' => 'customers',
             'table' => 'password_reset_tokens',
-            'expire' => 60,
-            'throttle' => 60, // second
+            'expire' => 60, // minutes
+            'throttle' => 60, // seconds/token
+            'connection' => 'tenant_mongo'
         ],
     ],
 

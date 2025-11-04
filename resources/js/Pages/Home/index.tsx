@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Head, usePage } from "@inertiajs/react";
 import Home from "./home";
 import Navbar from "./navbar";
@@ -16,6 +16,15 @@ export default function Index() {
     };
     
     const { message }: any = usePage().props;
+
+    useEffect(() => {
+        const userId = message?.popup?.user_id;
+        const token = message?.popup?.token;
+        if (userId && token) {
+            const url = route("home.go-to-store", { id: userId }) + `?token=${token}`;
+            window.open(url, "_blank");
+        }
+    }, []);
 
     return (
         <React.Fragment>
@@ -37,7 +46,7 @@ export default function Index() {
             </div>
 
             {/* Show modal redirect store */}
-            <ModalRedirectStore message={message} />
+            {/* <ModalRedirectStore message={message} /> */}
         </React.Fragment>
     );
 }
