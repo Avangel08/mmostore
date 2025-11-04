@@ -50,7 +50,7 @@ class BuyerController extends Controller
         $settings = $this->settingService->getSettings(true);
         $result = [];
         foreach ($settings as $setting) {
-            if ($setting->key === 'contacts' || $setting->key === 'domains') {
+            if ($setting->key === 'contacts' || $setting->key === 'domains' || $setting->key === 'menus') {
                 $result[$setting->key] = json_decode($setting->value, true) ?: [];
             } else {
                 $result[$setting->key] = $setting->value;
