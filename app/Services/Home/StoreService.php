@@ -12,7 +12,7 @@ class StoreService
 {
     public function getStoresVerified($request, $select = ['*'], $relation = [])
     {
-        $timeout = 6000; // second
+        $timeout = 600; // second
         $cacheKey = "store:stores_verified:" . md5(json_encode([$request, $select, $relation]));
         return Cache::tags([$this->getCacheTagVerify()])->remember($cacheKey, $timeout, function () use ($request, $select, $relation) {
             $page = $request['page'] ?? 1;
@@ -105,8 +105,8 @@ class StoreService
         Cache::tags([$this->getCacheTagVerify()])->flush();
     }
 
-    
-    public static function getAccessibleDomain(string|array|null $domains, $timeoutSecond = 1, $tryCount = 1): ?string
+
+    public function getAccessibleDomain(string|array|null $domains, $timeoutSecond = 1, $tryCount = 1): ?string
     {
         if (is_string($domains)) {
             return $domains;
@@ -120,29 +120,34 @@ class StoreService
             return $domains[0];
         }
 
-        // loop last to first
-        for ($index = count($domains) - 1; $index >= 0; $index--) {
-            $domain = $domains[$index];
-            if (empty($domain)) {
-                continue;
-            }
+        $cacheKey = 'store:accessible_domain:' . md5(json_encode([$domains]));
+        $timeout = 600; // second
 
-            if (!str_starts_with($domain, 'http://') && !str_starts_with($domain, 'https://')) {
-                $url = 'https://' . $domain;
-            } else {
-                $url = $domain;
-            }
-
-            try {
-                $response = Http::retry($tryCount, 100)->timeout($timeoutSecond)->head($url);
-                if ($response->successful()) {
-                    return $domain;
+        return Cache::tags([$this->getCacheTagVerify()])->remember($cacheKey, $timeout, function () use ($domains, $timeoutSecond, $tryCount) {
+            // loop last to first
+            for ($index = count($domains) - 1; $index >= 0; $index--) {
+                $domain = $domains[$index];
+                if (empty($domain)) {
+                    continue;
                 }
-            } catch (\Exception $e) {
-                continue;
-            }
-        }
 
-        return $domains[0] ?? null;
+                if (!str_starts_with($domain, 'http://') && !str_starts_with($domain, 'https://')) {
+                    $url = 'https://' . $domain;
+                } else {
+                    $url = $domain;
+                }
+
+                try {
+                    $response = Http::retry($tryCount, 100)->timeout($timeoutSecond)->head($url);
+                    if ($response->successful()) {
+                        return $domain;
+                    }
+                } catch (\Exception $e) {
+                    continue;
+                }
+            }
+
+            return $domains[0] ?? null;
+        });
     }
 }
