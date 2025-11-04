@@ -15,6 +15,10 @@ import {
   MediaEmbed,
   Paragraph,
   Table,
+  TableToolbar,
+  TableProperties,
+  TableCellProperties,
+  TableColumnResize,
   Undo,
   Image,
   ImageInsert,
@@ -42,7 +46,11 @@ import {
   Superscript,
   Alignment,
   RemoveFormat,
-  TodoList
+  TodoList,
+  Clipboard,
+  Emoji,
+  Mention,
+  TableCaption
 } from "ckeditor5";
 
 interface CustomCKEditorProps {
@@ -71,6 +79,12 @@ const CustomCKEditor: React.FC<CustomCKEditorProps> = ({
         "imageStyle:side",
         "|",
         "resizeImage",
+      ],
+    },
+    table: {
+      contentToolbar: [
+        'tableProperties', 'tableCellProperties', '|',
+        'tableColumn', 'tableRow', 'mergeTableCells', '|', 'toggleTableCaption'
       ],
     },
     toolbar: [
@@ -104,6 +118,7 @@ const CustomCKEditor: React.FC<CustomCKEditorProps> = ({
       "|",
       "insertTable",
       "|",
+      "emoji",
       "link",
       "insertImageViaUrl",
       "mediaEmbed",
@@ -124,6 +139,11 @@ const CustomCKEditor: React.FC<CustomCKEditorProps> = ({
       MediaEmbed,
       Paragraph,
       Table,
+      TableToolbar,
+      TableProperties,
+      TableCellProperties,
+      TableCaption,
+      TableColumnResize,
       Undo,
       Image,
       ImageInsert,
@@ -151,7 +171,10 @@ const CustomCKEditor: React.FC<CustomCKEditorProps> = ({
       Alignment,
       RemoveFormat,
       ListProperties,
-      TodoList
+      TodoList,
+      Clipboard,
+      Emoji,
+      Mention
     ],
     placeholder: props.placeholder || "",
     ...props.config,

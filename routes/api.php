@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\Api\Public\ResourceMmo\ResourceMmoApiController;
 use App\Http\Controllers\Api\Seller\Product\ProductApiController;
 use App\Http\Controllers\Api\Seller\Product\SellerAccountApiController;
 use App\Http\Controllers\Api\Buyer\Product\ProductController;
@@ -46,5 +47,12 @@ Route::group(['prefix' => 'v1','as' => 'api.'], function () use ($mainDomain) {
         // Webhook Seller
         Route::group(['prefix' => 'webhook', "middleware" => ["validate.subdomain","tenant.mongo"]], function () {
             Route::any("/sepay", [SePayWebHookController::class, 'callBack'])->name('webhook.sepay');
+        });
+
+        // resource market
+        Route::group(['prefix' => 'resources'], function () {
+            Route::get('/stores', [ResourceMmoApiController::class, 'getStores'])->name('resources.stores.index');
+            Route::get('/categories', [ResourceMmoApiController::class, 'getStoreCategories'])->name('resources.categories.index');
+            Route::get('/banner', [ResourceMmoApiController::class, 'getBanner'])->name('resources.banner.index');
         });
     });

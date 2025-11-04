@@ -7,7 +7,7 @@ import { usePage } from "@inertiajs/react";
 import DOMPurify from 'dompurify';
 import { CKEditorContent } from "../../../Components/CKEditorContent";
 
-const TableProductType = ({
+const TableStoreCategory = ({
   data,
   onReloadTable,
   onEdit,
@@ -71,7 +71,7 @@ const TableProductType = ({
           return (
             <Form.Check.Input
               type="checkbox"
-              className="productTypeCheckbox form-check-input"
+              className="storeCategoryCheckbox form-check-input"
               checked={isChecked}
               onChange={(e) => handleItemSelect(rowData.id, e.target.checked)}
             />
@@ -80,7 +80,7 @@ const TableProductType = ({
         id: "#",
       },
       {
-        header: t("Product type name"),
+        header: t("Store category name"),
         cell: (cell: any) => {
           return <span className="fw-semibold text-break text-wrap">{cell.getValue()}</span>;
         },
@@ -185,4 +185,4 @@ const TableProductType = ({
     </div>
   );
 };
-export default TableProductType;
+export default TableStoreCategory;

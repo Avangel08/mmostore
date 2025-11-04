@@ -20,7 +20,14 @@ class UserService
 
     public function delete($id)
     {
-        return User::where('id', $id)->delete();
+        return DB::transaction(function () use ($id) {
+            $store = Stores::where('user_id', $id)->get();
+            if ($store->isNotEmpty()) {
+                $store->storeCategories()->detach();
+                $store->delete();
+            }
+            return User::where('id', $id)->delete();
+        });
     }
 
     public function deletes(array $ids)
@@ -28,7 +35,10 @@ class UserService
         return DB::transaction(function () use ($ids) {
             $deletedUsers = User::whereIn('id', $ids)->delete();
 
-            Stores::whereIn('user_id', $ids)->delete();
+            Stores::whereIn('user_id', $ids)->get()->each(function ($store) {
+                $store->storeCategories()->detach();
+                $store->delete();
+            });
 
             return $deletedUsers;
         });
@@ -54,7 +64,8 @@ class UserService
                   ->filterEmail($request)
                   ->filterType($request)
                   ->filterStatus($request)
-                  ->filterCreatedDate($request);
+                  ->filterCreatedDate($request)
+                  ->filterStoreVerifyStatus($request);
         }
 
         if ($isPaginate) {

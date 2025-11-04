@@ -9,7 +9,7 @@ import * as Yup from "yup";
 import { showToast } from "../../../utils/showToast";
 import CustomCKEditor from "../../../Components/CustomCKEditor";
 
-export const ModelProductType = ({
+export const ModalStoreCategory = ({
   show,
   onHide,
   dataEdit,
@@ -31,22 +31,22 @@ export const ModelProductType = ({
 
   const formik = useFormik({
     initialValues: {
-      productTypeName: dataEdit?.name || "",
-      productTypeStatus: dataEdit?.status ?? "ACTIVE",
+      store_category_name: dataEdit?.name || "",
+      store_category_status: dataEdit?.status ?? "ACTIVE",
       description: dataEdit?.description ?? "",
     },
     validationSchema: Yup.object({
-      productTypeName: Yup.string()
+      store_category_name: Yup.string()
         .max(maxLengthName, `Must be ${maxLengthName} characters or less`)
         .required(t("Please enter this field")),
-      productTypeStatus: Yup.string()
+      store_category_status: Yup.string()
         .required(t("Please select status")),
       description: Yup.string(),
     }),
     onSubmit: (values) => {
       const url = isEditMode
-        ? route("admin.product-types.update", { id: dataEdit.id })
-        : route("admin.product-types.store");
+        ? route("admin.store-categories.update", { id: dataEdit.id })
+        : route("admin.store-categories.store");
 
       const method = isEditMode ? "put" : "post";
 
@@ -71,14 +71,14 @@ export const ModelProductType = ({
   });
 
   const selectedStatusOption = statusOptions?.find(
-    (option: any) => option?.value === formik.values.productTypeStatus
+    (option: any) => option?.value === formik.values.store_category_status
   ) ?? null;
 
   useEffect(() => {
     if (show) {
       formik.setValues({
-        productTypeName: dataEdit?.name || "",
-        productTypeStatus: dataEdit?.status ?? "ACTIVE",
+        store_category_name: dataEdit?.name || "",
+        store_category_status: dataEdit?.status ?? "ACTIVE",
         description: dataEdit?.description ?? "",
       });
     } else {
@@ -105,32 +105,32 @@ export const ModelProductType = ({
     >
       <Form onSubmit={formik.handleSubmit} noValidate>
         <Modal.Header closeButton>
-          <h5>{isEditMode ? t("Edit product type") : t("Add product type")}</h5>
+          <h5>{isEditMode ? t("Edit store category") : t("Add store category")}</h5>
         </Modal.Header>
         <Modal.Body>
-          <Form.Group className="mb-3" controlId="productTypeName">
+          <Form.Group className="mb-3" controlId="store_category_name">
             <Form.Label>
-              {t("Product type name")}
+              {t("Store category name")}
               <span className="text-danger">*</span>
             </Form.Label>
             <Form.Control
               type="text"
-              placeholder={t("Enter product type name")}
+              placeholder={t("Enter store category name")}
               maxLength={maxLengthName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.productTypeName}
+              value={formik.values.store_category_name}
               isInvalid={
-                !!((formik.touched.productTypeName && formik.errors.productTypeName))
+                !!((formik.touched.store_category_name && formik.errors.store_category_name))
               }
             />
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.productTypeName as string ?? "")}
+              {t(formik.errors.store_category_name as string ?? "")}
             </Form.Control.Feedback>
           </Form.Group>
 
           {/* Status */}
-          <Form.Group className="mb-3" controlId="productTypeStatus">
+          <Form.Group className="mb-3" controlId="store_category_status">
             <Form.Label>
               {t("Status")} <span className="text-danger">*</span>
             </Form.Label>
@@ -139,22 +139,22 @@ export const ModelProductType = ({
               placeholder={t("Select status")}
               value={selectedStatusOption}
               onChange={(selectedOption: any) => {
-                formik.setFieldValue("productTypeStatus", selectedOption?.value ?? "");
+                formik.setFieldValue("store_category_status", selectedOption?.value ?? "");
               }}
-              onBlur={() => formik.setFieldTouched("productTypeStatus", true)}
+              onBlur={() => formik.setFieldTouched("store_category_status", true)}
               className={
-                (formik?.touched?.productTypeStatus && formik?.errors?.productTypeStatus)
+                (formik?.touched?.store_category_status && formik?.errors?.store_category_status)
                   ? "is-invalid"
                   : ""
               }
             />
-            {((formik?.touched?.productTypeStatus && formik?.errors?.productTypeStatus)) && (
+            {((formik?.touched?.store_category_status && formik?.errors?.store_category_status)) && (
               <div className="invalid-feedback d-block">
-                {t(formik?.errors?.productTypeStatus as string ?? "")}
+                {t(formik?.errors?.store_category_status as string ?? "")}
               </div>
             )}
             <Form.Control.Feedback type="invalid">
-              {t(formik.errors.productTypeStatus as string ?? "")}
+              {t(formik.errors.store_category_status as string ?? "")}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -169,7 +169,7 @@ export const ModelProductType = ({
                 formik.setFieldValue("description", data);
               }}
               onBlur={() => formik.setFieldTouched("description", true)}
-              placeholder={t("Enter product type description")}
+              placeholder={t("Enter store category description")}
             />
             {((formik?.touched?.description && formik?.errors?.description)) && (
               <div className="invalid-feedback d-block">
