@@ -35,7 +35,7 @@ class ThemeSettingController extends Controller
         $result = [];
 
         foreach ($settings as $setting) {
-            if ($setting->key === 'contacts' || $setting->key === 'domains' || $setting->key === 'menus' || $setting->key === 'notification') {
+            if ($setting->key === 'contacts' || $setting->key === 'domains' || $setting->key === 'notification' || $setting->key === 'menus') {
                 $result[$setting->key] = json_decode($setting->value, true) ?: [];
             } else {
                 $result[$setting->key] = $setting->value;
@@ -90,7 +90,7 @@ class ThemeSettingController extends Controller
                 $value = $imagePath;
             }
 
-            if ($key === 'contacts' || $key === 'domains' || $key === 'menus' || $key === 'notification') {
+            if ($key === 'contacts' || $key === 'domains' || $key === 'notification' || $key === 'menus') {
                 $value = json_encode($value);
             }
 
