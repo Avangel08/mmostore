@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card, Col, Container, Row, Button, Form } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Card, Col, Container, Row, Button, Form, Alert } from 'react-bootstrap';
 import { Head, Link, router } from '@inertiajs/react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -13,6 +13,23 @@ const Index = () => {
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
     const [serverError, setServerError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+
+    useEffect(() => {
+        // Check if there's a reset=success parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('reset') === 'success') {
+            setShowSuccessMessage(true);
+            // Remove the parameter from URL without page reload
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+            
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                setShowSuccessMessage(false);
+            }, 5000);
+        }
+    }, []);
 
     const validation = useFormik({
         enableReinitialize: true,
@@ -70,20 +87,29 @@ const Index = () => {
                                 <Card className="mt-4">
                                     <Card.Body className="p-4">
                                         <div className="text-center mt-2">
-                                            <h5 className="text-primary">Welcome Back!</h5>
-                                            <p className="text-muted">Sign in to continue to MMO Store.</p>
+                                            <h5 className="text-primary">{t("Welcome Back!")}</h5>
+                                            <p className="text-muted">{t("Sign in to continue to MMO Store.")}</p>
                                         </div>
+                                        {showSuccessMessage && (
+                                            <Alert variant="success" className="mb-4" style={{ 
+                                                fontSize: '14px',
+                                                borderRadius: '8px'
+                                            }}>
+                                                <i className="ri-check-line me-2"></i>
+                                                {t('The password has been reset! You can now log in using your new password')}
+                                            </Alert>
+                                        )}
                                         {serverError && (
                                             <div className="alert alert-danger">{serverError}</div>
                                         )}
                                         <div className="p-2 mt-4">
                                             <form onSubmit={validation.handleSubmit}>
                                                 <div className="mb-3">
-                                                    <Form.Label htmlFor="email">Email</Form.Label>
+                                                    <Form.Label htmlFor="email">{t("Email")} <span className="text-danger">*</span></Form.Label>
                                                     <Form.Control
                                                         type="email"
                                                         id="email"
-                                                        placeholder="Enter email"
+                                                        placeholder={t("Enter email")}
                                                         value={validation.values.email}
                                                         onChange={validation.handleChange}
                                                         isInvalid={validation.touched.email && !!validation.errors.email}
@@ -96,15 +122,12 @@ const Index = () => {
                                                 </div>
 
                                                 <div className="mb-3">
-                                                    {/* <div className="float-end">
-                                                        <Link href="/forgot-password" className="text-muted">Forgot password?</Link>
-                                                    </div> */}
-                                                    <Form.Label htmlFor="password">Password</Form.Label>
+                                                    <Form.Label htmlFor="password">{t("Password")} <span className="text-danger">*</span></Form.Label>
                                                     <div className="position-relative auth-pass-inputgroup mb-3">
                                                         <Form.Control
                                                             type={passwordShow ? "text" : "password"}
                                                             id="password"
-                                                            placeholder="Enter password"
+                                                            placeholder={t("Enter password")}
                                                             value={validation.values.password}
                                                             onChange={validation.handleChange}
                                                             isInvalid={validation.touched.password && !!validation.errors.password}
@@ -124,9 +147,16 @@ const Index = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="form-check">
-                                                    <Form.Check.Input className="form-check-input" type="checkbox" id="auth-remember-check" />
-                                                    <Form.Check.Label htmlFor="auth-remember-check">Remember me</Form.Check.Label>
+                                                <div className="form-check d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <Form.Check.Input className="form-check-input" type="checkbox" id="auth-remember-check" />
+                                                        <Form.Check.Label htmlFor="auth-remember-check">{t("Remember me")}</Form.Check.Label>
+                                                    </div>
+                                                    <a 
+                                                        href={route('home.forgot-password')}
+                                                    >
+                                                        {t("Forgot password?")}
+                                                    </a>
                                                 </div>
 
                                                 <div className="mt-4">
@@ -136,7 +166,7 @@ const Index = () => {
                                                         type="submit"
                                                         disabled={isSubmitting}
                                                     >
-                                                        {isSubmitting ? "Signing in..." : "Sign In"}
+                                                        {isSubmitting ? t("Signing in...") : t("Sign In")}
                                                     </Button>
                                                 </div>
                                             </form>
@@ -145,7 +175,7 @@ const Index = () => {
                                 </Card>
 
                                 <div className="mt-4 text-center">
-                                    <p className="mb-0">Don't have an account? <Link href="/register" className="fw-semibold text-primary text-decoration-underline">Signup</Link></p>
+                                    <p className="mb-0">{t("Don't have an account?")} <a href="/register" className="fw-semibold text-primary text-decoration-underline">{t("Signup")}</a></p>
                                 </div>
                             </Col>
                         </Row>
