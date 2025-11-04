@@ -80,6 +80,7 @@ Route::middleware(['validate.subdomain', 'tenant.mongo'])
                 Route::group(['prefix' => 'theme-settings'], function() {
                     Route::get('/', [ThemeSettingController::class, 'index'])->name('seller.theme-settings');
                     Route::post('/update', [ThemeSettingController::class, 'update'])->name('seller.theme-settings.update');
+                    Route::post('/test-telegram', [ThemeSettingController::class, 'testTelegram'])->name('seller.theme-settings.test-telegram');
                 });
                 Route::group(['prefix' => 'customer-manager'], function () {
                     Route::get('/', [CustomerManagerController::class, 'index'])->name('seller.customer-manager.index');

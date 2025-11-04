@@ -8,6 +8,7 @@ use App\Models\MySQL\Stores;
 use App\Models\MySQL\User;
 use App\Services\Home\StoreService;
 use App\Services\Home\UserService;
+use App\Services\StoreCategory\StoreCategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Redirect;
@@ -18,14 +19,16 @@ class UserController extends Controller
 {
     protected $userService;
     protected $storeService;
+    protected $storeCategoryService;
 
     public function __construct(
         UserService $userService,
         StoreService $storeService,
-    )
-    {
+        StoreCategoryService $storeCategoryService
+    ) {
         $this->userService = $userService;
         $this->storeService = $storeService;
+        $this->storeCategoryService = $storeCategoryService;
     }
 
     public function index(Request $request)
@@ -34,10 +37,16 @@ class UserController extends Controller
         $perPage = $request->input('perPage', 10);
 
         return Inertia::render('UserManager/index', [
-            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: [], request: $request),
+            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: ['stores:id,user_id,verified_at'], request: $request),
             'status' => fn() => User::STATUS,
             'type' => fn() => User::TYPE,
-            'detail' => fn() => $this->userService->findById(id: $request->input('id'), relation: [])
+            'verifyStatus' => fn() => [
+                'Verified' => 'VERIFIED',
+                'Unverified' => 'UNVERIFIED',
+            ],
+            'detail' => fn() => $this->userService->findById(id: $request->input('id'), relation: []),
+            'verifyStoreData' => Inertia::optional(fn() => $this->userService->findById(id: $request->input('id'), relation: ['stores:id,user_id,name,domain,verified_at', 'stores.storeCategories:id,name,status'])),
+            'storeCategoryOptions' => Inertia::optional(fn() => $this->storeCategoryService->getCategoryOptions()),
         ]);
     }
 
@@ -88,7 +97,7 @@ class UserController extends Controller
 
             $this->userService->deletes($ids);
 
-            return back()->with('success', "Deleted selected " . count($ids) .  " user successfully");
+            return back()->with('success', "Deleted selected " . count($ids) . " user successfully");
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -107,7 +116,7 @@ class UserController extends Controller
             return back()->with('error', 'Store domain not found for this user');
         }
 
-        $domains = is_array($store->domain) ? $store->domain : [(string)$store->domain];
+        $domains = is_array($store->domain) ? $store->domain : [(string) $store->domain];
         $mainDomain = (string) config('app.main_domain');
 
         $host = collect($domains)->first(function ($d) use ($mainDomain) {
@@ -140,5 +149,20 @@ class UserController extends Controller
         }
 
         return Redirect::away($signedUrl);
+    }
+
+    public function verifyStore(UserManagementRequest $request)
+    {
+        try {
+            $data = $request->validated();
+            $this->storeService->verifyStore($data['stores']);
+            return back()->with('success', 'Saved verification information successfully');
+        } catch (\Exception $e) {
+            \Log::error($e, [
+                'ip' => $request->ip(),
+                'user_id' => auth(config('guard.admin'))->id() ?? null
+            ]);
+            return back()->with('error', $e->getMessage());
+        }
     }
 }

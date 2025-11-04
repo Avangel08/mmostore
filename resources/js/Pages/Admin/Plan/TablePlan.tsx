@@ -5,6 +5,7 @@ import { Form, Button, OverlayTrigger, Tooltip, Dropdown } from "react-bootstrap
 import moment from "moment";
 import { NumericFormat } from "react-number-format";
 import DOMPurify from 'dompurify';
+import { CKEditorContent } from "../../../Components/CKEditorContent";
 
 const TablePlan = ({
   data,
@@ -103,8 +104,7 @@ const TablePlan = ({
         header: t("Description"),
         cell: (cell: any) => {
           const html = cell.getValue() ?? "";
-          const safe = DOMPurify.sanitize(html);
-          return <span dangerouslySetInnerHTML={{ __html: safe }} />;
+          return <div className="text-break text-wrap"><CKEditorContent htmlContent={html}/></div>;
         },
         accessorKey: "description",
         enableColumnFilter: false,

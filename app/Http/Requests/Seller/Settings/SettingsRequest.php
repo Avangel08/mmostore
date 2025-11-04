@@ -19,7 +19,7 @@ class SettingsRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        foreach (['contacts', 'domains', 'menus'] as $key) {
+        foreach (['contacts', 'domains', 'notification', 'menus'] as $key) {
             if (is_string($this->$key)) {
                 $decoded = json_decode($this->$key, true);
 
@@ -58,6 +58,7 @@ class SettingsRequest extends FormRequest
     {
         $tab = $this->input('tab');
         $domainSuffix = config('app.domain_suffix');
+
         return match ($tab) {
             'themeTab' => [
                 'theme' => ['required', 'string'],
@@ -102,6 +103,13 @@ class SettingsRequest extends FormRequest
                         }
                     }
                 ]
+            ],
+            'notificationTab' => [
+                'notification' => ['required', 'array'],
+                'notification.enabled' => ['required'],
+                'notification.groupId' => ['required_if:notification.enabled,true', 'string', 'max:50'],
+                'notification.topicId' => ['required_if:notification.enabled,true', 'string', 'max:20'],
+                'notification.message' => ['required_if:notification.enabled,true', 'string', 'max:2000'],
             ],
             'menuTab' => [
                 'menus' => ['required', 'array'],
