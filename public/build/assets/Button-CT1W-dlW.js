@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/Button-BRcUTJGP.js
-import{u as x,c as l}from"./ThemeProvider-C0xt9VP8.js";import{d as B,j as N}from"./ContextMenuProvider-BnbZ3Xw_.js";import{u as $}from"./Button-C_zChQbi.js";const d=B.forwardRef(({as:e,bsPrefix:m,variant:a="primary",size:r,active:n=!1,disabled:t=!1,className:f,...s},u)=>{const o=x(m,"btn"),[c,{tagName:p}]=$({tagName:e,disabled:t,...s}),i=p;return N.jsx(i,{...c,...s,ref:u,disabled:t,className:l(f,o,n&&"active",a&&`${o}-${a}`,r&&`${o}-${r}`,s.href&&t&&"disabled")})});d.displayName="Button";export{d as B};
-========
-import{u as x,c as l}from"./ThemeProvider-CUiVOj3n.js";import{d as B,j as N}from"./ContextMenuProvider-BhVN3MI2.js";import{u as $}from"./Button-ItoOpMhW.js";const d=B.forwardRef(({as:e,bsPrefix:m,variant:a="primary",size:r,active:n=!1,disabled:t=!1,className:f,...s},u)=>{const o=x(m,"btn"),[c,{tagName:p}]=$({tagName:e,disabled:t,...s}),i=p;return N.jsx(i,{...c,...s,ref:u,disabled:t,className:l(f,o,n&&"active",a&&`${o}-${a}`,r&&`${o}-${r}`,s.href&&t&&"disabled")})});d.displayName="Button";export{d as B};
->>>>>>>> main:public/build/assets/Button-CT1W-dlW.js

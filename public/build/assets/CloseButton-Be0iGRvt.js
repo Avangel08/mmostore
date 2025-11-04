@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/CloseButton-Be0iGRvt.js
-import{P as o}from"./index-DJrr_1Uz.js";import{d as l,j as n}from"./ContextMenuProvider-BnbZ3Xw_.js";import{c as i}from"./ThemeProvider-C0xt9VP8.js";const c={"aria-label":o.string,onClick:o.func,variant:o.oneOf(["white"])},t=l.forwardRef(({className:a,variant:s,"aria-label":e="Close",...r},p)=>n.jsx("button",{ref:p,type:"button",className:i("btn-close",s&&`btn-close-${s}`,a),"aria-label":e,...r}));t.displayName="CloseButton";t.propTypes=c;export{t as C};
-========
-import{P as o}from"./index-CMi1q9xw.js";import{d as l,j as n}from"./ContextMenuProvider-BhVN3MI2.js";import{c as i}from"./ThemeProvider-CUiVOj3n.js";const c={"aria-label":o.string,onClick:o.func,variant:o.oneOf(["white"])},t=l.forwardRef(({className:a,variant:s,"aria-label":e="Close",...r},p)=>n.jsx("button",{ref:p,type:"button",className:i("btn-close",s&&`btn-close-${s}`,a),"aria-label":e,...r}));t.displayName="CloseButton";t.propTypes=c;export{t as C};
->>>>>>>> main:public/build/assets/CloseButton-D0xq5bFg.js

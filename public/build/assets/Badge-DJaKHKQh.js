@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/Badge-DlJ31L09.js
-import{u as f,c as i}from"./ThemeProvider-C0xt9VP8.js";import{d as n,j as x}from"./ContextMenuProvider-BnbZ3Xw_.js";const c=n.forwardRef(({bsPrefix:r,bg:s="primary",pill:e=!1,text:a,className:o,as:t="span",...p},m)=>{const d=f(r,"badge");return x.jsx(t,{ref:m,...p,className:i(o,d,e&&"rounded-pill",a&&`text-${a}`,s&&`bg-${s}`)})});c.displayName="Badge";export{c as B};
-========
-import{u as f,c as i}from"./ThemeProvider-CUiVOj3n.js";import{d as n,j as x}from"./ContextMenuProvider-BhVN3MI2.js";const c=n.forwardRef(({bsPrefix:r,bg:s="primary",pill:e=!1,text:a,className:o,as:t="span",...p},m)=>{const d=f(r,"badge");return x.jsx(t,{ref:m,...p,className:i(o,d,e&&"rounded-pill",a&&`text-${a}`,s&&`bg-${s}`)})});c.displayName="Badge";export{c as B};
->>>>>>>> main:public/build/assets/Badge-DJaKHKQh.js

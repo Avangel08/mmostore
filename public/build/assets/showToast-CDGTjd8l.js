@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/showToast-CDGTjd8l.js
-import{B as r,F as t}from"./react-toastify.esm-Dj3bmGVf.js";const i=(o,e,s)=>{r[e](o,{position:"top-center",autoClose:2500,hideProgressBar:!1,closeOnClick:!1,pauseOnHover:!0,draggable:!0,progress:void 0,theme:"colored",transition:t,...s})};export{i as s};
-========
-import{B as r,F as t}from"./react-toastify.esm-Bzp-JuTX.js";const i=(o,e,s)=>{r[e](o,{position:"top-center",autoClose:2500,hideProgressBar:!1,closeOnClick:!1,pauseOnHover:!0,draggable:!0,progress:void 0,theme:"colored",transition:t,...s})};export{i as s};
->>>>>>>> main:public/build/assets/showToast-BKDwzp8a.js

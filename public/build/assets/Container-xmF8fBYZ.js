@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/Container-xmF8fBYZ.js
-import{u as f,c as p}from"./ThemeProvider-C0xt9VP8.js";import{d as c,j as m}from"./ContextMenuProvider-BnbZ3Xw_.js";const x=c.forwardRef(({bsPrefix:a,fluid:s=!1,as:t="div",className:e,...o},n)=>{const r=f(a,"container"),i=typeof s=="string"?`-${s}`:"-fluid";return m.jsx(t,{ref:n,...o,className:p(e,s?`${r}${i}`:r)})});x.displayName="Container";export{x as C};
-========
-import{u as f,c as p}from"./ThemeProvider-CUiVOj3n.js";import{d as c,j as m}from"./ContextMenuProvider-BhVN3MI2.js";const x=c.forwardRef(({bsPrefix:a,fluid:s=!1,as:t="div",className:e,...o},n)=>{const r=f(a,"container"),i=typeof s=="string"?`-${s}`:"-fluid";return m.jsx(t,{ref:n,...o,className:p(e,s?`${r}${i}`:r)})});x.displayName="Container";export{x as C};
->>>>>>>> main:public/build/assets/Container-DaelVuOS.js

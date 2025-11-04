@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/Row-D4DhAVVB.js
-import{u as x,a as d,b as B,c as R}from"./ThemeProvider-C0xt9VP8.js";import{d as $,j}from"./ContextMenuProvider-BnbZ3Xw_.js";const w=$.forwardRef(({bsPrefix:c,className:n,as:i="div",...a},l)=>{const t=x(c,"row"),f=d(),p=B(),u=`${t}-cols`,r=[];return f.forEach(s=>{const e=a[s];delete a[s];let o;e!=null&&typeof e=="object"?{cols:o}=e:o=e;const m=s!==p?`-${s}`:"";o!=null&&r.push(`${u}${m}-${o}`)}),j.jsx(i,{ref:l,...a,className:R(n,t,...r)})});w.displayName="Row";export{w as R};
-========
-import{u as x,a as d,b as B,c as R}from"./ThemeProvider-CUiVOj3n.js";import{d as $,j}from"./ContextMenuProvider-BhVN3MI2.js";const w=$.forwardRef(({bsPrefix:c,className:n,as:i="div",...a},l)=>{const t=x(c,"row"),f=d(),p=B(),u=`${t}-cols`,r=[];return f.forEach(s=>{const e=a[s];delete a[s];let o;e!=null&&typeof e=="object"?{cols:o}=e:o=e;const m=s!==p?`-${s}`:"";o!=null&&r.push(`${u}${m}-${o}`)}),j.jsx(i,{ref:l,...a,className:R(n,t,...r)})});w.displayName="Row";export{w as R};
->>>>>>>> main:public/build/assets/Row-DTCryV-T.js

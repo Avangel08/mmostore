@@ -1,1 +1,0 @@
-import{j as o}from"./ContextMenuProvider-BnbZ3Xw_.js";/* empty css                  */const s=({htmlContent:t,...n})=>o.jsx("div",{className:"ck-content",...n,dangerouslySetInnerHTML:{__html:t}});export{s as C};
