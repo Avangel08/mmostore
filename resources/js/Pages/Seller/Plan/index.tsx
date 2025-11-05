@@ -11,6 +11,7 @@ import { ModalSelectPaymentMethod } from "./ModalSelectPaymentMethod";
 import { ModalPurchaseResult } from "./ModalPurchaseResult";
 import axios from "axios";
 import moment from "moment";
+import { CKEditorContent } from "../../../Components/CKEditorContent";
 
 const Plans = () => {
   const { t } = useTranslation();
@@ -476,7 +477,7 @@ const Plans = () => {
                             {t("Description")}
                           </h6>
                           <div className="text-muted small">
-                            <div dangerouslySetInnerHTML={{ __html: plan.description }} />
+                            <CKEditorContent htmlContent={plan.description} />
                           </div>
                         </div>
                       )}

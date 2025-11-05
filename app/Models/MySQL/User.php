@@ -60,6 +60,12 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function stores()
+    {
+        return $this->hasMany(Stores::class, 'user_id');
+    }
+
+
     // Override createToken from HasApiTokens trait
     public function createToken(string $name, array $abilities = ['*'], ?DateTimeInterface $expiresAt = null)
     {
@@ -141,6 +147,23 @@ class User extends Authenticatable
             }
             if ($request->filled('createdDateEnd')) {
                 $query->whereDate('created_at', '<=', $request->input('createdDateEnd'));
+            }
+        }
+        return $query;
+    }
+
+    public function scopeFilterStoreVerifyStatus($query, $request)
+    {
+        if ($request?->filled('verifyStatus')) {
+            $verifyStatus = $request->input('verifyStatus');
+            if ($verifyStatus == 'VERIFIED') {
+                $query->whereHas('stores', function ($q) {
+                    $q->whereNotNull('verified_at');
+                });
+            } elseif ($verifyStatus == 'UNVERIFIED') {
+                $query->whereHas('stores', function ($q) {
+                    $q->whereNull('verified_at');
+                });
             }
         }
         return $query;

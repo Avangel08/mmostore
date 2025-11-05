@@ -51,6 +51,21 @@ const Footer = () => {
                                                     Tính năng
                                                 </Link>
                                             </li>
+                                            <li>
+                                                <Link href="#faqs">
+                                                    FAQ
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <a target="_blank" rel="noopener noreferrer" href="https://t.me/mmoshop_io">
+                                                    Liên hệ
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a target="_blank" rel="noopener noreferrer" href="https://hidemium-organization.gitbook.io/mmoshop-owner-store">
+                                                    Tài liệu
+                                                </a>
+                                            </li>
                                             {/* <li>
                                                 <Link href="#plans">
                                                     Giá gói

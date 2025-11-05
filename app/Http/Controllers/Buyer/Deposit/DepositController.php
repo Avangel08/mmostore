@@ -10,6 +10,7 @@ use App\Services\CurrencyRateSeller\CurrencyRateSellerService;
 use App\Services\Customer\CustomerService;
 use App\Services\CheckBank\CheckBankService;
 use App\Services\PaymentMethodSeller\PaymentMethodSellerService;
+use App\Services\Setting\SettingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -21,18 +22,21 @@ class DepositController extends Controller
     protected $currencyRateSellerService;
     protected $customerService;
     protected $checkBankService;
+    protected $settingService;
     public function __construct(
         DepositService $depositService,
         PaymentMethodSellerService $paymentMethodSellerService,
         CurrencyRateSellerService $currencyRateSellerService,
         CustomerService $customerService,
-        CheckBankService $checkBankService
+        CheckBankService $checkBankService,
+        SettingService $settingService
     ) {
         $this->depositService = $depositService;
         $this->paymentMethodSellerService = $paymentMethodSellerService;
         $this->currencyRateSellerService = $currencyRateSellerService;
         $this->customerService = $customerService;
         $this->checkBankService = $checkBankService;
+        $this->settingService = $settingService;
     }
     /**
      * Display a listing of the resource.
@@ -45,10 +49,20 @@ class DepositController extends Controller
         }
         $listPaymentMethod = $this->paymentMethodSellerService->listActive();
         $store = app('store');
+        $settings = $this->settingService->getSettings(true);
+        $result = [];
+        foreach ($settings as $setting) {
+            if ($setting->key === 'contacts' || $setting->key === 'domains' || $setting->key === 'menus') {
+                $result[$setting->key] = json_decode($setting->value, true) ?: [];
+            } else {
+                $result[$setting->key] = $setting->value;
+            }
+        }
         return Inertia::render("Themes/{$theme}/Deposit/index", [
             'listPaymentMethod' => $listPaymentMethod,
             'store' =>  fn() => $store,
             'domainSuffix' => config('app.domain_suffix'),
+            'settings' => fn() => $result
         ]);
     }
 

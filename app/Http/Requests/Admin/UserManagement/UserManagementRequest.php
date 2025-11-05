@@ -47,6 +47,12 @@ class UserManagementRequest extends FormRequest
                 'ids' => ['required', 'array', 'min:1'],
                 'ids.*' => ['integer', Rule::exists('users', 'id')],
             ],
+            'verifyStore' => [
+                'stores' => ['required', 'array', 'min:1'],
+                'stores.*.store_id' => ['required', 'integer', Rule::exists('mysql.stores', 'id')],
+                'stores.*.store_category_ids' => ['nullable', 'array'],
+                'stores.*.store_category_ids.*' => ['required', 'integer', Rule::exists('mysql.store_categories', 'id')],
+            ],
             'adminAddPlanSeller' => [
                 'userId' => ['required', 'integer'],
                 'planId' => ['required', 'integer'],

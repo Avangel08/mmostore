@@ -12,6 +12,7 @@ use App\Services\Charge\ChargeService;
 use App\Services\CurrencyRate\CurrencyRateService;
 use App\Services\Home\StoreService;
 use App\Services\Home\UserService;
+use App\Services\StoreCategory\StoreCategoryService;
 use App\Services\PaymentMethod\PaymentMethodService;
 use App\Services\PaymentTransaction\PaymentTransactionAdminService;
 use App\Services\Plan\PlanService;
@@ -30,6 +31,7 @@ class UserController extends Controller
     protected $planService;
     protected $paymentMethodService;
     protected $storeService;
+    protected $storeCategoryService;
     protected $planCheckoutService;
     protected $chargeService;
     protected $paymentTransactionAdminService;
@@ -40,6 +42,7 @@ class UserController extends Controller
         PlanService $planService,
         PaymentMethodService $paymentMethodService,
         StoreService $storeService,
+        StoreCategoryService $storeCategoryService,
         PlanCheckoutService $planCheckoutService,
         ChargeService $chargeService,
         PaymentTransactionAdminService $paymentTransactionAdminService,
@@ -49,6 +52,7 @@ class UserController extends Controller
         $this->planService = $planService;
         $this->paymentMethodService = $paymentMethodService;
         $this->storeService = $storeService;
+        $this->storeCategoryService = $storeCategoryService;
         $this->planCheckoutService = $planCheckoutService;
         $this->chargeService = $chargeService;
         $this->paymentTransactionAdminService = $paymentTransactionAdminService;
@@ -61,10 +65,16 @@ class UserController extends Controller
         $perPage = $request->input('perPage', 10);
 
         return Inertia::render('UserManager/index', [
-            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: ['currentPlan'], request: $request),
+            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: ['stores:id,user_id,verified_at', 'currentPlan'], request: $request),
             'status' => fn() => User::STATUS,
             'type' => fn() => User::TYPE,
+            'verifyStatus' => fn() => [
+                'Verified' => 'VERIFIED',
+                'Unverified' => 'UNVERIFIED',
+            ],
             'detail' => fn() => $this->userService->findById(id: $request->input('id'), relation: ['currentPlan']),
+            'verifyStoreData' => Inertia::optional(fn() => $this->userService->findById(id: $request->input('id'), relation: ['stores:id,user_id,name,domain,verified_at', 'stores.storeCategories:id,name,status'])),
+            'storeCategoryOptions' => Inertia::optional(fn() => $this->storeCategoryService->getCategoryOptions()),
         ]);
     }
 
@@ -115,7 +125,7 @@ class UserController extends Controller
 
             $this->userService->deletes($ids);
 
-            return back()->with('success', "Deleted selected " . count($ids) .  " user successfully");
+            return back()->with('success', "Deleted selected " . count($ids) . " user successfully");
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -134,7 +144,7 @@ class UserController extends Controller
             return back()->with('error', 'Store domain not found for this user');
         }
 
-        $domains = is_array($store->domain) ? $store->domain : [(string)$store->domain];
+        $domains = is_array($store->domain) ? $store->domain : [(string) $store->domain];
         $mainDomain = (string) config('app.main_domain');
 
         $host = collect($domains)->first(function ($d) use ($mainDomain) {
@@ -167,6 +177,21 @@ class UserController extends Controller
         }
 
         return Redirect::away($signedUrl);
+    }
+
+    public function verifyStore(UserManagementRequest $request)
+    {
+        try {
+            $data = $request->validated();
+            $this->storeService->verifyStore($data['stores']);
+            return back()->with('success', 'Saved verification information successfully');
+        } catch (\Exception $e) {
+            \Log::error($e, [
+                'ip' => $request->ip(),
+                'user_id' => auth(config('guard.admin'))->id() ?? null
+            ]);
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     public function getUserPaginateSelect(Request $request)

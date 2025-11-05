@@ -14,7 +14,7 @@ import { showToast } from "../../../utils/showToast";
 const UserManager = () => {
     const { t } = useTranslation();
     const titleWeb = t("User") + " - Admin";
-    const { users, message, status, type } = usePage().props as any;
+    const { users, message, status, type, verifyStatus } = usePage().props as any;
     const [isOpenAddModal, setIsOpenAddModal] = useState(false);
     const [isOpenEditModal, setIsOpenEditModal] = useState(false);
     const [isOpenAddPlanModal, setIsOpenAddPlanModal] = useState(false);
@@ -139,7 +139,7 @@ const UserManager = () => {
                         <Col xs={12}>
                             <Card>
                                 <Card.Body>
-                                    <UserFilter onFilter={handleFilter} status={status} type={type} />
+                                    <UserFilter onFilter={handleFilter} status={status} type={type} verifyStatus={verifyStatus} />
                                     <Row style={{ marginBottom: "32px" }}>
                                         <Col>
                                             {selectedIds.length > 0 && (

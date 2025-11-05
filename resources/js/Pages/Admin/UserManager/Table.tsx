@@ -2,11 +2,12 @@ import React, { useMemo, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { router, usePage } from "@inertiajs/react";
 import TableWithContextMenu from "../../../Components/Common/TableWithContextMenu";
-import { Button, OverlayTrigger, Tooltip, Form } from "react-bootstrap";
+import { Button, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import moment from "moment";
-import { useQueryParams } from "../../../hooks/useQueryParam";
-// Using global route() helper injected by Ziggy/Inertia
+import { ToastContainer } from "react-toastify";
+import { showToast } from "../../../utils/showToast";
+import { ModalVerifyStore } from "./VerifyStore/ModalVerifyStore";
 
 const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
     data: any;
@@ -18,6 +19,9 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
     const { t } = useTranslation();
     const [selectedItems, setSelectedItems] = useState<(string | number)[]>([]);
     const [selectAll, setSelectAll] = useState(false);
+    const [showVerifyModal, setShowVerifyModal] = useState(false);
+    const [verifyStoreData, setVerifyStoreData] = useState<any>(null);
+    const [storeCategoryOptions, setStoreCategoryOptions] = useState<{ value: string; label: string }[]>([]);
 
     useEffect(() => {
         onSelectionChange && onSelectionChange(selectedItems);
@@ -58,6 +62,41 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
         }
     }, []);
 
+    const adminVerifyStore = async (id: string | number) => {
+        router.reload({
+            only: ["verifyStoreData", "storeCategoryOptions"],
+            data: { id },
+            replace: true,
+            onSuccess: (page: any) => {
+                if (!page?.props?.verifyStoreData) {
+                    showToast(t("Failed to load user store data"), "error");
+                    return;
+                }
+                setVerifyStoreData(page.props.verifyStoreData);
+                setStoreCategoryOptions(page?.props?.storeCategoryOptions || []);
+                setShowVerifyModal(true);
+            },
+            onError: () => {
+                showToast(t("Failed to load user store data"), "error");
+            }
+        });
+    }
+
+    const onReloadOptions = () => {
+        router.reload({
+            only: ["storeCategoryOptions"],
+            replace: true,
+            onSuccess: (page: any) => {
+                setStoreCategoryOptions(page?.props?.storeCategoryOptions || []);
+            },
+        });
+    };
+
+    const handleCloseVerifyModal = () => {
+        setShowVerifyModal(false);
+        setVerifyStoreData(null);
+    };
+
     const adminAddPlanSeller = (rowData: any) => {
         onAddPlan && onAddPlan(rowData);
     }
@@ -90,8 +129,24 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
             },
             {
                 header: t("Name"),
-                accessorKey: "name",
+                accessorKey: "",
                 enableColumnFilter: false,
+                cell: (cell: any) => {
+                    const row = cell.row.original;
+                    const name = row?.name ?? "";
+                    const stores = row?.stores || [];
+                    const verifiedAt = stores?.find((store: any) => !!store?.verified_at)?.verified_at ?? null;
+
+                    return <>
+                        <span className="fw-bold">{name}</span> {!!verifiedAt && (
+                            <OverlayTrigger
+                                placement="top"
+                                overlay={<Tooltip>{t("Verified at {{time}}", { time: !!verifiedAt ? moment(verifiedAt).format("DD/MM/YYYY HH:mm") : "" })}</Tooltip>}
+                            >
+                                <i className="ri-checkbox-circle-fill text-secondary fs-5"></i>
+                            </OverlayTrigger>)}
+                    </>
+                }
             },
             {
                 header: t("Email"),
@@ -168,6 +223,18 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
                     return <div className="d-flex gap-2">
                         <OverlayTrigger
                             placement="top"
+                            overlay={<Tooltip>{t("Verify store")}</Tooltip>}
+                        >
+                            <Button
+                                size="sm"
+                                variant="outline-primary"
+                                onClick={() => adminVerifyStore(id)}>
+                                <i className="ri-check-double-line"></i>
+                            </Button>
+                        </OverlayTrigger>
+
+                        <OverlayTrigger
+                            placement="top"
                             overlay={<Tooltip>{t("Login")}</Tooltip>}
                         >
                             <Button
@@ -179,7 +246,6 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
                                 }}><i className="ri-login-box-line"></i>
                             </Button>
                         </OverlayTrigger>
-
                         <OverlayTrigger
                             placement="top"
                             overlay={<Tooltip>{t("Add plan")}</Tooltip>}
@@ -195,7 +261,7 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
                 },
             },
         ],
-        [t, selectAll, selectedItems, handleSelectAll, handleItemSelect]
+        [t, selectAll, selectedItems, handleSelectAll, handleItemSelect, adminVerifyStore]
     );
 
     return (
@@ -211,6 +277,13 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
                 contextMenuOptions={contextMenuOptions}
                 isPaginateTable={true}
                 onReloadTable={onReloadTable}
+            />
+            <ModalVerifyStore
+                show={showVerifyModal}
+                onHide={handleCloseVerifyModal}
+                dataVerifyStore={verifyStoreData}
+                storeCategoryOptions={storeCategoryOptions}
+                onReloadOptions={onReloadOptions}
             />
         </div>
     );

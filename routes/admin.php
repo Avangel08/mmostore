@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\Plan\PlanController;
 use App\Http\Controllers\Admin\ProductType\ProductTypeController;
 use App\Http\Controllers\Admin\RoleManagement\RoleManagementController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\StoreCategory\StoreCategoryController;
 use App\Http\Controllers\Admin\UserManager\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,16 +44,19 @@ Route::domain($mainDomain)->group(function () {
             Route::put('/update/{id}', [UserController::class, 'update'])->name('admin.user.update');
             Route::delete('/delete', [UserController::class, 'delete'])->name('admin.user.delete');
             Route::get('/{id}/login-as', [UserController::class, 'loginAs'])->name('admin.user.login-as');
+            Route::post('/verify', [UserController::class, 'verifyStore'])->name('admin.user.verify-store');
             Route::get('/list-user', [UserController::class, 'getUserPaginateSelect'])->name('admin.user.list-user');
             Route::post('/add-plan', [UserController::class, 'adminAddPlanSeller'])->name('admin.user.add-plan');
         });
 
+        // plan
         Route::group(['prefix' => 'plans'], function () {
             Route::post('/duplicate-plan/{id}', [PlanController::class, 'duplicatePlan'])->name('admin.plans.duplicate-plan');
             Route::get('/list-plan', [PlanController::class, 'getPlanPaginateSelect'])->name('admin.plans.list-plan');
         });
         Route::resource('plans', PlanController::class, ['as' => 'admin']);
 
+        // product type
         Route::group(['prefix' => 'product-type'], function () {
             Route::delete('/delete-multiple', [ProductTypeController::class, 'deleteMultipleProductTypes'])->name('admin.product-types.delete-multiple');
         });
@@ -73,6 +77,12 @@ Route::domain($mainDomain)->group(function () {
             Route::delete('/destroy/{id}', [PaymentMethodAdminController::class, 'destroy'])->name('admin.payment-method.destroy');
             Route::get('/list-method', [PaymentMethodAdminController::class, 'getListPaymentMethod'])->name('admin.payment-method.list-method');
         });
+
+        // store categories
+        Route::group(['prefix' => 'store-categories'], function () {
+            Route::delete('/delete-multiple', [StoreCategoryController::class, 'deleteMultipleStoreCategories'])->name('admin.store-categories.delete-multiple');
+        });
+        Route::resource('store-categories', StoreCategoryController::class, ['as' => 'admin']);
     });
 
 });

@@ -7,8 +7,6 @@ use App\Models\MySQL\Stores;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-use function PHPSTORM_META\map;
-
 class SettingsRequest extends FormRequest
 {
     /**
@@ -21,7 +19,7 @@ class SettingsRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        foreach (['contacts', 'domains', 'notification'] as $key) {
+        foreach (['contacts', 'domains', 'notification', 'menus'] as $key) {
             if (is_string($this->$key)) {
                 $decoded = json_decode($this->$key, true);
 
@@ -113,7 +111,39 @@ class SettingsRequest extends FormRequest
                 'notification.topicId' => ['required_if:notification.enabled,true', 'string', 'max:20'],
                 'notification.message' => ['required_if:notification.enabled,true', 'string', 'max:2000'],
             ],
+            'menuTab' => [
+                'menus' => ['required', 'array'],
+                'menus.*.label' => ['required', 'string', 'max:20', 'distinct'],
+                'menus.*.value' => [
+                    'required',
+                    'string',
+                    'distinct',
+                    // Kiểm tra định dạng hợp lệ
+                    function ($attribute, $value, $fail) {
+                        $pattern = '/^(?!https?:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/';
+                        if (!preg_match($pattern, $value)) {
+                            $fail(__("The url ':value' is invalid.", ['value' => $value]));
+                        }
+                    },
+                ],
+                'menus.*.status' => ['required']
+            ],
             default => [],
         };
+    }
+
+    public function messages()
+    {
+        return [
+            // --- Custom messages ---
+            'menus.required' => __('At least one menu item is required.'),
+            'menus.*.label.required' => __('The menu label is required.'),
+            'menus.*.label.distinct' => __('Each menu label must be unique.'),
+            'menus.*.label.max' => __('The menu label may not be greater than :max characters.'),
+            'menus.*.value.required' => __('The menu URL is required.'),
+            'menus.*.value.distinct' => __('Each menu value must be unique.'),
+            'menus.*.status.required' => __('The menu status is required.'),
+            'menus.*.status.in' => __('The menu status must be Active or Inactive.'),
+        ];
     }
 }
