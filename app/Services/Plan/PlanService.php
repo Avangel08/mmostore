@@ -3,6 +3,8 @@
 namespace App\Services\Plan;
 
 use App\Models\MySQL\Plans;
+use App\Models\MySQL\User;
+use App\Services\Home\UserService;
 use Carbon\Carbon;
 
 /**
@@ -82,9 +84,36 @@ class PlanService
         return Plans::whereIn('id', $ids)->delete();
     }
 
-    public function getDefaultPlans($select = ['*'], $relation = [])
+    public function getDefaultPlan($select = ['*'], $relation = [])
     {
-        return Plans::select($select)->where('type', Plans::TYPE['DEFAULT'])->with($relation)->get();
+        return Plans::select($select)->where('type', Plans::TYPE['DEFAULT'])->with($relation)->first();
+    }
+
+    public function createDefaultPlanIfNotExist()
+    {
+        $userService = app(UserService::class);
+        $defaultPlan = $this->getDefaultPlan();
+        $adminUser = $userService->findByTypes([User::TYPE['ADMIN']], ['id'])->first();
+        if (!$defaultPlan) {
+            $planData = [
+                'type' => Plans::TYPE['DEFAULT'],
+                'name' => 'Free',
+                'price' => 0,
+                'price_origin' => 0,
+                'off' => 0,
+                'interval' => 30,
+                'interval_type' => 1,
+                'feature' => null,
+                'description' => null,
+                'status' => Plans::STATUS['ACTIVE'],
+                'creator_id' => $adminUser ? $adminUser->id : 1,
+                'best_choice' => 0,
+                'show_public' => 0,
+                'sub_description' => "Free plan with basic features",
+            ];
+            $defaultPlan = Plans::create($planData);
+        }
+        return $defaultPlan;
     }
 
     public function getSelectTypePlan()
@@ -93,8 +122,8 @@ class PlanService
             Plans::TYPE['NORMAL'] => 'Normal',
         ];
 
-        $defaultPlans = $this->getDefaultPlans(['id']);
-        if ($defaultPlans->isEmpty()) {
+        $defaultPlans = $this->getDefaultPlan(['id']);
+        if (!$defaultPlans) {
             $selectType[Plans::TYPE['DEFAULT']] = 'Default';
         }
         return $selectType;

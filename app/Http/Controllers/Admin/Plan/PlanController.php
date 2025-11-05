@@ -62,8 +62,8 @@ class PlanController extends Controller
             $data = $request->validated();
             $type = $data['type'];
             if ($type == Plans::TYPE['DEFAULT']) {
-                $plansDefaultType = $this->planService->getDefaultPlans();
-                if ($plansDefaultType->isNotEmpty()) {
+                $plansDefaultType = $this->planService->getDefaultPlan();
+                if ($plansDefaultType) {
                     throw ValidationException::withMessages([
                         'type' => ['Default plan already exists. Only one Default type plan is allowed']
                     ]);
@@ -117,8 +117,8 @@ class PlanController extends Controller
 
             $type = $data['type'];
             if ($plan?->type != Plans::TYPE['DEFAULT'] && $type == Plans::TYPE['DEFAULT']) {
-                $plansDefaultType = $this->planService->getDefaultPlans();
-                if ($plansDefaultType->isNotEmpty()) {
+                $plansDefaultType = $this->planService->getDefaultPlan();
+                if ($plansDefaultType) {
                     throw ValidationException::withMessages([
                         'type' => ['Default plan already exists. Only one Default type plan is allowed']
                     ]);

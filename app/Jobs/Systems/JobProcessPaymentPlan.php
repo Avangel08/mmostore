@@ -151,8 +151,12 @@ class JobProcessPaymentPlan implements ShouldQueue
             $planCheckoutService->update($planCheckout, ['status' => CheckOuts::STATUS['COMPLETE']]);
 
             echo "Kích hoạt gói " . $planCheckout->name . " thành công cho user_id: " . $userId . PHP_EOL;
-            echo "Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd . PHP_EOL;
-            echo "content_bank: " . $this->contentBank . PHP_EOL;
+            echo "Người tạo: " . $user->name . " - " . $user->email . PHP_EOL;
+            
+            if ($this->contentBank && !$isAdminSetPlan) {
+                echo "Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd . PHP_EOL;
+                echo "content_bank: " . $this->contentBank . PHP_EOL;
+            }
             DB::commit();
         } catch (Throwable $th) {
             DB::rollBack();
