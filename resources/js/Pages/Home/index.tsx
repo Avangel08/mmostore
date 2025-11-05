@@ -22,7 +22,7 @@ export default function Index() {
         const token = message?.popup?.token;
         if (userId && token) {
             const url = route("home.go-to-store", { id: userId }) + `?token=${token}`;
-            window.open(url, "_blank");
+            window.open(url, "_self");
         }
     }, []);
 
