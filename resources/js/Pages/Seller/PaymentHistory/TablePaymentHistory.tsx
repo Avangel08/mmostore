@@ -4,16 +4,18 @@ import TableWithContextMenu from "../../../Components/Common/TableWithContextMen
 import { ContextMenuBuilder } from "../../../Components/Common/ContextMenu";
 import { usePage } from "@inertiajs/react";
 import { formatDateTime } from "../../../utils/helpers";
+import { _getWidgetTypeAroundButtonPosition } from "ckeditor5";
 
-const TableCategory = ({
+const TablePaymentHistory = ({
   data,
   onReloadTable,
+  typeOptions
 }: {
   data: any;
   onReloadTable?: (page: number, perPage: number, filters?: any) => void;
+  typeOptions: any;
 }) => {
   const { t } = useTranslation();
-  const { statusConst } = usePage().props as any;
 
   const columns = useMemo(
     () => [
@@ -41,6 +43,17 @@ const TableCategory = ({
           return <span className="fw-semibold">{cell.getValue()}</span>;
         },
         accessorKey: "payment_method.name",
+        enableColumnFilter: false,
+        enableSorting: true,
+      },
+
+      {
+        header: t("Type transaction"),
+        cell: (cell: any) => {
+          const label = typeOptions?.[Number(cell.getValue())] || cell.getValue();
+          return <span>{label}</span>;
+        },
+        accessorKey: "type",
         enableColumnFilter: false,
         enableSorting: true,
       },
@@ -74,7 +87,7 @@ const TableCategory = ({
         },
       },
     ],
-    [t, statusConst]
+    [t, typeOptions]
   );
 
   return (
@@ -93,4 +106,4 @@ const TableCategory = ({
     </div>
   );
 };
-export default TableCategory;
+export default TablePaymentHistory;

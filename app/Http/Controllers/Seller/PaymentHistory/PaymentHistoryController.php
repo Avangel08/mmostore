@@ -35,6 +35,7 @@ class PaymentHistoryController extends Controller
         $request = $request->all();
         return Inertia::render('PaymentHistory/index', [
             'paymentHistories' => fn() => $this->balanceHistoryService->getForTable($request),
+            'typeOptions' => $this->balanceHistoryService->getTypeOptions(),
         ]);
     }
 
