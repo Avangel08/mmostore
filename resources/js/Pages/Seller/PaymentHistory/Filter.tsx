@@ -204,6 +204,23 @@ const Filter = ({ onFilter, currentFilters, typeOptions = [] }: PaymentHistoryFi
                 onChange={(e) => handleInputChange("customerName", e.target.value)}
               />
             </Col>
+            
+            <Col md={3}>
+              <Form.Label htmlFor="filter-type">{t("Type")}</Form.Label>
+              <Select
+                id="filter-type"
+                value={selectedType}
+                onChange={handleTypeChange}
+                options={formattedTypeOptions}
+                classNamePrefix="select"
+                isSearchable={true}
+                placeholder={t("Select type")}
+                menuPortalTarget={document.body}
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
+              />
+            </Col>
 
             <Col md={3}>
               <Form.Label htmlFor="filter-date">
@@ -230,23 +247,6 @@ const Filter = ({ onFilter, currentFilters, typeOptions = [] }: PaymentHistoryFi
                     : []
                 }
                 onChange={handleDateChange}
-              />
-            </Col>
-
-            <Col md={3}>
-              <Form.Label htmlFor="filter-type">{t("Type")}</Form.Label>
-              <Select
-                id="filter-type"
-                value={selectedType}
-                onChange={handleTypeChange}
-                options={formattedTypeOptions}
-                classNamePrefix="select"
-                isSearchable={true}
-                placeholder={t("Select type")}
-                menuPortalTarget={document.body}
-                styles={{
-                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                }}
               />
             </Col>
           </Row>
