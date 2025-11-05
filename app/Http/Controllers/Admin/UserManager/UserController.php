@@ -237,9 +237,8 @@ class UserController extends Controller
             }
 
             $planCheckout = $this->planCheckoutService->createCheckout($user, $plan, $paymentMethod, true);
-            $transactionId = Helpers::generateTransactionId('ADMIN_ADD_PLAN');
             $expireTimeByAdmin = Carbon::parse($data['datetimeExpired']);
-            dispatch_sync(new JobProcessPaymentPlan($planCheckout->content_bank, $transactionId, $data['amount'], $expireTimeByAdmin, $data['note'] ?? null));
+            dispatch_sync(JobProcessPaymentPlan::forAdminAddPlan(checkoutId: $planCheckout->id, expireTimeByAdmin: $expireTimeByAdmin, note: $data['note'] ?? null));
             
             return back()->with('success', 'Plan added to user successfully');
         } catch(Throwable $th){

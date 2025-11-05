@@ -82,7 +82,7 @@ class JobCheckBankAdmin implements ShouldQueue
                     $contentBank = $dataLog['content_bank'];
                     $transactionId = $dataLog['key_unique'];
                     $amount = $dataLog['amount'];
-                    JobProcessPaymentPlan::dispatch($contentBank, $transactionId, $amount);
+                    dispatch(JobProcessPaymentPlan::forBankTransaction(contentBank: $contentBank, transactionId: $transactionId, amount: $amount));
                 }
             }
         }

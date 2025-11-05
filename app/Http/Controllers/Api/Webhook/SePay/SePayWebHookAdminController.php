@@ -75,7 +75,7 @@ class SePayWebHookAdminController extends Controller
             $contentBank = $contentBank['content_bank'];
             $transactionId = $data['referenceCode'];
             $amount = $data['transferAmount'];
-            JobProcessPaymentPlan::dispatch($contentBank, $transactionId, $amount);
+            dispatch(JobProcessPaymentPlan::forBankTransaction(contentBank: $contentBank, transactionId: $transactionId, amount: $amount));
             return response()->json([
                 'status' => 'success',
                 'message' => 'Webhook received successfully',
