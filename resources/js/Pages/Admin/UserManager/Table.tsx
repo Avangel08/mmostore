@@ -246,7 +246,6 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange, onAddPlan }: {
                                 }}><i className="ri-login-box-line"></i>
                             </Button>
                         </OverlayTrigger>
-                        
                         <OverlayTrigger
                             placement="top"
                             overlay={<Tooltip>{t("Add plan")}</Tooltip>}

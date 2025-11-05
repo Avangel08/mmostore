@@ -6,12 +6,12 @@ import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
 import { showToast } from "../../../utils/showToast";
-import { CKEditorContent } from "../../../Components/CKEditorContent";
 import { ModalCheckoutPlan } from "./ModalCheckoutPlan";
 import { ModalSelectPaymentMethod } from "./ModalSelectPaymentMethod";
 import { ModalPurchaseResult } from "./ModalPurchaseResult";
 import axios from "axios";
 import moment from "moment";
+import { CKEditorContent } from "../../../Components/CKEditorContent";
 
 const Plans = () => {
   const { t } = useTranslation();

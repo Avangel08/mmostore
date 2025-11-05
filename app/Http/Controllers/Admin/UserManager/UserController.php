@@ -12,12 +12,12 @@ use App\Services\Charge\ChargeService;
 use App\Services\CurrencyRate\CurrencyRateService;
 use App\Services\Home\StoreService;
 use App\Services\Home\UserService;
+use App\Services\StoreCategory\StoreCategoryService;
 use App\Services\PaymentMethod\PaymentMethodService;
 use App\Services\PaymentTransaction\PaymentTransactionAdminService;
 use App\Services\Plan\PlanService;
 use App\Services\PlanCheckout\PlanCheckoutService;
 use Carbon\Carbon;
-use App\Services\StoreCategory\StoreCategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Redirect;
@@ -42,7 +42,8 @@ class UserController extends Controller
         PlanService $planService,
         PaymentMethodService $paymentMethodService,
         StoreService $storeService,
-        StoreCategoryService $storeCategoryService,   PlanCheckoutService $planCheckoutService,
+        StoreCategoryService $storeCategoryService,
+        PlanCheckoutService $planCheckoutService,
         ChargeService $chargeService,
         PaymentTransactionAdminService $paymentTransactionAdminService,
         CurrencyRateService $currencyRateService
@@ -64,7 +65,7 @@ class UserController extends Controller
         $perPage = $request->input('perPage', 10);
 
         return Inertia::render('UserManager/index', [
-            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: ['stores:id,user_id,verified_at','currentPlan'], request: $request),
+            'users' => fn() => $this->userService->getAll(isPaginate: true, page: $page, perPage: $perPage, relation: ['stores:id,user_id,verified_at', 'currentPlan'], request: $request),
             'status' => fn() => User::STATUS,
             'type' => fn() => User::TYPE,
             'verifyStatus' => fn() => [

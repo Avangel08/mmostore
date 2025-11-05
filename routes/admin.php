@@ -44,7 +44,6 @@ Route::domain($mainDomain)->group(function () {
             Route::put('/update/{id}', [UserController::class, 'update'])->name('admin.user.update');
             Route::delete('/delete', [UserController::class, 'delete'])->name('admin.user.delete');
             Route::get('/{id}/login-as', [UserController::class, 'loginAs'])->name('admin.user.login-as');
-            Route::get('/list-user', [UserController::class, 'getUserPaginateSelect'])->name('admin.user.list-user');
             Route::post('/verify', [UserController::class, 'verifyStore'])->name('admin.user.verify-store');
             Route::get('/list-user', [UserController::class, 'getUserPaginateSelect'])->name('admin.user.list-user');
             Route::post('/add-plan', [UserController::class, 'adminAddPlanSeller'])->name('admin.user.add-plan');
