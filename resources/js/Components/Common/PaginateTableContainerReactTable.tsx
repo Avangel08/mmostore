@@ -91,7 +91,7 @@ interface TableContainerProps {
   handleContactClick?: any;
   handleTicketClick?: any;
   onSubmit?: any;
-  onReloadTable?: (page: number, perPage: number) => void;
+  onReloadTable?: (page: number, perPage: number, filter?: any) => void;
   perPageEntries?: number[];
   onRowContextMenu?: (event: React.MouseEvent, rowData: any) => void;
   divStyle?: React.CSSProperties;
@@ -132,6 +132,10 @@ const PaginateTableContainer = ({
   const param = useQueryParams();
   const page = param?.[keyPageParam] ?? "1";
   const perPage = param?.[keyPerPageParam] ?? "10";
+
+  const otherParams = param ? Object.fromEntries(
+    Object.entries(param).filter(([key]) => key != keyPageParam && key != keyPerPageParam)
+  ) : {};
 
   const [selectedEntries, setSelectedEntries] = useState({ value: perPage, label: perPage });
 
@@ -178,7 +182,7 @@ const PaginateTableContainer = ({
       if (onReloadTable) {
         const currentState = table.getState().pagination;
         const newState = typeof updater === 'function' ? updater(currentState) : updater;
-        onReloadTable(newState.pageIndex + 1, newState.pageSize);
+        onReloadTable(newState.pageIndex + 1, newState.pageSize, otherParams);
       }
       setPagination(updater);
     },
@@ -437,7 +441,7 @@ const PaginateTableContainer = ({
           <Select
               value={selectedEntries}
               onChange={(selected: any) => {
-                onReloadTable && onReloadTable(1, selected.value);
+                onReloadTable && onReloadTable(1, selected.value, otherParams);
                 setPagination((old) => ({
                   ...old,
                   pageSize: selected.value,

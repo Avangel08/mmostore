@@ -27,10 +27,10 @@ const PaymentHistory = () => {
   const buildQuery = (p: any = {}) => ({
     page: Number(p.page || 1),
     perPage: Number(p.perPage || 10),
-    transaction_id: p.transactionId || "",
-    customer_name: p.customerName || "",
-    start_time: p.createdDateStart || "",
-    end_time: p.createdDateEnd || "",
+    transaction_id: p.transactionId || p.transaction_id || "",
+    customer_name: p.customerName || p.customer_name || "",
+    start_time: p.createdDateStart || p.start_time || "",
+    end_time: p.createdDateEnd || p.end_time || "",
     type: p.type || "",
   });
 
