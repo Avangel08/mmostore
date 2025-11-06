@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Systems;
 
+use App\Helpers\Helpers;
 use App\Models\MySQL\CheckOuts;
 use App\Models\MySQL\PaymentTransactions;
 use App\Services\Charge\ChargeService;
@@ -25,17 +26,49 @@ class JobProcessPaymentPlan implements ShouldQueue
     protected $amount;
     protected ?Carbon $expireTimeByAdmin;
     protected $note;
-    /**
-     * Create a new job instance.
-     */
-    public function __construct($contentBank, $transactionId, $amount, ?Carbon $expireTimeByAdmin = null, $note = null)
+    protected $checkoutId;
+    protected $isShowEcho;
+
+    public function __construct($contentBank = null, $transactionId = null, $amount = 0, ?Carbon $expireTimeByAdmin = null, $note = null, $checkoutId = null, bool $isShowEcho = false)
     {
         $this->contentBank = $contentBank;
         $this->transactionId = $transactionId;
         $this->amount = $amount;
         $this->expireTimeByAdmin = $expireTimeByAdmin;
         $this->note = $note;
+        $this->checkoutId = $checkoutId;
+        $this->isShowEcho = $isShowEcho;
         $this->queue = 'process_payment_plan';
+    }
+
+    public static function forBankTransaction(string $contentBank, string $transactionId, float $amount, bool $isShowEcho = true): self
+    {
+        return new self(
+            contentBank: $contentBank,
+            transactionId: $transactionId,
+            amount: $amount,
+            isShowEcho: $isShowEcho
+        );
+    }
+
+    public static function forAdminAddPlan(int $checkoutId, Carbon $expireTimeByAdmin, ?string $note = null, ?string $transactionId = null, bool $isShowEcho = false): self
+    {
+        $transactionId = $transactionId ?? Helpers::generateTransactionId('ADMIN_ADD_PLAN');
+        return new self(
+            expireTimeByAdmin: $expireTimeByAdmin,
+            note: $note,
+            checkoutId: $checkoutId,
+            transactionId: $transactionId,
+            isShowEcho: $isShowEcho
+        );
+    }
+
+    public static function forDefaultPlanNewUser(int $checkoutId, bool $isShowEcho = false): self
+    {
+        return new self(
+            checkoutId: $checkoutId,
+            isShowEcho: $isShowEcho
+        );
     }
 
     /**
@@ -49,21 +82,22 @@ class JobProcessPaymentPlan implements ShouldQueue
         CurrencyRateService $currencyRateService,
         ChargeService $chargeService
     ): void {
-        echo "==========================================Start JobProcessPaymentPlan==========================================" . PHP_EOL;
-
-        if ($this->expireTimeByAdmin) {
-            echo "Admin thêm gói cho user" . PHP_EOL;
-        }
-
-        $isCreatedPaymentTransaction = false;
+        $this->showEcho("==========================================Start JobProcessPaymentPlan==========================================");
 
         try {
             DB::beginTransaction();
-            $planCheckout = $planCheckoutService->findByContentBank($this->contentBank);
+            $planCheckout = null;
+
+            if (!empty($this->contentBank)) {
+                $planCheckout = $planCheckoutService->findPendingByContentBank($this->contentBank);
+            } else if (!empty($this->checkoutId)) {
+                $planCheckout = $planCheckoutService->findPendingById($this->checkoutId);
+            }
 
             if (!$planCheckout) {
-                echo "Không tìm thấy thông tin checkout" . PHP_EOL;
-                echo "content_bank: " . $this->contentBank . PHP_EOL;
+                $message = "Không tìm thấy thông tin checkout cho ";
+                $message .= !empty($this->contentBank) ? "content_bank: " . $this->contentBank : "checkout_id: " . $this->checkoutId;
+                $this->showEcho($message);
                 DB::commit();
                 return;
             }
@@ -71,8 +105,8 @@ class JobProcessPaymentPlan implements ShouldQueue
             $userId = $planCheckout->user_id;
             $user = $userService->findById($userId);
             if (!$user) {
-                echo "Không tìm thấy user cần thanh toán gói" . PHP_EOL;
-                echo "user_id: " . $userId . PHP_EOL;
+                $this->showEcho("Không tìm thấy user cần thanh toán gói");
+                $this->showEcho("user_id: " . $userId);
                 DB::commit();
                 return;
             }
@@ -80,32 +114,26 @@ class JobProcessPaymentPlan implements ShouldQueue
             $planId = $planCheckout->plan_id;
             $plan = $planService->getById($planId);
             if (!$plan) {
-                echo "Không tìm thấy gói" . PHP_EOL;
-                echo "plan_id: " . $planId . PHP_EOL;
+                $this->showEcho("Không tìm thấy gói");
+                $this->showEcho("plan_id: " . $planId);
                 DB::commit();
                 return;
             }
 
-            $paymentTransaction = $paymentTransactionAdminService->create([
-                'user_id' => $userId,
-                'check_out_id' => $planCheckout->id,
-                'payment_method_id' => $planCheckout->payment_method_id,
-                'amount' => $currencyRateService->convertVNDToUSD($this->amount),
-                'amount_vnd' => $this->amount,
-                'currency' => 'VND',
-                'transaction_id' => $this->transactionId,
-                'payment_date' => Carbon::now(),
-                'creator_id' => $planCheckout->creator_id,
-                'status' => PaymentTransactions::STATUS['PENDING'],
-                'note' => $this->note,
-            ]);
+            $isAdminSetPlan = !empty($this->expireTimeByAdmin);
+            $isNotDefaultPlan = $planCheckout->type != CheckOuts::TYPE['DEFAULT'];
+            $isCreatedPaymentTransaction = false;
 
-            $isCreatedPaymentTransaction = $paymentTransaction ? true : false;
+            if ($isNotDefaultPlan) {
+                $paymentTransaction = $this->createPaymentTransaction($paymentTransactionAdminService, $currencyRateService, $userId, $planCheckout);
+                $isCreatedPaymentTransaction = $paymentTransaction ? true : false;
+            }
 
-            if (empty($this->expireTimeByAdmin) && $this->amount < $planCheckout->amount_vnd) {
-                echo "Số tiền cần thanh toán không đủ" . PHP_EOL;
-                echo "Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd . PHP_EOL;
-                echo "content_bank: " . $this->contentBank . PHP_EOL;
+            if (!$isAdminSetPlan && $isNotDefaultPlan && $this->amount < $planCheckout->amount_vnd) {
+                $this->showEcho("Số tiền cần thanh toán không đủ");
+                $this->showEcho("Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd);
+                $this->showEcho("content_bank: " . $this->contentBank);
+
                 $paymentTransactionAdminService->update($paymentTransaction, [
                     'status' => PaymentTransactions::STATUS['REJECT'],
                     'system_note' => 'Số tiền thanh toán không đủ',
@@ -116,30 +144,61 @@ class JobProcessPaymentPlan implements ShouldQueue
             }
 
             $charge = $chargeService->makePlanCharge($planCheckout, $userId, $this->expireTimeByAdmin);
-            $paymentTransactionAdminService->update($paymentTransaction, [
-                'status' => PaymentTransactions::STATUS['COMPLETE'],
-                'active_plan_date' => Carbon::now(),
-                'charge_id' => $charge->id,
-            ]);
+
+            if ($isNotDefaultPlan) {
+                $paymentTransactionAdminService->update($paymentTransaction, [
+                    'status' => PaymentTransactions::STATUS['COMPLETE'],
+                    'active_plan_date' => Carbon::now(),
+                    'charge_id' => $charge->id,
+                ]);
+            }
 
             $planCheckoutService->update($planCheckout, ['status' => CheckOuts::STATUS['COMPLETE']]);
 
-            echo "Kích hoạt gói " . $planCheckout->name . " thành công cho user_id: " . $userId . PHP_EOL;
-            echo "Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd . PHP_EOL;
-            echo "content_bank: " . $this->contentBank . PHP_EOL;
+            $this->showEcho("Kích hoạt gói " . $planCheckout->name . " thành công cho user_id: " . $userId);
+            $this->showEcho("Người tạo: " . $user->name . " - " . $user->email);
+
+            if ($this->contentBank && !$isAdminSetPlan) {
+                $this->showEcho("Số tiền đã thanh toán: " . $this->amount . " - Số tiền cần thanh toán: " . $planCheckout->amount_vnd);
+                $this->showEcho("content_bank: " . $this->contentBank);
+            }
             DB::commit();
         } catch (Throwable $th) {
             DB::rollBack();
-            echo 'Lỗi JobProcessPaymentPlan: ' . $th->getMessage() . PHP_EOL;
+            $this->showEcho('Lỗi JobProcessPaymentPlan: ' . $th->getMessage());
             throw $th;
         } finally {
-            if ($isCreatedPaymentTransaction && empty($this->expireTimeByAdmin)) {
+            if ($isCreatedPaymentTransaction && !$isAdminSetPlan) {
                 $paymentTransactionAdminService->rememberPurchaseCache([
                     'user_id' => $userId,
                     'payment_transaction_id' => $paymentTransaction->id,
                 ]);
             }
-            echo "==========================================End JobProcessPaymentPlan==========================================" . PHP_EOL;
+            $this->showEcho("==========================================End JobProcessPaymentPlan==========================================");
+        }
+    }
+
+    public function createPaymentTransaction(PaymentTransactionAdminService $paymentTransactionAdminService, CurrencyRateService $currencyRateService, $userId, CheckOuts $planCheckout)
+    {
+        return $paymentTransactionAdminService->create([
+            'user_id' => $userId,
+            'check_out_id' => $planCheckout->id,
+            'payment_method_id' => $planCheckout->payment_method_id,
+            'amount' => $currencyRateService->convertVNDToUSD($this->amount),
+            'amount_vnd' => $this->amount,
+            'currency' => 'VND',
+            'transaction_id' => $this->transactionId,
+            'payment_date' => Carbon::now(),
+            'creator_id' => $planCheckout->creator_id,
+            'status' => PaymentTransactions::STATUS['PENDING'],
+            'note' => $this->note,
+        ]);
+    }
+
+    public function showEcho($content)
+    {
+        if ($this->isShowEcho) {
+            echo $content . PHP_EOL;
         }
     }
 }

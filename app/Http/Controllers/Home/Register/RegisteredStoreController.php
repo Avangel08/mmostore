@@ -16,6 +16,7 @@ use App\Services\Home\ServerService;
 use App\Services\Home\StoreService;
 use App\Services\Home\UserService;
 use App\Services\PaymentMethodSeller\PaymentMethodSellerService;
+use App\Services\Plan\PlanService;
 use App\Services\Setting\SettingService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -33,6 +34,7 @@ class RegisteredStoreController extends Controller
     protected $tenancyService;
     protected $paymentMethodSellerService;
     protected $currencyRateSellerService;
+    protected $planService;
 
     public function __construct(
         UserService $userService,
@@ -41,7 +43,8 @@ class RegisteredStoreController extends Controller
         SettingService $settingService,
         TenancyService $tenancyService,
         PaymentMethodSellerService $paymentMethodSellerService,
-        CurrencyRateSellerService $currencyRateSellerService
+        CurrencyRateSellerService $currencyRateSellerService,
+        PlanService $planService
     )
     {
         $this->userService = $userService;
@@ -51,6 +54,7 @@ class RegisteredStoreController extends Controller
         $this->tenancyService = $tenancyService;
         $this->paymentMethodSellerService = $paymentMethodSellerService;
         $this->currencyRateSellerService = $currencyRateSellerService;
+        $this->planService = $planService;
     }
 
     public function register(): Response
@@ -107,6 +111,8 @@ class RegisteredStoreController extends Controller
                     "prefix" => $store['id']
                 ]
             ]);
+            
+            $this->planService->assignDefaultPlanToUser($user);
 
             $defaultSettings = [
                 "theme" => "theme_1",

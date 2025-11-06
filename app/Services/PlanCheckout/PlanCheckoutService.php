@@ -24,9 +24,14 @@ class PlanCheckoutService
         return $checkoutItem->update($data);
     }
 
-    public function findByContentBank($contentBank)
+    public function findPendingByContentBank($contentBank, $select = ["*"], $with = [])
     {
-        return CheckOuts::where('content_bank', $contentBank)->where('status', CheckOuts::STATUS['PENDING'])->first();
+        return CheckOuts::where('content_bank', $contentBank)->where('status', CheckOuts::STATUS['PENDING'])->select($select)->with($with)->first();
+    }
+
+    public function findPendingById($id, $select = ["*"], $with = [])
+    {
+        return CheckOuts::where('id', $id)->where('status', CheckOuts::STATUS['PENDING'])->select($select)->with($with)->first();
     }
 
     public function findExist($data)
@@ -56,13 +61,17 @@ class PlanCheckoutService
             'description' => $plan->description,
             'status' => CheckOuts::STATUS['PENDING'],
             'creator_id' => $isAdminCreate ? Auth::guard(config('guard.admin'))->id() : $user->id,
-            'content_bank' => CheckBankService::genContentBank($user->id, $plan->id, $paymentMethod->key, 8) . ($isAdminCreate ? '_ADMIN' : ''),
+            'content_bank' => null,
         ];
 
         $checkout = $this->findExist($dataInsert);
+
         if (!$checkout) {
             $checkout = CheckOuts::create($dataInsert);
-            $checkout->update(['content_bank' => CheckBankService::genContentBank($user->id, $checkout->id, $paymentMethod->key, 8) . ($isAdminCreate ? '_ADMIN' : '')]);
+        }
+
+        if (!$isAdminCreate) {
+            $checkout->update(['content_bank' => CheckBankService::genContentBank($user->id, $checkout->id, $paymentMethod->key, 8)]);
         }
 
         return $checkout;

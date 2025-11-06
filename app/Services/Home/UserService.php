@@ -54,6 +54,11 @@ class UserService
         return User::select($select)->with($relation)->whereIn('id', $ids)->get();
     }
 
+    public function findByTypes(array $types, $select = ["*"], $relation = [])
+    {
+        return User::select($select)->with($relation)->whereIn('type', $types)->get();
+    }
+
     public function getAll($select = ["*"], $relation = [], $isPaginate = false, $perPage = 10, $page = 1, $orderBy = ['id', 'DESC'], $request = null)
     {
         $query = User::select($select)->with($relation);
