@@ -88,9 +88,9 @@ const DomainConfig = ({ activeTab }: any) => {
                         </p>
                         <div className="support-message text-muted mb-3">
                             <span className="me-2">{t("Contact the admin for support with domain configuration.")}</span>
-                            <Link href="https://t.me/mmoshop_io" className="support-link fst-italic text-decoration-underline text-success" target="_blank" rel="noreferrer">
+                            <a href="https://t.me/mmoshop_io" className="support-link fst-italic text-decoration-underline text-success" target="_blank" rel="noreferrer">
                                 <i className="ri-customer-service-line"></i> {t("Get support")}
-                            </Link>
+                            </a>
                         </div>
                         <Row>
                             <Col>
