@@ -706,5 +706,7 @@
     "Purchase": "Mua hàng",
     "Deduct money": "Trừ tiền",
     "Type transaction": "Loại giao dịch",
-    "Order payment": "Thanh toán đơn hàng"
+    "Order payment": "Thanh toán đơn hàng",
+    "Contact the admin for support with domain configuration.": "Liên hệ với quản trị viên để được hỗ trợ cấu hình tên miền.",
+    "Get support": "Nhận hỗ trợ"
 }   
