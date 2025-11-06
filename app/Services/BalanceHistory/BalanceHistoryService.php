@@ -22,13 +22,25 @@ class BalanceHistoryService
             ->orderBy('date_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
+
+    public function getTypeOptions()
+    {
+        return [ 
+            BalanceHistories::TYPE['deposit'] => __('Deposit'),
+            BalanceHistories::TYPE['purchase'] => __('Order payment'),
+            BalanceHistories::TYPE['deduct_money'] => __('Deduct money'),
+        ];
+    }
+
     public function getForTable($request){
         $page = $request['page'] ?? 1;
         $perPage = $request['perPage'] ?? 10;
 
         return BalanceHistories::with('customer:_id,name')
             ->with('paymentMethod:id,name')
-            ->filterSearch($request)
+            ->filterTransactionId($request)
+            ->filterCustomerName($request)
+            ->filterType($request)
             ->filterDateAt($request)   
             ->orderBy('date_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
