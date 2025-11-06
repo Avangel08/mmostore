@@ -2,10 +2,16 @@
 
 namespace App\Services\Plan;
 
+use App\Jobs\Systems\JobProcessPaymentPlan;
 use App\Models\MySQL\Plans;
 use App\Models\MySQL\User;
 use App\Services\Home\UserService;
+use App\Services\PaymentMethod\PaymentMethodService;
+use App\Services\PlanCheckout\PlanCheckoutService;
 use Carbon\Carbon;
+use DB;
+use Exception;
+use Log;
 
 /**
  * Class PlanService
@@ -166,7 +172,7 @@ class PlanService
         $paginatedResults = $query->orderBy('price', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
 
-       $listPlanOptions = $paginatedResults->map(
+        $listPlanOptions = $paginatedResults->map(
             fn($item) => [
                 'value' => $item->id,
                 'label' => $item->name,
@@ -180,5 +186,52 @@ class PlanService
             'results' => $listPlanOptions,
             'has_more' => $paginatedResults->hasMorePages(),
         ];
+    }
+
+    public function assignDefaultPlanToUser(User $user)
+    {
+        try {
+            DB::beginTransaction();
+            $paymentMethodService = app(PaymentMethodService::class);
+            $planCheckoutService = app(PlanCheckoutService::class);
+            $defaultPlan = $this->getDefaultPlan();
+
+            if (!$defaultPlan) {
+                $defaultPlan = $this->createDefaultPlanIfNotExist();
+            }
+
+            if (!$defaultPlan) {
+                throw new Exception('Default plan not found. Please create a default plan first.');
+            }
+
+            $paymentMethod = $paymentMethodService->findNoBankMethod();
+
+            if (!$paymentMethod) {
+                throw new Exception('Payment method no_bank not found.');
+            }
+
+            $planCheckout = $planCheckoutService->createCheckout(
+                $user,
+                $defaultPlan,
+                $paymentMethod,
+            );
+
+            if (!$planCheckout) {
+                throw new Exception('Failed to create checkout for user ID: ' . $user->id);
+            }
+
+            dispatch_sync(JobProcessPaymentPlan::forDefaultPlanNewUser(checkoutId: $planCheckout->id));
+            DB::commit();
+            return true;
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::error("Error in assignDefaultPlanToUser", [
+                "exception" => $th,
+                'user_id' => $user?->id,
+                'user_name' => $user?->name,
+                'email' => $user?->email
+            ]);
+            return false;
+        }
     }
 }
