@@ -201,7 +201,7 @@ class JobProcessPurchase implements ShouldQueue
                         'before' => $deductResult['before'] ?? null,
                         'after' => $deductResult['after'] ?? null,
                         'description' => "{$subProduct->name}, {$this->quantity}",
-                        'date_at' => now(),
+                        'date_at' => now()->toDateTimeString(),
                         'transaction' => $order->order_number ?? 'PURCHASE_' . time(),
                         'gate_way' => $gateWay,
                     ]);
