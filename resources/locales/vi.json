@@ -890,5 +890,7 @@
     "PAID": "Đã thanh toán",
     "FAILED": "Lỗi",
     "COMPLETED": "Thành công",
-    "No data": "Không có dữ liệu"
-}
+    "No data": "Không có dữ liệu",
+    "Contact the admin for support with domain configuration.": "Liên hệ với quản trị viên để được hỗ trợ cấu hình tên miền.",
+    "Get support": "Nhận hỗ trợ"
+}   
