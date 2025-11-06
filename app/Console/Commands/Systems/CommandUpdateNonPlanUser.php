@@ -18,7 +18,10 @@ class CommandUpdateNonPlanUser extends Command
      *
      * @var string
      */
-    protected $signature = 'systems:update-non-plan-user';
+    protected $signature = 'systems:update-non-plan-user 
+                            {--save : Actually save changes to database (dry-run by default, no changes saved)}
+                            {--user-id= : Process only specific user ID}
+                            {--max-records= : Maximum number of records to process}';
 
     /**
      * The console command description.
@@ -28,6 +31,14 @@ class CommandUpdateNonPlanUser extends Command
     protected $description = 'Assign default plan to seller users if no plan exists';
 
     protected $logFile;
+    protected $statistics = [
+        'total_found' => 0,
+        'processed' => 0,
+        'successful' => 0,
+        'failed' => 0,
+        'skipped' => 0,
+        'mode' => 'dry-run',
+    ];
 
     /**
      * Execute the console command.
@@ -38,6 +49,18 @@ class CommandUpdateNonPlanUser extends Command
         PlanCheckoutService $planCheckoutService
     ) {
         $this->setupLogFile();
+
+        $isDryRun = !$this->option('save');
+        $specificUserId = $this->option('user-id');
+        $maxRecords = $this->option('max-records') ? (int) $this->option('max-records') : null;
+
+        $this->statistics['mode'] = $isDryRun ? 'dry-run' : 'save';
+
+        if ($isDryRun) {
+            $this->logInfo('DRY RUN MODE - No changes will be saved to database. Use --save to actually save changes.');
+        } else {
+            $this->logInfo('SAVE MODE - Changes will be saved to the database.');
+        }
 
         $this->logInfo('Starting to assign default plans to seller users without any plan...');
 
@@ -62,58 +85,86 @@ class CommandUpdateNonPlanUser extends Command
                 return Command::FAILURE;
             }
 
-            $totalUsers = User::where('type', User::TYPE['SELLER'])
-                ->whereDoesntHave('currentPlan')
-                ->count();
+            $query = User::where('type', User::TYPE['SELLER'])
+                ->whereDoesntHave('currentPlan');
+
+            if ($specificUserId) {
+                $query->where('id', $specificUserId);
+            }
+
+            if ($maxRecords) {
+                $query->limit($maxRecords);
+            }
+
+            $totalUsers = $query->count();
+            $this->statistics['total_found'] = $totalUsers;
 
             if ($totalUsers === 0) {
                 $this->logInfo('No seller users found without a plan.');
+                $this->showStatistics();
                 return Command::SUCCESS;
             }
 
             $this->logInfo("Found {$totalUsers} seller(s) without a plan.");
 
-            $successCount = 0;
-            $failureCount = 0;
             $chunkSize = 100;
 
             $progressBar = $this->output->createProgressBar($totalUsers);
             $progressBar->start();
 
-            User::where('type', User::TYPE['SELLER'])
-                ->whereDoesntHave('currentPlan')
-                ->chunkById($chunkSize, function ($users) use ($planCheckoutService, $defaultPlan, $paymentMethod, &$successCount, &$failureCount, $progressBar) {
+            // Rebuild query for chunking
+            $chunkQuery = User::where('type', User::TYPE['SELLER'])
+                ->whereDoesntHave('currentPlan');
+
+            if ($specificUserId) {
+                $chunkQuery->where('id', $specificUserId);
+            }
+
+            if ($maxRecords) {
+                $chunkQuery->limit($maxRecords);
+            }
+
+            $chunkQuery->chunkById($chunkSize, function ($users) use ($planCheckoutService, $defaultPlan, $paymentMethod, $progressBar, $isDryRun) {
                     foreach ($users as $user) {
+                        $this->statistics['processed']++;
+                        
                         try {
-                            DB::beginTransaction();
+                            if ($isDryRun) {
+                                $this->logInfo(" [DRY RUN] Would assign default plan to user ID: {$user->id} | Name: {$user->name} | Email: {$user->email}");
+                                $this->statistics['successful']++;
+                            } else {
+                                DB::beginTransaction();
 
-                            // Create checkout for this user
-                            $planCheckout = $planCheckoutService->createCheckout(
-                                $user,
-                                $defaultPlan,
-                                $paymentMethod,
-                            );
+                                // Create checkout for this user
+                                $planCheckout = $planCheckoutService->createCheckout(
+                                    $user,
+                                    $defaultPlan,
+                                    $paymentMethod,
+                                );
 
-                            if (!$planCheckout) {
-                                $message = "Failed to create checkout for user ID: {$user->id} - {$user->name}";
-                                $this->logWarn($message);
-                                $failureCount++;
-                                DB::rollBack();
-                                $progressBar->display();
-                                $progressBar->advance();
-                                continue;
+                                if (!$planCheckout) {
+                                    $message = "Failed to create checkout for user ID: {$user->id} - {$user->name}";
+                                    $this->logWarn($message);
+                                    $this->statistics['failed']++;
+                                    DB::rollBack();
+                                    $progressBar->display();
+                                    $progressBar->advance();
+                                    continue;
+                                }
+
+                                dispatch_sync(JobProcessPaymentPlan::forDefaultPlanNewUser(checkoutId: $planCheckout->id));
+
+                                $this->logInfo("Successfully assigned default plan to user ID: {$user->id} | Name: {$user->name} | Email: {$user->email}");
+                                $this->statistics['successful']++;
+                                DB::commit();
                             }
-
-                            dispatch_sync(JobProcessPaymentPlan::forDefaultPlanNewUser(checkoutId: $planCheckout->id));
-
-                            $this->logInfo(" Successfully assigned default plan to user ID: {$user->id} | Name: {$user->name} | Email: {$user->email}");
-                            $successCount++;
-                            DB::commit();
                         } catch (Throwable $th) {
-                            DB::rollBack();
+                            if (!$isDryRun) {
+                                DB::rollBack();
+                            }
                             $this->logError("Error processing user ID: {$user->id} - {$user->name}");
                             $this->logError("Error: {$th->getMessage()}");
-                            $failureCount++;
+                            $this->statistics['failed']++;
                         }
 
                         $progressBar->display();
@@ -125,18 +176,42 @@ class CommandUpdateNonPlanUser extends Command
             $this->newLine(2);
 
             $this->logInfo("Process completed!");
-            $this->logInfo("Successfully assigned default plan to {$successCount} user(s).");
+            $this->showStatistics();
 
-            if ($failureCount > 0) {
-                $this->logWarn("Failed to assign plan to {$failureCount} user(s).");
-            }
-
-            return Command::SUCCESS;
+            return $this->statistics['failed'] > 0 ? Command::FAILURE : Command::SUCCESS;
         } catch (Throwable $th) {
             $this->logError('An error occurred: ' . $th->getMessage());
             $this->logError('Stack trace: ' . $th->getTraceAsString());
+            $this->showStatistics();
             return Command::FAILURE;
         }
+    }
+
+    protected function showStatistics()
+    {
+        $this->newLine();
+        $this->logInfo('=== EXECUTION STATISTICS ===');
+        $this->logInfo("Execution mode: " . strtoupper($this->statistics['mode']));
+        $this->logInfo("Total users found: {$this->statistics['total_found']}");
+        $this->logInfo("Users processed: {$this->statistics['processed']}");
+        $this->logInfo("Successful operations: {$this->statistics['successful']}");
+        $this->logInfo("Failed operations: {$this->statistics['failed']}");
+        $this->logInfo("Skipped operations: {$this->statistics['skipped']}");
+        
+        if ($this->statistics['processed'] > 0) {
+            $successRate = round(($this->statistics['successful'] / $this->statistics['processed']) * 100, 2);
+            $this->logInfo("Success rate: {$successRate}%");
+        }
+        
+        if ($this->statistics['mode'] === 'dry-run') {
+            $this->logInfo("* This was a DRY RUN - no actual changes were made to the database.");
+        }
+
+        if ($this->statistics['mode'] === 'save') {
+            $this->logInfo("* Changes were SAVED to the database.");
+        }
+        
+        $this->logInfo('============================');
     }
 
     protected function setupLogFile()
