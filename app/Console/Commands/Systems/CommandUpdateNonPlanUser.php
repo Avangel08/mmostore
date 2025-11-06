@@ -4,7 +4,6 @@ namespace App\Console\Commands\Systems;
 
 use App\Jobs\Systems\JobProcessPaymentPlan;
 use App\Models\MySQL\User;
-use App\Services\Home\UserService;
 use App\Services\PaymentMethod\PaymentMethodService;
 use App\Services\Plan\PlanService;
 use App\Services\PlanCheckout\PlanCheckoutService;
@@ -12,7 +11,7 @@ use Illuminate\Console\Command;
 use DB;
 use Throwable;
 
-class UpdateNonPlanUser extends Command
+class CommandUpdateNonPlanUser extends Command
 {
     /**
      * The name and signature of the console command.
@@ -100,13 +99,14 @@ class UpdateNonPlanUser extends Command
                                 $this->logWarn($message);
                                 $failureCount++;
                                 DB::rollBack();
+                                $progressBar->display();
                                 $progressBar->advance();
                                 continue;
                             }
 
                             dispatch_sync(JobProcessPaymentPlan::forDefaultPlanNewUser(checkoutId: $planCheckout->id));
 
-                            $this->logInfo("Successfully assigned plan to user ID: {$user->id} - {$user->name}");
+                            $this->logInfo(" Successfully assigned default plan to user ID: {$user->id} | Name: {$user->name} | Email: {$user->email}");
                             $successCount++;
                             DB::commit();
                         } catch (Throwable $th) {
@@ -116,6 +116,7 @@ class UpdateNonPlanUser extends Command
                             $failureCount++;
                         }
 
+                        $progressBar->display();
                         $progressBar->advance();
                     }
                 });
