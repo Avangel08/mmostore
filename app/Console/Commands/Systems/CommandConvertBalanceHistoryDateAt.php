@@ -17,18 +17,20 @@ class CommandConvertBalanceHistoryDateAt extends Command
      *
      * @var string
      */
-    protected $signature = 'systems:convert-balance-history-dates {--save : Save changes to database} {--chunk-size=1000 : Number of records to process per chunk}';
+    protected $signature = 'systems:convert-balance-history-dates {--save : Save changes to database} {--chunk-size=1000 : Number of records to process per chunk} {--max-records= : Maximum total records to process across all stores} {--store-id= : Process only specific store ID}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Chuyển đổi trường date_at trong BalanceHistories từ các kiểu dữ liệu khác nhau (string/ISODate) sang định dạng chuỗi';
+    protected $description = 'Chuyển đổi trường date_at trong BalanceHistories từ các kiểu dữ liệu khác nhau (string/ISODate) sang định dạng chuỗi. Hỗ trợ giới hạn số lượng và chọn store cụ thể.';
 
     protected $logFile;
     protected $saveToDb;
     protected $chunkSize;
+    protected $maxRecords;
+    protected $storeId;
 
     /**
      * Execute the console command.
@@ -38,6 +40,8 @@ class CommandConvertBalanceHistoryDateAt extends Command
         $this->setupLogFile();
         $this->saveToDb = $this->option('save');
         $this->chunkSize = (int) $this->option('chunk-size');
+        $this->maxRecords = $this->option('max-records') ? (int) $this->option('max-records') : null;
+        $this->storeId = $this->option('store-id');
         $this->info("============= LỆNH CHUYỂN ĐỔI NGÀY THÁNG LỊCH SỬ SỐ DƯ =============");
 
         if ($this->saveToDb) {
@@ -48,18 +52,33 @@ class CommandConvertBalanceHistoryDateAt extends Command
 
         $this->logInfo("🚀 Bắt đầu chuyển đổi trường date_at trong BalanceHistories...");
         $this->logInfo("📦 Kích thước chunk: {$this->chunkSize} bản ghi mỗi lô");
+        
+        if ($this->maxRecords) {
+            $this->logInfo("🎯 Giới hạn tối đa: {$this->maxRecords} bản ghi sẽ được xử lý");
+        }
+        
+        if ($this->storeId) {
+            $this->logInfo("🏪 Chỉ xử lý Store ID: {$this->storeId}");
+        }
 
         $totalStores = 0;
         $totalConverted = 0;
         $totalErrors = 0;
 
-        $listStore = Stores::where("status", Stores::STATUS['ACTIVE'])->cursor();
+        // Build store query based on parameters
+        $storeQuery = Stores::where("status", Stores::STATUS['ACTIVE']);
+        if ($this->storeId) {
+            $storeQuery->where('id', $this->storeId);
+        }
+        
+        $listStore = $storeQuery->cursor();
         $index = 0;
         foreach ($listStore as $store) {
             try {
                 $this->newLine();
                 $this->logInfo((++$index) . ". Đang xử lý Store ID: {$store->id} ");
                 $this->logInfo("Tên Store: {$store->name}");
+                $this->logInfo("Domain: " . json_encode($store->domain));
 
                 $connect = $tenancyService->buildConnectionFromStore($store);
                 $tenancyService->applyConnection($connect, true);
@@ -74,12 +93,19 @@ class CommandConvertBalanceHistoryDateAt extends Command
                 if ($totalRecords > 0) {
                     $this->logInfo("Bắt đầu quá trình chuyển đổi...");
 
-                    BalanceHistories::chunkById($this->chunkSize, function ($records) use (&$storeConverted, &$storeErrors) {
+                    BalanceHistories::chunkById($this->chunkSize, function ($records) use (&$storeConverted, &$storeErrors, &$totalConverted) {
                         foreach ($records as $record) {
+                            // Check if we've reached the max records limit BEFORE processing
+                            if ($this->maxRecords && $totalConverted >= $this->maxRecords) {
+                                $this->logInfo("🛑 Đã đạt giới hạn tối đa {$this->maxRecords} bản ghi. Dừng xử lý.");
+                                return false; // Stop chunk processing
+                            }
+                            
                             try {
                                 $converted = $this->convertDateField($record);
                                 if ($converted) {
                                     $storeConverted++;
+                                    $totalConverted++; // Update total immediately after conversion
                                     if ($this->saveToDb) {
                                         $this->logInfo("✅ Đã cập nhật bản ghi {$record->_id} vào cơ sở dữ liệu");
                                     }
@@ -88,7 +114,6 @@ class CommandConvertBalanceHistoryDateAt extends Command
                                 $this->logError("Lỗi khi xử lý bản ghi {$record->_id}: {$th->getMessage()}");
                                 $storeErrors++;
                             }
-
                         }
                     });
                 } else {
@@ -102,8 +127,14 @@ class CommandConvertBalanceHistoryDateAt extends Command
                 }
 
                 $totalStores++;
-                $totalConverted += $storeConverted;
+                // Note: totalConverted is now updated inside the chunk processing
                 $totalErrors += $storeErrors;
+                
+                // Check if we've reached the max records limit
+                if ($this->maxRecords && $totalConverted >= $this->maxRecords) {
+                    $this->logInfo("🛑 Đã đạt giới hạn tối đa {$this->maxRecords} bản ghi. Dừng xử lý tất cả stores.");
+                    break;
+                }
             } catch (Throwable $th) {
                 $this->logError("THẤT BẠI khi xử lý store {$store->id}: {$th->getMessage()}");
                 $totalErrors++;
