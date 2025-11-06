@@ -700,5 +700,7 @@
     "The menu URL is required.": "Vui lòng nhập đường dẫn menu.",
     "Each menu value must be unique.": "Mỗi đường dẫn menu phải là duy nhất.",
     "The menu status is required.": "Vui lòng chọn trạng thái menu.",
-    "The menu status must be Active or Inactive.": "Trạng thái menu phải là Hoạt động hoặc Không hoạt động."
+    "The menu status must be Active or Inactive.": "Trạng thái menu phải là Hoạt động hoặc Không hoạt động.",
+    "Contact the admin for support with domain configuration.": "Liên hệ với quản trị viên để được hỗ trợ cấu hình tên miền.",
+    "Get support": "Nhận hỗ trợ"
 }   
