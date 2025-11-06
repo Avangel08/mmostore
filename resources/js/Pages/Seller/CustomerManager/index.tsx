@@ -23,8 +23,8 @@ const CustomerManager = () => {
     page: Number(p.page || 1),
     perPage: Number(p.perPage || 10),
     search: p.search || "",
-    start_time: p.createdDateStart || "",
-    end_time: p.createdDateEnd || "",
+    start_time: p.createdDateStart || p.start_time || "",
+    end_time: p.createdDateEnd || p.end_time || "",
   });
 
   const fetchData = (
