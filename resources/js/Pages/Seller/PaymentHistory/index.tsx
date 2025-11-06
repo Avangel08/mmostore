@@ -5,29 +5,33 @@ import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import { useTranslation } from "react-i18next";
 import { ToastContainer } from "react-toastify";
-import TableCategory from "./TableCategory";
+import TablePaymentHistory from "./TablePaymentHistory";
 import { useQueryParams } from "../../../hooks/useQueryParam";
 import Filter from "./Filter";
 import axios from "axios";
 
 const PaymentHistory = () => {
   const { t } = useTranslation();
-  const { paymentHistories } = usePage().props;
+  const { paymentHistories, typeOptions } = usePage().props;
   const params = useQueryParams();
   
   // Store current filters in state
   const [currentFilters, setCurrentFilters] = useState<any>({
-    name: params?.name || "",
+    transactionId: params?.transactionId || "",
+    customerName: params?.customerName || "",
     createdDateStart: params?.createdDateStart || "",
     createdDateEnd: params?.createdDateEnd || "",
+    type: params?.type || "",
   });
   
   const buildQuery = (p: any = {}) => ({
     page: Number(p.page || 1),
     perPage: Number(p.perPage || 10),
-    search: p.name || "",
-    start_time: p.createdDateStart || "",
-    end_time: p.createdDateEnd || "",
+    transaction_id: p.transactionId || p.transaction_id || "",
+    customer_name: p.customerName || p.customer_name || "",
+    start_time: p.createdDateStart || p.start_time || "",
+    end_time: p.createdDateEnd || p.end_time || "",
+    type: p.type || "",
   });
 
   const fetchData = (
@@ -74,7 +78,11 @@ const PaymentHistory = () => {
             <Col xs={12}>
               <Card>
                 <Card.Body>
-                  <Filter onFilter={handleFilter} currentFilters={currentFilters} />
+                  <Filter 
+                    onFilter={handleFilter} 
+                    currentFilters={currentFilters}
+                    typeOptions={typeOptions || []}
+                  />
                   <Row style={{ marginBottom: "15px" }}>
                     <Col>
                       <div className="d-flex gap-2">
@@ -84,9 +92,10 @@ const PaymentHistory = () => {
                   </Row>
                   <Row>
                     <Col>
-                      <TableCategory
+                      <TablePaymentHistory
                         data={paymentHistories || []}
                         onReloadTable={handlePagination}
+                        typeOptions={typeOptions || []}
                       />
                     </Col>
                   </Row>

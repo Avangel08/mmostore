@@ -2,27 +2,31 @@ import React, { useState, useRef, useEffect } from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import Flatpickr from "react-flatpickr";
+import Select from "react-select";
 import moment from "moment";
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
 import { english } from "flatpickr/dist/l10n/default.js";
 import { useQueryParams } from "../../../hooks/useQueryParam";
 
-interface CategoryFilterProps {
+interface PaymentHistoryFilterProps {
   onFilter: (
     currentPage: number,
     perPage: number,
-    filters: CategoryFilters
+    filters: PaymentHistoryFilters
   ) => void;
-  currentFilters?: CategoryFilters;
+  currentFilters?: PaymentHistoryFilters;
+  typeOptions?: Record<string, string> | Array<{ value: string; label: string }>;
 }
 
-interface CategoryFilters {
-  name: string;
+interface PaymentHistoryFilters {
+  transactionId: string;
+  customerName: string;
   createdDateStart: string;
   createdDateEnd: string;
+  type: string;
 }
 
-const Filter = ({ onFilter, currentFilters }: CategoryFilterProps) => {
+const Filter = ({ onFilter, currentFilters, typeOptions = [] }: PaymentHistoryFilterProps) => {
   const { t, i18n } = useTranslation();
 
   const flatpickrRef = useRef<any>(null);
@@ -33,22 +37,52 @@ const Filter = ({ onFilter, currentFilters }: CategoryFilterProps) => {
 
   const perPage = paramsUrl?.perPage ?? "10";
 
-  const getInitialFilters = (): CategoryFilters => {
+  const formattedTypeOptions = React.useMemo(() => {
+    const allOption = { value: "", label: t("All") };
+    if (Array.isArray(typeOptions)) {
+      return [allOption, ...typeOptions];
+    }
+    const mappedOptions = Object.entries(typeOptions).map(([key, value]) => ({
+      value: key,
+      label: value
+    }));
+    return [allOption, ...mappedOptions];
+  }, [typeOptions, t]);
+
+  const getInitialFilters = (): PaymentHistoryFilters => {
     return {
-      name: currentFilters?.name ?? paramsUrl?.name ?? "",
-      createdDateStart: currentFilters?.createdDateStart ?? paramsUrl?.createdDateStart ?? "",
-      createdDateEnd: currentFilters?.createdDateEnd ?? paramsUrl?.createdDateEnd ?? "",
+      transactionId: currentFilters?.transactionId ?? paramsUrl?.transaction_id ?? "",
+      customerName: currentFilters?.customerName ?? paramsUrl?.customer_name ?? "",
+      createdDateStart: currentFilters?.createdDateStart ?? paramsUrl?.start_time ?? "",
+      createdDateEnd: currentFilters?.createdDateEnd ?? paramsUrl?.end_time ?? "",
+      type: currentFilters?.type ?? paramsUrl?.type ?? "",
     };
   };
 
-  const [filters, setFilters] = useState<CategoryFilters>(getInitialFilters());
+  const [filters, setFilters] = useState<PaymentHistoryFilters>(getInitialFilters());
   
-  // Update filters when currentFilters prop changes
+  const [selectedType, setSelectedType] = useState(() => {
+    const typeValue = paramsUrl?.type ?? "";
+    return formattedTypeOptions.find(option => option.value === typeValue) || formattedTypeOptions[0];
+  });
+  
   useEffect(() => {
     if (currentFilters) {
       setFilters(currentFilters);
     }
   }, [currentFilters]);
+
+  useEffect(() => {
+    const urlType = paramsUrl?.type;
+    if (urlType !== null && formattedTypeOptions.length > 0) {
+      const matchingType = formattedTypeOptions.find(
+        (option) => option.value.toString() === urlType
+      );
+      if (matchingType) {
+        setSelectedType(matchingType);
+      }
+    }
+  }, [formattedTypeOptions]);
 
   const getFlatpickrLocale = () => {
     switch (i18n.language) {
@@ -59,7 +93,7 @@ const Filter = ({ onFilter, currentFilters }: CategoryFilterProps) => {
     }
   };
 
-  const handleInputChange = (field: keyof CategoryFilters, value: string) => {
+  const handleInputChange = (field: keyof PaymentHistoryFilters, value: string) => {
     setFilters((prev) => ({
       ...prev,
       [field]: value,
@@ -76,25 +110,34 @@ const Filter = ({ onFilter, currentFilters }: CategoryFilterProps) => {
     }));
   };
 
+  const handleTypeChange = (selected: any) => {
+    setSelectedType(selected);
+    handleInputChange("type", selected.value);
+  };
+
   const handleFilter = () => {
     onFilter(1, Number(perPage), filters);
   };
 
   const hasActiveFilters = () => {
     return Boolean(
-      (filters.name && filters.name.trim() !== "") ||
+      (filters.transactionId && filters.transactionId.trim() !== "") ||
+      (filters.customerName && filters.customerName.trim() !== "") ||
       (filters.createdDateStart && filters.createdDateStart !== "") ||
-      (filters.createdDateEnd && filters.createdDateEnd !== "")
+      (filters.createdDateEnd && filters.createdDateEnd !== "") ||
+      (filters.type && filters.type !== "")
     );
   };
-
   const handleReset = () => {
     const resetFilters = {
-      name: "",
+      transactionId: "",
+      customerName: "",
       createdDateStart: "",
-      createdDateEnd: ""
+      createdDateEnd: "",
+      type: ""
     };
     setFilters(resetFilters);
+    setSelectedType(formattedTypeOptions[0]);
 
     if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
       flatpickrRef.current.flatpickr.clear();
@@ -141,13 +184,41 @@ const Filter = ({ onFilter, currentFilters }: CategoryFilterProps) => {
         <div className="p-3 border rounded bg-light">
           <Row className="g-3">
             <Col md={3}>
-              <Form.Label htmlFor="filter-name">{t("Name")}</Form.Label>
+              <Form.Label htmlFor="filter-transaction-id">{t("Transaction ID")}</Form.Label>
               <Form.Control
                 type="text"
-                id="filter-name"
-                placeholder={t("Enter name or transaction")}
-                value={filters.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
+                id="filter-transaction-id"
+                placeholder={t("Enter transaction ID")}
+                value={filters.transactionId}
+                onChange={(e) => handleInputChange("transactionId", e.target.value)}
+              />
+            </Col>
+
+            <Col md={3}>
+              <Form.Label htmlFor="filter-customer-name">{t("Customer Name")}</Form.Label>
+              <Form.Control
+                type="text"
+                id="filter-customer-name"
+                placeholder={t("Enter customer name")}
+                value={filters.customerName}
+                onChange={(e) => handleInputChange("customerName", e.target.value)}
+              />
+            </Col>
+            
+            <Col md={3}>
+              <Form.Label htmlFor="filter-type">{t("Type")}</Form.Label>
+              <Select
+                id="filter-type"
+                value={selectedType}
+                onChange={handleTypeChange}
+                options={formattedTypeOptions}
+                classNamePrefix="select"
+                isSearchable={true}
+                placeholder={t("Select type")}
+                menuPortalTarget={document.body}
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
               />
             </Col>
 
@@ -178,7 +249,9 @@ const Filter = ({ onFilter, currentFilters }: CategoryFilterProps) => {
                 onChange={handleDateChange}
               />
             </Col>
-            <Col md={3} className="d-flex align-items-end">
+          </Row>
+          <Row className="g-3 mt-1">
+            <Col md={12} className="d-flex justify-content-start">
               <Button variant="primary" onClick={handleFilter}>
                 <i className="ri-search-line align-bottom me-1"></i>
                 {t("Filter")}
