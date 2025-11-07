@@ -84,7 +84,7 @@ const Features = () => {
                         <Col className="col-sm">
                             <div>
                                 <h4 className="text-white mb-0 fw-semibold">
-                                    {t("Grab your own store now!")}
+                                    {t("Grab your own store now")}
                                 </h4>
                             </div>
                         </Col>
