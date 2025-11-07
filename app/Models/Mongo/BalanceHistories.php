@@ -44,6 +44,16 @@ class BalanceHistories extends Model
     {
         return $this->belongsTo(PaymentMethodSeller::class, 'payment_method_id');
     }
+
+    public function scopeFilterSearch($query, $request){
+        if(isset($request['search']) && $request['search'] != ''){
+            $query->whereHas('customer', function($q) use ($request){
+                $q->where('name', 'like', '%'.$request['search'].'%');
+            })->orWhere('transaction', 'like', '%'.$request['search'].'%');
+        }
+
+        return $query;
+    }
     
     public function scopeFilterTransactionId($query, $request){
         if(isset($request['transaction_id']) && $request['transaction_id'] != ''){
