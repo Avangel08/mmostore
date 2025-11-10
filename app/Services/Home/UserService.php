@@ -3,8 +3,7 @@ namespace App\Services\Home;
 
 use App\Models\MySQL\User;
 use App\Models\MySQL\Stores;
-use DB;
-
+use Illuminate\Support\Facades\DB;
 
 class UserService
 {
@@ -56,9 +55,16 @@ class UserService
 
     public function getAll($select = ["*"], $relation = [], $isPaginate = false, $perPage = 10, $page = 1, $orderBy = ['id', 'DESC'], $request = null)
     {
-        $query = User::select($select)->with($relation);
+        $selectColumns = $select;
 
-        // Apply filters if request is provided
+        if (count($selectColumns) === 1 && $selectColumns[0] === '*') {
+            $selectColumns = ['users.*'];
+        }
+
+        $query = User::select($selectColumns)
+            ->with($relation)
+            ->withReportAccountSeller();
+
         if ($request) {
             $query->filterName($request)
                   ->filterEmail($request)
@@ -68,10 +74,17 @@ class UserService
                   ->filterStoreVerifyStatus($request);
         }
 
-        if ($isPaginate) {
-            return $query->orderBy(...$orderBy)->paginate($perPage, ['*'], 'page', $page);
+        $orderColumn = $orderBy[0] ?? 'id';
+        $orderDirection = $orderBy[1] ?? 'DESC';
+
+        if (!str_contains($orderColumn, '.')) {
+            $orderColumn = 'users.' . $orderColumn;
         }
 
-        return $query->orderBy(...$orderBy)->get();
+        if ($isPaginate) {
+            return $query->orderBy($orderColumn, $orderDirection)->paginate($perPage, ['*'], 'page', $page);
+        }
+
+        return $query->orderBy($orderColumn, $orderDirection)->get();
     }
 }

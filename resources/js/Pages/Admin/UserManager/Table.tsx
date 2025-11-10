@@ -174,6 +174,24 @@ const Table = ({ data, onReloadTable, onEdit, onSelectionChange }: {
                 },
             },
             {
+                header: t("Live"),
+                accessorKey: "live_count",
+                enableColumnFilter: false,
+                cell: (cell: any) => {
+                    const value = cell.getValue() ?? 0;
+                    return <span>{value}</span>;
+                },
+            },
+            {
+                header: t("Sold"),
+                accessorKey: "sold_count",
+                enableColumnFilter: false,
+                cell: (cell: any) => {
+                    const value = cell.getValue() ?? 0;
+                    return <span>{value}</span>;
+                },
+            },
+            {
                 header: t("Created date"),
                 accessorKey: "created_at",
                 enableColumnFilter: false,

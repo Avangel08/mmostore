@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\Systems\AggregateAccountStatistics;
 use App\Console\Commands\Systems\CheckBank;
 use App\Console\Commands\Systems\CheckBankSeller;
 use App\Console\Commands\CleanupStaleReservations;
@@ -41,5 +42,11 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping(10)
             ->runInBackground()
             ->appendOutputTo($pathLogs . '/check_bank_seller.txt');
+
+        $schedule->command(AggregateAccountStatistics::class)
+            ->everyThirtyMinutes()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo($pathLogs . '/aggregate_account_statistics.txt');
     }
 }
