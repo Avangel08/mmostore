@@ -22,13 +22,13 @@ class DashboardService
         // Get current period data
         $totalEarnings = $this->getTotalEarnings($startDate, $endDate);
         $totalOrders = $this->getTotalOrders($startDate, $endDate);
-        $totalCustomers = $this->getTotalCustomers($startDate, $endDate);
+        $totalDeposits = $this->getTotalDeposits($startDate, $endDate);
         $newCustomers = $this->getNewCustomers($startDate, $endDate);
 
         // Get previous period data for comparison
         $previousEarnings = $this->getTotalEarnings($previousStartDate, $previousEndDate);
         $previousOrders = $this->getTotalOrders($previousStartDate, $previousEndDate);
-        $previousCustomers = $this->getTotalCustomers($previousStartDate, $previousEndDate);
+        $previousDeposits = $this->getTotalDeposits($previousStartDate, $previousEndDate);
         $previousNewCustomers = $this->getNewCustomers($previousStartDate, $previousEndDate);
 
         return [
@@ -42,10 +42,10 @@ class DashboardService
                 'previous' => $previousOrders,
                 'percentage_change' => $this->calculatePercentageChange($totalOrders, $previousOrders)
             ],
-            'total_customers' => [
-                'value' => $totalCustomers,
-                'previous' => $previousCustomers,
-                'percentage_change' => $this->calculatePercentageChange($totalCustomers, $previousCustomers)
+            'total_deposits' => [
+                'value' => $totalDeposits,
+                'previous' => $previousDeposits,
+                'percentage_change' => $this->calculatePercentageChange($totalDeposits, $previousDeposits)
             ],
             'new_customers' => [
                 'value' => $newCustomers,
@@ -75,13 +75,26 @@ class DashboardService
     }
 
     /**
-     * Get total amount of customer deposits
+     * Get total amount of customer deposits (type = 1)
+     * Note: date_at is stored as string in MongoDB
      */
-    private function getTotalCustomers(Carbon $startDate, Carbon $endDate): float
+    private function getTotalDeposits(Carbon $startDate, Carbon $endDate): float
     {
+        $startDateString = $startDate->copy()->startOfDay()->toDateTimeString();
+        $endDateString = $endDate->copy()->endOfDay()->toDateTimeString();
+        
         return BalanceHistories::where('type', BalanceHistories::TYPE['deposit'])
-            ->whereBetween('date_at', [$startDate, $endDate->endOfDay()])
-            ->sum('amount');
+            ->where('date_at', '>=', $startDateString)
+            ->where('date_at', '<=', $endDateString)
+            ->sum('amount_vnd');
+    }
+
+    /**
+     * Get total customers count
+     */
+    private function getTotalCustomers(Carbon $startDate, Carbon $endDate): int
+    {
+        return Customers::whereBetween('created_at', [$startDate, $endDate->endOfDay()])->count();
     }
 
     /**
@@ -110,36 +123,36 @@ class DashboardService
      */
     public function getRevenueMetrics(Carbon $startDate, Carbon $endDate): array
     {
-        // Previous period for comparison
         $daysDiff = $startDate->diffInDays($endDate);
         $previousStartDate = $startDate->copy()->subDays($daysDiff + 1);
         $previousEndDate = $startDate->copy()->subDay();
 
-        // Current period
         $currentOrders = Orders::whereBetween('created_at', [$startDate, $endDate->endOfDay()])->count();
+
         $currentEarnings = Orders::where('status', Orders::STATUS['COMPLETED'])
             ->where('payment_status', Orders::PAYMENT_STATUS['PAID'])
             ->whereBetween('created_at', [$startDate, $endDate->endOfDay()])
             ->sum('total_price');
         
-        // Get refunded orders count (assuming refunded status in orders)
         $currentRefunds = Orders::where('payment_status', Orders::PAYMENT_STATUS['REFUNDED'])
             ->whereBetween('created_at', [$startDate, $endDate->endOfDay()])
             ->count();
 
-        // Calculate conversion ratio (orders / customers)
         $totalCustomers = Customers::whereBetween('created_at', [$startDate, $endDate->endOfDay()])->count();
+
         $conversionRatio = $totalCustomers > 0 ? ($currentOrders / $totalCustomers) * 100 : 0;
 
-        // Previous period
         $previousOrders = Orders::whereBetween('created_at', [$previousStartDate, $previousEndDate->endOfDay()])->count();
+
         $previousEarnings = Orders::where('status', Orders::STATUS['COMPLETED'])
             ->where('payment_status', Orders::PAYMENT_STATUS['PAID'])
             ->whereBetween('created_at', [$previousStartDate, $previousEndDate->endOfDay()])
             ->sum('total_price');
+
         $previousRefunds = Orders::where('payment_status', Orders::PAYMENT_STATUS['REFUNDED'])
             ->whereBetween('created_at', [$previousStartDate, $previousEndDate->endOfDay()])
             ->count();
+
         $previousCustomers = Customers::whereBetween('created_at', [$previousStartDate, $previousEndDate->endOfDay()])->count();
         $previousConversionRatio = $previousCustomers > 0 ? ($previousOrders / $previousCustomers) * 100 : 0;
 
@@ -167,19 +180,12 @@ class DashboardService
         ];
     }
 
-    /**
-     * Get best selling products
-     */
     public function getBestSellingProducts(Carbon $startDate, Carbon $endDate, int $page = 1, int $perPage = 10): array
     {
-        // Get orders with product data
-        $orders = Orders::where('status', Orders::STATUS['COMPLETED'])
-            ->where('payment_status', Orders::PAYMENT_STATUS['PAID'])
-            ->whereBetween('created_at', [$startDate, $endDate->endOfDay()])
+        $orders = Orders::whereBetween('created_at', [$startDate, $endDate->endOfDay()])
             ->with('product:_id,name')
             ->get();
 
-        // Group by product and calculate totals
         $productStats = [];
         foreach ($orders as $order) {
             $productId = $order->product_id;
@@ -201,19 +207,16 @@ class DashboardService
             $productStats[$productId]['count']++;
         }
         
-        // Calculate average price and sort by orders
         foreach ($productStats as &$stat) {
             $stat['price'] = $stat['count'] > 0 ? $stat['total_price'] / $stat['count'] : 0;
             $stat['amount'] = $stat['total_amount'];
-            unset($stat['total_price'], $stat['total_amount'], $stat['count']);
+            unset($stat['total_price'], $stat['total_amount']);
         }
         
-        // Sort by orders desc
         usort($productStats, function($a, $b) {
             return $b['orders'] - $a['orders'];
         });
         
-        // Paginate
         $total = count($productStats);
         $offset = ($page - 1) * $perPage;
         $items = array_slice($productStats, $offset, $perPage);
@@ -286,10 +289,15 @@ class DashboardService
             // Get total orders for the day
             $orders = Orders::whereBetween('created_at', [$dayStart, $dayEnd])->count();
             
-            // Get total deposits for the day
+            // Get total deposits for the day (type = 1: user nạp tiền vào hệ thống)
+            // Note: date_at is stored as string in MongoDB
+            $dayStartString = $dayStart->toDateTimeString();
+            $dayEndString = $dayEnd->toDateTimeString();
+            
             $deposits = BalanceHistories::where('type', BalanceHistories::TYPE['deposit'])
-                ->whereBetween('date_at', [$dayStart, $dayEnd])
-                ->sum('amount');
+                ->where('date_at', '>=', $dayStartString)
+                ->where('date_at', '<=', $dayEndString)
+                ->sum('amount_vnd');
             
             // Get new customers for the day
             $newCustomers = Customers::whereBetween('created_at', [$dayStart, $dayEnd])->count();

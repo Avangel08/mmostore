@@ -17,7 +17,7 @@ interface DashboardProps {
     metrics?: {
         total_earnings: { value: number; previous: number; percentage_change: number };
         total_orders: { value: number; previous: number; percentage_change: number };
-        total_customers: { value: number; previous: number; percentage_change: number };
+        total_deposits: { value: number; previous: number; percentage_change: number };
         new_customers: { value: number; previous: number; percentage_change: number };
     };
     revenue_metrics?: {
@@ -85,7 +85,6 @@ const Dashboard = ({
     const [currentPageProducts, setCurrentPageProducts] = useState<number>(1);
     const [currentPageOrders, setCurrentPageOrders] = useState<number>(1);
     
-    // Date range filter
     const flatpickrRef = useRef<any>(null);
     const [dateRange, setDateRange] = useState<{ start: Date | null; end: Date | null }>({
         start: new Date(),
@@ -202,12 +201,12 @@ const Dashboard = ({
         }
     };
 
-    // Initialize date range from server or default to today
     useEffect(() => {
         if (serverFilters && serverFilters.start_date && serverFilters.end_date) {
             const start = moment(serverFilters.start_date).toDate();
             const end = moment(serverFilters.end_date).toDate();
             setDateRange({ start, end });
+
             if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
                 flatpickrRef.current.flatpickr.setDate([start, end]);
             }
@@ -215,17 +214,18 @@ const Dashboard = ({
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             setDateRange({ start: today, end: today });
+
             if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
                 flatpickrRef.current.flatpickr.setDate([today, today]);
             }
         }
     }, [serverFilters]);
 
-    // Initialize pagination from server
     useEffect(() => {
         if (serverBestSellingProducts?.current_page) {
             setCurrentPageProducts(serverBestSellingProducts.current_page);
         }
+
         if (serverRecentOrders?.current_page) {
             setCurrentPageOrders(serverRecentOrders.current_page);
         }
@@ -245,7 +245,6 @@ const Dashboard = ({
 
     const revenueChartColors = useChartColors("revenueChart");
 
-    // Generate chart data from daily data for 4 separate charts
     const getChartDataFromDailyData = () => {
         if (!serverDailyChartData || Object.keys(serverDailyChartData).length === 0) {
             return {
@@ -267,7 +266,6 @@ const Dashboard = ({
         const depositsData = Object.values(serverDailyChartData).map(item => item.deposits);
         const customersData = Object.values(serverDailyChartData).map(item => item.new_customers);
 
-        // Calculate max values for each dataset
         const maxEarnings = Math.max(...earningsData, 0);
         const maxOrders = Math.max(...ordersData, 0);
         const maxDeposits = Math.max(...depositsData, 0);
@@ -288,7 +286,6 @@ const Dashboard = ({
 
     const chartData = getChartDataFromDailyData();
 
-    // Use server best selling products if available, otherwise empty array
     const bestSellingProductsData = serverBestSellingProducts?.data || [];
     const bestSellingProductsPagination = serverBestSellingProducts || {
         current_page: 1,
@@ -297,7 +294,6 @@ const Dashboard = ({
         last_page: 1
     };
 
-    // Use server recent orders if available, otherwise empty array
     const recentOrdersData = serverRecentOrders?.data || [];
     const recentOrdersPagination = serverRecentOrders || {
         current_page: 1,
@@ -306,7 +302,6 @@ const Dashboard = ({
         last_page: 1
     };
 
-    // Revenue metrics data - use server data if available
     const getRevenueMetrics = () => {
         if (!serverRevenueMetrics) {
             return [
@@ -364,9 +359,7 @@ const Dashboard = ({
 
     const revenueMetrics = getRevenueMetrics();
 
-    // Chart options for daily line charts
     const getChartOptions = (formatter: (y: any) => string, maxValue?: number) => {
-        // Calculate y-axis min and max based on maxValue
         let yaxisConfig: any = {
             labels: {
                 formatter: formatter
@@ -376,12 +369,10 @@ const Dashboard = ({
         };
 
         if (maxValue !== undefined && maxValue > 0) {
-            // If there's data, set min to 0 and max to next round number above maxValue
             const nextRoundNumber = Math.ceil((maxValue + 1) / 10) * 10;
             yaxisConfig.min = 0;
             yaxisConfig.max = Math.max(nextRoundNumber, 10);
         } else {
-            // If no data, set default range
             yaxisConfig.min = 0;
             yaxisConfig.max = 10;
         }
@@ -459,6 +450,7 @@ const Dashboard = ({
         } else if (num >= 1000) {
             return (num / 1000).toFixed(0) + 'K';
         }
+
         return num.toFixed(0);
     };
 
@@ -466,6 +458,7 @@ const Dashboard = ({
         if (typeof y !== "undefined") {
             return formatCompactNumber(y);
         }
+
         return "0";
     }, chartData.maxEarnings);
 
@@ -473,6 +466,7 @@ const Dashboard = ({
         if (typeof y !== "undefined") {
             return y.toFixed(0);
         }
+
         return "0";
     }, chartData.maxOrders);
 
@@ -480,6 +474,7 @@ const Dashboard = ({
         if (typeof y !== "undefined") {
             return formatCompactNumber(y);
         }
+
         return "0";
     }, chartData.maxDeposits);
 
@@ -487,14 +482,13 @@ const Dashboard = ({
         if (typeof y !== "undefined") {
             return y.toFixed(0);
         }
+
         return "0";
     }, chartData.maxCustomers);
 
 
-    // Dashboard metrics data - use server data if available, otherwise use defaults
     const getDashboardMetrics = () => {
         if (!serverMetrics) {
-            // Return default data if no server metrics
             return [
                 {
                     id: 1,
@@ -572,7 +566,7 @@ const Dashboard = ({
             {
                 id: 3,
                 label: t("Deposit"),
-                counter: serverMetrics.total_customers.value,
+                counter: serverMetrics.total_deposits.value,
                 icon: "bx bx-dollar-circle",
                 iconClass: "warning-subtle",
                 iconColor: "warning",
@@ -597,10 +591,9 @@ const Dashboard = ({
 
     const dashboardMetrics = getDashboardMetrics();
 
-    // Utility function for money formatting
     const formatMoney = (num: number) => {
         if (typeof num !== 'number') num = Number(num);
-        // If the decimal part is 0, don't show .00
+
         if (num % 1 === 0) {
             return num.toLocaleString(undefined, { maximumFractionDigits: 0 });
         } else {
@@ -608,7 +601,6 @@ const Dashboard = ({
         }
     };
 
-    // Utility function for status formatting (capitalize first letter, lowercase rest)
     const formatStatus = (status: string) => {
         if (!status) return '';
         return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
@@ -695,8 +687,6 @@ const Dashboard = ({
                                                             duration={2}
                                                             formatter={(value: number) => {
                                                                 if (item.decimals === 2) {
-                                                                    // For money values (Earnings, Deposits)
-                                                                    // If the decimal part is 0, don't show .00
                                                                     if (value % 1 === 0) {
                                                                         return value.toLocaleString(undefined, { 
                                                                             maximumFractionDigits: 0 
@@ -708,8 +698,7 @@ const Dashboard = ({
                                                                         });
                                                                     }
                                                                 } else {
-                                                                    // For counts (Orders, New Customers)
-                                                                    return value.toLocaleString(undefined, { 
+                                                                    return value.toLocaleString(undefined, {
                                                                         maximumFractionDigits: 0 
                                                                     });
                                                                 }
@@ -856,7 +845,7 @@ const Dashboard = ({
                                                                             </div>
                                                                         </td>
                                                                         <td>{formatMoney(product.price)}</td>
-                                                                        <td>{product.orders}</td>
+                                                                        <td>{product.count}</td>
                                                                         <td>{formatMoney(product.amount)}</td>
                                                                     </tr>
                                                                 ))

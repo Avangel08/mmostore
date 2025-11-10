@@ -29,24 +29,21 @@ class DashBoardController extends Controller
         $currentStore = request()->get('current_store');
         $subdomain = $currentStore ? $currentStore->id : 'unknown';
         
-        // Get date range from request or use default (today)
         $startDate = $request->input('start_date', Carbon::today()->format('Y-m-d'));
         $endDate = $request->input('end_date', Carbon::today()->format('Y-m-d'));
         
         $startDateCarbon = Carbon::parse($startDate)->startOfDay();
         $endDateCarbon = Carbon::parse($endDate)->endOfDay();
         
-        // Get pagination parameters
         $productPage = $request->input('product_page', 1);
         $orderPage = $request->input('order_page', 1);
         
-        // Get dashboard metrics
         $metrics = $this->dashboardService->getMetrics($startDateCarbon, $endDateCarbon);
         $revenueMetrics = $this->dashboardService->getRevenueMetrics($startDateCarbon, $endDateCarbon);
         $bestSellingProducts = $this->dashboardService->getBestSellingProducts($startDateCarbon, $endDateCarbon, $productPage, 10);
         $recentOrders = $this->dashboardService->getRecentOrders($startDateCarbon, $endDateCarbon, $orderPage, 10);
         $dailyChartData = $this->dashboardService->getDailyChartData($startDateCarbon, $endDateCarbon);
-        
+
         return Inertia::render('Dashboard/index', [
             'user' => $user,
             'subdomain' => $subdomain,
