@@ -892,5 +892,9 @@
     "COMPLETED": "Thành công",
     "No data": "Không có dữ liệu",
     "Contact the admin for support with domain configuration.": "Liên hệ với quản trị viên để được hỗ trợ cấu hình tên miền.",
-    "Get support": "Nhận hỗ trợ"
-}   
+    "Get support": "Nhận hỗ trợ",
+    "Draft": "Bản nháp",
+    "Published": "Xuất bản",
+    "Private": "Riêng tư",
+    "Visibility": "Hiển thị công khai"
+}

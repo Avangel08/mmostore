@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ProductType\ProductTypeController;
 use App\Http\Controllers\Admin\RoleManagement\RoleManagementController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\StoreCategory\StoreCategoryController;
+use App\Http\Controllers\Admin\Posts\PostController;
 use App\Http\Controllers\Admin\UserManager\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -83,6 +84,16 @@ Route::domain($mainDomain)->group(function () {
             Route::delete('/delete-multiple', [StoreCategoryController::class, 'deleteMultipleStoreCategories'])->name('admin.store-categories.delete-multiple');
         });
         Route::resource('store-categories', StoreCategoryController::class, ['as' => 'admin']);
+
+        Route::group(['prefix' => '/posts'], function () {
+            Route::get('/', [PostController::class, 'index'])->name('admin.posts.index');
+            Route::get('/create', [PostController::class, 'create'])->name('admin.posts.create');
+            Route::post('/', [PostController::class, 'store'])->name('admin.posts.store');
+            Route::get('/edit/{id}', [PostController::class, 'edit'])->name('admin.posts.edit');
+            Route::put('/{id}', [PostController::class, 'update'])->name('admin.posts.update');
+            Route::delete('/{id}', [PostController::class, 'destroy'])->name('admin.posts.destroy');
+            Route::get('/{id}', [PostController::class, 'show'])->name('admin.posts.show');
+        });
     });
 
 });
