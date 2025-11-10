@@ -8,6 +8,7 @@ import Services from "./Services";
 import Features from "./Features";
 import Faqs from "./Faqs";
 import ModalRedirectStore from "./Modal/ModalRedirectStore";
+import AdPopup from "../../Components/AdPopup";
 
 export default function Index() {
     const toTop = () => {
@@ -38,6 +39,7 @@ export default function Index() {
 
             {/* Show modal redirect store */}
             <ModalRedirectStore message={message} />
+            <AdPopup /> 
         </React.Fragment>
     );
 }
