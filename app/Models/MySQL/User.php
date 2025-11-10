@@ -6,11 +6,11 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\NewAccessToken;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Jobs\Mail\JobMailSellerResetPassword;
 
 class User extends Authenticatable
 {
@@ -65,8 +65,50 @@ class User extends Authenticatable
         return $this->hasMany(Stores::class, 'user_id');
     }
 
+    public function reportAccountSellers()
+    {
+        return $this->hasManyThrough(
+            ReportAccountSeller::class,
+            Stores::class,
+            'user_id',
+            'store_id',
+            'id',
+            'id'
+        );
+    }
 
-    // Override createToken from HasApiTokens trait
+    public function scopeWithReportAccountSeller($query)
+    {
+        $latestStatsSubquery = DB::table('report_account_seller as stats')
+            ->select('stats.store_id', 'stats.live_count', 'stats.sold_count')
+            ->join(
+                DB::raw('(SELECT store_id, MAX(recorded_at) AS recorded_at FROM report_account_seller GROUP BY store_id) latest'),
+                function ($join) {
+                    $join->on('stats.store_id', '=', 'latest.store_id')
+                        ->on('stats.recorded_at', '=', 'latest.recorded_at');
+                }
+            );
+
+        $userStatsSubquery = DB::table('stores')
+            ->select(
+                'stores.user_id',
+                DB::raw('SUM(COALESCE(latest_stats.live_count, 0)) as total_live_count'),
+                DB::raw('SUM(COALESCE(latest_stats.sold_count, 0)) as total_sold_count')
+            )
+            ->leftJoinSub($latestStatsSubquery, 'latest_stats', function ($join) {
+                $join->on('latest_stats.store_id', '=', 'stores.id');
+            })
+            ->groupBy('stores.user_id');
+
+        return $query->leftJoinSub($userStatsSubquery, 'user_stats', function ($join) {
+            $join->on('user_stats.user_id', '=', 'users.id');
+        })
+        ->addSelect([
+            DB::raw('COALESCE(user_stats.total_live_count, 0) as live_count'),
+            DB::raw('COALESCE(user_stats.total_sold_count, 0) as sold_count'),
+        ]);
+    }
+
     public function createToken(string $name, array $abilities = ['*'], ?DateTimeInterface $expiresAt = null)
     {
         $plainTextToken = $this->generateTokenString();
