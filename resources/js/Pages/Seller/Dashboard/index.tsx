@@ -260,16 +260,44 @@ const Dashboard = ({
             };
         }
 
-        const dates = Object.values(serverDailyChartData).map(item => item.date);
-        const earningsData = Object.values(serverDailyChartData).map(item => item.earnings);
-        const ordersData = Object.values(serverDailyChartData).map(item => item.orders);
-        const depositsData = Object.values(serverDailyChartData).map(item => item.deposits);
-        const customersData = Object.values(serverDailyChartData).map(item => item.new_customers);
+        const allKeys = Object.keys(serverDailyChartData);
+        
+        const sortedKeys = allKeys.sort();
+        
+        const dates: string[] = [];
+        const earningsData: number[] = [];
+        const ordersData: number[] = [];
+        const depositsData: number[] = [];
+        const customersData: number[] = [];
 
-        const maxEarnings = Math.max(...earningsData, 0);
-        const maxOrders = Math.max(...ordersData, 0);
-        const maxDeposits = Math.max(...depositsData, 0);
-        const maxCustomers = Math.max(...customersData, 0);
+        sortedKeys.forEach((dateKey) => {
+            const dayData = serverDailyChartData[dateKey];
+            
+            if (dayData && typeof dayData === 'object') {
+                dates.push(String(dayData.date || ''));
+                earningsData.push(Number(dayData.earnings) || 0);
+                ordersData.push(Number(dayData.orders) || 0);
+                depositsData.push(Number(dayData.deposits) || 0);
+                customersData.push(Number(dayData.new_customers) || 0);
+            }
+        });
+        
+        const dataLength = dates.length;
+        if (earningsData.length !== dataLength || ordersData.length !== dataLength || 
+            depositsData.length !== dataLength || customersData.length !== dataLength) {
+            console.warn('Chart data arrays length mismatch', {
+                dates: dates.length,
+                earnings: earningsData.length,
+                orders: ordersData.length,
+                deposits: depositsData.length,
+                customers: customersData.length
+            });
+        }
+
+        const maxEarnings = earningsData.length > 0 ? Math.max(...earningsData.filter(v => !isNaN(v)), 0) : 0;
+        const maxOrders = ordersData.length > 0 ? Math.max(...ordersData.filter(v => !isNaN(v)), 0) : 0;
+        const maxDeposits = depositsData.length > 0 ? Math.max(...depositsData.filter(v => !isNaN(v)), 0) : 0;
+        const maxCustomers = customersData.length > 0 ? Math.max(...customersData.filter(v => !isNaN(v)), 0) : 0;
 
         return {
             earningsChart: [{ name: t("Earning"), type: "line", data: earningsData }],
@@ -393,6 +421,7 @@ const Dashboard = ({
                 enabled: false
             },
             xaxis: {
+                type: 'category',
                 categories: chartData.categories,
                 axisTicks: {
                     show: false
@@ -401,7 +430,13 @@ const Dashboard = ({
                     show: false
                 },
                 labels: {
-                    show: false
+                    show: false,
+                    formatter: function(val: string) {
+                        return val;
+                    }
+                },
+                tooltip: {
+                    enabled: false
                 }
             },
             yaxis: yaxisConfig,
@@ -433,8 +468,17 @@ const Dashboard = ({
             intersect: false,
             x: {
                 show: true,
-                formatter: function(value: number) {
-                    return chartData.categories[value];
+                formatter: function(val: any, opts: any) {
+                    // For category type charts, opts.dataPointIndex is the correct index
+                    // This index directly corresponds to the categories array index
+                    if (opts && typeof opts.dataPointIndex === 'number') {
+                        const idx = opts.dataPointIndex;
+                        if (chartData.categories && idx >= 0 && idx < chartData.categories.length) {
+                            return chartData.categories[idx];
+                        }
+                    }
+                    // Fallback: val should be the category string for category type
+                    return val || '';
                 }
             },
             y: {
@@ -446,9 +490,21 @@ const Dashboard = ({
 
     const formatCompactNumber = (num: number): string => {
         if (num >= 1000000) {
-            return (num / 1000000).toFixed(1) + 'M';
+            // Format as: 1M3 (1 million 300 thousand)
+            const millions = Math.floor(num / 1000000);
+            const thousands = Math.floor((num % 1000000) / 100000);
+            if (thousands > 0) {
+                return millions + 'M' + thousands;
+            }
+            return millions + 'M';
         } else if (num >= 1000) {
-            return (num / 1000).toFixed(0) + 'K';
+            // Format as: 1k3 (1 thousand 300)
+            const thousands = Math.floor(num / 1000);
+            const hundreds = Math.floor((num % 1000) / 100);
+            if (hundreds > 0) {
+                return thousands + 'k' + hundreds;
+            }
+            return thousands + 'k';
         }
 
         return num.toFixed(0);

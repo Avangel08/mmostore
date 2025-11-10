@@ -32,9 +32,10 @@ class DashBoardController extends Controller
         $startDate = $request->input('start_date', Carbon::today()->format('Y-m-d'));
         $endDate = $request->input('end_date', Carbon::today()->format('Y-m-d'));
         
-        $startDateCarbon = Carbon::parse($startDate)->startOfDay();
-        $endDateCarbon = Carbon::parse($endDate)->endOfDay();
-        
+        $timezone = config('app.timezone', 'UTC');
+        $startDateCarbon = Carbon::createFromFormat('Y-m-d', $startDate, $timezone)->startOfDay();
+        $endDateCarbon = Carbon::createFromFormat('Y-m-d', $endDate, $timezone)->endOfDay();
+
         $productPage = $request->input('product_page', 1);
         $orderPage = $request->input('order_page', 1);
         

@@ -235,10 +235,14 @@ class DashboardService
      */
     public function getRecentOrders(Carbon $startDate, Carbon $endDate, int $page = 1, int $perPage = 10): array
     {
-        $total = Orders::whereBetween('created_at', [$startDate, $endDate->endOfDay()])->count();
+        // Ensure startDate is at start of day and endDate is at end of day
+        $startDate = $startDate->copy()->startOfDay();
+        $endDate = $endDate->copy()->endOfDay();
+        
+        $total = Orders::whereBetween('created_at', [$startDate, $endDate])->count();
         
         $orders = Orders::with(['customer:_id,name', 'product:_id,name'])
-            ->whereBetween('created_at', [$startDate, $endDate->endOfDay()])
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'desc')
             ->skip(($page - 1) * $perPage)
             ->take($perPage)
@@ -254,7 +258,7 @@ class DashboardService
                 'status' => $order->status ?? 'PENDING',
                 'payment_status' => $order->payment_status ?? 'PENDING',
                 'notes' => $order->notes ?? '',
-                'created_at' => $order->created_at ? \Carbon\Carbon::parse($order->created_at)->format('d M Y') : 'N/A'
+                'created_at' => $order->created_at ? \Carbon\Carbon::parse($order->created_at)->toISOString() : null
             ];
         })->toArray();
 
@@ -269,18 +273,39 @@ class DashboardService
 
     /**
      * Get daily data for charts
+     * Ensures data is generated for all dates from startDate to endDate (inclusive)
      */
     public function getDailyChartData(Carbon $startDate, Carbon $endDate): array
     {
         $dailyData = [];
-        $currentDate = $startDate->copy();
         
-        while ($currentDate <= $endDate) {
+        // Normalize to start of day for consistent date comparison
+        // Extract date strings to avoid any timezone conversion issues
+        $startDateNormalized = $startDate->copy()->startOfDay();
+        $endDateNormalized = $endDate->copy()->startOfDay();
+        
+        // Get date strings in Y-m-d format for reliable date-only operations
+        $startDateStr = $startDateNormalized->format('Y-m-d');
+        $endDateStr = $endDateNormalized->format('Y-m-d');
+        
+        // Create clean date objects from strings to ensure exact date matching
+        $appTimezone = config('app.timezone', 'UTC');
+        $startDateOnly = Carbon::createFromFormat('Y-m-d', $startDateStr, $appTimezone)->startOfDay();
+        $endDateOnly = Carbon::createFromFormat('Y-m-d', $endDateStr, $appTimezone)->startOfDay();
+        
+        // Calculate total days to iterate (inclusive of both start and end dates)
+        $daysDiff = $startDateOnly->diffInDays($endDateOnly);
+        
+        // Generate data for each day from start to end (inclusive)
+        for ($i = 0; $i <= $daysDiff; $i++) {
+            $currentDate = $startDateOnly->copy()->addDays($i);
             $dayStart = $currentDate->copy()->startOfDay();
             $dayEnd = $currentDate->copy()->endOfDay();
-            $dateKey = $currentDate->format('Y-m-d');
             
-            // Get total earnings for the day
+            // Use Y-m-d format as key for consistent sorting in frontend
+            $dateKey = $currentDate->format('Y-m-d');
+
+            // Get total earnings for the day (completed and paid orders only)
             $earnings = Orders::where('status', Orders::STATUS['COMPLETED'])
                 ->where('payment_status', Orders::PAYMENT_STATUS['PAID'])
                 ->whereBetween('created_at', [$dayStart, $dayEnd])
@@ -290,7 +315,7 @@ class DashboardService
             $orders = Orders::whereBetween('created_at', [$dayStart, $dayEnd])->count();
             
             // Get total deposits for the day (type = 1: user nạp tiền vào hệ thống)
-            // Note: date_at is stored as string in MongoDB
+            // Note: date_at is stored as string in MongoDB, so we compare as strings
             $dayStartString = $dayStart->toDateTimeString();
             $dayEndString = $dayEnd->toDateTimeString();
             
@@ -302,6 +327,7 @@ class DashboardService
             // Get new customers for the day
             $newCustomers = Customers::whereBetween('created_at', [$dayStart, $dayEnd])->count();
             
+            // Store data with date key and formatted date display value
             $dailyData[$dateKey] = [
                 'date' => $currentDate->format('d-m'),
                 'earnings' => round($earnings, 2),
@@ -309,10 +335,8 @@ class DashboardService
                 'deposits' => round($deposits, 2),
                 'new_customers' => $newCustomers
             ];
-            
-            $currentDate->addDay();
         }
-        
+
         return $dailyData;
     }
 }
