@@ -15,16 +15,7 @@ export default function Index() {
         document.documentElement.scrollTop = 0;
     };
     
-    const { message }: any = usePage().props;
-
-    useEffect(() => {
-        const userId = message?.popup?.user_id;
-        const token = message?.popup?.token;
-        if (userId && token) {
-            const url = route("home.go-to-store", { id: userId }) + `?token=${token}`;
-            window.open(url, "_self");
-        }
-    }, []);
+    // const { message }: any = usePage().props;
 
     return (
         <React.Fragment>
