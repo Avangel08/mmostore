@@ -1,11 +1,16 @@
 import { usePage } from "@inertiajs/react";
 import React, { useEffect, useState } from "react";
-import { Modal } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 
 const banners = [
-    "/images/popup-hidemium.png",
-    "/images/popup-merdify.png",
-    "/images/popup-hidemium-3.png",
+    {
+        image: "/images/popup-hidemium.png",
+        link: "https://hidemium.io/?utm_source=hidemium_web&utm_medium=banner&utm_campaign=hidemium",
+    },
+    {
+        image: "/images/popup-merdify.png",
+        link: "https://merdify.com/?utm_campaign=merdify&utm_medium=banner&utm_source=hidemium_web",
+    },
 ];
 
 const AdPopup = () => {
@@ -76,20 +81,35 @@ const AdPopup = () => {
                         border: none;
                         overflow: hidden;
                     }
+                    .close-popup {
+                        position: absolute;
+                        top: 10px;
+                        right: 10px;
+                        cursor: pointer;
+                        z-index: 10;
+                        color: white;
+                    }
+
                 `}
             </style>
             <Modal
                 show={showPopup}
                 onHide={handleClose}
                 onExited={handleExited}
+                backdrop="static"
                 size="lg"
                 centered
             >
-                <img
-                    src={storageUrl + banners[currentIndex]}
-                    alt={`Ad Banner ${currentIndex + 1}`}
-                    className="w-100"
-                />
+                <Button className="close-popup btn btn-ghost-dark waves-effect waves-light" onClick={handleClose}>
+                    <i className="ri-close-line fs-4"></i>
+                </Button>
+                <a href={banners[currentIndex].link} target="_blank" rel="noopener noreferrer">
+                    <img
+                        src={storageUrl + banners[currentIndex].image}
+                        alt={`Ad Banner ${currentIndex + 1}`}
+                        className="w-100"
+                    />
+                </a>
             </Modal>
         </React.Fragment>
     );
