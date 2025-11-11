@@ -5,11 +5,11 @@ import { Button, Modal } from "react-bootstrap";
 const banners = [
     {
         image: "/images/popup-hidemium.png",
-        link: "https://hidemium.io/?utm_source=hidemium_web&utm_medium=banner&utm_campaign=hidemium",
+        link: "https://hidemium.io?utm_source=hidemium_web&utm_medium=banner&utm_campaign=hidemium",
     },
     {
         image: "/images/popup-merdify.png",
-        link: "https://merdify.com/?utm_campaign=merdify&utm_medium=banner&utm_source=hidemium_web",
+        link: "https://merdify.com?utm_campaign=merdify&utm_medium=banner&utm_source=hidemium_web",
     },
 ];
 
