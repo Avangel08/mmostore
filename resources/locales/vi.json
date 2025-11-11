@@ -716,5 +716,8 @@
     "PAID": "Đã thanh toán",
     "FAILED": "Lỗi",
     "COMPLETED": "Thành công",
-    "No data": "Không có dữ liệu"
+    "No data": "Không có dữ liệu",
+    "Phương thức thanh toán không tồn tại": "Phương thức thanh toán không tồn tại",
+    "Số dư không đủ": "Số dư không đủ",
+    "Xác nhận đơn hàng": "Xác nhận đơn hàng"
 }
