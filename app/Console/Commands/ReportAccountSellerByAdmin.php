@@ -32,6 +32,7 @@ class ReportAccountSellerByAdmin extends Command
             foreach ($stores as $store) {
                 try {
                     $this->info("Processing store ID: {$store->id}, Name: {$store->name}");
+                    \Log::info('Starting report account seller by admin');
 
                     $connection = $tenancyService->buildConnectionFromStore($store);
                     $tenancyService->applyConnection($connection, true);
