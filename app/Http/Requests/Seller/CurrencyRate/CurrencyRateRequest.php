@@ -27,13 +27,13 @@ class CurrencyRateRequest extends FormRequest
             'store' => [
                 'to_vnd' => ['required', 'numeric', 'min:1000'],
                 'date' => ['required', 'date'],
-                'status' => ['required', 'string'],
+				'status' => ['required', 'integer', 'in:0,1'],
             ],
             'update' => [
                 'id' => ['required'],
                 'to_vnd' => ['required', 'numeric', 'min:1000'],
                 'date' => ['required', 'date'],
-                'status' => ['required', 'string'],
+				'status' => ['required', 'integer', 'in:0,1'],
             ],
             default => [],
         };

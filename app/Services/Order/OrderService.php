@@ -168,9 +168,7 @@ class OrderService
             ->get();
 
         $items = $accounts->map(function ($acc) {
-            return [
-                $acc->data
-            ];
+            return $acc->data;
         })->values()->toArray();
 
         return [

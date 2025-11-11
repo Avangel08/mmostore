@@ -42,7 +42,8 @@ export const ModalCurrencyRate = ({
         .min(1000, t("Must be greater than or equal to 1000")),
       date: Yup.string()
         .required(t("Please select this field")),
-      status: Yup.string()
+      status: Yup.number()
+        .oneOf([0, 1])
         .required(t("Please select this field")),
     });
   }, [t]);
@@ -51,13 +52,13 @@ export const ModalCurrencyRate = ({
     id: string;
     to_vnd: number;
     date: string;
-    status: string;
+    status: number;
   }>({
     initialValues: {
       id: dataEdit?.id || "",
       to_vnd: dataEdit?.to_vnd || 1000,
       date: dataEdit?.date || moment().format("YYYY-MM-DD"),
-      status: dataEdit?.status ? String(dataEdit.status) : "1",
+      status: typeof dataEdit?.status === "number" ? dataEdit.status : 1,
     },
     validationSchema,
     enableReinitialize: true,
@@ -94,7 +95,7 @@ export const ModalCurrencyRate = ({
         id: dataEdit?.id || "",
         to_vnd: dataEdit?.to_vnd || 1000,
         date: dataEdit?.date || moment().format("YYYY-MM-DD"),
-        status: dataEdit?.status ? String(dataEdit.status) : "1",
+        status: typeof dataEdit?.status === "number" ? dataEdit.status : 1,
       });
     } else {
       formik.resetForm();
@@ -180,14 +181,14 @@ export const ModalCurrencyRate = ({
             </Form.Label>
             <Form.Select
               name="status"
-              onChange={formik.handleChange}
+              onChange={(e) => formik.setFieldValue("status", Number(e.target.value))}
               onBlur={formik.handleBlur}
               value={formik.values.status}
               isInvalid={!!((formik.touched.status && formik.errors.status) || errors?.status)}
             >
               <option value="">{t("Select status")}</option>
               {dataOptions?.statusList && Object.keys(dataOptions.statusList).map((key: any) => (
-                <option key={key} value={key}>
+                <option key={key} value={Number(key)}>
                   {t(dataOptions?.statusList[key])}
                 </option>
               ))}

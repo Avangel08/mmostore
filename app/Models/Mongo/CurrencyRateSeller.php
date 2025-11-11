@@ -20,6 +20,10 @@ class CurrencyRateSeller extends Model
         'status'
     ];
 
+    protected $casts = [
+        'status' => 'integer',
+    ];
+
     public function scopeFilterSearch($query, $request)
     {
         if (isset($request['search']) && $request['search'] != '') {

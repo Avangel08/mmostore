@@ -53,7 +53,7 @@ class CheckoutService
                 ];
             }
 
-            JobProcessPurchase::dispatchSync(
+            JobProcessPurchase::dispatch(
                 $productId,
                 $subProductId,
                 $customerId,
