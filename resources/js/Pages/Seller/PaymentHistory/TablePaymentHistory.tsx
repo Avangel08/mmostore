@@ -50,7 +50,14 @@ const TablePaymentHistory = ({
       {
         header: t("Type transaction"),
         cell: (cell: any) => {
-          const label = typeOptions?.[Number(cell.getValue())] || cell.getValue();
+          const typeValue = Number(cell.getValue());
+          const typeTranslationMap: Record<number, string> = {
+            1: "Deposit",
+            2: "Order payment",
+            3: "Deduct money",
+          };
+          const translationKey = typeTranslationMap[typeValue];
+          const label = translationKey ? t(translationKey) : (typeOptions?.[typeValue] || cell.getValue());
           return <span>{label}</span>;
         },
         accessorKey: "type",

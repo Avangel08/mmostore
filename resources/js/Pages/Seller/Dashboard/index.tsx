@@ -679,24 +679,24 @@ const Dashboard = ({
                                                     {moment(dateRange.start).format('DD/MM/YYYY')} - {moment(dateRange.end).format('DD/MM/YYYY')}
                                                 </>
                                             ) : (
-                                                'Chọn khoảng thời gian'
+                                                t("Select date range")
                                             )}
                                             <i className="ri-arrow-down-s-line ms-1"></i>
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
-                                            <Dropdown.Item onClick={() => handlePresetDateRange('today')}>Hôm nay</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => handlePresetDateRange('yesterday')}>Hôm qua</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => handlePresetDateRange('last7days')}>7 ngày gần nhất</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => handlePresetDateRange('last30days')}>30 ngày gần nhất</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => handlePresetDateRange('thisMonth')}>Tháng này</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => handlePresetDateRange('lastMonth')}>Tháng trước</Dropdown.Item>
+                                            <Dropdown.Item onClick={() => handlePresetDateRange('today')}>{t("Today")}</Dropdown.Item>
+                                            <Dropdown.Item onClick={() => handlePresetDateRange('yesterday')}>{t("Yesterday")}</Dropdown.Item>
+                                            <Dropdown.Item onClick={() => handlePresetDateRange('last7days')}>{t("Last 7 days")}</Dropdown.Item>
+                                            <Dropdown.Item onClick={() => handlePresetDateRange('last30days')}>{t("Last 30 days")}</Dropdown.Item>
+                                            <Dropdown.Item onClick={() => handlePresetDateRange('thisMonth')}>{t("This month")}</Dropdown.Item>
+                                            <Dropdown.Item onClick={() => handlePresetDateRange('lastMonth')}>{t("Last month")}</Dropdown.Item>
                                             <Dropdown.Divider />
                                             <div className="px-3 py-2">
-                                                <Form.Label className="small text-muted mb-1">Chọn khoảng thời gian tùy chỉnh</Form.Label>
+                                                <Form.Label className="small text-muted mb-1">{t("Select custom date range")}</Form.Label>
                                                 <Flatpickr
                                                     ref={flatpickrRef}
                                                     className="form-control form-control-sm"
-                                                    placeholder="Chọn khoảng thời gian"
+                                                    placeholder={t("Select date range")}
                                                     options={{
                                                         mode: "range",
                                                         dateFormat: "d/m/Y",
@@ -714,7 +714,7 @@ const Dashboard = ({
                                     </Dropdown>
                                     <Button variant="primary" onClick={handleApplyFilter}>
                                         <i className="ri-search-line me-1"></i>
-                                        Áp dụng
+                                        {t("Apply")}
                                     </Button>
                                 </div>
                             </div>
@@ -917,7 +917,7 @@ const Dashboard = ({
                                                 {bestSellingProductsPagination.total > 0 && (
                                                     <div className="d-flex align-items-center justify-content-between mt-3">
                                                         <div className="text-muted">
-                                                            Hiển thị {(bestSellingProductsPagination.current_page - 1) * bestSellingProductsPagination.per_page + 1} đến {Math.min(bestSellingProductsPagination.current_page * bestSellingProductsPagination.per_page, bestSellingProductsPagination.total)} trong số {bestSellingProductsPagination.total} kết quả
+                                                            {t("Showing")} {(bestSellingProductsPagination.current_page - 1) * bestSellingProductsPagination.per_page + 1} {t("to")} {Math.min(bestSellingProductsPagination.current_page * bestSellingProductsPagination.per_page, bestSellingProductsPagination.total)} {t("of")} {bestSellingProductsPagination.total} {t("results")}
                                                         </div>
                                                         <div className="d-flex align-items-center gap-2">
                                                             <Button
@@ -1010,7 +1010,7 @@ const Dashboard = ({
                                                 {recentOrdersPagination.total > 0 && (
                                                     <div className="d-flex align-items-center justify-content-between mt-3">
                                                         <div className="text-muted">
-                                                            Hiển thị {(recentOrdersPagination.current_page - 1) * recentOrdersPagination.per_page + 1} đến {Math.min(recentOrdersPagination.current_page * recentOrdersPagination.per_page, recentOrdersPagination.total)} trong số {recentOrdersPagination.total} kết quả
+                                                            {t("Showing")} {(recentOrdersPagination.current_page - 1) * recentOrdersPagination.per_page + 1} {t("to")} {Math.min(recentOrdersPagination.current_page * recentOrdersPagination.per_page, recentOrdersPagination.total)} {t("of")} {recentOrdersPagination.total} {t("results")}
                                                         </div>
                                                         <div className="d-flex align-items-center gap-2">
                                                             <Button

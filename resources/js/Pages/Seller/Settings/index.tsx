@@ -34,13 +34,13 @@ const ThemeSettings = () => {
                                             <Nav.Item>
                                                 <Nav.Link eventKey="themeTab">
                                                     <i className="ri-store-2-line me-1"></i>
-                                                    {t("Giao diện")}
+                                                    {t("Theme")}
                                                 </Nav.Link>
                                             </Nav.Item>
                                             <Nav.Item>
                                                 <Nav.Link eventKey="contactTab">
                                                     <i className="ri-phone-line me-1"></i>
-                                                    {t("Liên hệ")}
+                                                    {t("Contact")}
                                                 </Nav.Link>
                                             </Nav.Item>
                                             <Nav.Item>

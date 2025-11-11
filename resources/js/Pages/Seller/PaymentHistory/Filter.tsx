@@ -37,17 +37,32 @@ const Filter = ({ onFilter, currentFilters, typeOptions = [] }: PaymentHistoryFi
 
   const perPage = paramsUrl?.perPage ?? "10";
 
+  // Mapping type values to translation keys
+  const typeTranslationMap: Record<number, string> = {
+    1: "Deposit",
+    2: "Order payment",
+    3: "Deduct money",
+  };
+
   const formattedTypeOptions = React.useMemo(() => {
     const allOption = { value: "", label: t("All") };
     if (Array.isArray(typeOptions)) {
-      return [allOption, ...typeOptions];
+      const translatedOptions = typeOptions.map((option: any) => ({
+        value: option.value,
+        label: typeTranslationMap[option.value] ? t(typeTranslationMap[option.value]) : option.label
+      }));
+      return [allOption, ...translatedOptions];
     }
-    const mappedOptions = Object.entries(typeOptions).map(([key, value]) => ({
-      value: key,
-      label: value
-    }));
+    const mappedOptions = Object.entries(typeOptions).map(([key, value]) => {
+      const typeValue = Number(key);
+      const translationKey = typeTranslationMap[typeValue];
+      return {
+        value: key,
+        label: translationKey ? t(translationKey) : String(value)
+      };
+    });
     return [allOption, ...mappedOptions];
-  }, [typeOptions, t]);
+  }, [typeOptions, t, i18n.language]);
 
   const getInitialFilters = (): PaymentHistoryFilters => {
     return {
@@ -61,7 +76,10 @@ const Filter = ({ onFilter, currentFilters, typeOptions = [] }: PaymentHistoryFi
 
   const [filters, setFilters] = useState<PaymentHistoryFilters>(getInitialFilters());
   
-  const [selectedType, setSelectedType] = useState(() => {
+  const [selectedType, setSelectedType] = useState<any>(() => {
+    if (formattedTypeOptions.length === 0) {
+      return { value: "", label: t("All") };
+    }
     const typeValue = paramsUrl?.type ?? "";
     return formattedTypeOptions.find(option => option.value === typeValue) || formattedTypeOptions[0];
   });
@@ -73,16 +91,22 @@ const Filter = ({ onFilter, currentFilters, typeOptions = [] }: PaymentHistoryFi
   }, [currentFilters]);
 
   useEffect(() => {
+    if (formattedTypeOptions.length === 0) return;
+
     const urlType = paramsUrl?.type;
-    if (urlType !== null && formattedTypeOptions.length > 0) {
+    if (urlType !== null && urlType !== "") {
       const matchingType = formattedTypeOptions.find(
         (option) => option.value.toString() === urlType
       );
       if (matchingType) {
         setSelectedType(matchingType);
+      } else {
+        setSelectedType(formattedTypeOptions[0]);
       }
+    } else {
+      setSelectedType(formattedTypeOptions[0]);
     }
-  }, [formattedTypeOptions]);
+  }, [formattedTypeOptions, paramsUrl?.type, i18n.language]);
 
   const getFlatpickrLocale = () => {
     switch (i18n.language) {

@@ -318,6 +318,7 @@
     "Deposit success" : "Deposit success",
     "Successful deposit": "Successful deposit",
     "Enter name or transaction" : "Enter name or transaction",
+    "Enter name and transaction": "Enter name and transaction",
     "Enter name or email": "Enter name or email",
     "Transaction" : "Transaction",
     "Insufficient balance": "Insufficient balance",
@@ -362,5 +363,19 @@
     "The menu URL is required.": "The menu URL is required.",
     "Each menu value must be unique.": "Each menu URL must be unique.",
     "The menu status is required.": "The menu status is required.",
-    "The menu status must be Active or Inactive.": "The menu status must be Active or Inactive."
+    "The menu status must be Active or Inactive.": "The menu status must be Active or Inactive.",
+    "Select date range": "Select date range",
+    "Today": "Today",
+    "Yesterday": "Yesterday",
+    "Last 7 days": "Last 7 days",
+    "Last 30 days": "Last 30 days",
+    "This month": "This month",
+    "Last month": "Last month",
+    "Select custom date range": "Select custom date range",
+    "Apply": "Apply",
+    "to": "to",
+    "of": "of",
+    "Deposit": "Deposit",
+    "Order payment": "Order payment",
+    "Deduct money": "Deduct money"
 }
