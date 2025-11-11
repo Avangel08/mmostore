@@ -50,6 +50,17 @@ class Stores extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function reportAccountSellers()
+    {
+        return $this->hasMany(ReportAccountSeller::class, 'store_id');
+    }
+
+    public function latestReportAccountSeller()
+    {
+        return $this->hasOne(ReportAccountSeller::class, 'store_id')
+            ->latestOfMany('recorded_at');
+    }
+
     public function scopeFilterName($query, $request)
     {
         if (isset($request['search']) && $request['search'] != '') {
