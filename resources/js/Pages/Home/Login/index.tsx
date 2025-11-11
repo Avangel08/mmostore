@@ -8,6 +8,7 @@ import { t } from 'i18next';
 //import images
 import logoLight from "../../../../images/logo-light.png";
 import GuestLayout from '../../../Layouts/GuestLayout';
+import axios from 'axios';
 
 const Index = () => {
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
@@ -47,18 +48,24 @@ const Index = () => {
         }),
         onSubmit: (values) => {
             setIsSubmitting(true);
-            router.post(route('home.login.post'), values, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    setServerError(null);
-                    setIsSubmitting(false);
-                },
-                onError: (errors: any) => {
-                    validation.setErrors(errors);
-                    const topMessage = Array.isArray(errors?.login) ? errors.login[0] : errors?.login;
-                    setServerError(topMessage || t('Invalid credentials'));
-                    setIsSubmitting(false);
+            axios.post(route('home.login.post'), values).then((response) => {
+                setServerError(null);
+                setIsSubmitting(false);
+                const data = response?.data as {
+                    user_id?: string;
+                    token?: string;
+                    expires_at?: string;
+                };
+                if (data?.token && data?.user_id) {
+                    const url = route("home.go-to-store", { id: data.user_id }) + `?token=${data.token}`;
+                    window.open(url, "_self");
                 }
+            }).catch((response) => {
+                const errors = response?.response?.data?.errors;
+                validation.setErrors(errors);
+                const topMessage = Array.isArray(errors?.login) ? errors.login[0] : errors?.login;
+                setServerError(topMessage || t('Invalid credentials'));
+                setIsSubmitting(false);
             });
         },
     });

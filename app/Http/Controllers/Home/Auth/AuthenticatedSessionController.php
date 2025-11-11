@@ -46,13 +46,19 @@ class AuthenticatedSessionController extends Controller
         $cacheKey = "popup_login_token:{$user->id}:{$popupToken}";
         Cache::put($cacheKey, true, now()->addMinutes(120));
 
-        $request->session()->flash('popup', [
+        /*  old code using session to show popup ask redirect to subdomain
+            $request->session()->flash('popup', [
+                'user_id' => (string) $user->id,
+                'token' => $popupToken,
+                'expires_at' => now()->addMinutes(120)->toISOString(),
+            ]); 
+        */
+
+        return response()->json([
             'user_id' => (string) $user->id,
             'token' => $popupToken,
             'expires_at' => now()->addMinutes(120)->toISOString(),
         ]);
-
-        return redirect()->intended(RouteServiceProvider::getRedirectAfterAuthenticated());
     }
 
     public function goToStore(Request $request, $id)
