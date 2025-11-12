@@ -119,7 +119,7 @@ const ModalBuy: React.FC<ProductModalProps> = ({ productId, show, onClose, }) =>
                         fontSize: "1.75rem",
                     }}
                 >
-                    {t("Xác nhận đơn hàng")}
+                    {t("Confirm order")}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body style={{ padding: "0 2rem 2rem 2rem" }}>
