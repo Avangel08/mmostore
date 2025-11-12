@@ -106,7 +106,8 @@ const AdPopup = () => {
                         alt={`Ad Banner ${currentIndex + 1}`}
                         width="500"
                         height="500"
-                        loading="lazy"
+                        loading="eager"
+                        fetchPriority="high"
                         decoding="async"
                         className="w-100"
                     />
