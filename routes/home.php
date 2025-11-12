@@ -23,4 +23,6 @@ Route::domain($mainDomain)->group(function () {
     Route::get('forgot-password/success', [ForgotPasswordController::class, 'success'])->name('home.forgot-password.success');
     Route::get('reset-password/{token}', [ResetPasswordController::class, 'create'])->name('home.reset-password');
     Route::post('reset-password', [ResetPasswordController::class, 'store'])->name('home.reset-password.post');
+    // Post Routes
+    Route::get('post/{slug}', [HomeController::class, 'post'])->name('home.post.detail');
 });
