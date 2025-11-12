@@ -42,6 +42,9 @@ const PostDetail = () => {
                         background: #fff;
                         border-bottom: 1px solid #e9ebec;
                     }
+                    .header-item {
+                        height: auto;
+                    }
                 `}
             </style>
             <Head title="MMO Store" />
