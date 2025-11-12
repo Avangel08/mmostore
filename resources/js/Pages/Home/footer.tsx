@@ -66,12 +66,12 @@ const Footer = () => {
                                     <div className="text-muted mt-3">
                                         <ul className="list-unstyled ff-secondary footer-list">
                                             <li>
-                                                <Link href="/">
+                                                <Link href="https://mmostores.shop/post/chinh-sach-bao-mat">
                                                     Chính sách bảo mật
                                                 </Link>
                                             </li>
                                             <li>
-                                                <Link href="/apps-mailbox">
+                                                <Link href="https://mmostores.shop/post/dieu-khoan-su-dung">
                                                     Điều khoản sử dụng
                                                 </Link>
                                             </li>
