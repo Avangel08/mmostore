@@ -36,4 +36,7 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'ecaptcha' => [
+        'key' => env('ECAPTCHA_KEY', "966eef428fc9be34a57dd29245b48162"),
+    ]
 ];

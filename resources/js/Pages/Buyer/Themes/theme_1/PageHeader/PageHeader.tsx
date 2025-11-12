@@ -1,6 +1,7 @@
 import React from "react"
 import { Col, Container, Row } from "react-bootstrap"
 import { usePage } from "@inertiajs/react";
+import "ckeditor5/ckeditor5.css";
 
 import hero from "../../../../../../images/hero/hero.png"
 

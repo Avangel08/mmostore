@@ -3,8 +3,7 @@ namespace App\Services\Home;
 
 use App\Models\MySQL\User;
 use App\Models\MySQL\Stores;
-use DB;
-
+use Illuminate\Support\Facades\DB;
 
 class UserService
 {
@@ -20,7 +19,14 @@ class UserService
 
     public function delete($id)
     {
-        return User::where('id', $id)->delete();
+        return DB::transaction(function () use ($id) {
+            $store = Stores::where('user_id', $id)->get();
+            if ($store->isNotEmpty()) {
+                $store->storeCategories()->detach();
+                $store->delete();
+            }
+            return User::where('id', $id)->delete();
+        });
     }
 
     public function deletes(array $ids)
@@ -28,7 +34,10 @@ class UserService
         return DB::transaction(function () use ($ids) {
             $deletedUsers = User::whereIn('id', $ids)->delete();
 
-            Stores::whereIn('user_id', $ids)->delete();
+            Stores::whereIn('user_id', $ids)->get()->each(function ($store) {
+                $store->storeCategories()->detach();
+                $store->delete();
+            });
 
             return $deletedUsers;
         });
@@ -46,21 +55,36 @@ class UserService
 
     public function getAll($select = ["*"], $relation = [], $isPaginate = false, $perPage = 10, $page = 1, $orderBy = ['id', 'DESC'], $request = null)
     {
-        $query = User::select($select)->with($relation);
+        $selectColumns = $select;
 
-        // Apply filters if request is provided
+        if (count($selectColumns) === 1 && $selectColumns[0] === '*') {
+            $selectColumns = ['users.*'];
+        }
+
+        $query = User::select($selectColumns)
+            ->with($relation)
+            ->withReportAccountSeller();
+
         if ($request) {
             $query->filterName($request)
                   ->filterEmail($request)
                   ->filterType($request)
                   ->filterStatus($request)
-                  ->filterCreatedDate($request);
+                  ->filterCreatedDate($request)
+                  ->filterStoreVerifyStatus($request);
+        }
+
+        $orderColumn = $orderBy[0] ?? 'id';
+        $orderDirection = $orderBy[1] ?? 'DESC';
+
+        if (!str_contains($orderColumn, '.')) {
+            $orderColumn = 'users.' . $orderColumn;
         }
 
         if ($isPaginate) {
-            return $query->orderBy(...$orderBy)->paginate($perPage, ['*'], 'page', $page);
+            return $query->orderBy($orderColumn, $orderDirection)->paginate($perPage, ['*'], 'page', $page);
         }
 
-        return $query->orderBy(...$orderBy)->get();
+        return $query->orderBy($orderColumn, $orderDirection)->get();
     }
 }

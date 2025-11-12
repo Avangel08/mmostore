@@ -1,5 +1,5 @@
 import { Link } from "@inertiajs/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Scrollspy from "react-scrollspy";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -29,6 +29,7 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
     const { t } = useTranslation();
     const storageUrl = usePage().props.storageUrl as string;
     const theme = useThemeConfig()
+    const { settings } = usePage().props as any;
 
     const handleLogout = () => {
         router.post(route("buyer.logout"), {}, {
@@ -104,6 +105,14 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
             document.body.classList.contains('twocolumn-panel') ? document.body.classList.remove('twocolumn-panel') : document.body.classList.add('twocolumn-panel');
         }
     };
+
+    const menuItems = useMemo(() => {
+        if (settings?.menus) {
+            const newMenu = settings?.menus.filter((menu: any) => menu.status === 'active')
+            return newMenu;
+        }
+        return []
+    }, [settings?.menus])
 
     return (
         <React.Fragment>
@@ -187,6 +196,15 @@ const Navbar = ({ onChangeLayoutMode, layoutModeType }: any) => {
                                         </NavLink>
                                     )}
                                 </li>
+                                {menuItems && menuItems?.map((item: any, index: number) => (
+                                    <li key={index} className="nav-item">
+                                        {!!user && (
+                                            <NavLink target="_blank" rel="noopener noreferrer" className="fs-16" href={`https://${item?.value}`}>
+                                                {item?.label ?? ""}
+                                            </NavLink>
+                                        )}
+                                    </li>
+                                ))}
                             </Scrollspy>
 
                             <div className="d-flex align-items-center">

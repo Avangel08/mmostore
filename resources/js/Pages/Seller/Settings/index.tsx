@@ -9,6 +9,7 @@ import ThemeConfigs from "./themeConfig";
 import DomainConfig from "./domainConfig";
 import ContactConfig from "./contactConfig";
 import NotificationConfig from "./notificationConfig";
+import MenuConfig from "./menuConfig";
 
 const ThemeSettings = () => {
     const { t } = useTranslation()
@@ -54,6 +55,12 @@ const ThemeSettings = () => {
                                                     {t("Notification")}
                                                 </Nav.Link>
                                             </Nav.Item>
+                                            <Nav.Item>
+                                                <Nav.Link eventKey="menuTab">
+                                                    <i className="ri-menu-line me-1"></i>
+                                                    {t("Menu")}
+                                                </Nav.Link>
+                                            </Nav.Item>
                                         </Nav>
                                         <Tab.Content className="mt-4">
                                             <Tab.Pane eventKey="themeTab">
@@ -67,6 +74,9 @@ const ThemeSettings = () => {
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="notificationTab">
                                                 <NotificationConfig activeTab={activeTab} />
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="menuTab">
+                                                <MenuConfig activeTab={activeTab} />
                                             </Tab.Pane>
                                         </Tab.Content>
                                     </Tab.Container>

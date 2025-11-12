@@ -17,6 +17,7 @@ interface UserFilterProps {
     ) => void;
     status?: any;
     type?: any;
+    verifyStatus?: any;
 }
 
 interface UserFilters {
@@ -26,9 +27,10 @@ interface UserFilters {
     createdDateStart: string;
     createdDateEnd: string;
     status: string;
+    verifyStatus: string;
 }
 
-const UserFilter = ({onFilter, status, type}: UserFilterProps) => {
+const UserFilter = ({ onFilter, status, type, verifyStatus }: UserFilterProps) => {
     const {t, i18n} = useTranslation();
     const flatpickrRef = useRef<any>(null);
     const [isFilterVisible, setIsFilterVisible] = useState(false);
@@ -43,6 +45,7 @@ const UserFilter = ({onFilter, status, type}: UserFilterProps) => {
             createdDateStart: paramsUrl?.createdDateStart ?? "",
             createdDateEnd: paramsUrl?.createdDateEnd ?? "",
             status: paramsUrl?.status ?? "",
+            verifyStatus: paramsUrl?.verifyStatus ?? "",
         };
     };
 
@@ -64,8 +67,17 @@ const UserFilter = ({onFilter, status, type}: UserFilterProps) => {
         }))
     ], [status, t]);
 
+    const verifyStatusOptions: any = useMemo(() => [
+        {value: "", label: t("All")},
+        ...Object.entries(verifyStatus || {}).map(([key, value]) => ({
+            value: value,
+            label: t(key)
+        }))
+    ], [verifyStatus, t]);
+
     const [selectedType, setSelectedType] = useState({value: "", label: t("All")});
     const [selectedStatus, setSelectedStatus] = useState({value: "", label: t("All")});
+    const [selectedVerifyStatus, setSelectedVerifyStatus] = useState({value: "", label: t("All")});
 
     useEffect(() => {
         if (typeOptions.length > 0) {
@@ -73,6 +85,9 @@ const UserFilter = ({onFilter, status, type}: UserFilterProps) => {
         }
         if (statusOptions.length > 0) {
             setSelectedStatus(statusOptions[0]);
+        }
+        if (verifyStatusOptions.length > 0) {
+            setSelectedVerifyStatus(verifyStatusOptions[0]);
         }
     }, [typeOptions, statusOptions]);
 
@@ -97,7 +112,18 @@ const UserFilter = ({onFilter, status, type}: UserFilterProps) => {
                 setSelectedStatus(matchingStatus);
             }
         }
-    }, [paramsUrl?.type, paramsUrl?.status, typeOptions, statusOptions]);
+
+        const urlVerifyStatus = paramsUrl?.verifyStatus;
+        if (urlVerifyStatus !== null) {
+            const matchingVerifyStatus = verifyStatusOptions.find(
+                (option: any) => option.value.toString() === urlVerifyStatus
+            );
+
+            if (matchingVerifyStatus) {
+                setSelectedVerifyStatus(matchingVerifyStatus);
+            }
+        }
+    }, [paramsUrl?.type, paramsUrl?.status, paramsUrl?.verifyStatus, typeOptions, statusOptions, verifyStatusOptions]);
 
 
     const getFlatpickrLocale = () => {
@@ -136,6 +162,11 @@ const UserFilter = ({onFilter, status, type}: UserFilterProps) => {
         handleInputChange("status", selected.value);
     };
 
+    const handleVerifyStatusChange = (selected: any) => {
+        setSelectedVerifyStatus(selected);
+        handleInputChange("verifyStatus", selected.value);
+    };
+
     const handleFilter = () => {
         onFilter(1, Number(perPage), filters);
     };
@@ -153,13 +184,15 @@ const UserFilter = ({onFilter, status, type}: UserFilterProps) => {
         const createdDateStart = paramsUrl?.createdDateStart || "";
         const createdDateEnd = paramsUrl?.createdDateEnd || "";
         const status = paramsUrl?.status || "";
+        const verifyStatus = paramsUrl?.verifyStatus || "";
         return (
             (name !== null && name !== "") ||
             (email !== null && email !== "") ||
             (type !== null && type !== "") ||
             (createdDateStart !== null && createdDateStart !== "") ||
             (createdDateEnd !== null && createdDateEnd !== "") ||
-            (status !== null && status !== "")
+            (status !== null && status !== "") ||
+            (verifyStatus !== null && verifyStatus !== "")
         );
     };
 
@@ -171,10 +204,12 @@ const UserFilter = ({onFilter, status, type}: UserFilterProps) => {
             createdDateStart: "",
             createdDateEnd: "",
             status: "",
+            verifyStatus: "",
         };
         setFilters(resetFilters);
         setSelectedType(typeOptions[0]);
         setSelectedStatus(statusOptions[0]);
+        setSelectedVerifyStatus(verifyStatusOptions[0]);
 
         if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
             flatpickrRef.current.flatpickr.clear();
@@ -196,9 +231,8 @@ const UserFilter = ({onFilter, status, type}: UserFilterProps) => {
                     className="d-flex align-items-center"
                 >
                     <i
-                        className={`ri-filter-${
-                            isFilterVisible ? "off" : "2"
-                        }-line align-bottom me-2`}
+                        className={`ri-filter-${isFilterVisible ? "off" : "2"
+                            }-line align-bottom me-2`}
                     ></i>
                     {isFilterVisible ? t("Hide Filters") : t("Show Filters")}
                 </Button>
@@ -257,7 +291,7 @@ const UserFilter = ({onFilter, status, type}: UserFilterProps) => {
                                     locale: getFlatpickrLocale(),
                                 }}
                                 value={
-                                    filters.createdDateStart && filters.createdDateEnd ? [ new Date(filters.createdDateStart), new Date(filters.createdDateEnd) ] : filters.createdDateStart ? [new Date(filters.createdDateStart)] : []
+                                    filters.createdDateStart && filters.createdDateEnd ? [new Date(filters.createdDateStart), new Date(filters.createdDateEnd)] : filters.createdDateStart ? [new Date(filters.createdDateStart)] : []
                                 }
                                 onChange={handleDateChange}
                             />
@@ -295,6 +329,23 @@ const UserFilter = ({onFilter, status, type}: UserFilterProps) => {
                                 menuPortalTarget={document.body}
                                 styles={{
                                     menuPortal: (base) => ({...base, zIndex: 9999}),
+                                }}
+                            />
+                        </Col>
+
+                        <Col md={3}>
+                            <Form.Label htmlFor="filter-verify-status">{t("Verify status")}</Form.Label>
+                            <Select
+                                id="filter-verify-status"
+                                value={selectedVerifyStatus}
+                                onChange={handleVerifyStatusChange}
+                                options={verifyStatusOptions}
+                                classNamePrefix="select"
+                                isSearchable={true}
+                                placeholder={t("Select verify status")}
+                                menuPortalTarget={document.body}
+                                styles={{
+                                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                                 }}
                             />
                         </Col>

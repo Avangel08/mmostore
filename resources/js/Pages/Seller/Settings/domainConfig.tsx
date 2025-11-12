@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { FieldArray, FormikProvider, useFormik } from "formik";
-import { router, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import * as Yup from "yup";
 import { showToast } from "../../../utils/showToast";
 
@@ -83,9 +83,15 @@ const DomainConfig = ({ activeTab }: any) => {
                     <div className="mb-3">
                         <h5 className="mb-2">{t("Domain")}<span className="text-danger">*</span></h5>
                         <p className="text-muted fs-14 mb-1">{t("To ensure that a website can be recognized and displayed to users, it must always have a primary domain name. Only one domain can be selected as the main domain")}</p>
-                        <p className="text-muted fs-14 mb-3">
+                        <p className="text-muted fs-14 mb-1">
                             {t("Current domain")}:{" "}<span className="fst-italic">{domains.find((d: any) => d.includes(domainSuffix))}</span>
                         </p>
+                        <div className="support-message text-muted mb-3">
+                            <span className="me-2">{t("Contact the admin for support with domain configuration.")}</span>
+                            <a href="https://t.me/mmoshop_io" className="support-link fst-italic text-decoration-underline text-success" target="_blank" rel="noreferrer">
+                                <i className="ri-customer-service-line"></i> {t("Get support")}
+                            </a>
+                        </div>
                         <Row>
                             <Col>
                                 {/* <Form.Group>

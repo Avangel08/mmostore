@@ -98,6 +98,7 @@ const bestSellingProducts = [
         date: "19 Mar 2021",
         price: 85.2,
         orders: 35,
+        stock: null,
         amount: 2982,
     },
     {
@@ -117,6 +118,7 @@ const bestSellingProducts = [
         date: "11 Feb 2021",
         price: 127.5,
         orders: 56,
+        stock: null,
         amount: 7140,
     },
     {

@@ -8,6 +8,7 @@ use App\Services\BuyerProfile\BuyerProfileService;
 use App\Models\Mongo\CustomerAccessToken;
 use App\Services\CustomerAccessToken\CustomerAccessTokenService;
 use App\Services\Order\OrderService;
+use App\Services\Setting\SettingService;
 use Illuminate\Support\Facades\Auth;
 use Hash;
 use Illuminate\Validation\ValidationException;
@@ -18,15 +19,19 @@ class ProfileController extends Controller
 {
     protected $buyerProfileService;
     protected $customerAccessTokenService;
+    protected $orderService;
+    protected $settingService;
 
     public function __construct(
         BuyerProfileService $buyerProfileService,
         CustomerAccessTokenService $customerAccessTokenService,
-        OrderService $orderService
+        OrderService $orderService,
+        SettingService $settingService
     ) {
         $this->buyerProfileService = $buyerProfileService;
         $this->customerAccessTokenService = $customerAccessTokenService;
         $this->orderService = $orderService;
+        $this->settingService = $settingService;
     }
 
     public function index()
@@ -38,6 +43,15 @@ class ProfileController extends Controller
             return back()->with('error', 'User not found');
         }
         $store = app('store');
+        $settings = $this->settingService->getSettings(true);
+        $result = [];
+        foreach ($settings as $setting) {
+            if ($setting->key === 'contacts' || $setting->key === 'domains' || $setting->key === 'menus') {
+                $result[$setting->key] = json_decode($setting->value, true) ?: [];
+            } else {
+                $result[$setting->key] = $setting->value;
+            }
+        }
         return Inertia::render("Themes/{$theme}/Profile/index", [
             'purchasedCount' => Inertia::optional(fn() => $this->orderService->countQuantityPurchasedByOrder($user->_id)),
             'token' => $this->customerAccessTokenService->userFindFirstTokenByTokenable(
@@ -46,7 +60,7 @@ class ProfileController extends Controller
             ),
             'store' =>  fn() => $store,
             'domainSuffix' => config('app.domain_suffix'),
-
+            'settings' => fn() => $result
         ]);
     }
 
