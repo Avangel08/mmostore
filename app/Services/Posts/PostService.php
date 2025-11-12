@@ -59,4 +59,12 @@ class PostService
             ->where('id', $id)
             ->first();
     }
+
+    public function findBySlug($slug, $select = ['*'], $relation = [])
+    {
+        return Posts::select($select)
+            ->with($relation)
+            ->where('slug', $slug)
+            ->first();
+    }
 }

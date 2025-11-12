@@ -14,4 +14,5 @@ Route::domain($mainDomain)->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'index'])->name('home.login');
     Route::post('login', [AuthenticatedSessionController::class, 'login'])->name('home.login.post');
     Route::get('go-to-store/{id}', [AuthenticatedSessionController::class, 'goToStore'])->name('home.go-to-store');
+    Route::get('post/{slug}', [HomeController::class, 'post'])->name('home.post.detail');
 });
