@@ -4,11 +4,11 @@ import { Button, Modal } from "react-bootstrap";
 
 const banners = [
     {
-        image: "/images/popup-hidemium.png",
+        image: "/images/banner/popup-hidemium.webp",
         link: "https://hidemium.io?utm_source=mmoshop_web&utm_medium=banner&utm_campaign=hidemium",
     },
     {
-        image: "/images/popup-merdify.png",
+        image: "/images/banner/popup-merdify.webp",
         link: "https://merdify.com?utm_campaign=merdify&utm_medium=banner&utm_source=mmoshop_web",
     },
 ];
@@ -20,8 +20,6 @@ const AdPopup = () => {
         const data = JSON.parse(localStorage.getItem("ad_popup_log") || "{}");
         return typeof data.index === "number" ? data.index : 0;
     });
-
-    const storageUrl = usePage().props.storageUrl as string;
 
     useEffect(() => {
         const showAdPopup = () => setShowPopup(true);
@@ -97,7 +95,6 @@ const AdPopup = () => {
                 onHide={handleClose}
                 onExited={handleExited}
                 backdrop="static"
-                size="lg"
                 centered
             >
                 <Button className="close-popup btn btn-ghost-dark waves-effect waves-light" onClick={handleClose}>
@@ -105,8 +102,12 @@ const AdPopup = () => {
                 </Button>
                 <a href={banners[currentIndex].link} target="_blank" rel="noopener noreferrer">
                     <img
-                        src={storageUrl + banners[currentIndex].image}
+                        src={banners[currentIndex].image}
                         alt={`Ad Banner ${currentIndex + 1}`}
+                        width="500"
+                        height="500"
+                        loading="lazy"
+                        decoding="async"
                         className="w-100"
                     />
                 </a>
