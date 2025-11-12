@@ -349,6 +349,5 @@
     "The menu status is required.": "The menu status is required.",
     "The menu status must be Active or Inactive.": "The menu status must be Active or Inactive.",
     "Phương thức thanh toán không tồn tại": "Payment method does not exist",
-    "Số dư không đủ": "Insufficient balance",
-    "Xác nhận đơn hàng": "Confirm Order"
+    "Số dư không đủ": "Insufficient balance"
 }
