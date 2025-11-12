@@ -38,7 +38,7 @@ const Sidebar = ({ layoutType }: any) => {
     <React.Fragment>
       <div className="app-menu navbar-menu">
         <div className="navbar-brand-box">
-          <Link href="/" className="logo logo-dark">
+          <Link href={route('seller.home')} className="logo logo-dark">
             <span className="logo-sm">
               <img src={logoSm} alt="" height="22" />
             </span>
@@ -47,7 +47,7 @@ const Sidebar = ({ layoutType }: any) => {
             </span>
           </Link>
 
-          <Link href="/" className="logo logo-light">
+          <Link href={route('seller.home')} className="logo logo-light">
             <span className="logo-sm">
               <img src={logoSm} alt="" height="22" />
             </span>
@@ -66,7 +66,7 @@ const Sidebar = ({ layoutType }: any) => {
         </div>
 
         <Dropdown className="sidebar-user m-1 rounded">
-          <Dropdown.Toggle type="button" className="btn material-shadow-none arrow-none" id="page-header-user-dropdown" style={{backgroundColor: 'transparent', border: "none"}}>
+          <Dropdown.Toggle type="button" className="btn material-shadow-none arrow-none" id="page-header-user-dropdown" style={{ backgroundColor: 'transparent', border: "none" }}>
             <span className="d-flex align-items-center gap-2">
               <img className="rounded header-profile-user" src={avatar1} alt="Header Avatar" />
               <span className="text-start">
