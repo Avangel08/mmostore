@@ -119,7 +119,7 @@ const Faqs = () => {
                                             onClick={t_col1}
                                             style={{ cursor: "pointer" }}
                                         >
-                                            {t("What is MMO Shop?")}
+                                            {t("What is MMO Shop")}
                                         </button>
                                     </h2>
                                     <Collapse

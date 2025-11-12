@@ -131,7 +131,7 @@ const Navbar = () => {
                                     <NavLink href="#faqs">FAQ</NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <NavLink target="_blank" href="https://t.me/mmoshop_io">Liên hệ</NavLink>
+                                    <NavLink target="_blank" href="https://t.me/mmoshop_io">{t("Contact")}</NavLink>
                                 </li>
                                 <li className="nav-item">
                                     <NavLink target="_blank" href="https://hidemium-organization.gitbook.io/mmoshop-owner-store">{t("Document")}</NavLink>

@@ -60,12 +60,12 @@ const Footer = () => {
                                             </li>
                                             <li>
                                                 <a target="_blank" rel="noopener noreferrer" href="https://t.me/mmoshop_io">
-                                                    Liên hệ
+                                                    {t("Contact")}
                                                 </a>
                                             </li>
                                             <li>
                                                 <a target="_blank" rel="noopener noreferrer" href="https://hidemium-organization.gitbook.io/mmoshop-owner-store">
-                                                    Tài liệu
+                                                    {t("Document")}
                                                 </a>
                                             </li>
                                             {/* <li>
