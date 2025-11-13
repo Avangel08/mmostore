@@ -76,7 +76,9 @@ const ThemeConfigs = ({ activeTab }: any) => {
             metaDescription: settings?.metaDescription || ""
         },
         validationSchema: Yup.object({
-            storeName: Yup.string().required(t("Please enter store name")),
+            storeName: Yup.string()
+                .required(t("Please enter store name"))
+                .max(60, t("Store name must not exceed 60 characters")),
             pageHeaderImage: settings?.pageHeaderImage
                 ? Yup.mixed().nullable()
                 : Yup.mixed().required(t("Please select a page header image")),
@@ -85,6 +87,8 @@ const ThemeConfigs = ({ activeTab }: any) => {
                 : Yup.mixed().required(t("Please select a logo store")),
             pageHeaderText: Yup.string().required(t("Please enter page header text")),
             currency: Yup.string().required(t("Please choose currency")),
+            metaDescription: Yup.string()
+                .max(200, t("Meta description must not exceed 200 characters")),
         }),
         onSubmit: (values) => {
             const formData = new FormData();
@@ -222,6 +226,7 @@ const ThemeConfigs = ({ activeTab }: any) => {
                                     >
                                         {t('Store name')}{" "}<span className="text-danger">*</span>
                                     </Form.Label>
+                                    <p className="text-muted fst-italic">{t("Store name and title as it appears in the search toolbar (no more than 60 characters)")}</p>
                                     <Form.Control
                                         type="text"
                                         className="form-control"
@@ -231,6 +236,7 @@ const ThemeConfigs = ({ activeTab }: any) => {
                                         id="setting-title-input"
                                         placeholder={t("Enter name store")}
                                         value={formik.values.storeName}
+                                        maxLength={60}
                                         isInvalid={!!(formik.touched?.storeName && formik.errors?.storeName)}
                                     />
                                 </Form.Group>
@@ -248,7 +254,7 @@ const ThemeConfigs = ({ activeTab }: any) => {
                                     >
                                         {t('Meta description')}
                                     </Form.Label>
-                                    <p className="text-muted fst-italic">{t("Meta description for a website on search engines")}</p>
+                                    <p className="text-muted fst-italic">{t("Meta description for a website on search engines (no more than 200 characters)")}</p>
                                     <Form.Control
                                         type="text"
                                         className="form-control"
@@ -258,7 +264,14 @@ const ThemeConfigs = ({ activeTab }: any) => {
                                         id="setting-meta-description-input"
                                         placeholder={t("Enter meta description")}
                                         value={formik.values.metaDescription}
+                                        maxLength={200}
+                                        isInvalid={!!(formik.touched?.metaDescription && formik.errors?.metaDescription)}
                                     />
+                                    {formik.touched?.metaDescription && formik.errors?.metaDescription && (
+                                        <Form.Control.Feedback type="invalid" className="invalid-feedback d-block">
+                                            {t(formik.errors.metaDescription)}
+                                        </Form.Control.Feedback>
+                                    )}
                                 </Form.Group>
                             </div>
                             {/** Store Logo */}
@@ -286,7 +299,7 @@ const ThemeConfigs = ({ activeTab }: any) => {
                             )}
                             <div className="mb-4">
                                 <h5 className="fs-14 mb-2">{t("Logo")}{" "}<span className="text-danger">*</span></h5>
-                                <p className="text-muted fst-italic">Kích thước tối thiểu: 124 × 17 px</p>
+                                <p className="text-muted fst-italic">{t("Recommended size")}: 124 × 17 px</p>
                                 <div className="text-center">
                                     <div className="position-relative d-inline-block">
                                         <div className="position-absolute top-100 start-100 translate-middle">
@@ -358,7 +371,7 @@ const ThemeConfigs = ({ activeTab }: any) => {
                             )}
                             <div className="mb-3">
                                 <Form.Label>{t('Page header image')}{" "}<span className="text-danger">*</span></Form.Label>
-                                <p className="text-muted fst-italic">Kích thước yêu cầu: 262 × 195 px</p>
+                                <p className="text-muted fst-italic">{t("Recommended size")}: 262 × 195 px</p>
                                 <FilePond
                                     files={files}
                                     onupdatefiles={(fileItems) => {
