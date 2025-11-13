@@ -89,8 +89,8 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
                                                 </Button>
                                             </div>
                                         ) : order.status === "FAILED" && order.notes ? (
-                                            <span className="text-danger" title={order.notes}>
-                          {order.notes}
+                                            <span className="text-danger" title={t(order.notes)}>
+                          {t(order.notes)}
                         </span>
                                         ) : ("")}
                                     </td>
@@ -106,5 +106,4 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
 };
 
 export default OrdersTable;
-
 
