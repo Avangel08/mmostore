@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import Flatpickr from "react-flatpickr";
@@ -47,42 +47,55 @@ const ProductFilter = ({ onFilter, additionalButtons }: ProductFilterProps) => {
 
   const [filters, setFilters] = useState<ProductFilters>(getInitialFilters());
 
-  const categoryOptions = categories.map((cat: any) => ({
-    value: cat?.id,
-    label: cat?.name,
-  }));
-  categoryOptions.unshift({ value: "", label: t("All") });
+  const categoryOptions = useMemo(() => {
+    const options = categories.map((cat: any) => ({
+      value: cat?.id,
+      label: cat?.name,
+    }));
+    options.unshift({ value: "", label: t("All") });
+    return options;
+  }, [categories, t, i18n.language]);
 
-  const statusOptions = [
+  const statusOptions = useMemo(() => [
     { value: "", label: t("All") },
     { value: "ACTIVE", label: t("Active") },
     { value: "INACTIVE", label: t("Inactive") },
-  ];
+  ], [t, i18n.language]);
 
-  const [selectedCategory, setSelectedCategory] = useState(categoryOptions[0]);
-  const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
+  const [selectedCategory, setSelectedCategory] = useState<any>(() => categoryOptions[0] || { value: "", label: t("All") });
+  const [selectedStatus, setSelectedStatus] = useState<any>(() => statusOptions[0] || { value: "", label: t("All") });
 
   useEffect(() => {
+    if (categoryOptions.length === 0 || statusOptions.length === 0) return;
+
     const urlCategory = paramsUrl?.category;
-    if (urlCategory !== null) {
+    if (urlCategory !== null && urlCategory !== "") {
       const matchingCategory = categoryOptions.find(
         (option) => option?.value?.toString() === urlCategory
       );
       if (matchingCategory) {
         setSelectedCategory(matchingCategory);
+      } else {
+        setSelectedCategory(categoryOptions[0]);
       }
+    } else {
+      setSelectedCategory(categoryOptions[0]);
     }
 
     const urlStatus = paramsUrl?.status;
-    if (urlStatus !== null) {
+    if (urlStatus !== null && urlStatus !== "") {
       const matchingStatus = statusOptions.find(
         (option) => option?.value?.toString() === urlStatus
       );
       if (matchingStatus) {
         setSelectedStatus(matchingStatus);
+      } else {
+        setSelectedStatus(statusOptions[0]);
       }
+    } else {
+      setSelectedStatus(statusOptions[0]);
     }
-  }, []);
+  }, [categoryOptions, statusOptions, paramsUrl?.category, paramsUrl?.status, i18n.language]);
 
   const getFlatpickrLocale = () => {
     switch (i18n.language) {

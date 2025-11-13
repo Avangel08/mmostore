@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import Flatpickr from "react-flatpickr";
@@ -46,26 +46,32 @@ const CategoryFilter = ({ onFilter, additionalButtons }: CategoryFilterProps) =>
 
   const [filters, setFilters] = useState<CategoryFilters>(getInitialFilters());
 
-  const statusOptions = [
+  const statusOptions = useMemo(() => [
     { value: "", label: t("All") },
     { value: "ACTIVE", label: t("Active") },
     { value: "INACTIVE", label: t("Inactive") },
-  ];
+  ], [t, i18n.language]);
 
-  const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
+  const [selectedStatus, setSelectedStatus] = useState<any>(() => statusOptions[0] || { value: "", label: t("All") });
 
   // Set initial status from URL parameter
   useEffect(() => {
+    if (statusOptions.length === 0) return;
+
     const urlStatus = paramsUrl?.status;
-    if (urlStatus !== null) {
+    if (urlStatus !== null && urlStatus !== "") {
       const matchingStatus = statusOptions.find(
         (option) => option.value.toString() === urlStatus
       );
       if (matchingStatus) {
         setSelectedStatus(matchingStatus);
+      } else {
+        setSelectedStatus(statusOptions[0]);
       }
+    } else {
+      setSelectedStatus(statusOptions[0]);
     }
-  }, []);
+  }, [statusOptions, paramsUrl?.status, i18n.language]);
 
   const getFlatpickrLocale = () => {
     switch (i18n.language) {
