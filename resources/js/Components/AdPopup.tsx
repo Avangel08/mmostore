@@ -22,6 +22,12 @@ const AdPopup = () => {
     });
 
     useEffect(() => {
+        // 🎯 1. Preload tất cả ảnh banner
+        banners.forEach((banner) => {
+            const img = new Image();
+            img.src = banner.image;
+        });
+
         const showAdPopup = () => setShowPopup(true);
         window.addEventListener("showAdPopup", showAdPopup);
         setTimeout(() => checkAndShowAd(), 0);
