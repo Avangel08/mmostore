@@ -17,6 +17,7 @@ interface ProductFilterProps {
     filters: ProductFilters
   ) => void;
   additionalButtons?: React.ReactNode;
+  statusConst?: Record<string, string>;
 }
 
 interface ProductFilters {
@@ -27,7 +28,7 @@ interface ProductFilters {
   status: string;
 }
 
-const ProductFilter = ({ onFilter, additionalButtons }: ProductFilterProps) => {
+const ProductFilter = ({ onFilter, additionalButtons, statusConst = {} }: ProductFilterProps) => {
   const { t, i18n } = useTranslation();
   const flatpickrRef = useRef<any>(null);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
@@ -54,48 +55,59 @@ const ProductFilter = ({ onFilter, additionalButtons }: ProductFilterProps) => {
     }));
     options.unshift({ value: "", label: t("All") });
     return options;
-  }, [categories, t, i18n.language]);
+  }, [categories, t]);
 
-  const statusOptions = useMemo(() => [
-    { value: "", label: t("All") },
-    { value: "ACTIVE", label: t("Active") },
-    { value: "INACTIVE", label: t("Inactive") },
-  ], [t, i18n.language]);
+  const statusOptions = useMemo(() => {
+    const options = [
+      { value: "", label: t("All") },
+    ];
+    
+    // Convert statusConst from backend to options format
+    Object.entries(statusConst).forEach(([key, label]) => {
+      options.push({
+        value: key,
+        label: t(label),
+      });
+    });
+    
+    return options;
+  }, [statusConst, t]);
 
-  const [selectedCategory, setSelectedCategory] = useState<any>(() => categoryOptions[0] || { value: "", label: t("All") });
-  const [selectedStatus, setSelectedStatus] = useState<any>(() => statusOptions[0] || { value: "", label: t("All") });
+  // Store values separately to preserve them during language changes
+  const [categoryValue, setCategoryValue] = useState<string>(paramsUrl?.category || "");
+  const [statusValue, setStatusValue] = useState<string>(paramsUrl?.status || "");
+  
+  // Find current options based on values
+  const selectedCategory = useMemo(() => {
+    if (categoryOptions.length === 0) return { value: "", label: t("All") };
+    if (categoryValue && categoryValue !== "") {
+      const found = categoryOptions.find(
+        (option) => option.value?.toString() === categoryValue
+      );
+      if (found) return found;
+    }
+    return categoryOptions[0];
+  }, [categoryOptions, categoryValue, t]);
 
+  const selectedStatus = useMemo(() => {
+    if (statusOptions.length === 0) return { value: "", label: t("All") };
+    if (statusValue && statusValue !== "") {
+      const found = statusOptions.find(
+        (option) => option.value.toString() === statusValue
+      );
+      if (found) return found;
+    }
+    return statusOptions[0];
+  }, [statusOptions, statusValue, t]);
+
+  // Sync values with URL parameters (only when URL changes)
   useEffect(() => {
-    if (categoryOptions.length === 0 || statusOptions.length === 0) return;
-
-    const urlCategory = paramsUrl?.category;
-    if (urlCategory !== null && urlCategory !== "") {
-      const matchingCategory = categoryOptions.find(
-        (option) => option?.value?.toString() === urlCategory
-      );
-      if (matchingCategory) {
-        setSelectedCategory(matchingCategory);
-      } else {
-        setSelectedCategory(categoryOptions[0]);
-      }
-    } else {
-      setSelectedCategory(categoryOptions[0]);
-    }
-
-    const urlStatus = paramsUrl?.status;
-    if (urlStatus !== null && urlStatus !== "") {
-      const matchingStatus = statusOptions.find(
-        (option) => option?.value?.toString() === urlStatus
-      );
-      if (matchingStatus) {
-        setSelectedStatus(matchingStatus);
-      } else {
-        setSelectedStatus(statusOptions[0]);
-      }
-    } else {
-      setSelectedStatus(statusOptions[0]);
-    }
-  }, [categoryOptions, statusOptions, paramsUrl?.category, paramsUrl?.status, i18n.language]);
+    const urlCategory = paramsUrl?.category || "";
+    const urlStatus = paramsUrl?.status || "";
+    
+    if (urlCategory !== categoryValue) setCategoryValue(urlCategory);
+    if (urlStatus !== statusValue) setStatusValue(urlStatus);
+  }, [paramsUrl?.category, paramsUrl?.status]);
 
   const getFlatpickrLocale = () => {
     switch (i18n.language) {
@@ -124,12 +136,12 @@ const ProductFilter = ({ onFilter, additionalButtons }: ProductFilterProps) => {
   };
 
   const handleCategoryChange = (selected: any) => {
-    setSelectedCategory(selected);
+    setCategoryValue(selected.value);
     handleInputChange("category", selected.value);
   };
 
   const handleStatusChange = (selected: any) => {
-    setSelectedStatus(selected);
+    setStatusValue(selected.value);
     handleInputChange("status", selected.value);
   };
 
@@ -161,8 +173,8 @@ const ProductFilter = ({ onFilter, additionalButtons }: ProductFilterProps) => {
       status: "",
     };
     setFilters(resetFilters);
-    setSelectedCategory(categoryOptions[0]);
-    setSelectedStatus(statusOptions[0]);
+    setCategoryValue("");
+    setStatusValue("");
 
     if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
       flatpickrRef.current.flatpickr.clear();

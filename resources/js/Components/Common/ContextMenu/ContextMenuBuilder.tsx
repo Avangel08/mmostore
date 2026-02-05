@@ -134,7 +134,7 @@ export class ContextMenuBuilder {
     label: string,
     icon?: string,
     className?: string,
-    onClick: (rowData: any) => void,
+    onClick?: (rowData: any) => void,
     disabled: boolean = false
   ): ContextMenuBuilder {
     this.addOption({
@@ -143,7 +143,7 @@ export class ContextMenuBuilder {
       icon,
       className,
       disabled,
-      onClick,
+      onClick: onClick || (() => {}),
     });
     return this;
   }

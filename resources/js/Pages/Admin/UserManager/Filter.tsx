@@ -75,55 +75,49 @@ const UserFilter = ({ onFilter, status, type, verifyStatus }: UserFilterProps) =
         }))
     ], [verifyStatus, t]);
 
-    const [selectedType, setSelectedType] = useState({value: "", label: t("All")});
-    const [selectedStatus, setSelectedStatus] = useState({value: "", label: t("All")});
-    const [selectedVerifyStatus, setSelectedVerifyStatus] = useState({value: "", label: t("All")});
+    // Store values separately to preserve them during language changes
+    const [typeValue, setTypeValue] = useState<string>(paramsUrl?.type || "");
+    const [statusValue, setStatusValue] = useState<string>(paramsUrl?.status || "");
+    const [verifyStatusValue, setVerifyStatusValue] = useState<string>(paramsUrl?.verifyStatus || "");
 
+    // Find current options based on values
+    const selectedType = useMemo(() => {
+        if (typeOptions.length === 0) return { value: "", label: t("All") };
+        if (typeValue && typeValue !== "") {
+            const found = typeOptions.find((option) => option.value.toString() === typeValue);
+            if (found) return found;
+        }
+        return typeOptions[0];
+    }, [typeOptions, typeValue, t]);
+
+    const selectedStatus = useMemo(() => {
+        if (statusOptions.length === 0) return { value: "", label: t("All") };
+        if (statusValue && statusValue !== "") {
+            const found = statusOptions.find((option) => option.value.toString() === statusValue);
+            if (found) return found;
+        }
+        return statusOptions[0];
+    }, [statusOptions, statusValue, t]);
+
+    const selectedVerifyStatus = useMemo(() => {
+        if (verifyStatusOptions.length === 0) return { value: "", label: t("All") };
+        if (verifyStatusValue && verifyStatusValue !== "") {
+            const found = verifyStatusOptions.find((option: any) => option.value.toString() === verifyStatusValue);
+            if (found) return found;
+        }
+        return verifyStatusOptions[0];
+    }, [verifyStatusOptions, verifyStatusValue, t]);
+
+    // Sync values with URL parameters
     useEffect(() => {
-        if (typeOptions.length > 0) {
-            setSelectedType(typeOptions[0]);
-        }
-        if (statusOptions.length > 0) {
-            setSelectedStatus(statusOptions[0]);
-        }
-        if (verifyStatusOptions.length > 0) {
-            setSelectedVerifyStatus(verifyStatusOptions[0]);
-        }
-    }, [typeOptions, statusOptions]);
-
-    useEffect(() => {
-        const urlType = paramsUrl?.type;
-        if (urlType !== null) {
-            const matchingType = typeOptions.find(
-                (option) => option.value.toString() === urlType
-            );
-            if (matchingType) {
-                setSelectedType(matchingType);
-            }
-        }
-
-        const urlStatus = paramsUrl?.status;
-        if (urlStatus !== null) {
-            const matchingStatus = statusOptions.find(
-                (option) => option.value.toString() === urlStatus
-            );
-
-            if (matchingStatus) {
-                setSelectedStatus(matchingStatus);
-            }
-        }
-
-        const urlVerifyStatus = paramsUrl?.verifyStatus;
-        if (urlVerifyStatus !== null) {
-            const matchingVerifyStatus = verifyStatusOptions.find(
-                (option: any) => option.value.toString() === urlVerifyStatus
-            );
-
-            if (matchingVerifyStatus) {
-                setSelectedVerifyStatus(matchingVerifyStatus);
-            }
-        }
-    }, [paramsUrl?.type, paramsUrl?.status, paramsUrl?.verifyStatus, typeOptions, statusOptions, verifyStatusOptions]);
+        const urlType = paramsUrl?.type || "";
+        const urlStatus = paramsUrl?.status || "";
+        const urlVerifyStatus = paramsUrl?.verifyStatus || "";
+        
+        if (urlType !== typeValue) setTypeValue(urlType);
+        if (urlStatus !== statusValue) setStatusValue(urlStatus);
+        if (urlVerifyStatus !== verifyStatusValue) setVerifyStatusValue(urlVerifyStatus);
+    }, [paramsUrl?.type, paramsUrl?.status, paramsUrl?.verifyStatus]);
 
 
     const getFlatpickrLocale = () => {
@@ -153,17 +147,17 @@ const UserFilter = ({ onFilter, status, type, verifyStatus }: UserFilterProps) =
     };
 
     const handleTypeChange = (selected: any) => {
-        setSelectedType(selected);
+        setTypeValue(selected.value);
         handleInputChange("type", selected.value);
     };
 
     const handleStatusChange = (selected: any) => {
-        setSelectedStatus(selected);
+        setStatusValue(selected.value);
         handleInputChange("status", selected.value);
     };
 
     const handleVerifyStatusChange = (selected: any) => {
-        setSelectedVerifyStatus(selected);
+        setVerifyStatusValue(selected.value);
         handleInputChange("verifyStatus", selected.value);
     };
 
@@ -207,9 +201,9 @@ const UserFilter = ({ onFilter, status, type, verifyStatus }: UserFilterProps) =
             verifyStatus: "",
         };
         setFilters(resetFilters);
-        setSelectedType(typeOptions[0]);
-        setSelectedStatus(statusOptions[0]);
-        setSelectedVerifyStatus(verifyStatusOptions[0]);
+        setTypeValue("");
+        setStatusValue("");
+        setVerifyStatusValue("");
 
         if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
             flatpickrRef.current.flatpickr.clear();

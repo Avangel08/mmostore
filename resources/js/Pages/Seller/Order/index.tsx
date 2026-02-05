@@ -12,7 +12,7 @@ import axios from "axios";
 
 const Order = () => {
     const {t} = useTranslation();
-    const {orders, categories, products} = usePage().props;
+    const {orders, categories, products, statusConst, paymentStatusConst} = usePage().props as any;
 
     const [showModal, setShowModal] = useState(false);
     const [dataEdit, setDataEdit] = useState<any>(null);
@@ -94,6 +94,8 @@ const Order = () => {
                                             category?: { _id: string; name: string }
                                         }>}
                                         customers={customers}
+                                        statusConst={statusConst}
+                                        paymentStatusConst={paymentStatusConst}
                                     />
                                     <Row>
                                         <Col>

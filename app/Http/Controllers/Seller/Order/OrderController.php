@@ -35,8 +35,19 @@ class OrderController extends Controller
 
         return Inertia::render('Order/index', [
             'orders' => fn() => $this->orderService->getForTable($requestData),
-            'statusOptions' => Orders::STATUS,
-            'paymentStatusOptions' => Orders::PAYMENT_STATUS,
+            'statusConst' => fn() => [
+                Orders::STATUS['PENDING'] => 'Pending',
+                Orders::STATUS['PROCESSING'] => 'Processing',
+                Orders::STATUS['COMPLETED'] => 'Completed',
+                Orders::STATUS['CANCELLED'] => 'Cancelled',
+                Orders::STATUS['FAILED'] => 'Failed',
+            ],
+            'paymentStatusConst' => fn() => [
+                Orders::PAYMENT_STATUS['PENDING'] => 'Pending',
+                Orders::PAYMENT_STATUS['PAID'] => 'Paid',
+                Orders::PAYMENT_STATUS['FAILED'] => 'Failed',
+                Orders::PAYMENT_STATUS['REFUNDED'] => 'Refunded',
+            ],
             'categories' => $this->categoryService->getActive(),
             'products' => $this->productService->getActive(),
         ]);

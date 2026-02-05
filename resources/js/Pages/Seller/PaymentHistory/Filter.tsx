@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import Flatpickr from "react-flatpickr";
@@ -37,32 +37,22 @@ const Filter = ({ onFilter, currentFilters, typeOptions = [] }: PaymentHistoryFi
 
   const perPage = paramsUrl?.perPage ?? "10";
 
-  // Mapping type values to translation keys
-  const typeTranslationMap: Record<number, string> = {
-    1: "Deposit",
-    2: "Order payment",
-    3: "Deduct money",
-  };
-
   const formattedTypeOptions = React.useMemo(() => {
     const allOption = { value: "", label: t("All") };
     if (Array.isArray(typeOptions)) {
-      const translatedOptions = typeOptions.map((option: any) => ({
+      const mappedOptions = typeOptions.map((option: any) => ({
         value: option.value,
-        label: typeTranslationMap[option.value] ? t(typeTranslationMap[option.value]) : option.label
+        label: option.label ? t(option.label) : String(option.value)
       }));
-      return [allOption, ...translatedOptions];
+      return [allOption, ...mappedOptions];
     }
-    const mappedOptions = Object.entries(typeOptions).map(([key, value]) => {
-      const typeValue = Number(key);
-      const translationKey = typeTranslationMap[typeValue];
-      return {
-        value: key,
-        label: translationKey ? t(translationKey) : String(value)
-      };
-    });
+    // typeOptions is an object with keys as type values and values as translation keys
+    const mappedOptions = Object.entries(typeOptions).map(([key, value]) => ({
+      value: key,
+      label: t(String(value))
+    }));
     return [allOption, ...mappedOptions];
-  }, [typeOptions, t, i18n.language]);
+  }, [typeOptions, t]);
 
   const getInitialFilters = (): PaymentHistoryFilters => {
     return {
@@ -76,37 +66,40 @@ const Filter = ({ onFilter, currentFilters, typeOptions = [] }: PaymentHistoryFi
 
   const [filters, setFilters] = useState<PaymentHistoryFilters>(getInitialFilters());
   
-  const [selectedType, setSelectedType] = useState<any>(() => {
+  // Store value separately to preserve it during language changes
+  const [typeValue, setTypeValue] = useState<string>(paramsUrl?.type || "");
+  
+  // Find current option based on value
+  const selectedType = useMemo(() => {
     if (formattedTypeOptions.length === 0) {
       return { value: "", label: t("All") };
     }
-    const typeValue = paramsUrl?.type ?? "";
-    return formattedTypeOptions.find(option => option.value === typeValue) || formattedTypeOptions[0];
-  });
+    if (typeValue && typeValue !== "") {
+      const found = formattedTypeOptions.find(
+        (option) => option.value.toString() === typeValue
+      );
+      if (found) return found;
+    }
+    return formattedTypeOptions[0];
+  }, [formattedTypeOptions, typeValue, t]);
   
   useEffect(() => {
     if (currentFilters) {
       setFilters(currentFilters);
+      // Sync typeValue with currentFilters.type
+      if (currentFilters.type !== typeValue) {
+        setTypeValue(currentFilters.type || "");
+      }
     }
   }, [currentFilters]);
 
+  // Sync typeValue with URL parameter (only when URL changes)
   useEffect(() => {
-    if (formattedTypeOptions.length === 0) return;
-
-    const urlType = paramsUrl?.type;
-    if (urlType !== null && urlType !== "") {
-      const matchingType = formattedTypeOptions.find(
-        (option) => option.value.toString() === urlType
-      );
-      if (matchingType) {
-        setSelectedType(matchingType);
-      } else {
-        setSelectedType(formattedTypeOptions[0]);
-      }
-    } else {
-      setSelectedType(formattedTypeOptions[0]);
+    const urlType = paramsUrl?.type || "";
+    if (urlType !== typeValue) {
+      setTypeValue(urlType);
     }
-  }, [formattedTypeOptions, paramsUrl?.type, i18n.language]);
+  }, [paramsUrl?.type]);
 
   const getFlatpickrLocale = () => {
     switch (i18n.language) {
@@ -135,7 +128,7 @@ const Filter = ({ onFilter, currentFilters, typeOptions = [] }: PaymentHistoryFi
   };
 
   const handleTypeChange = (selected: any) => {
-    setSelectedType(selected);
+    setTypeValue(selected.value);
     handleInputChange("type", selected.value);
   };
 
@@ -161,7 +154,7 @@ const Filter = ({ onFilter, currentFilters, typeOptions = [] }: PaymentHistoryFi
       type: ""
     };
     setFilters(resetFilters);
-    setSelectedType(formattedTypeOptions[0]);
+    setTypeValue("");
 
     if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
       flatpickrRef.current.flatpickr.clear();

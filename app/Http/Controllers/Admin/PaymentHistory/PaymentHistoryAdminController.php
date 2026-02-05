@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\PaymentHistory;
 
 use App\Http\Controllers\Controller;
+use App\Models\MySQL\PaymentTransactions;
 use App\Services\PaymentTransaction\PaymentTransactionAdminService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,6 +21,11 @@ class PaymentHistoryAdminController extends Controller
     {
         return Inertia::render('PaymentHistory/index', [
             'paymentHistory' => fn() => $this->paymentTransactionAdminService->getPaginateData($request->all()),
+            'statusConst' => fn() => [
+                PaymentTransactions::STATUS['PENDING'] => 'Pending',
+                PaymentTransactions::STATUS['COMPLETE'] => 'Completed',
+                PaymentTransactions::STATUS['REJECT'] => 'Rejected',
+            ],
         ]);
     }
 }

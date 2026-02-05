@@ -15,6 +15,7 @@ interface CategoryFilterProps {
     filters: CategoryFilters
   ) => void;
   additionalButtons?: React.ReactNode;
+  statusConst?: Record<string, string>;
 }
 
 interface CategoryFilters {
@@ -24,7 +25,7 @@ interface CategoryFilters {
   status: string;
 }
 
-const CategoryFilter = ({ onFilter, additionalButtons }: CategoryFilterProps) => {
+const CategoryFilter = ({ onFilter, additionalButtons, statusConst = {} }: CategoryFilterProps) => {
   const { t, i18n } = useTranslation();
 
   const flatpickrRef = useRef<any>(null);
@@ -46,32 +47,50 @@ const CategoryFilter = ({ onFilter, additionalButtons }: CategoryFilterProps) =>
 
   const [filters, setFilters] = useState<CategoryFilters>(getInitialFilters());
 
-  const statusOptions = useMemo(() => [
-    { value: "", label: t("All") },
-    { value: "ACTIVE", label: t("Active") },
-    { value: "INACTIVE", label: t("Inactive") },
-  ], [t, i18n.language]);
+  const statusOptions = useMemo(() => {
+    const options = [
+      { value: "", label: t("All") },
+    ];
+    
+    // Convert statusConst from backend to options format
+    Object.entries(statusConst).forEach(([key, label]) => {
+      options.push({
+        value: key,
+        label: t(label),
+      });
+    });
+    
+    return options;
+  }, [statusConst, t]);
 
-  const [selectedStatus, setSelectedStatus] = useState<any>(() => statusOptions[0] || { value: "", label: t("All") });
-
-  // Set initial status from URL parameter
-  useEffect(() => {
-    if (statusOptions.length === 0) return;
-
-    const urlStatus = paramsUrl?.status;
-    if (urlStatus !== null && urlStatus !== "") {
-      const matchingStatus = statusOptions.find(
-        (option) => option.value.toString() === urlStatus
-      );
-      if (matchingStatus) {
-        setSelectedStatus(matchingStatus);
-      } else {
-        setSelectedStatus(statusOptions[0]);
-      }
-    } else {
-      setSelectedStatus(statusOptions[0]);
+  // Store the current status value separately to preserve it during language changes
+  const [statusValue, setStatusValue] = useState<string>(paramsUrl?.status || "");
+  
+  // Find the current status option based on statusValue
+  const selectedStatus = useMemo(() => {
+    if (statusOptions.length === 0) {
+      return { value: "", label: t("All") };
     }
-  }, [statusOptions, paramsUrl?.status, i18n.language]);
+    
+    if (statusValue && statusValue !== "") {
+      const found = statusOptions.find(
+        (option) => option.value.toString() === statusValue
+      );
+      if (found) {
+        return found;
+      }
+    }
+    
+    return statusOptions[0];
+  }, [statusOptions, statusValue, t]);
+
+  // Sync statusValue with URL parameter (only when URL changes)
+  useEffect(() => {
+    const urlStatus = paramsUrl?.status || "";
+    if (urlStatus !== statusValue) {
+      setStatusValue(urlStatus);
+    }
+  }, [paramsUrl?.status]);
 
   const getFlatpickrLocale = () => {
     switch (i18n.language) {
@@ -100,7 +119,7 @@ const CategoryFilter = ({ onFilter, additionalButtons }: CategoryFilterProps) =>
   };
 
   const handleStatusChange = (selected: any) => {
-    setSelectedStatus(selected);
+    setStatusValue(selected.value);
     handleInputChange("status", selected.value);
   };
 
@@ -129,7 +148,7 @@ const CategoryFilter = ({ onFilter, additionalButtons }: CategoryFilterProps) =>
       status: "",
     };
     setFilters(resetFilters);
-    setSelectedStatus(statusOptions[0]);
+    setStatusValue("");
 
     if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
       flatpickrRef.current.flatpickr.clear();

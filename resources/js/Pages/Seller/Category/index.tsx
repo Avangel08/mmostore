@@ -13,7 +13,7 @@ import { showToast } from "../../../utils/showToast";
 
 const Category = () => {
   const { t } = useTranslation();
-  const { categories } = usePage().props;
+  const { categories, statusConst } = usePage().props as any;
   const [showModal, setShowModal] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
@@ -144,6 +144,7 @@ const Category = () => {
                   <div className="mb-4">
                     <CategoryFilter 
                       onFilter={handleFilter}
+                      statusConst={statusConst}
                       additionalButtons={
                         <>
                           <Button

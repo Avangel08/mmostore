@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import Flatpickr from "react-flatpickr";
@@ -15,6 +15,7 @@ interface StoreCategoryFilterProps {
     filters: StoreCategoryFilters
   ) => void;
   additionalButtons?: React.ReactNode;
+  statusConst?: Record<string, string>;
 }
 
 interface StoreCategoryFilters {
@@ -24,7 +25,7 @@ interface StoreCategoryFilters {
   status: string;
 }
 
-const StoreCategoryFilter = ({ onFilter, additionalButtons }: StoreCategoryFilterProps) => {
+const StoreCategoryFilter = ({ onFilter, additionalButtons, statusConst = {} }: StoreCategoryFilterProps) => {
   const { t, i18n } = useTranslation();
 
   const flatpickrRef = useRef<any>(null);
@@ -46,26 +47,50 @@ const StoreCategoryFilter = ({ onFilter, additionalButtons }: StoreCategoryFilte
 
   const [filters, setFilters] = useState<StoreCategoryFilters>(getInitialFilters());
 
-  const statusOptions = [
-    { value: "", label: t("All") },
-    { value: "ACTIVE", label: t("Active") },
-    { value: "INACTIVE", label: t("Inactive") },
-  ];
+  const statusOptions = useMemo(() => {
+    const options = [
+      { value: "", label: t("All") },
+    ];
+    
+    // Convert statusConst from backend to options format
+    Object.entries(statusConst).forEach(([key, label]) => {
+      options.push({
+        value: key,
+        label: t(label),
+      });
+    });
+    
+    return options;
+  }, [statusConst, t]);
 
-  const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
-
-  // Set initial status from URL parameter
-  useEffect(() => {
-    const urlStatus = paramsUrl?.status;
-    if (urlStatus !== null) {
-      const matchingStatus = statusOptions.find(
-        (option) => option.value.toString() === urlStatus
+  // Store the current status value separately to preserve it during language changes
+  const [statusValue, setStatusValue] = useState<string>(paramsUrl?.status || "");
+  
+  // Find the current status option based on statusValue
+  const selectedStatus = useMemo(() => {
+    if (statusOptions.length === 0) {
+      return { value: "", label: t("All") };
+    }
+    
+    if (statusValue && statusValue !== "") {
+      const found = statusOptions.find(
+        (option) => option.value.toString() === statusValue
       );
-      if (matchingStatus) {
-        setSelectedStatus(matchingStatus);
+      if (found) {
+        return found;
       }
     }
-  }, []);
+    
+    return statusOptions[0];
+  }, [statusOptions, statusValue, t]);
+
+  // Sync statusValue with URL parameter (only when URL status changes)
+  useEffect(() => {
+    const urlStatus = paramsUrl?.status || "";
+    if (urlStatus !== statusValue) {
+      setStatusValue(urlStatus);
+    }
+  }, [paramsUrl?.status]);
 
   const getFlatpickrLocale = () => {
     switch (i18n.language) {
@@ -94,7 +119,7 @@ const StoreCategoryFilter = ({ onFilter, additionalButtons }: StoreCategoryFilte
   };
 
   const handleStatusChange = (selected: any) => {
-    setSelectedStatus(selected);
+    setStatusValue(selected.value);
     handleInputChange("status", selected.value);
   };
 
@@ -123,7 +148,7 @@ const StoreCategoryFilter = ({ onFilter, additionalButtons }: StoreCategoryFilte
       status: "",
     };
     setFilters(resetFilters);
-    setSelectedStatus(statusOptions[0]);
+    setStatusValue("");
 
     if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
       flatpickrRef.current.flatpickr.clear();
@@ -245,3 +270,4 @@ const StoreCategoryFilter = ({ onFilter, additionalButtons }: StoreCategoryFilte
 };
 
 export default StoreCategoryFilter;
+

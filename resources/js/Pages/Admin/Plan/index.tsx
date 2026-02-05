@@ -13,7 +13,7 @@ import Layout from "../../../CustomAdminLayouts";
 
 const Plan = () => {
   const { t } = useTranslation();
-  const { plans } = usePage().props;
+  const { plans, statusConst, typeConst } = usePage().props as any;
 
   const [showModal, setShowModal] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
@@ -105,7 +105,7 @@ const Plan = () => {
             <Col xs={12}>
               <Card>
                 <Card.Body>
-                  <PlanFilter onFilter={handleFilter} />
+                  <PlanFilter onFilter={handleFilter} statusConst={statusConst} typeConst={typeConst} />
                   <Row style={{ marginBottom: "32px" }}>
                     <Col>
                       <div className="d-flex gap-2">

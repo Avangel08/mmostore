@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import Flatpickr from "react-flatpickr";
@@ -17,6 +17,7 @@ interface PaymentHistoryFilterProps {
     filters: PaymentHistoryFilters
   ) => void;
   additionalButtons?: React.ReactNode;
+  statusConst?: Record<string, string>;
 }
 
 interface PaymentHistoryFilters {
@@ -31,7 +32,7 @@ interface PaymentHistoryFilters {
   expirationDateEnd: string;
 }
 
-const PaymentHistoryFilter = ({ onFilter, additionalButtons }: PaymentHistoryFilterProps) => {
+const PaymentHistoryFilter = ({ onFilter, additionalButtons, statusConst = {} }: PaymentHistoryFilterProps) => {
   const { t, i18n } = useTranslation();
 
   const flatpickrRef = useRef<any>(null);
@@ -59,34 +60,60 @@ const PaymentHistoryFilter = ({ onFilter, additionalButtons }: PaymentHistoryFil
 
   const [filters, setFilters] = useState<PaymentHistoryFilters>(getInitialFilters());
 
-  const statusOptions = [
-    { value: "", label: t("All") },
-    { value: "0", label: t("Pending") },
-    { value: "1", label: t("Completed") },
-    { value: "2", label: t("Rejected") },
-  ];
+  const statusOptions = useMemo(() => {
+    const options = [
+      { value: "", label: t("All") },
+    ];
+    
+    // Convert statusConst from backend to options format
+    Object.entries(statusConst).forEach(([key, label]) => {
+      options.push({
+        value: key.toString(),
+        label: t(label),
+      });
+    });
+    
+    return options;
+  }, [statusConst, t]);
 
-  const planTypeOptions = [
+  const planTypeOptions = useMemo(() => [
     { value: "", label: t("All") },
     { value: "0", label: t("Default") },
     { value: "1", label: t("Normal") },
-  ];
+  ], [t]);
 
-  const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
+  // Store values separately to preserve them during language changes
+  const [statusValue, setStatusValue] = useState<string>(paramsUrl?.status || "");
+  const [planTypeValue, setPlanTypeValue] = useState<string>(paramsUrl?.planType || "");
   const [selectedUser, setSelectedUser] = useState({ value: "", label: t("All") });
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState({ value: "", label: t("All") });
-  const [selectedPlanType, setSelectedPlanType] = useState(planTypeOptions[0]);
 
-  useEffect(() => {
-    const urlStatus = paramsUrl?.status;
-    if (urlStatus !== null) {
-      const matchingStatus = statusOptions.find(
-        (option) => option.value.toString() === urlStatus
-      );
-      if (matchingStatus) {
-        setSelectedStatus(matchingStatus);
-      }
+  // Find current options based on values
+  const selectedStatus = useMemo(() => {
+    if (statusOptions.length === 0) return { value: "", label: t("All") };
+    if (statusValue && statusValue !== "") {
+      const found = statusOptions.find((option) => option.value.toString() === statusValue);
+      if (found) return found;
     }
+    return statusOptions[0];
+  }, [statusOptions, statusValue, t]);
+
+  const selectedPlanType = useMemo(() => {
+    if (planTypeOptions.length === 0) return { value: "", label: t("All") };
+    if (planTypeValue && planTypeValue !== "") {
+      const found = planTypeOptions.find((option) => option.value.toString() === planTypeValue);
+      if (found) return found;
+    }
+    return planTypeOptions[0];
+  }, [planTypeOptions, planTypeValue, t]);
+
+  // Sync values with URL parameters
+  useEffect(() => {
+    const urlStatus = paramsUrl?.status || "";
+    const urlPlanType = paramsUrl?.planType || "";
+    
+    if (urlStatus !== statusValue) setStatusValue(urlStatus);
+    if (urlPlanType !== planTypeValue) setPlanTypeValue(urlPlanType);
 
     const urlUser = paramsUrl?.userId;
     if (urlUser) {
@@ -125,17 +152,7 @@ const PaymentHistoryFilter = ({ onFilter, additionalButtons }: PaymentHistoryFil
           setSelectedPaymentMethod({ value: urlPaymentMethod, label: urlPaymentMethod });
         });
     }
-
-    const urlPlanType = paramsUrl?.planType;
-    if (urlPlanType !== null) {
-      const matchingPlanType = planTypeOptions.find(
-        (option) => option.value.toString() === urlPlanType
-      );
-      if (matchingPlanType) {
-        setSelectedPlanType(matchingPlanType);
-      }
-    }
-  }, []);
+  }, [paramsUrl?.status, paramsUrl?.planType, paramsUrl?.userId, paramsUrl?.paymentMethodId]);
 
   const getFlatpickrLocale = () => {
     switch (i18n.language) {
@@ -174,7 +191,7 @@ const PaymentHistoryFilter = ({ onFilter, additionalButtons }: PaymentHistoryFil
   };
 
   const handleStatusChange = (selected: any) => {
-    setSelectedStatus(selected);
+    setStatusValue(selected.value);
     handleInputChange("status", selected.value);
   };
 
@@ -189,7 +206,7 @@ const PaymentHistoryFilter = ({ onFilter, additionalButtons }: PaymentHistoryFil
   };
 
   const handlePlanTypeChange = (selected: any) => {
-    setSelectedPlanType(selected);
+    setPlanTypeValue(selected.value);
     handleInputChange("planType", selected.value);
   };
 
@@ -233,10 +250,10 @@ const PaymentHistoryFilter = ({ onFilter, additionalButtons }: PaymentHistoryFil
       expirationDateEnd: "",
     };
     setFilters(resetFilters);
-    setSelectedStatus(statusOptions[0]);
+    setStatusValue("");
+    setPlanTypeValue("");
     setSelectedUser({ value: "", label: t("All") });
     setSelectedPaymentMethod({ value: "", label: t("All") });
-    setSelectedPlanType(planTypeOptions[0]);
 
     if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
       flatpickrRef.current.flatpickr.clear();

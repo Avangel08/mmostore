@@ -10,7 +10,7 @@ import PaymentHistoryFilter from "./PaymentHistoryFilter";
 
 const PaymentHistory = () => {
   const { t } = useTranslation();
-  const { paymentHistory } = usePage().props;
+  const { paymentHistory, statusConst } = usePage().props as any;
 
   const fetchData = (
     currentPage: number = 1,
@@ -53,6 +53,7 @@ const PaymentHistory = () => {
                   <div className="mb-4">
                     <PaymentHistoryFilter 
                       onFilter={handleFilter}
+                      statusConst={statusConst}
                     />
                   </div>
                   <Row>

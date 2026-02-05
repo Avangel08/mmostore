@@ -13,7 +13,7 @@ import StoreCategoryFilter from "./StoreCategoryFilter";
 
 const StoreCategory = () => {
   const { t } = useTranslation();
-  const { storeCategories } = usePage().props;
+  const { storeCategories, statusConst } = usePage().props as any;
   const [showModal, setShowModal] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
@@ -144,6 +144,7 @@ const StoreCategory = () => {
                   <div className="mb-4">
                     <StoreCategoryFilter
                       onFilter={handleFilter}
+                      statusConst={statusConst}
                       additionalButtons={
                         <>
                           <Button

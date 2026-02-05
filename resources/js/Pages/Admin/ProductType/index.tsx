@@ -13,7 +13,7 @@ import { showToast } from "../../../utils/showToast";
 
 const ProductType = () => {
   const { t } = useTranslation();
-  const { productTypes } = usePage().props;
+  const { productTypes, statusConst } = usePage().props as any;
   const [showModal, setShowModal] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
@@ -144,6 +144,7 @@ const ProductType = () => {
                   <div className="mb-4">
                     <ProductTypeFilter 
                       onFilter={handleFilter}
+                      statusConst={statusConst}
                       additionalButtons={
                         <>
                           <Button

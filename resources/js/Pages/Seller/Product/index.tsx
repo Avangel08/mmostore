@@ -13,7 +13,7 @@ import { showToast } from "../../../utils/showToast";
 
 const Product = () => {
   const { t } = useTranslation();
-  const { products } = usePage().props;
+  const { products, statusConst } = usePage().props as any;
   const [showStockModal, setShowStockModal] = useState(false);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<
@@ -143,6 +143,7 @@ const Product = () => {
                   <div className="mb-4">
                     <ProductFilter 
                       onFilter={handleFilter}
+                      statusConst={statusConst}
                       additionalButtons={
                         <>
                           <Button variant="success" onClick={openAddPage}>

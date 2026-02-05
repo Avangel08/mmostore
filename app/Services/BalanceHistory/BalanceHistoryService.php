@@ -26,9 +26,9 @@ class BalanceHistoryService
     public function getTypeOptions()
     {
         return [ 
-            BalanceHistories::TYPE['deposit'] => __('Deposit'),
-            BalanceHistories::TYPE['purchase'] => __('Order payment'),
-            BalanceHistories::TYPE['deduct_money'] => __('Deduct money'),
+            BalanceHistories::TYPE['deposit'] => 'Deposit',
+            BalanceHistories::TYPE['purchase'] => 'Order payment',
+            BalanceHistories::TYPE['deduct_money'] => 'Deduct money',
         ];
     }
 

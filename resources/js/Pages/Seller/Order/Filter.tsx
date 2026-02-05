@@ -32,6 +32,8 @@ interface FilterProps {
         name: string;
         email: string;
     }>;
+    statusConst?: Record<string, string>;
+    paymentStatusConst?: Record<string, string>;
 }
 
 interface Filters {
@@ -45,7 +47,7 @@ interface Filters {
     customer_id: string;
 }
 
-const Filter = ({onFilter, categories = [], products = [], customers = []}: FilterProps) => {
+const Filter = ({onFilter, categories = [], products = [], customers = [], statusConst = {}, paymentStatusConst = {}}: FilterProps) => {
     const {t, i18n} = useTranslation();
     const flatpickrRef = useRef<any>(null);
     const [isFilterVisible, setIsFilterVisible] = useState(false);
@@ -238,11 +240,9 @@ const Filter = ({onFilter, categories = [], products = [], customers = []}: Filt
                                 onChange={(e) => handleInputChange("status", e.target.value)}
                             >
                                 <option value="">{t("All Status")}</option>
-                                <option value="PENDING">{t("Pending")}</option>
-                                <option value="PROCESSING">{t("Processing")}</option>
-                                <option value="COMPLETED">{t("Completed")}</option>
-                                <option value="CANCELLED">{t("Cancelled")}</option>
-                                <option value="FAILED">{t("Failed")}</option>
+                                {Object.entries(statusConst).map(([key, label]) => (
+                                    <option key={key} value={key}>{t(label)}</option>
+                                ))}
                             </Form.Select>
                         </Col>
 
@@ -254,10 +254,9 @@ const Filter = ({onFilter, categories = [], products = [], customers = []}: Filt
                                 onChange={(e) => handleInputChange("payment_status", e.target.value)}
                             >
                                 <option value="">{t("All Status")}</option>
-                                <option value="PENDING">{t("Pending")}</option>
-                                <option value="PAID">{t("Paid")}</option>
-                                <option value="FAILED">{t("Failed")}</option>
-                                <option value="REFUNDED">{t("Refunded")}</option>
+                                {Object.entries(paymentStatusConst).map(([key, label]) => (
+                                    <option key={key} value={key}>{t(label)}</option>
+                                ))}
                             </Form.Select>
                         </Col>
 

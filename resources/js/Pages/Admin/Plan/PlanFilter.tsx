@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Row, Col, Form, Button, InputGroup, FormControlProps } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import Flatpickr from "react-flatpickr";
@@ -15,6 +15,8 @@ interface PlanFilterProps {
     perPage: number,
     filters: PlanFilters
   ) => void;
+  statusConst?: Record<string, string>;
+  typeConst?: Record<string, string>;
 }
 
 interface PlanFilters {
@@ -28,7 +30,7 @@ interface PlanFilters {
   showPublic: string;
 }
 
-const PlanFilter = ({ onFilter }: PlanFilterProps) => {
+const PlanFilter = ({ onFilter, statusConst = {}, typeConst = {} }: PlanFilterProps) => {
   const { t, i18n } = useTranslation();
 
   const flatpickrRef = useRef<any>(null);
@@ -54,60 +56,87 @@ const PlanFilter = ({ onFilter }: PlanFilterProps) => {
 
   const [filters, setFilters] = useState<PlanFilters>(getInitialFilters());
 
-  const typeOptions = [
-    { value: "", label: t("All") },
-    { value: 0, label: t("Default") },
-    { value: 1, label: t("Normal") },
-  ];
+  const typeOptions = useMemo(() => {
+    const options = [
+      { value: "", label: t("All") },
+    ];
+    
+    // Convert typeConst from backend to options format
+    Object.entries(typeConst).forEach(([key, label]) => {
+      options.push({
+        value: key,
+        label: t(label),
+      });
+    });
+    
+    return options;
+  }, [typeConst, t]);
 
-  const statusOptions = [
-    { value: "", label: t("All") },
-    { value: 1, label: t("Active") },
-    { value: 0, label: t("Inactive") },
-  ];
+  const statusOptions = useMemo(() => {
+    const options = [
+      { value: "", label: t("All") },
+    ];
+    
+    // Convert statusConst from backend to options format
+    Object.entries(statusConst).forEach(([key, label]) => {
+      options.push({
+        value: key,
+        label: t(label),
+      });
+    });
+    
+    return options;
+  }, [statusConst, t]);
 
-  const showPublicOptions = [
+  const showPublicOptions = useMemo(() => [
     { value: "", label: t("All") },
     { value: 1, label: t("Yes") },
     { value: 0, label: t("No") },
-  ];
+  ], [t]);
 
-  const [selectedType, setSelectedType] = useState(typeOptions[0]);
-  const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
-  const [selectedShowPublic, setSelectedShowPublic] = useState(showPublicOptions[0]);
+  // Store values separately to preserve them during language changes
+  const [typeValue, setTypeValue] = useState<string>(paramsUrl?.type || "");
+  const [statusValue, setStatusValue] = useState<string>(paramsUrl?.status || "");
+  const [showPublicValue, setShowPublicValue] = useState<string>(paramsUrl?.showPublic || "");
+  
+  // Find current options based on values
+  const selectedType = useMemo(() => {
+    if (typeOptions.length === 0) return { value: "", label: t("All") };
+    if (typeValue && typeValue !== "") {
+      const found = typeOptions.find((option) => option.value.toString() === typeValue);
+      if (found) return found;
+    }
+    return typeOptions[0];
+  }, [typeOptions, typeValue, t]);
 
-  // Set initial values from URL parameters
+  const selectedStatus = useMemo(() => {
+    if (statusOptions.length === 0) return { value: "", label: t("All") };
+    if (statusValue && statusValue !== "") {
+      const found = statusOptions.find((option) => option.value.toString() === statusValue);
+      if (found) return found;
+    }
+    return statusOptions[0];
+  }, [statusOptions, statusValue, t]);
+
+  const selectedShowPublic = useMemo(() => {
+    if (showPublicOptions.length === 0) return { value: "", label: t("All") };
+    if (showPublicValue && showPublicValue !== "") {
+      const found = showPublicOptions.find((option) => option.value.toString() === showPublicValue);
+      if (found) return found;
+    }
+    return showPublicOptions[0];
+  }, [showPublicOptions, showPublicValue, t]);
+
+  // Sync values with URL parameters
   useEffect(() => {
-    const urlType = paramsUrl?.type;
-    if (urlType !== null) {
-      const matchingType = typeOptions.find(
-        (option) => option.value.toString() === urlType
-      );
-      if (matchingType) {
-        setSelectedType(matchingType);
-      }
-    }
-
-    const urlStatus = paramsUrl?.status;
-    if (urlStatus !== null) {
-      const matchingStatus = statusOptions.find(
-        (option) => option.value.toString() === urlStatus
-      );
-      if (matchingStatus) {
-        setSelectedStatus(matchingStatus);
-      }
-    }
-
-    const urlShowPublic = paramsUrl?.showPublic;
-    if (urlShowPublic !== null) {
-      const matchingShowPublic = showPublicOptions.find(
-        (option) => option.value.toString() === urlShowPublic
-      );
-      if (matchingShowPublic) {
-        setSelectedShowPublic(matchingShowPublic);
-      }
-    }
-  }, []);
+    const urlType = paramsUrl?.type || "";
+    const urlStatus = paramsUrl?.status || "";
+    const urlShowPublic = paramsUrl?.showPublic || "";
+    
+    if (urlType !== typeValue) setTypeValue(urlType);
+    if (urlStatus !== statusValue) setStatusValue(urlStatus);
+    if (urlShowPublic !== showPublicValue) setShowPublicValue(urlShowPublic);
+  }, [paramsUrl?.type, paramsUrl?.status, paramsUrl?.showPublic]);
 
 
 
@@ -138,17 +167,17 @@ const PlanFilter = ({ onFilter }: PlanFilterProps) => {
   };
 
   const handleTypeChange = (selected: any) => {
-    setSelectedType(selected);
+    setTypeValue(selected.value);
     handleInputChange("type", selected.value);
   };
 
   const handleStatusChange = (selected: any) => {
-    setSelectedStatus(selected);
+    setStatusValue(selected.value);
     handleInputChange("status", selected.value);
   };
 
   const handleShowPublicChange = (selected: any) => {
-    setSelectedShowPublic(selected);
+    setShowPublicValue(selected.value);
     handleInputChange("showPublic", selected.value);
   };
 
@@ -211,9 +240,9 @@ const PlanFilter = ({ onFilter }: PlanFilterProps) => {
       showPublic: "",
     };
     setFilters(resetFilters);
-    setSelectedType(typeOptions[0]);
-    setSelectedStatus(statusOptions[0]);
-    setSelectedShowPublic(showPublicOptions[0]);
+    setTypeValue("");
+    setStatusValue("");
+    setShowPublicValue("");
 
     if (flatpickrRef.current && flatpickrRef.current.flatpickr) {
       flatpickrRef.current.flatpickr.clear();
